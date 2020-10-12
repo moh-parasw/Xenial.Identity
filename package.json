@@ -1,0 +1,23 @@
+{
+  "name": "Xenial.Identity",
+  "version": "1.0.0",
+  "description": "",
+  "main": "commitlint.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xenial-io/Xenial.Identity.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xenial-io/Xenial.Identity/issues"
+  },
+  "homepage": "https://github.com/xenial-io/Xenial.Identity#readme",
+  "dependencies": {
+    "@xenial-io/xenial-template": "0.0.7"
+  }
+}
