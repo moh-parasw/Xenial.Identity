@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using Westwind.AspNetCore.LiveReload;
+
 namespace Xenial.Identity
 {
     public class Startup
@@ -25,7 +27,17 @@ namespace Xenial.Identity
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            if (Environment.IsDevelopment())
+            {
+                services.AddLiveReload();
+            }
+
+            var mvcBuilder = services.AddControllersWithViews();
+
+            if (Environment.IsDevelopment())
+            {
+                mvcBuilder.AddRazorRuntimeCompilation();
+            }
 
             var builder = services.AddIdentityServer(options =>
             {
@@ -64,6 +76,7 @@ namespace Xenial.Identity
         {
             if (Environment.IsDevelopment())
             {
+                app.UseLiveReload();
                 app.UseDeveloperExceptionPage();
             }
 

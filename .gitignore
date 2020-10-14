@@ -10,6 +10,8 @@
 *.userosscache
 *.sln.docstates
 
+.tye/process_store
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

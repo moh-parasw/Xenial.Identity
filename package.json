@@ -40,6 +40,6 @@
     "zlib": "^1.0.5"
   },
   "dependencies": {
-    "@xenial-io/xenial-template": "0.0.7"
+    "@xenial-io/xenial-template": "0.0.8"
   }
 }
