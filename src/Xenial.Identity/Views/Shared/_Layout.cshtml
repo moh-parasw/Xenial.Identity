@@ -22,7 +22,12 @@
         <partial name="_Nav" />
     
         <main>
-            @RenderBody()
+            <div class="article-wrapper">
+                <aside></aside>
+                <article>
+                    @RenderBody()
+                </article>
+            </div>
         </main>
         <partial name="_Footer" />
     </div>

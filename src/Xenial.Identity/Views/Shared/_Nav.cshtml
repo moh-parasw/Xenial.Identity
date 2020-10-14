@@ -60,46 +60,42 @@
     <nav class="xenial-header__nav">
         <ul class="xenial-header__navlist">
         <li>
-            <label for="xenial-toggle-theme">
-            <i class="fas fa-sun"></i>
-            Theme
-            </label>
-        </li>
-        <li>
-            <a href="#">
+            <a href="/">
             <i class="fas fa-home"></i>
             Home
             </a>
         </li>
         <li>
             <a href="#">
-            <i class="fas fa-info-circle"></i>
-            About
+            <i class="fas fa-user"></i>
+                @if (!string.IsNullOrWhiteSpace(name))
+                {
+                    <span>@name</span>
+                }
+                else
+                {
+                    <span>Profile</span>
+                }
             </a>
         </li>
+        @if(!string.IsNullOrEmpty(name))
+        {
+            <li>
+                <a class="dropdown-item" asp-action="Logout" asp-controller="Account">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </li>
+        }
         <li>
-            <a href="#">
-            <i class="fas fa-briefcase"></i>
-            Projects
-            </a>
-        </li>
-        <li>
-            <a href="#">
-            <i class="fas fa-book"></i>
-            Series
-            </a>
-        </li>
-        <li>
-            <a href="#">
-            <i class="fas fa-archive"></i>
-            Archive
-            </a>
-        </li>
-        <li>
-            <a href="#">
-            <i class="fas fa-tag"></i>
-            Tags
-            </a>
+            <label
+                for="xenial-toggle-theme"
+                title="Turn the lights on/off"
+                aria-label="Theme"
+            >
+                <i class="xenial-theme-indicator"></i>
+                <span class="xenial-theme-text" aria-hidden="true">Theme</span>
+            </label>
         </li>
         </ul>
     </nav>
