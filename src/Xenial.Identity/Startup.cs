@@ -2,13 +2,23 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Threading.Tasks;
+
 using IdentityServer4;
 using IdentityServerHost.Quickstart.UI;
+
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
+using Newtonsoft.Json.Linq;
 
 using Westwind.AspNetCore.LiveReload;
 
@@ -60,15 +70,80 @@ namespace Xenial.Identity
             builder.AddDeveloperSigningCredential();
 
             services.AddAuthentication()
-                .AddGoogle(options =>
+                .AddOAuth("github", "Github", options =>
                 {
                     options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                    options.ClientId = Configuration["GitHub:ClientId"];
+                    options.ClientSecret = Configuration["GitHub:ClientSecret"];
+                    options.CallbackPath = new PathString("/signin-github");
+                    options.AuthorizationEndpoint = "https://github.com/login/oauth/authorize";
+                    options.TokenEndpoint = "https://github.com/login/oauth/access_token";
+                    options.UserInformationEndpoint = "https://api.github.com/user";
+                    options.ClaimsIssuer = "OAuth2-Github";
+                    options.SaveTokens = true;
 
-                    // register your IdentityServer with Google at https://console.developers.google.com
-                    // enable the Google+ API
-                    // set the redirect URI to https://localhost:5001/signin-google
-                    options.ClientId = "copy client ID from Google here";
-                    options.ClientSecret = "copy client secret from Google here";
+                    options.Events = new OAuthEvents
+                    {
+                        OnCreatingTicket = async context => { await CreatingGitHubAuthTicket(context); }
+                    };
+
+                    static async Task CreatingGitHubAuthTicket(OAuthCreatingTicketContext context)
+                    {
+                        // Get the GitHub user
+                        var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
+                        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                        var response = await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted);
+                        response.EnsureSuccessStatusCode();
+
+                        var user = JObject.Parse(await response.Content.ReadAsStringAsync());
+
+                        AddClaims(context, user);
+                    }
+
+                    static void AddClaims(OAuthCreatingTicketContext context, JObject user)
+                    {
+                        var identifier = user.Value<string>("id");
+                        if (!string.IsNullOrEmpty(identifier))
+                        {
+                            context.Identity.AddClaim(new Claim(
+                                ClaimTypes.NameIdentifier, identifier,
+                                ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                        }
+
+                        var userName = user.Value<string>("login");
+                        if (!string.IsNullOrEmpty(userName))
+                        {
+                            context.Identity.AddClaim(new Claim(
+                                ClaimsIdentity.DefaultNameClaimType, userName,
+                                ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                        }
+
+                        var name = user.Value<string>("name");
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            context.Identity.AddClaim(new Claim(
+                                "urn:github:name", name,
+                                ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                        }
+
+                        var link = user.Value<string>("url");
+                        if (!string.IsNullOrEmpty(link))
+                        {
+                            context.Identity.AddClaim(new Claim(
+                                "urn:github:url", link,
+                                ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                        }
+
+                        var avatarUrl = user.Value<string>("avatar_url");
+                        if (!string.IsNullOrEmpty(avatarUrl))
+                        {
+                            context.Identity.AddClaim(new Claim(
+                                "urn:github:avatar_url", avatarUrl,
+                                ClaimValueTypes.String, context.Options.ClaimsIssuer));
+                        }
+                    }
                 });
         }
 
