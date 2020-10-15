@@ -73,10 +73,57 @@
         }
 
         input[type="checkbox"] {
-            flex: 0;
-            display: flex;
-            margin-top: auto;
-            margin-bottom: auto;
+          flex: 0;
+          display: flex;
+          margin-top: auto;
+          margin-bottom: auto;
+        }
+
+        input[type="checkbox"].toggle {
+          flex: unset;
+          width: 4rem;
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+          -webkit-tap-highlight-color: transparent;
+          display: inline-block;
+          position: relative;
+          margin: 0;
+          border-radius: 2rem;
+
+          &:focus {
+            outline: 0;
+          }
+
+          height: 32px;
+          border-radius: 16px;
+          display: inline-block;
+          position: relative;
+          margin: 0;
+          border: 2px solid var(--xenial-dark-color);
+          background: var(--xenial-darker-color);
+          transition: transform 200ms ease, background-color 200ms ease;
+          cursor: pointer;
+
+          &:after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--xenial-dark-color);
+            transition: transform 200ms cubic-bezier(0.5, 0.1, 0.75, 1.35),
+              background-color 200ms cubic-bezier(0.5, 0.1, 0.75, 1.35);
+          }
+          &:checked {
+            border-color: var(--xenial-highlight-color);
+            &:after {
+              background: var(--xenial-highlight-color);
+              transform: translatex(2rem);
+            }
+          }
         }
 
         .validation-message {

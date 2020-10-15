@@ -32,10 +32,8 @@
                             @if (Model.AllowRememberLogin)
                             {
                                 <li class="xenial-form__list-item">
-                                    <label class="form-check-label" asp-for="RememberLogin">
-                                        Remember My Login
-                                    </label>
-                                    <input class="form-check-input" asp-for="RememberLogin">
+                                    <label asp-for="RememberLogin"></label>
+                                    <input class="toggle" asp-for="RememberLogin">
                                 </li>
                             }
                             <li class="xenial-form__list-item">
