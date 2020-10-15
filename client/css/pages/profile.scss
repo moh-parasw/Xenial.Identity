@@ -1,0 +1,15 @@
+.xenial-body {
+  .profile-page {
+    a,
+    a:link,
+    a:visited,
+    a:hover {
+      text-decoration: none;
+    }
+    a {
+      &:hover {
+        color: var(--xenial-tag-color);
+      }
+    }
+  }
+}

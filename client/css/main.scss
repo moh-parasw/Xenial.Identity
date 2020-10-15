@@ -5,5 +5,9 @@
 @import "common";
 @import "forms";
 
+//Components
+@import "components/profile-card";
+
 //Specific
-@import "login";
+@import "pages/login";
+@import "pages/profile";

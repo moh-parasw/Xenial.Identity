@@ -1,0 +1,87 @@
+@mixin dont-break {
+  /* These are technically the same, but use both */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-word-break: break-all;
+  /* This is the dangerous one in WebKit, as it breaks things wherever */
+  word-break: break-all;
+  /* Instead use this non-standard one: */
+  word-break: break-word;
+
+  /* Adds a hyphen where the word breaks, if supported (No Blink) */
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.profile-card {
+  background-color: red;
+  display: flex;
+  flex-direction: row;
+  // max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &__image {
+    font-size: 1rem;
+    display: inline-flex;
+    margin: 0.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: black;
+
+    a {
+      display: flex;
+      line-height: 1;
+      margin: auto;
+      padding: 0;
+      align-content: center;
+    }
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+
+    &-name {
+      font-size: 2rem;
+      font-weight: bold;
+      flex: 1;
+      min-width: 0;
+
+      > * {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        @include dont-break;
+      }
+    }
+
+    &-email {
+      > a {
+        display: inline;
+        word-wrap: none;
+        text-decoration: none;
+        i {
+          display: inline;
+          text-decoration: none;
+          padding-right: 0.2rem;
+        }
+        span {
+          display: inline;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          text-decoration: underline;
+          @include dont-break;
+        }
+      }
+    }
+  }
+}
