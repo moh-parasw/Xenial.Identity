@@ -99,7 +99,7 @@ $content-selector: "~ .content > section";
           &:focus,
           &:active {
             outline: 0;
-            color: var(--xenial-highlight-color);
+            color: var(--xenial-tag-color);
           }
         }
       }
@@ -115,7 +115,7 @@ $content-selector: "~ .content > section";
         max-width: 100%;
         margin: 0 auto;
         height: $indicator-height;
-        background: var(--xenial-highlight-color);
+        background: var(--xenial-tag-color);
         border-radius: 1px;
       }
     }
@@ -153,7 +153,7 @@ $content-selector: "~ .content > section";
       @include tabs {
         > label {
           cursor: default;
-          color: var(--xenial-highlight-color);
+          color: var(--xenial-tag-color);
 
           @media (max-width: map-get($breakpoints, small)) {
             background: rgba(0, 0, 0, 0.08);

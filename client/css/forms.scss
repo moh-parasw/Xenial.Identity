@@ -141,16 +141,17 @@
 
         button {
           margin: {
-            left: 1rem;
+            left: 0;
+            bottom: 0.5rem;
           }
           padding: 8px 16px;
           border: none;
           border-radius: 3px;
           text-transform: uppercase;
-          letter-spacing: 0.09em;
           font-weight: bold;
           background-color: var(--xenial-lighter-color);
           color: var(--xenial-darker-color);
+          cursor: pointer;
 
           &.xenial-form__list-item-submit {
             background-color: var(--xenial-highlight-color);

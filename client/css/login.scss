@@ -8,6 +8,50 @@
     .login-form {
       max-width: 370px;
       @include xenial-form(1000rem);
+
+      &__providers {
+        margin: 0;
+        padding: 0;
+        &-item {
+          margin: 0;
+          &::before {
+            content: none;
+          }
+
+          &-button,
+          &-button:link,
+          &-button:hover,
+          &-button:visited {
+            text-decoration: none;
+            cursor: pointer;
+            background-color: var(--xenial-lighter-color);
+            color: var(--xenial-darker-color);
+            border-radius: 2px;
+            display: block;
+            margin-left: 0;
+            margin-bottom: 0.5rem;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 3px;
+            background-color: var(--xenial-lighter-color);
+            color: var(--xenial-darker-color);
+            cursor: pointer;
+            text-align: center;
+            margin: {
+              left: 2rem;
+              right: 2rem;
+            }
+          }
+        }
+      }
+      &-or {
+        display: block;
+        text-align: center;
+        margin: {
+          top: 0.5rem;
+          bottom: 0.5rem;
+        }
+      }
     }
   }
 }
