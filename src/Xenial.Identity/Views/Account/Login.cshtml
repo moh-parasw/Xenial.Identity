@@ -1,23 +1,51 @@
-﻿@model LoginViewModel
+﻿@{
+    Layout = "_LayoutWithoutSide";
+}
+
+@model LoginViewModel
 
 <div class="login-page">
-    <div class="lead">
-        <h1>Login</h1>
-        <p>Choose how to login</p>
-    </div>
+    <div class="tabs">
 
-    <partial name="_ValidationSummary" />
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <input type="radio" id="tab2" name="tab-control">
+        <ul class="tabs__list">
+            <li class="tabs__list-item" title="Features">
+                <label class="tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-sign-in-alt"></i> <span>Login</span>
+                </label>
+            </li>
+            <li class="tabs__list-item" title="Delivery Contents">
+                <label class="tabs__list-item-label" for="tab2" role="button">
+                    <i class="fas fa-user-plus"></i> <span>Signup</span>
+                </label>
+            </li>
+        </ul>
 
-    <div class="row">
-
-        @if (Model.EnableLocalLogin)
-        {
-            <div class="col-sm-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Local Account</h2>
-                    </div>
-
+        <div class="slider"><div class="indicator"></div></div>
+        <div class="content">
+            <section class="login-form">
+                <h2>Login</h2>
+                @if (Model.VisibleExternalProviders.Any())
+                {
+                    <ul>
+                        @foreach (var provider in Model.VisibleExternalProviders)
+                        {
+                            <li class="list-inline-item">
+                                <a class="btn btn-secondary"
+                                   asp-controller="External"
+                                   asp-action="Challenge"
+                                   asp-route-scheme="@provider.AuthenticationScheme"
+                                   asp-route-returnUrl="@Model.ReturnUrl">
+                                    @provider.DisplayName
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                    <span class="or">or</span>
+                }
+                @if (Model.EnableLocalLogin)
+                {
                     <form asp-route="Login" class="xenial-form">
                         <ul class="xenial-form__list">
                             <li class="xenial-form__list-item">
@@ -42,43 +70,15 @@
                             </li>
                         </ul>
                     </form>
-                </div>
-            </div>
-        }
 
-        @if (Model.VisibleExternalProviders.Any())
-        {
-            <div class="col-sm-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h2>External Account</h2>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-inline">
-                            @foreach (var provider in Model.VisibleExternalProviders)
-                            {
-                                <li class="list-inline-item">
-                                    <a class="btn btn-secondary"
-                                       asp-controller="External"
-                                       asp-action="Challenge"
-                                       asp-route-scheme="@provider.AuthenticationScheme"
-                                       asp-route-returnUrl="@Model.ReturnUrl">
-                                        @provider.DisplayName
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        }
-
-        @if (!Model.EnableLocalLogin && !Model.VisibleExternalProviders.Any())
-        {
-            <div class="alert alert-warning">
-                <strong>Invalid login request</strong>
-                There are no login schemes configured for this request.
-            </div>
-        }
+                    <partial name="_ValidationSummary" />
+                }
+            </section>
+            <section>
+                <h2>Delivery Contents</h2>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Autem quas adipisci a accusantium eius ut voluptatibus ad impedit nulla, ipsa qui. Quasi temporibus eos commodi aliquid impedit amet, similique nulla.
+            </section>
+        </div>
     </div>
+
 </div>

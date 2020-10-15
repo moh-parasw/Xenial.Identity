@@ -1,4 +1,4 @@
-.xenial-body {
+@mixin xenial-form($breakpoint: 768px) {
   .xenial-form {
     height: auto;
     display: flex;
@@ -152,10 +152,6 @@
           background-color: var(--xenial-lighter-color);
           color: var(--xenial-darker-color);
 
-          &:first-of-type {
-            margin-left: auto;
-          }
-
           &.xenial-form__list-item-submit {
             background-color: var(--xenial-highlight-color);
             color: var(--xenial-darker-color);
@@ -166,7 +162,7 @@
           }
         }
 
-        @media (min-width: 768px) {
+        @media (min-width: $breakpoint) {
           flex-direction: row;
           label + * {
             flex: 1 0 220px;
@@ -175,12 +171,16 @@
             flex: 1 0 120px;
             padding: 8px;
           }
-        }
 
-        &.buttons {
-          flex-direction: row;
+          &.buttons {
+            flex-direction: row;
+          }
         }
       }
     }
   }
+}
+
+.xenial-body {
+  // @include xenial-form();
 }

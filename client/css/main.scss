@@ -1,4 +1,9 @@
 @import "@xenial-io/xenial-template/src/css/main.scss";
 
+//Generic
+@import "tabs";
 @import "common";
 @import "forms";
+
+//Specific
+@import "login";

@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <base href="/" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=5"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Xenial</title>
+    
+    <link rel="icon" type="image/x-icon" href="~/img/favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="~/img/favicon.ico" />
+    
+    <link rel="stylesheet" href="~/css/bundle.css" />
+</head>
+<body>
+    <input class="xenial__toggletheme-checkbox" id="xenial-toggle-theme" type="checkbox" aria-hidden="true">
+    <div class="xenial-body">
+        <partial name="_Nav" />
+    
+        <main>
+            <article>
+                @RenderBody()
+            </article>
+        </main>
+        <partial name="_Footer" />
+    </div>
+    <script src="~/js/index.min.js"></script>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>
