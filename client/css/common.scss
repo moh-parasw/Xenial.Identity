@@ -1,0 +1,28 @@
+.xenial-body {
+  button {
+    margin: {
+      left: 1rem;
+    }
+    padding: 8px 16px;
+    border: none;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    font-weight: bold;
+    background-color: var(--xenial-lighter-color);
+    color: var(--xenial-darker-color);
+
+    &:first-of-type {
+      margin-left: auto;
+    }
+
+    &.xenial-form__list-item-submit {
+      background-color: var(--xenial-highlight-color);
+      color: var(--xenial-darker-color);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+}
