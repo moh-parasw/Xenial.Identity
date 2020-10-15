@@ -66,7 +66,7 @@
             </a>
         </li>
         <li>
-            <a href="#">
+            <a href="/profile">
             <i class="fas fa-user"></i>
                 @if (!string.IsNullOrWhiteSpace(name))
                 {
@@ -113,13 +113,13 @@
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">@name <b class="caret"></b></a>
-                    
+
                     <div class="dropdown-menu">
                         <a class="dropdown-item" asp-action="Logout" asp-controller="Account">Logout</a>
                     </div>
               </li>
             </ul>
         }
-    
+
     </nav>
 </div> *@

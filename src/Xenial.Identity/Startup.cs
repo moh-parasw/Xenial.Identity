@@ -49,6 +49,13 @@ namespace Xenial.Identity
                 mvcBuilder.AddRazorRuntimeCompilation();
             }
 
+            var razorPagesBuilder = services.AddRazorPages();
+
+            if (Environment.IsDevelopment())
+            {
+                razorPagesBuilder.AddRazorRuntimeCompilation();
+            }
+
             var builder = services.AddIdentityServer(options =>
             {
                 options.Events.RaiseErrorEvents = true;
@@ -162,6 +169,7 @@ namespace Xenial.Identity
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapRazorPages();
                 endpoints.MapDefaultControllerRoute();
             });
         }
