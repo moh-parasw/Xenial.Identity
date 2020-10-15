@@ -20,19 +20,27 @@
 }
 
 .profile-card {
-  background-color: red;
+  --height: 3rem;
+  --small-size: 0.8rem;
+
+  @media (min-width: 281px) {
+    --height: 4rem;
+    --small-size: 1rem;
+  }
+
+  // background-color: red;
   display: flex;
   flex-direction: row;
-  // max-width: 400px;
+  max-width: 400px;
   overflow: hidden;
   text-overflow: ellipsis;
 
   &__image {
-    font-size: 1rem;
+    font-size: calc(var(--height) / 2);
     display: inline-flex;
     margin: 0.5rem;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: var(--height);
+    height: var(--height);
     border-radius: 50%;
     background-color: black;
 
@@ -52,10 +60,12 @@
     min-width: 0;
 
     &-name {
-      font-size: 2rem;
+      font-size: calc(calc(var(--height) / 2) - 0.5rem);
       font-weight: bold;
       flex: 1;
       min-width: 0;
+      line-height: 1;
+      padding-top: 0.5rem;
 
       > * {
         white-space: nowrap;
@@ -65,10 +75,15 @@
     }
 
     &-email {
+      line-height: 1;
+      padding-bottom: 1rem;
+
       > a {
         display: inline;
         word-wrap: none;
         text-decoration: none;
+        font-size: var(--small-size);
+
         i {
           display: inline;
           text-decoration: none;
