@@ -11,5 +11,74 @@
         color: var(--xenial-tag-color);
       }
     }
+
+    &__cards {
+      display: flex;
+      flex-direction: column;
+
+      &__change {
+        --height: 2rem;
+        --small-size: 0.8rem;
+
+        --space-left: calc(calc(var(--profile-card-height) / 4) - 0.25rem);
+        --space--right: calc(
+          calc(var(--profile-card-small-size) / 4) + 0.75rem
+        );
+
+        display: flex;
+        flex-direction: row;
+        max-width: 400px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-left: var(--space-left);
+
+        @media (min-width: 281px) {
+          --space--right: calc(
+            calc(var(--profile-card-small-size) / 4) + 1.25rem
+          );
+        }
+
+        &-image {
+          font-size: calc(var(--height) / 2);
+          display: inline-flex;
+          margin: {
+            left: 0.5rem;
+            right: var(--space--right);
+            top: 0.5rem;
+          }
+          width: var(--height);
+          height: var(--height);
+          border-radius: 50%;
+          background-color: var(--xenial-dark-color);
+
+          > * {
+            display: flex;
+            line-height: 1;
+            margin: auto;
+            padding: 0;
+            align-content: center;
+          }
+        }
+
+        &-details {
+          display: flex;
+          flex-direction: column;
+
+          &-header {
+            font-weight: bold;
+          }
+          &-section {
+            font-size: 0.8rem;
+          }
+        }
+      }
+
+      @media (min-width: 768px) {
+        flex-direction: row;
+        &__change {
+          margin-left: auto;
+        }
+      }
+    }
   }
 }

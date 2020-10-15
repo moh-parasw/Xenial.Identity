@@ -18,16 +18,17 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-
-.profile-card {
-  --height: 3rem;
-  --small-size: 0.8rem;
+:root {
+  --profile-card-height: 3rem;
+  --profile-card-small-size: 0.8rem;
 
   @media (min-width: 281px) {
-    --height: 4rem;
-    --small-size: 1rem;
+    --profile-card-height: 4rem;
+    --profile-card-small-size: 1rem;
   }
+}
 
+.profile-card {
   // background-color: red;
   display: flex;
   flex-direction: row;
@@ -36,13 +37,13 @@
   text-overflow: ellipsis;
 
   &__image {
-    font-size: calc(var(--height) / 2);
+    font-size: calc(var(--profile-card-height) / 2);
     display: inline-flex;
     margin: 0.5rem;
-    width: var(--height);
-    height: var(--height);
+    width: var(--profile-card-height);
+    height: var(--profile-card-height);
     border-radius: 50%;
-    background-color: black;
+    background-color: var(--xenial-dark-color);
 
     a {
       display: flex;
@@ -60,7 +61,7 @@
     min-width: 0;
 
     &-name {
-      font-size: calc(calc(var(--height) / 2) - 0.5rem);
+      font-size: calc(calc(var(--profile-card-height) / 2) - 0.5rem);
       font-weight: bold;
       flex: 1;
       min-width: 0;
@@ -82,7 +83,7 @@
         display: inline;
         word-wrap: none;
         text-decoration: none;
-        font-size: var(--small-size);
+        font-size: var(--profile-card-small-size);
 
         i {
           display: inline;
