@@ -8,7 +8,7 @@
     }
     a {
       &:hover {
-        color: var(--xenial-tag-color);
+        color: var(--xenial-highlight-color);
       }
     }
 
@@ -77,6 +77,7 @@
         flex-direction: row;
         &__change {
           margin-left: auto;
+          --space--right: 0.5rem;
         }
       }
     }
