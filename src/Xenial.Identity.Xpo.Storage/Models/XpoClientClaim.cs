@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using DevExpress.Xpo;
+
 using IdentityServer4.Models;
 
 namespace Xenial.Identity.Xpo.Storage.Models
@@ -9,6 +11,9 @@ namespace Xenial.Identity.Xpo.Storage.Models
     public class XpoClientClaim
     {
         private static readonly ClientClaim @default = new ClientClaim();
+
+        public int Id { get; set; }
+
         /// <summary>
         /// The claim type
         /// </summary>
@@ -19,9 +24,8 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// </summary>
         public string Value { get; set; } = @default.Value;
 
-        /// <summary>
-        /// The claim value type
-        /// </summary>
-        public string ValueType { get; set; } = @default.ValueType;
+        [Persistent("ClientId")]
+        [Association]
+        public XpoClient Client { get; set; }
     }
 }

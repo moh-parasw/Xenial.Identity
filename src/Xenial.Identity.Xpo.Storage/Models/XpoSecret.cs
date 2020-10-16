@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using DevExpress.Xpo;
+
 using IdentityServer4.Models;
 
 namespace Xenial.Identity.Xpo.Storage.Models
@@ -9,6 +11,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
     public class XpoSecret
     {
         private static readonly Secret @default = new Secret();
+        public int Id { get; set; }
 
         /// <summary>
         /// Gets or sets the description.
@@ -41,5 +44,11 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// The type of the client secret.
         /// </value>
         public string Type { get; set; } = @default.Type;
+
+        public DateTime Created { get; set; } = DateTime.UtcNow;
+
+        [Persistent("ClientId")]
+        [Association]
+        public XpoClient Client { get; set; }
     }
 }
