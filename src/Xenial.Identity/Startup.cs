@@ -57,9 +57,10 @@ namespace Xenial.Identity
                 .UseConnectionString(Configuration.GetConnectionString("DefaultConnection"))
                 .UseThreadSafeDataLayer(true)
                 .UseConnectionPool(false) // Remove this line if you use a database server like SQL Server, Oracle, PostgreSql, etc.
-                .UseAutoCreationOption(DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema) // Remove this line if the database already exists
-                .UseEntityTypes(IdentityXpoTypes.PersistentTypes) // Pass all of your persistent object types to this method.
+                .UseAutoCreationOption(DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema)
+                .UseEntityTypes(IdentityXpoTypes.PersistentTypes)
             );
+
             services.AddXpoDefaultUnitOfWork();
 
             var builder = services.AddIdentityServer(options =>
