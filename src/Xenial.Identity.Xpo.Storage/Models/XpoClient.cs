@@ -13,7 +13,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public class XpoClient
     {
-        private static readonly Client defaultClient = new Client();
+        private static readonly Client @default = new Client();
         private string DebuggerDisplay => ClientId ?? $"{{{typeof(Client)}}}";
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <value>
         /// The protocol type.
         /// </value>
-        public string ProtocolType { get; set; } = defaultClient.ProtocolType;
+        public string ProtocolType { get; set; } = @default.ProtocolType;
 
         /// <summary>
         /// Client secrets - only relevant for flows that require a secret
@@ -42,7 +42,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <summary>
         /// If set to false, no client secret is needed to request tokens at the token endpoint (defaults to <c>true</c>)
         /// </summary>
-        public bool RequireClientSecret { get; set; } = defaultClient.RequireClientSecret;
+        public bool RequireClientSecret { get; set; } = @default.RequireClientSecret;
 
         /// <summary>
         /// Client display name (used for logging and consent screen)
@@ -67,12 +67,12 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <summary>
         /// Specifies whether a consent screen is required (defaults to <c>false</c>)
         /// </summary>
-        public bool RequireConsent { get; set; } = defaultClient.RequireConsent;
+        public bool RequireConsent { get; set; } = @default.RequireConsent;
 
         /// <summary>
         /// Specifies whether user can choose to store consent decisions (defaults to <c>true</c>)
         /// </summary>
-        public bool AllowRememberConsent { get; set; } = defaultClient.AllowRememberConsent;
+        public bool AllowRememberConsent { get; set; } = @default.AllowRememberConsent;
 
         /// <summary>
         /// Specifies the allowed grant types (legal combinations of AuthorizationCode, Implicit, Hybrid, ResourceOwner, ClientCredentials).
@@ -82,17 +82,17 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <summary>
         /// Specifies whether a proof key is required for authorization code based token requests (defaults to <c>true</c>).
         /// </summary>
-        public bool RequirePkce { get; set; } = defaultClient.RequirePkce;
+        public bool RequirePkce { get; set; } = @default.RequirePkce;
 
         /// <summary>
         /// Specifies whether a proof key can be sent using plain method (not recommended and defaults to <c>false</c>.)
         /// </summary>
-        public bool AllowPlainTextPkce { get; set; } = defaultClient.AllowPlainTextPkce;
+        public bool AllowPlainTextPkce { get; set; } = @default.AllowPlainTextPkce;
 
         /// <summary>
         /// Specifies whether the client must use a request object on authorize requests (defaults to <c>false</c>.)
         /// </summary>
-        public bool RequireRequestObject { get; set; } = defaultClient.RequireRequestObject;
+        public bool RequireRequestObject { get; set; } = @default.RequireRequestObject;
 
         /// <summary>
         /// Controls whether access tokens are transmitted via the browser for this client (defaults to <c>false</c>).
@@ -101,7 +101,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <value>
         /// <c>true</c> if access tokens can be transmitted via the browser; otherwise, <c>false</c>.
         /// </value>
-        public bool AllowAccessTokensViaBrowser { get; set; } = defaultClient.AllowAccessTokensViaBrowser;
+        public bool AllowAccessTokensViaBrowser { get; set; } = @default.AllowAccessTokensViaBrowser;
 
         /// <summary>
         /// Specifies allowed URIs to return tokens or authorization codes to
@@ -121,7 +121,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <summary>
         /// Specifies is the user's session id should be sent to the FrontChannelLogoutUri. Defaults to <c>true</c>.
         /// </summary>
-        public bool FrontChannelLogoutSessionRequired { get; set; } = defaultClient.FrontChannelLogoutSessionRequired;
+        public bool FrontChannelLogoutSessionRequired { get; set; } = @default.FrontChannelLogoutSessionRequired;
 
         /// <summary>
         /// Specifies logout URI at client for HTTP back-channel based logout.
@@ -131,12 +131,12 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <summary>
         /// Specifies is the user's session id should be sent to the BackChannelLogoutUri. Defaults to <c>true</c>.
         /// </summary>
-        public bool BackChannelLogoutSessionRequired { get; set; } = defaultClient.BackChannelLogoutSessionRequired;
+        public bool BackChannelLogoutSessionRequired { get; set; } = @default.BackChannelLogoutSessionRequired;
 
         /// <summary>
         /// Gets or sets a value indicating whether [allow offline access]. Defaults to <c>false</c>.
         /// </summary>
-        public bool AllowOfflineAccess { get; set; } = defaultClient.AllowOfflineAccess;
+        public bool AllowOfflineAccess { get; set; } = @default.AllowOfflineAccess;
 
         /// <summary>
         /// Specifies the api scopes that the client is allowed to request. If empty, the client can't access any scope
@@ -147,12 +147,12 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// When requesting both an id token and access token, should the user claims always be added to the id token instead of requiring the client to use the userinfo endpoint.
         /// Defaults to <c>false</c>.
         /// </summary>
-        public bool AlwaysIncludeUserClaimsInIdToken { get; set; } = defaultClient.AlwaysIncludeUserClaimsInIdToken;
+        public bool AlwaysIncludeUserClaimsInIdToken { get; set; } = @default.AlwaysIncludeUserClaimsInIdToken;
 
         /// <summary>
         /// Lifetime of identity token in seconds (defaults to 300 seconds / 5 minutes)
         /// </summary>
-        public int IdentityTokenLifetime { get; set; } = defaultClient.IdentityTokenLifetime;
+        public int IdentityTokenLifetime { get; set; } = @default.IdentityTokenLifetime;
 
         /// <summary>
         /// Signing algorithm for identity token. If empty, will use the server default signing algorithm.
@@ -162,22 +162,22 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <summary>
         /// Lifetime of access token in seconds (defaults to 3600 seconds / 1 hour)
         /// </summary>
-        public int AccessTokenLifetime { get; set; } = defaultClient.AccessTokenLifetime;
+        public int AccessTokenLifetime { get; set; } = @default.AccessTokenLifetime;
 
         /// <summary>
         /// Lifetime of authorization code in seconds (defaults to 300 seconds / 5 minutes)
         /// </summary>
-        public int AuthorizationCodeLifetime { get; set; } = defaultClient.AuthorizationCodeLifetime;
+        public int AuthorizationCodeLifetime { get; set; } = @default.AuthorizationCodeLifetime;
 
         /// <summary>
         /// Maximum lifetime of a refresh token in seconds. Defaults to 2592000 seconds / 30 days
         /// </summary>
-        public int AbsoluteRefreshTokenLifetime { get; set; } = defaultClient.AbsoluteRefreshTokenLifetime;
+        public int AbsoluteRefreshTokenLifetime { get; set; } = @default.AbsoluteRefreshTokenLifetime;
 
         /// <summary>
         /// Sliding lifetime of a refresh token in seconds. Defaults to 1296000 seconds / 15 days
         /// </summary>
-        public int SlidingRefreshTokenLifetime { get; set; } = defaultClient.SlidingRefreshTokenLifetime;
+        public int SlidingRefreshTokenLifetime { get; set; } = @default.SlidingRefreshTokenLifetime;
 
         /// <summary>
         /// Lifetime of a user consent in seconds. Defaults to null (no expiration)
@@ -188,7 +188,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// ReUse: the refresh token handle will stay the same when refreshing tokens
         /// OneTime: the refresh token handle will be updated when refreshing tokens
         /// </summary>
-        public TokenUsage RefreshTokenUsage { get; set; } = defaultClient.RefreshTokenUsage;
+        public TokenUsage RefreshTokenUsage { get; set; } = @default.RefreshTokenUsage;
 
         /// <summary>
         /// Gets or sets a value indicating whether the access token (and its claims) should be updated on a refresh token request.
@@ -197,18 +197,18 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <value>
         /// <c>true</c> if the token should be updated; otherwise, <c>false</c>.
         /// </value>
-        public bool UpdateAccessTokenClaimsOnRefresh { get; set; } = defaultClient.UpdateAccessTokenClaimsOnRefresh;
+        public bool UpdateAccessTokenClaimsOnRefresh { get; set; } = @default.UpdateAccessTokenClaimsOnRefresh;
 
         /// <summary>
         /// Absolute: the refresh token will expire on a fixed point in time (specified by the AbsoluteRefreshTokenLifetime)
         /// Sliding: when refreshing the token, the lifetime of the refresh token will be renewed (by the amount specified in SlidingRefreshTokenLifetime). The lifetime will not exceed AbsoluteRefreshTokenLifetime.
         /// </summary>        
-        public TokenExpiration RefreshTokenExpiration { get; set; } = defaultClient.RefreshTokenExpiration;
+        public TokenExpiration RefreshTokenExpiration { get; set; } = @default.RefreshTokenExpiration;
 
         /// <summary>
         /// Specifies whether the access token is a reference token or a self contained JWT token (defaults to Jwt).
         /// </summary>
-        public AccessTokenType AccessTokenType { get; set; } = defaultClient.AccessTokenType;
+        public AccessTokenType AccessTokenType { get; set; } = @default.AccessTokenType;
 
         /// <summary>
         /// Gets or sets a value indicating whether the local login is allowed for this client. Defaults to <c>true</c>.
@@ -216,7 +216,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <value>
         ///   <c>true</c> if local logins are enabled; otherwise, <c>false</c>.
         /// </value>
-        public bool EnableLocalLogin { get; set; } = defaultClient.EnableLocalLogin;
+        public bool EnableLocalLogin { get; set; } = @default.EnableLocalLogin;
 
         /// <summary>
         /// Specifies which external IdPs can be used with this client (if list is empty all IdPs are allowed). Defaults to empty.
@@ -229,7 +229,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <value>
         /// <c>true</c> to add an id; otherwise, <c>false</c>.
         /// </value>
-        public bool IncludeJwtId { get; set; } = defaultClient.IncludeJwtId;
+        public bool IncludeJwtId { get; set; } = @default.IncludeJwtId;
 
         /// <summary>
         /// Allows settings claims for the client (will be included in the access token).
@@ -246,7 +246,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <value>
         /// <c>true</c> if claims should always be sent; otherwise, <c>false</c>.
         /// </value>
-        public bool AlwaysSendClientClaims { get; set; } = defaultClient.AlwaysSendClientClaims;
+        public bool AlwaysSendClientClaims { get; set; } = @default.AlwaysSendClientClaims;
 
         /// <summary>
         /// Gets or sets a value to prefix it on client claim types. Defaults to <c>client_</c>.
@@ -254,7 +254,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <value>
         /// Any non empty string if claims should be prefixed with the value; otherwise, <c>null</c>.
         /// </value>
-        public string ClientClaimsPrefix { get; set; } = defaultClient.ClientClaimsPrefix;
+        public string ClientClaimsPrefix { get; set; } = @default.ClientClaimsPrefix;
 
         /// <summary>
         /// Gets or sets a salt value used in pair-wise subjectId generation for users of this client.
@@ -280,7 +280,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <value>
         /// The device code lifetime.
         /// </value>
-        public int DeviceCodeLifetime { get; set; } = defaultClient.DeviceCodeLifetime;
+        public int DeviceCodeLifetime { get; set; } = @default.DeviceCodeLifetime;
 
         /// <summary>
         /// Gets or sets the allowed CORS origins for JavaScript clients.

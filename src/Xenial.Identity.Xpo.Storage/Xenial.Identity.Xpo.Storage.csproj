@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -7,6 +7,10 @@
   <ItemGroup>
     <PackageReference Include="DevExpress.Xpo" Version="20.2.2-beta" />
     <PackageReference Include="IdentityServer4.Storage" Version="4.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ValueConverters\" />
   </ItemGroup>
 
 </Project>
