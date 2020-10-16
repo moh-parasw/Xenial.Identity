@@ -19,6 +19,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests
             XpoDefault.DataLayer = XpoDefault.GetDataLayer(connectionString, AutoCreateOption.DatabaseAndSchema);
 
             ApiResourceMappersTests.Tests();
+            PersistedGrantMappersTests.Tests();
 
             return await Run(args);
         }

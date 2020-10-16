@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 
+using DevExpress.Xpo;
+
 using IdentityServer4.Models;
 
 using Xenial.Identity.Xpo.Storage.Models;
@@ -28,8 +30,8 @@ namespace Xenial.Identity.Xpo.Storage.Mappers
         /// </summary>
         /// <param name="model">The model.</param>
         /// <returns></returns>
-        public static XpoPersistedGrant ToEntity(this PersistedGrant model)
-            => model == null ? null : Mapper.Map<XpoPersistedGrant>(model);
+        public static XpoPersistedGrant ToEntity(this PersistedGrant model, Session session)
+            => model == null ? null : Mapper.Map<XpoPersistedGrant>(model, opt => opt.ConstructServicesUsing(t => session.GetClassInfo(t).CreateNewObject(session)));
 
         /// <summary>
         /// Updates an entity from a model.

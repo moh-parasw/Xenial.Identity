@@ -1,38 +1,39 @@
-﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
+﻿using DevExpress.Xpo;
 
 using FluentAssertions;
-using IdentityServer4.EntityFramework.Mappers;
+
 using IdentityServer4.Models;
-using Xunit;
 
-namespace IdentityServer4.EntityFramework.UnitTests.Mappers
+using Xenial.Identity.Xpo.Storage.Mappers;
+
+using static Xenial.Tasty;
+
+namespace Xenial.Identity.Xpo.Storage.Tests.Mappers
 {
-    public class PersistedGrantMappersTests
+    public static class PersistedGrantMappersTests
     {
-        [Fact]
-        public void PersistedGrantAutomapperConfigurationIsValid()
+        public static void Tests() => Describe(nameof(PersistedGrantMappers), () =>
         {
-            PersistedGrantMappers.Mapper.ConfigurationProvider.AssertConfigurationIsValid<PersistedGrantMapperProfile>();
-        }
+            It("PersistedGrant Automapper Configuration is valid", () => PersistedGrantMappers.Mapper.ConfigurationProvider.AssertConfigurationIsValid<PersistedGrantMapperProfile>());
 
-        [Fact]
-        public void CanMap()
-        {
-            var model = new PersistedGrant()
+            It("Can map", () =>
             {
-                ConsumedTime = new System.DateTime(2020, 02, 03, 4, 5, 6)
-            };
-            
-            var mappedEntity = model.ToEntity();
-            mappedEntity.ConsumedTime.Value.Should().Be(new System.DateTime(2020, 02, 03, 4, 5, 6));
-            
-            var mappedModel = mappedEntity.ToModel();
-            mappedModel.ConsumedTime.Value.Should().Be(new System.DateTime(2020, 02, 03, 4, 5, 6));
+                using var session = new Session();
+                var model = new PersistedGrant()
+                {
+                    ConsumedTime = new System.DateTime(2020, 02, 03, 4, 5, 6)
+                };
 
-            Assert.NotNull(mappedModel);
-            Assert.NotNull(mappedEntity);
-        }
+                var mappedEntity = model.ToEntity(session);
+                mappedEntity.ConsumedTime.Value.Should().Be(new System.DateTime(2020, 02, 03, 4, 5, 6));
+
+                var mappedModel = mappedEntity.ToModel();
+                mappedModel.ConsumedTime.Value.Should().Be(new System.DateTime(2020, 02, 03, 4, 5, 6));
+
+                mappedModel.Should().NotBeNull();
+                mappedEntity.Should().NotBeNull();
+
+            });
+        });
     }
 }

@@ -18,6 +18,7 @@ namespace Xenial.Identity.Xpo.Storage.Mappers
         /// </summary>
         public PersistedGrantMapperProfile()
             => CreateMap<XpoPersistedGrant, PersistedGrant>(MemberList.Destination)
-                .ReverseMap();
+                .ReverseMap()
+                .ConstructUsingServiceLocator();
     }
 }

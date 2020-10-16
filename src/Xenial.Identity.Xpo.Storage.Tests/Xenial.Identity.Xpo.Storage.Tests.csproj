@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,7 +8,6 @@
   <ItemGroup>
     <Compile Remove="Mappers\ClientMappersTests.cs" />
     <Compile Remove="Mappers\IdentityResourcesMappersTests.cs" />
-    <Compile Remove="Mappers\PersistedGrantMappersTests.cs" />
     <Compile Remove="Mappers\ScopeMappersTests.cs" />
   </ItemGroup>
 
