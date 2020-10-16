@@ -61,6 +61,7 @@ namespace Xenial.Identity.Xpo.Storage.Stores
                 Logger.LogDebug("{persistedGrantKey} found in database", token.Key);
 
                 token.UpdateEntity(existing);
+                await UnitOfWork.SaveAsync(existing);
             }
 
             try
