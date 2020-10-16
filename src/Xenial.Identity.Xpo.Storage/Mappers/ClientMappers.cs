@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 
+using DevExpress.Xpo;
+
 using IdentityServer4.Models;
 
 using Xenial.Identity.Xpo.Storage.Models;
@@ -28,7 +30,7 @@ namespace Xenial.Identity.Xpo.Storage.Mappers
         /// </summary>
         /// <param name="model">The model.</param>
         /// <returns></returns>
-        public static XpoClient ToEntity(this Client model)
-            => Mapper.Map<XpoClient>(model);
+        public static XpoClient ToEntity(this Client model, Session session)
+            => Mapper.Map<XpoClient>(model, opts => opts.ConstructServicesUsing(t => session.GetClassInfo(t).CreateObject(session)));
     }
 }

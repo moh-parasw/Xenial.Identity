@@ -8,7 +8,6 @@
   <ItemGroup>
     <Compile Remove="Mappers\ClientMappersTests.cs" />
     <Compile Remove="Mappers\IdentityResourcesMappersTests.cs" />
-    <Compile Remove="Mappers\ScopeMappersTests.cs" />
   </ItemGroup>
 
   <ItemGroup>

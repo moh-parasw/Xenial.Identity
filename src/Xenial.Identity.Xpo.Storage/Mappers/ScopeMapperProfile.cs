@@ -20,18 +20,21 @@ namespace Xenial.Identity.Xpo.Storage.Mappers
         public ScopeMapperProfile()
         {
             CreateMap<XpoApiScopeProperty, KeyValuePair<string, string>>()
-                .ReverseMap();
+                .ReverseMap()
+                .ConstructUsingServiceLocator();
 
             CreateMap<XpoApiScopeClaim, string>()
                .ConstructUsing(x => x.Type)
                .ReverseMap()
-               .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src));
+               .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src))
+               .ConstructUsingServiceLocator();
 
             CreateMap<XpoApiScope, ApiScope>(MemberList.Destination)
                 .ConstructUsing(src => new ApiScope())
                 .ForMember(x => x.Properties, opts => opts.MapFrom(x => x.Properties))
                 .ForMember(x => x.UserClaims, opts => opts.MapFrom(x => x.UserClaims))
-                .ReverseMap();
+                .ReverseMap()
+                .ConstructUsingServiceLocator();
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Xenial.Identity.Xpo.Storage.Mappers
         /// <param name="model">The model.</param>
         /// <returns></returns>
         public static XpoPersistedGrant ToEntity(this PersistedGrant model, Session session)
-            => model == null ? null : Mapper.Map<XpoPersistedGrant>(model, opt => opt.ConstructServicesUsing(t => session.GetClassInfo(t).CreateNewObject(session)));
+            => model == null ? null : Mapper.Map<XpoPersistedGrant>(model, opt => opt.ConstructServicesUsing(t => session.GetClassInfo(t).CreateObject(session)));
 
         /// <summary>
         /// Updates an entity from a model.
