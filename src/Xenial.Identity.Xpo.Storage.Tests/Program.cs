@@ -30,14 +30,18 @@ namespace Xenial.Identity.Xpo.Storage.Tests
 
             var directory = Path.GetDirectoryName(typeof(Program).Assembly.Location);
 
-            ClientStoreTests.Tests("InMemory", connectionString);
-            ClientStoreTests.Tests("Sqlite", SQLiteConnectionProvider.GetConnectionString(Path.Combine(directory, $"{Guid.NewGuid()}.db")));
+            var databases = new[]
+            {
+                ("InMemory", connectionString),
+                ("Sqlite", SQLiteConnectionProvider.GetConnectionString(Path.Combine(directory, $"{Guid.NewGuid()}.db")))
+            };
 
-            DeviceFlowStoreTests.Tests("InMemory", connectionString);
-            DeviceFlowStoreTests.Tests("Sqlite", SQLiteConnectionProvider.GetConnectionString(Path.Combine(directory, $"{Guid.NewGuid()}.db")));
-
-            PersistedGrantStoreTests.Tests("InMemory", connectionString);
-            PersistedGrantStoreTests.Tests("Sqlite", SQLiteConnectionProvider.GetConnectionString(Path.Combine(directory, $"{Guid.NewGuid()}.db")));
+            foreach (var (name, cs) in databases)
+            {
+                ClientStoreTests.Tests(name, cs);
+                DeviceFlowStoreTests.Tests(name, cs);
+                PersistedGrantStoreTests.Tests(name, cs);
+            }
 
             return await Run(args);
         }
