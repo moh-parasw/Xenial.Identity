@@ -43,7 +43,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         [Size(200)]
         public string DisplayName { get => displayName; set => SetPropertyValue(ref displayName, value); }
 
-        [Persistent("DisplayName")]
+        [Persistent("Description")]
         [Size(1000)]
         public string Description { get => description; set => SetPropertyValue(ref description, value); }
 

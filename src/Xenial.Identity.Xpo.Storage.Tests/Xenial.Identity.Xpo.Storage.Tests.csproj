@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Mappers\ClientMappersTests.cs" />
+    <Compile Remove="Mappers\IdentityResourcesMappersTests.cs" />
+    <Compile Remove="Mappers\PersistedGrantMappersTests.cs" />
+    <Compile Remove="Mappers\ScopeMappersTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    <PackageReference Include="Xenial.Tasty" Version="0.1.24" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Xenial.Identity.Xpo.Storage\Xenial.Identity.Xpo.Storage.csproj" />
+  </ItemGroup>
+
+</Project>

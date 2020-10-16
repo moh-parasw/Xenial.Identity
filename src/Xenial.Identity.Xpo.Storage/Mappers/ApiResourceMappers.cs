@@ -28,7 +28,7 @@ namespace Xenial.Identity.Xpo.Storage.Mappers
         /// </summary>
         /// <param name="model">The model.</param>
         /// <returns></returns>
-        public static XpoApiResource ToEntity(this ApiResource model)
-            => model == null ? null : Mapper.Map<XpoApiResource>(model);
+        public static XpoApiResource ToEntity(this ApiResource model, DevExpress.Xpo.Session session)
+            => model == null ? null : Mapper.Map<XpoApiResource>(model, opt => opt.ConstructServicesUsing(t => session.GetClassInfo(t).CreateNewObject(session)));
     }
 }

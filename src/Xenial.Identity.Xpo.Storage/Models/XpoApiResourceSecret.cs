@@ -16,6 +16,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         private DateTime? expiration;
         private string type = "SharedSecret";
         private DateTime created = DateTime.UtcNow;
+        private XpoApiResource apiResource;
 
         public XpoApiResourceSecret(Session session) : base(session) { }
 
@@ -42,5 +43,9 @@ namespace Xenial.Identity.Xpo.Storage.Models
 
         [Persistent("Created")]
         public DateTime Created { get => created; set => SetPropertyValue(ref created, value); }
+
+        [Persistent("ApiResourceId")]
+        [Association]
+        public XpoApiResource ApiResource { get => apiResource; set => SetPropertyValue(ref apiResource, value); }
     }
 }
