@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
@@ -9,8 +7,10 @@ namespace Xenial.Identity.Xpo.Storage.Models
 {
     [Persistent("PersistedGrants")]
     [Indices(new[] { index1, index2 })]
-    public class XpoPersistedGrant
+    public class XpoPersistedGrant : XpoStorageBaseObject
     {
+        public XpoPersistedGrant(Session session) : base(session) { }
+
         private const string index1 = nameof(SubjectId) + ";" + nameof(ClientId) + ";" + nameof(Type);
         private const string index2 = nameof(SubjectId) + ";" + nameof(SessionId) + ";" + nameof(Type);
 

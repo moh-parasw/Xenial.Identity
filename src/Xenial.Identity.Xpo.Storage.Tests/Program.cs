@@ -7,6 +7,7 @@ using DevExpress.Xpo.DB;
 
 using Xenial.Identity.Xpo.Storage.Tests.IntegrationTests;
 using Xenial.Identity.Xpo.Storage.Tests.Mappers;
+using Xenial.Identity.Xpo.Storage.Tests.TokenCleanup;
 
 using static Xenial.Tasty;
 
@@ -42,6 +43,8 @@ namespace Xenial.Identity.Xpo.Storage.Tests
                 DeviceFlowStoreTests.Tests(name, cs);
                 PersistedGrantStoreTests.Tests(name, cs);
                 ResourceStoreTests.Tests(name, cs);
+
+                TokenCleanupTests.Tests(name, cs);
             }
 
             return await Run(args);
