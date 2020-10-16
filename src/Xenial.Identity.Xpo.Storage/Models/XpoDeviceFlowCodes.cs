@@ -29,10 +29,9 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// The device code.
         /// </value>
         [Persistent("DeviceCode")]
-        [Key(AutoGenerate = false)]
-        [Indexed(Unique = true)]
         [Size(200)]
         [RuleRequiredField(DefaultContexts.Save)]
+        [Indexed(Unique = true)]
         public string DeviceCode { get => deviceCode; set => SetPropertyValue(ref deviceCode, value); }
 
         /// <summary>
@@ -44,6 +43,8 @@ namespace Xenial.Identity.Xpo.Storage.Models
         [Persistent("UserCode")]
         [Size(200)]
         [RuleRequiredField(DefaultContexts.Save)]
+        [Key(AutoGenerate = false)]
+        [Indexed(Unique = true)]
         public string UserCode { get => userCode; set => SetPropertyValue(ref userCode, value); }
 
         /// <summary>

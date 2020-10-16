@@ -33,6 +33,9 @@ namespace Xenial.Identity.Xpo.Storage.Tests
             ClientStoreTests.Tests("InMemory", connectionString);
             ClientStoreTests.Tests("Sqlite", SQLiteConnectionProvider.GetConnectionString(Path.Combine(directory, $"{Guid.NewGuid()}.db")));
 
+            DeviceFlowStoreTests.Tests("InMemory", connectionString);
+            DeviceFlowStoreTests.Tests("Sqlite", SQLiteConnectionProvider.GetConnectionString(Path.Combine(directory, $"{Guid.NewGuid()}.db")));
+
             return await Run(args);
         }
     }
