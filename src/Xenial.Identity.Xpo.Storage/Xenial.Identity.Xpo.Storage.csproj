@@ -10,8 +10,4 @@
     <PackageReference Include="IdentityServer4.Storage" Version="4.1.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="ValueConverters\" />
-  </ItemGroup>
-
 </Project>

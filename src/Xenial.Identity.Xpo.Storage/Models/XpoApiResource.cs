@@ -5,6 +5,8 @@ using System.Text;
 using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
 
+using Xenial.Identity.Xpo.Storage.ValueConverters;
+
 namespace Xenial.Identity.Xpo.Storage.Models
 {
     [Persistent("ApiResources")]
@@ -15,7 +17,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         private string name;
         private string displayName;
         private string description;
-        private string allowedAccessTokenSigningAlgorithms;
+        private ICollection<string> allowedAccessTokenSigningAlgorithms = new HashSet<string>();
         private bool showInDiscoveryDocument = true;
         private DateTime created = DateTime.UtcNow;
         private DateTime? updated;
@@ -45,11 +47,10 @@ namespace Xenial.Identity.Xpo.Storage.Models
         [Size(1000)]
         public string Description { get => description; set => SetPropertyValue(ref description, value); }
 
-        //TODO: ValueConverter
-        //[ValueConverter(typeof(AllowedSigningAlgorithmsConverter))]
+        [ValueConverter(typeof(AllowedSigningAlgorithmsConverter))]
         [Persistent("AllowedAccessTokenSigningAlgorithms")]
         [Size(100)]
-        public string AllowedAccessTokenSigningAlgorithms { get => allowedAccessTokenSigningAlgorithms; set => SetPropertyValue(ref allowedAccessTokenSigningAlgorithms, value); }
+        public ICollection<string> AllowedAccessTokenSigningAlgorithms { get => allowedAccessTokenSigningAlgorithms; set => SetPropertyValue(ref allowedAccessTokenSigningAlgorithms, value); }
 
         [Persistent("ShowInDiscoveryDocument")]
         public bool ShowInDiscoveryDocument { get => showInDiscoveryDocument; set => SetPropertyValue(ref showInDiscoveryDocument, value); }

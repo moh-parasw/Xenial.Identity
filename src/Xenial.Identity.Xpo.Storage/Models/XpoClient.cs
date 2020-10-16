@@ -8,6 +8,8 @@ using DevExpress.Xpo;
 
 using IdentityServer4.Models;
 
+using Xenial.Identity.Xpo.Storage.ValueConverters;
+
 namespace Xenial.Identity.Xpo.Storage.Models
 {
     /// <summary>
@@ -170,10 +172,9 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <summary>
         /// Signing algorithm for identity token. If empty, will use the server default signing algorithm.
         /// </summary>
-        //TODO: AllowedSigningAlgorithmsConverter
         [Persistent("AllowedIdentityTokenSigningAlgorithms")]
         [Size(100)]
-        //[ValueConverter(typeof(AllowedSigningAlgorithmsConverter))]
+        [ValueConverter(typeof(AllowedSigningAlgorithmsConverter))]
         public ICollection<string> AllowedIdentityTokenSigningAlgorithms { get => allowedIdentityTokenSigningAlgorithms; set => SetPropertyValue(ref allowedIdentityTokenSigningAlgorithms, value); }
 
         #endregion
