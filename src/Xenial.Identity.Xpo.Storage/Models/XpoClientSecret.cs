@@ -15,7 +15,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         private static readonly Secret @default = new Secret();
         private int id;
         private string description = @default.Description;
-        private string value = @default.Value;
+        private string val = @default.Value;
         private DateTime? expiration = @default.Expiration;
         private string type = @default.Type;
         private DateTime created = DateTime.UtcNow;
@@ -36,6 +36,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         [Persistent("Description")]
         [Size(2000)]
         public string Description { get => description; set => SetPropertyValue(ref description, value); }
+
         /// <summary>
         /// Gets or sets the value.
         /// </summary>
@@ -45,7 +46,8 @@ namespace Xenial.Identity.Xpo.Storage.Models
         [Persistent("Value")]
         [Size(4000)]
         [RuleRequiredField(DefaultContexts.Save)]
-        public string Value { get => value; set => SetPropertyValue(ref value, value); }
+        public string Value { get => val; set => SetPropertyValue(ref val, value); }
+
         /// <summary>
         /// Gets or sets the expiration.
         /// </summary>
@@ -54,6 +56,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// </value>
         [Persistent("Expiration")]
         public DateTime? Expiration { get => expiration; set => SetPropertyValue(ref expiration, value); }
+
         /// <summary>
         /// Gets or sets the type of the client secret.
         /// </summary>
