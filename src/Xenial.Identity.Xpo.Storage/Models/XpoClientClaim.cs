@@ -15,7 +15,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         private static readonly ClientClaim @default = new ClientClaim();
         private int id;
         private string type = @default.Type;
-        private string value = @default.Value;
+        private string val = @default.Value;
         private XpoClient client;
 
         public XpoClientClaim(Session session) : base(session) { }
@@ -38,7 +38,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         [Persistent("Value")]
         [Size(250)]
         [RuleRequiredField(DefaultContexts.Save)]
-        public string Value { get => value; set => SetPropertyValue(ref value, value); }
+        public string Value { get => val; set => SetPropertyValue(ref val, value); }
 
         [Persistent("ClientId")]
         [Association]
