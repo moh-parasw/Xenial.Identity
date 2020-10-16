@@ -54,6 +54,7 @@ namespace Xenial.Identity.Xpo.Storage.Stores
                 Logger.LogDebug("{persistedGrantKey} not found in database", token.Key);
 
                 var persistedGrant = token.ToEntity(UnitOfWork);
+                await UnitOfWork.SaveAsync(persistedGrant);
             }
             else
             {

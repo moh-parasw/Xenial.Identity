@@ -20,21 +20,24 @@ namespace Xenial.Identity.Xpo.Storage.Tests
             var connectionString = InMemoryDataStore.GetConnectionStringInMemory(true);
             XpoDefault.DataLayer = XpoDefault.GetDataLayer(connectionString, AutoCreateOption.DatabaseAndSchema);
 
-            ApiResourceMappersTests.Tests();
-            PersistedGrantMappersTests.Tests();
-            ScopesMappersTests.Tests();
-            IdentityResourceMappersTests.Tests();
-            ClientMappersTests.Tests();
+            //ApiResourceMappersTests.Tests();
+            //PersistedGrantMappersTests.Tests();
+            //ScopesMappersTests.Tests();
+            //IdentityResourceMappersTests.Tests();
+            //ClientMappersTests.Tests();
 
             SQLiteConnectionProvider.Register();
 
             var directory = Path.GetDirectoryName(typeof(Program).Assembly.Location);
 
-            ClientStoreTests.Tests("InMemory", connectionString);
-            ClientStoreTests.Tests("Sqlite", SQLiteConnectionProvider.GetConnectionString(Path.Combine(directory, $"{Guid.NewGuid()}.db")));
+            //ClientStoreTests.Tests("InMemory", connectionString);
+            //ClientStoreTests.Tests("Sqlite", SQLiteConnectionProvider.GetConnectionString(Path.Combine(directory, $"{Guid.NewGuid()}.db")));
 
-            DeviceFlowStoreTests.Tests("InMemory", connectionString);
-            DeviceFlowStoreTests.Tests("Sqlite", SQLiteConnectionProvider.GetConnectionString(Path.Combine(directory, $"{Guid.NewGuid()}.db")));
+            //DeviceFlowStoreTests.Tests("InMemory", connectionString);
+            //DeviceFlowStoreTests.Tests("Sqlite", SQLiteConnectionProvider.GetConnectionString(Path.Combine(directory, $"{Guid.NewGuid()}.db")));
+
+            PersistedGrantStoreTests.Tests("InMemory", connectionString);
+            PersistedGrantStoreTests.Tests("Sqlite", SQLiteConnectionProvider.GetConnectionString(Path.Combine(directory, $"{Guid.NewGuid()}.db")));
 
             return await Run(args);
         }
