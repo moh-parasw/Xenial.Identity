@@ -116,7 +116,7 @@ namespace Xenial.Identity.Xpo.Storage.Stores
                 throw new InvalidOperationException("Could not update device code");
             }
 
-            var entity = ToEntity(data, existing.DeviceCode, userCode);
+            var entity = ToEntity(data, existing, existing.DeviceCode, userCode);
             Logger.LogDebug("{userCode} found in database", userCode);
 
             existing.SubjectId = data.Subject?.FindFirst(JwtClaimTypes.Subject).Value;
@@ -176,16 +176,33 @@ namespace Xenial.Identity.Xpo.Storage.Stores
                 return null;
             }
 
-            return new XpoDeviceFlowCodes(UnitOfWork)
+            return ToEntity(model, new XpoDeviceFlowCodes(UnitOfWork), deviceCode, userCode);
+        }
+
+        /// <summary>
+        /// Converts a model to an entity.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="xpoDeviceFlowCodes"></param>
+        /// <param name="deviceCode"></param>
+        /// <param name="userCode"></param>
+        /// <returns></returns>
+        protected XpoDeviceFlowCodes ToEntity(DeviceCode model, XpoDeviceFlowCodes xpoDeviceFlowCodes, string deviceCode, string userCode)
+        {
+            if (model == null || xpoDeviceFlowCodes == null || deviceCode == null || userCode == null)
             {
-                DeviceCode = deviceCode,
-                UserCode = userCode,
-                ClientId = model.ClientId,
-                SubjectId = model.Subject?.FindFirst(JwtClaimTypes.Subject).Value,
-                CreationTime = model.CreationTime,
-                Expiration = model.CreationTime.AddSeconds(model.Lifetime),
-                Data = Serializer.Serialize(model)
-            };
+                return null;
+            }
+
+            xpoDeviceFlowCodes.DeviceCode = deviceCode;
+            xpoDeviceFlowCodes.UserCode = userCode;
+            xpoDeviceFlowCodes.ClientId = model.ClientId;
+            xpoDeviceFlowCodes.SubjectId = model.Subject?.FindFirst(JwtClaimTypes.Subject).Value;
+            xpoDeviceFlowCodes.CreationTime = model.CreationTime;
+            xpoDeviceFlowCodes.Expiration = model.CreationTime.AddSeconds(model.Lifetime);
+            xpoDeviceFlowCodes.Data = Serializer.Serialize(model);
+
+            return xpoDeviceFlowCodes;
         }
 
         /// <summary>
