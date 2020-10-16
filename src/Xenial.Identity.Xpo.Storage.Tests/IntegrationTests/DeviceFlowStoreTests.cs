@@ -340,6 +340,56 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                     parsedCode.Subject.Claims.FirstOrDefault(x => x.Type == JwtClaimTypes.Subject && x.Value == expectedSubject).Should().NotBeNull();
                 }
             });
+
+            It("RemoveByDeviceCodeAsync when DeviceCodeExists should delete DeviceCode", async () =>
+            {
+                var testDeviceCode = $"device_{Guid.NewGuid()}";
+                var testUserCode = $"user_{Guid.NewGuid()}";
+
+                var existingDeviceCode = new DeviceCode
+                {
+                    ClientId = "device_flow",
+                    RequestedScopes = new[] { "openid", "api1" },
+                    CreationTime = new DateTime(2018, 10, 19, 16, 14, 29),
+                    Lifetime = 300,
+                    IsOpenId = true
+                };
+
+                using (var uow1 = new UnitOfWork(dataLayer))
+                {
+                    new XpoDeviceFlowCodes(uow1)
+                    {
+                        DeviceCode = testDeviceCode,
+                        UserCode = testUserCode,
+                        ClientId = existingDeviceCode.ClientId,
+                        CreationTime = existingDeviceCode.CreationTime,
+                        Expiration = existingDeviceCode.CreationTime.AddSeconds(existingDeviceCode.Lifetime),
+                        Data = serializer.Serialize(existingDeviceCode)
+                    };
+                    await uow1.CommitChangesAsync();
+                }
+
+                var (store, uow) = CreateStore();
+                using (uow)
+                {
+                    await store.RemoveByDeviceCodeAsync(testDeviceCode);
+                }
+
+                using (var uow2 = new UnitOfWork(dataLayer))
+                {
+                    var code = await uow2.Query<XpoDeviceFlowCodes>().FirstOrDefaultAsync(x => x.UserCode == testUserCode);
+                    code.Should().BeNull();
+                }
+            });
+
+            It("RemoveByDeviceCodeAsync when DeviceCode does not exists should succeed", async () =>
+            {
+                var (store, uow) = CreateStore();
+                using (uow)
+                {
+                    await store.RemoveByDeviceCodeAsync($"device_{Guid.NewGuid()}");
+                }
+            });
         });
     }
 }
