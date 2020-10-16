@@ -18,7 +18,7 @@ using Xenial.Identity.Xpo.Storage.Models;
 namespace Xenial.Identity.Xpo.Storage.Stores
 {
     /// <summary>
-    /// Implementation of IDeviceFlowStore thats uses EF.
+    /// Implementation of IDeviceFlowStore thats uses Xpo.
     /// </summary>
     /// <seealso cref="IDeviceFlowStore" />
     public class DeviceFlowStore : IDeviceFlowStore

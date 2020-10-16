@@ -19,7 +19,7 @@ using Xenial.Identity.Xpo.Storage.Models;
 namespace Xenial.Identity.Xpo.Storage.Stores
 {
     /// <summary>
-    /// Implementation of IPersistedGrantStore thats uses EF.
+    /// Implementation of IPersistedGrantStore thats uses Xpo.
     /// </summary>
     /// <seealso cref="IdentityServer4.Stores.IPersistedGrantStore" />
     public class PersistedGrantStore : IPersistedGrantStore

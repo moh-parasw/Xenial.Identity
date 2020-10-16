@@ -15,7 +15,7 @@ using Xenial.Identity.Xpo.Storage.Models;
 namespace Xenial.Identity.Xpo.Storage.Stores
 {
     /// <summary>
-    /// Implementation of IClientStore thats uses EF.
+    /// Implementation of IClientStore thats uses Xpo.
     /// </summary>
     /// <seealso cref="IClientStore" />
     public class ClientStore : IClientStore

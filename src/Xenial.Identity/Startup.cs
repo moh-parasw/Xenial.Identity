@@ -1,14 +1,9 @@
-﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
-
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
 using IdentityServer4;
-using IdentityServerHost.Quickstart.UI;
 
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
@@ -21,6 +16,8 @@ using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Linq;
 
 using Westwind.AspNetCore.LiveReload;
+
+using Xenial.Identity.Xpo.Storage;
 
 namespace Xenial.Identity
 {
@@ -56,6 +53,15 @@ namespace Xenial.Identity
                 razorPagesBuilder.AddRazorRuntimeCompilation();
             }
 
+            services.AddXpoDefaultDataLayer(ServiceLifetime.Singleton, dl => dl
+                .UseConnectionString(Configuration.GetConnectionString("DefaultConnection"))
+                .UseThreadSafeDataLayer(true)
+                .UseConnectionPool(false) // Remove this line if you use a database server like SQL Server, Oracle, PostgreSql, etc.
+                .UseAutoCreationOption(DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema) // Remove this line if the database already exists
+                .UseEntityTypes(IdentityXpoTypes.PersistentTypes) // Pass all of your persistent object types to this method.
+            );
+            services.AddXpoDefaultUnitOfWork();
+
             var builder = services.AddIdentityServer(options =>
             {
                 options.Events.RaiseErrorEvents = true;
@@ -65,8 +71,7 @@ namespace Xenial.Identity
 
                 // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
                 options.EmitStaticAudienceClaim = true;
-            })
-                .AddTestUsers(TestUsers.Users);
+            }).AddXpoIdentityStore();
 
             // in-memory, code config
             builder.AddInMemoryIdentityResources(Config.IdentityResources);

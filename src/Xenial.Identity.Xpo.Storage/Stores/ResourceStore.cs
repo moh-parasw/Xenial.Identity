@@ -16,7 +16,7 @@ using Xenial.Identity.Xpo.Storage.Models;
 namespace Xenial.Identity.Xpo.Storage.Stores
 {
     /// <summary>
-    /// Implementation of IResourceStore thats uses EF.
+    /// Implementation of IResourceStore thats uses Xpo.
     /// </summary>
     /// <seealso cref="IdentityServer4.Stores.IResourceStore" />
     public class ResourceStore : IResourceStore
