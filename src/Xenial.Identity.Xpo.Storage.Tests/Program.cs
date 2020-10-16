@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 using DevExpress.Xpo;
@@ -25,7 +26,12 @@ namespace Xenial.Identity.Xpo.Storage.Tests
             IdentityResourceMappersTests.Tests();
             ClientMappersTests.Tests();
 
+            SQLiteConnectionProvider.Register();
+
+            var directory = Path.GetDirectoryName(typeof(Program).Assembly.Location);
+
             ClientStoreTests.Tests("InMemory", connectionString);
+            ClientStoreTests.Tests("Sqlite", SQLiteConnectionProvider.GetConnectionString(Path.Combine(directory, $"{Guid.NewGuid()}.db")));
 
             return await Run(args);
         }
