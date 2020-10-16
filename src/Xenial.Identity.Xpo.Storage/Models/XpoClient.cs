@@ -36,6 +36,12 @@ namespace Xenial.Identity.Xpo.Storage.Models
         private string pairWiseSubjectSalt;
         private string userCodeType;
         private ICollection<string> allowedIdentityTokenSigningAlgorithms = new HashSet<string>();
+        private bool requireClientSecret = @default.RequireClientSecret;
+        private bool requireConsent = @default.RequireConsent;
+        private bool allowRememberConsent = @default.AllowRememberConsent;
+        private bool requirePkce = @default.RequirePkce;
+        private bool allowPlainTextPkce = @default.AllowPlainTextPkce;
+        private bool requireRequestObject = @default.RequireRequestObject;
 
         #region Fields with mappings
 
@@ -232,38 +238,32 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// If set to false, no client secret is needed to request tokens at the token endpoint (defaults to <c>true</c>)
         /// </summary>
         [Persistent("RequireClientSecret")]
-        public bool RequireClientSecret { get; set; } = @default.RequireClientSecret;
-
+        public bool RequireClientSecret { get => requireClientSecret; set => SetPropertyValue(ref requireClientSecret, value); }
         /// <summary>
         /// Specifies whether a consent screen is required (defaults to <c>false</c>)
         /// </summary>
         [Persistent("RequireConsent")]
-        public bool RequireConsent { get; set; } = @default.RequireConsent;
-
+        public bool RequireConsent { get => requireConsent; set => SetPropertyValue(ref requireConsent, value); }
         /// <summary>
         /// Specifies whether user can choose to store consent decisions (defaults to <c>true</c>)
         /// </summary>
         [Persistent("AllowRememberConsent")]
-        public bool AllowRememberConsent { get; set; } = @default.AllowRememberConsent;
-
+        public bool AllowRememberConsent { get => allowRememberConsent; set => SetPropertyValue(ref allowRememberConsent, value); }
         /// <summary>
         /// Specifies whether a proof key is required for authorization code based token requests (defaults to <c>true</c>).
         /// </summary>
         [Persistent("RequirePkce")]
-        public bool RequirePkce { get; set; } = @default.RequirePkce;
-
+        public bool RequirePkce { get => requirePkce; set => SetPropertyValue(ref requirePkce, value); }
         /// <summary>
         /// Specifies whether a proof key can be sent using plain method (not recommended and defaults to <c>false</c>.)
         /// </summary>
         [Persistent("AllowPlainTextPkce")]
-        public bool AllowPlainTextPkce { get; set; } = @default.AllowPlainTextPkce;
-
+        public bool AllowPlainTextPkce { get => allowPlainTextPkce; set => SetPropertyValue(ref allowPlainTextPkce, value); }
         /// <summary>
         /// Specifies whether the client must use a request object on authorize requests (defaults to <c>false</c>.)
         /// </summary>
         [Persistent("RequireRequestObject")]
-        public bool RequireRequestObject { get; set; } = @default.RequireRequestObject;
-
+        public bool RequireRequestObject { get => requireRequestObject; set => SetPropertyValue(ref requireRequestObject, value); }
         /// <summary>
         /// Controls whether access tokens are transmitted via the browser for this client (defaults to <c>false</c>).
         /// This can prevent accidental leakage of access tokens when multiple response types are allowed.
@@ -271,6 +271,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <value>
         /// <c>true</c> if access tokens can be transmitted via the browser; otherwise, <c>false</c>.
         /// </value>
+        /// 
         [Persistent("AllowAccessTokensViaBrowser")]
         public bool AllowAccessTokensViaBrowser { get; set; } = @default.AllowAccessTokensViaBrowser;
 
