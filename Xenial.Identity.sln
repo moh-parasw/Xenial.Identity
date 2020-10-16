@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30608.117
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9F253852-1584-4769-BC8C-EF3EE2B67216}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xenial.Identity", "src\Xenial.Identity\Xenial.Identity.csproj", "{F4B69847-F79C-494A-B9DE-D9FA7842E295}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xenial.Identity", "src\Xenial.Identity\Xenial.Identity.csproj", "{F4B69847-F79C-494A-B9DE-D9FA7842E295}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xenial.Identity.Xpo.Storage", "src\Xenial.Identity.Xpo.Storage\Xenial.Identity.Xpo.Storage.csproj", "{F81E6750-0688-4586-87D5-A736C677196B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{F4B69847-F79C-494A-B9DE-D9FA7842E295}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -32,8 +31,27 @@ Global
 		{F4B69847-F79C-494A-B9DE-D9FA7842E295}.Release|x64.Build.0 = Release|Any CPU
 		{F4B69847-F79C-494A-B9DE-D9FA7842E295}.Release|x86.ActiveCfg = Release|Any CPU
 		{F4B69847-F79C-494A-B9DE-D9FA7842E295}.Release|x86.Build.0 = Release|Any CPU
+		{F81E6750-0688-4586-87D5-A736C677196B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F81E6750-0688-4586-87D5-A736C677196B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F81E6750-0688-4586-87D5-A736C677196B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F81E6750-0688-4586-87D5-A736C677196B}.Debug|x64.Build.0 = Debug|Any CPU
+		{F81E6750-0688-4586-87D5-A736C677196B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F81E6750-0688-4586-87D5-A736C677196B}.Debug|x86.Build.0 = Debug|Any CPU
+		{F81E6750-0688-4586-87D5-A736C677196B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F81E6750-0688-4586-87D5-A736C677196B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F81E6750-0688-4586-87D5-A736C677196B}.Release|x64.ActiveCfg = Release|Any CPU
+		{F81E6750-0688-4586-87D5-A736C677196B}.Release|x64.Build.0 = Release|Any CPU
+		{F81E6750-0688-4586-87D5-A736C677196B}.Release|x86.ActiveCfg = Release|Any CPU
+		{F81E6750-0688-4586-87D5-A736C677196B}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F4B69847-F79C-494A-B9DE-D9FA7842E295} = {9F253852-1584-4769-BC8C-EF3EE2B67216}
+		{F81E6750-0688-4586-87D5-A736C677196B} = {9F253852-1584-4769-BC8C-EF3EE2B67216}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {54506508-3F71-4603-BEAB-1608975B4484}
 	EndGlobalSection
 EndGlobal
