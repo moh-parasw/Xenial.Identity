@@ -213,7 +213,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// </summary>
         [Association]
         [Aggregated]
-        public XPCollection<XpoSecret> ClientSecrets => GetCollection<XpoSecret>();
+        public XPCollection<XpoClientSecret> ClientSecrets => GetCollection<XpoClientSecret>();
 
         /// <summary>
         /// Allows settings claims for the client (will be included in the access token).
