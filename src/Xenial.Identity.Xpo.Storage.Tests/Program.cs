@@ -21,6 +21,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests
             ApiResourceMappersTests.Tests();
             PersistedGrantMappersTests.Tests();
             ScopesMappersTests.Tests();
+            IdentityResourceMappersTests.Tests();
 
             return await Run(args);
         }

@@ -1,30 +1,31 @@
-﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+﻿using DevExpress.Xpo;
 
+using FluentAssertions;
 
-using IdentityServer4.EntityFramework.Mappers;
 using IdentityServer4.Models;
-using Xunit;
 
-namespace IdentityServer4.EntityFramework.UnitTests.Mappers
+using Xenial.Identity.Xpo.Storage.Mappers;
+
+using static Xenial.Tasty;
+
+namespace Xenial.Identity.Xpo.Storage.Tests.Mappers
 {
-    public class IdentityResourcesMappersTests
+    public static class IdentityResourceMappersTests
     {
-        [Fact]
-        public void IdentityResourceAutomapperConfigurationIsValid()
+        public static void Tests() => Describe(nameof(IdentityResourceMappers), () =>
         {
-            IdentityResourceMappers.Mapper.ConfigurationProvider.AssertConfigurationIsValid<IdentityResourceMapperProfile>();
-        }
+            It("IdentityResource Automapper Configuration is valid", () => IdentityResourceMappers.Mapper.ConfigurationProvider.AssertConfigurationIsValid<IdentityResourceMapperProfile>());
 
-        [Fact]
-        public void CanMapIdentityResources()
-        {
-            var model = new IdentityResource();
-            var mappedEntity = model.ToEntity();
-            var mappedModel = mappedEntity.ToModel();
+            It("Can map IdentityResources", () =>
+            {
+                using var session = new Session();
+                var model = new IdentityResource();
+                var mappedEntity = model.ToEntity(session);
+                var mappedModel = mappedEntity.ToModel();
 
-            Assert.NotNull(mappedModel);
-            Assert.NotNull(mappedEntity);
-        }
+                mappedModel.Should().NotBeNull();
+                mappedEntity.Should().NotBeNull();
+            });
+        });
     }
 }
