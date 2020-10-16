@@ -26,7 +26,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         [RuleRequiredField(DefaultContexts.Save)]
         public string Key { get => key; set => SetPropertyValue(ref key, value); }
 
-        [Persistent("Key")]
+        [Persistent("Value")]
         [Size(2000)]
         [RuleRequiredField(DefaultContexts.Save)]
         public string Value { get => val; set => SetPropertyValue(ref val, value); }
