@@ -59,8 +59,6 @@ namespace Xenial.Identity.Xpo.Storage.Stores
                 .Where(apiResource => apiResourceNames.Contains(apiResource.Name));
 
             var result = (await apis.ToArrayAsync())
-                //TODO: Not sure if needed
-                //.Where(x => apiResourceNames.Contains(x.Name))
                 .Select(x => x.ToModel()).ToArray();
 
             if (result.Any())
@@ -89,10 +87,7 @@ namespace Xenial.Identity.Xpo.Storage.Stores
                 where api.Scopes.Where(x => names.Contains(x.Scope)).Any()
                 select api;
 
-            var results = (await apis.ToArrayAsync())
-                  //TODO: Not sure if needed
-                  //.Where(api => api.Scopes.Any(x => names.Contains(x.Scope)))
-                  ;
+            var results = await apis.ToArrayAsync();
             var models = results.Select(x => x.ToModel()).ToArray();
 
             Logger.LogDebug("Found {apis} API resources in database", models.Select(x => x.Name));
@@ -114,10 +109,7 @@ namespace Xenial.Identity.Xpo.Storage.Stores
                 where scopes.Contains(identityResource.Name)
                 select identityResource;
 
-            var results = (await resources.ToArrayAsync())
-                //TODO: Not sure if needed
-                .Where(x => scopes.Contains(x.Name))
-                ;
+            var results = await resources.ToArrayAsync();
 
             Logger.LogDebug("Found {scopes} identity scopes in database", results.Select(x => x.Name));
 
@@ -138,10 +130,7 @@ namespace Xenial.Identity.Xpo.Storage.Stores
                 where scopes.Contains(scope.Name)
                 select scope;
 
-            var results = (await resources.ToArrayAsync())
-                //TODO: Not sure if needed
-                //.Where(x => scopes.Contains(x.Name))
-                ;
+            var results = await resources.ToArrayAsync();
 
             Logger.LogDebug("Found {scopes} scopes in database", results.Select(x => x.Name));
 

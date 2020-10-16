@@ -38,9 +38,9 @@ namespace Xenial.Identity.Xpo.Storage.Tests
 
             foreach (var (name, cs) in databases)
             {
-                //ClientStoreTests.Tests(name, cs);
-                //DeviceFlowStoreTests.Tests(name, cs);
-                //PersistedGrantStoreTests.Tests(name, cs);
+                ClientStoreTests.Tests(name, cs);
+                DeviceFlowStoreTests.Tests(name, cs);
+                PersistedGrantStoreTests.Tests(name, cs);
                 ResourceStoreTests.Tests(name, cs);
             }
 
