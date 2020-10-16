@@ -42,6 +42,26 @@ namespace Xenial.Identity.Xpo.Storage.Models
         private bool requirePkce = @default.RequirePkce;
         private bool allowPlainTextPkce = @default.AllowPlainTextPkce;
         private bool requireRequestObject = @default.RequireRequestObject;
+        private bool allowAccessTokensViaBrowser = @default.AllowAccessTokensViaBrowser;
+        private bool frontChannelLogoutSessionRequired = @default.FrontChannelLogoutSessionRequired;
+        private bool backChannelLogoutSessionRequired = @default.BackChannelLogoutSessionRequired;
+        private bool allowOfflineAccess = @default.AllowOfflineAccess;
+        private bool alwaysIncludeUserClaimsInIdToken = @default.AlwaysIncludeUserClaimsInIdToken;
+        private int identityTokenLifetime = @default.IdentityTokenLifetime;
+        private int accessTokenLifetime = @default.AccessTokenLifetime;
+        private int authorizationCodeLifetime = @default.AuthorizationCodeLifetime;
+        private int absoluteRefreshTokenLifetime = @default.AbsoluteRefreshTokenLifetime;
+        private int slidingRefreshTokenLifetime = @default.SlidingRefreshTokenLifetime;
+        private int? consentLifetime = null;
+        private TokenUsage refreshTokenUsage = @default.RefreshTokenUsage;
+        private bool updateAccessTokenClaimsOnRefresh = @default.UpdateAccessTokenClaimsOnRefresh;
+        private TokenExpiration refreshTokenExpiration = @default.RefreshTokenExpiration;
+        private AccessTokenType accessTokenType = @default.AccessTokenType;
+        private bool enableLocalLogin = @default.EnableLocalLogin;
+        private bool includeJwtId = @default.IncludeJwtId;
+        private bool alwaysSendClientClaims = @default.AlwaysSendClientClaims;
+        private int? userSsoLifetime;
+        private int deviceCodeLifetime = @default.DeviceCodeLifetime;
 
         #region Fields with mappings
 
@@ -228,6 +248,8 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <value>
         /// The properties.
         /// </value>
+        [Association]
+        [Aggregated]
         public XPCollection<XpoClientProperty> Properties => GetCollection<XpoClientProperty>();
 
         #endregion
@@ -239,31 +261,37 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// </summary>
         [Persistent("RequireClientSecret")]
         public bool RequireClientSecret { get => requireClientSecret; set => SetPropertyValue(ref requireClientSecret, value); }
+
         /// <summary>
         /// Specifies whether a consent screen is required (defaults to <c>false</c>)
         /// </summary>
         [Persistent("RequireConsent")]
         public bool RequireConsent { get => requireConsent; set => SetPropertyValue(ref requireConsent, value); }
+
         /// <summary>
         /// Specifies whether user can choose to store consent decisions (defaults to <c>true</c>)
         /// </summary>
         [Persistent("AllowRememberConsent")]
         public bool AllowRememberConsent { get => allowRememberConsent; set => SetPropertyValue(ref allowRememberConsent, value); }
+
         /// <summary>
         /// Specifies whether a proof key is required for authorization code based token requests (defaults to <c>true</c>).
         /// </summary>
         [Persistent("RequirePkce")]
         public bool RequirePkce { get => requirePkce; set => SetPropertyValue(ref requirePkce, value); }
+
         /// <summary>
         /// Specifies whether a proof key can be sent using plain method (not recommended and defaults to <c>false</c>.)
         /// </summary>
         [Persistent("AllowPlainTextPkce")]
         public bool AllowPlainTextPkce { get => allowPlainTextPkce; set => SetPropertyValue(ref allowPlainTextPkce, value); }
+
         /// <summary>
         /// Specifies whether the client must use a request object on authorize requests (defaults to <c>false</c>.)
         /// </summary>
         [Persistent("RequireRequestObject")]
         public bool RequireRequestObject { get => requireRequestObject; set => SetPropertyValue(ref requireRequestObject, value); }
+
         /// <summary>
         /// Controls whether access tokens are transmitted via the browser for this client (defaults to <c>false</c>).
         /// This can prevent accidental leakage of access tokens when multiple response types are allowed.
@@ -271,77 +299,76 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <value>
         /// <c>true</c> if access tokens can be transmitted via the browser; otherwise, <c>false</c>.
         /// </value>
-        /// 
         [Persistent("AllowAccessTokensViaBrowser")]
-        public bool AllowAccessTokensViaBrowser { get; set; } = @default.AllowAccessTokensViaBrowser;
+        public bool AllowAccessTokensViaBrowser { get => allowAccessTokensViaBrowser; set => SetPropertyValue(ref allowAccessTokensViaBrowser, value); }
 
         /// <summary>
         /// Specifies is the user's session id should be sent to the FrontChannelLogoutUri. Defaults to <c>true</c>.
         /// </summary>
         [Persistent("FrontChannelLogoutSessionRequired")]
-        public bool FrontChannelLogoutSessionRequired { get; set; } = @default.FrontChannelLogoutSessionRequired;
+        public bool FrontChannelLogoutSessionRequired { get => frontChannelLogoutSessionRequired; set => SetPropertyValue(ref frontChannelLogoutSessionRequired, value); }
 
         /// <summary>
         /// Specifies is the user's session id should be sent to the BackChannelLogoutUri. Defaults to <c>true</c>.
         /// </summary>
         [Persistent("BackChannelLogoutSessionRequired")]
-        public bool BackChannelLogoutSessionRequired { get; set; } = @default.BackChannelLogoutSessionRequired;
+        public bool BackChannelLogoutSessionRequired { get => backChannelLogoutSessionRequired; set => SetPropertyValue(ref backChannelLogoutSessionRequired, value); }
 
         /// <summary>
         /// Gets or sets a value indicating whether [allow offline access]. Defaults to <c>false</c>.
         /// </summary>
         [Persistent("AllowOfflineAccess")]
-        public bool AllowOfflineAccess { get; set; } = @default.AllowOfflineAccess;
+        public bool AllowOfflineAccess { get => allowOfflineAccess; set => SetPropertyValue(ref allowOfflineAccess, value); }
 
         /// <summary>
         /// When requesting both an id token and access token, should the user claims always be added to the id token instead of requiring the client to use the userinfo endpoint.
         /// Defaults to <c>false</c>.
         /// </summary>
         [Persistent("AlwaysIncludeUserClaimsInIdToken")]
-        public bool AlwaysIncludeUserClaimsInIdToken { get; set; } = @default.AlwaysIncludeUserClaimsInIdToken;
+        public bool AlwaysIncludeUserClaimsInIdToken { get => alwaysIncludeUserClaimsInIdToken; set => SetPropertyValue(ref alwaysIncludeUserClaimsInIdToken, value); }
 
         /// <summary>
         /// Lifetime of identity token in seconds (defaults to 300 seconds / 5 minutes)
         /// </summary>
         [Persistent("IdentityTokenLifetime")]
-        public int IdentityTokenLifetime { get; set; } = @default.IdentityTokenLifetime;
+        public int IdentityTokenLifetime { get => identityTokenLifetime; set => SetPropertyValue(ref identityTokenLifetime, value); }
 
         /// <summary>
         /// Lifetime of access token in seconds (defaults to 3600 seconds / 1 hour)
         /// </summary>
         [Persistent("AccessTokenLifetime")]
-        public int AccessTokenLifetime { get; set; } = @default.AccessTokenLifetime;
+        public int AccessTokenLifetime { get => accessTokenLifetime; set => SetPropertyValue(ref accessTokenLifetime, value); }
 
         /// <summary>
         /// Lifetime of authorization code in seconds (defaults to 300 seconds / 5 minutes)
         /// </summary>
         [Persistent("AuthorizationCodeLifetime")]
-        public int AuthorizationCodeLifetime { get; set; } = @default.AuthorizationCodeLifetime;
+        public int AuthorizationCodeLifetime { get => authorizationCodeLifetime; set => SetPropertyValue(ref authorizationCodeLifetime, value); }
 
         /// <summary>
         /// Maximum lifetime of a refresh token in seconds. Defaults to 2592000 seconds / 30 days
         /// </summary>
         [Persistent("AbsoluteRefreshTokenLifetime")]
-        public int AbsoluteRefreshTokenLifetime { get; set; } = @default.AbsoluteRefreshTokenLifetime;
+        public int AbsoluteRefreshTokenLifetime { get => absoluteRefreshTokenLifetime; set => SetPropertyValue(ref absoluteRefreshTokenLifetime, value); }
 
         /// <summary>
         /// Sliding lifetime of a refresh token in seconds. Defaults to 1296000 seconds / 15 days
         /// </summary>
         [Persistent("SlidingRefreshTokenLifetime")]
-        public int SlidingRefreshTokenLifetime { get; set; } = @default.SlidingRefreshTokenLifetime;
+        public int SlidingRefreshTokenLifetime { get => slidingRefreshTokenLifetime; set => SetPropertyValue(ref slidingRefreshTokenLifetime, value); }
 
         /// <summary>
         /// Lifetime of a user consent in seconds. Defaults to null (no expiration)
         /// </summary>
         [Persistent("ConsentLifetime")]
-        public int? ConsentLifetime { get; set; } = null;
+        public int? ConsentLifetime { get => consentLifetime; set => SetPropertyValue(ref consentLifetime, value); }
 
         /// <summary>
         /// ReUse: the refresh token handle will stay the same when refreshing tokens
         /// OneTime: the refresh token handle will be updated when refreshing tokens
         /// </summary>
         [Persistent("RefreshTokenUsage")]
-        public TokenUsage RefreshTokenUsage { get; set; } = @default.RefreshTokenUsage;
+        public TokenUsage RefreshTokenUsage { get => refreshTokenUsage; set => SetPropertyValue(ref refreshTokenUsage, value); }
 
         /// <summary>
         /// Gets or sets a value indicating whether the access token (and its claims) should be updated on a refresh token request.
@@ -351,20 +378,20 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <c>true</c> if the token should be updated; otherwise, <c>false</c>.
         /// </value>
         [Persistent("UpdateAccessTokenClaimsOnRefresh")]
-        public bool UpdateAccessTokenClaimsOnRefresh { get; set; } = @default.UpdateAccessTokenClaimsOnRefresh;
+        public bool UpdateAccessTokenClaimsOnRefresh { get => updateAccessTokenClaimsOnRefresh; set => SetPropertyValue(ref updateAccessTokenClaimsOnRefresh, value); }
 
         /// <summary>
         /// Absolute: the refresh token will expire on a fixed point in time (specified by the AbsoluteRefreshTokenLifetime)
         /// Sliding: when refreshing the token, the lifetime of the refresh token will be renewed (by the amount specified in SlidingRefreshTokenLifetime). The lifetime will not exceed AbsoluteRefreshTokenLifetime.
         /// </summary>        
         [Persistent("RefreshTokenExpiration")]
-        public TokenExpiration RefreshTokenExpiration { get; set; } = @default.RefreshTokenExpiration;
+        public TokenExpiration RefreshTokenExpiration { get => refreshTokenExpiration; set => SetPropertyValue(ref refreshTokenExpiration, value); }
 
         /// <summary>
         /// Specifies whether the access token is a reference token or a self contained JWT token (defaults to Jwt).
         /// </summary>
         [Persistent("AccessTokenType")]
-        public AccessTokenType AccessTokenType { get; set; } = @default.AccessTokenType;
+        public AccessTokenType AccessTokenType { get => accessTokenType; set => SetPropertyValue(ref accessTokenType, value); }
 
         /// <summary>
         /// Gets or sets a value indicating whether the local login is allowed for this client. Defaults to <c>true</c>.
@@ -373,7 +400,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         ///   <c>true</c> if local logins are enabled; otherwise, <c>false</c>.
         /// </value>
         [Persistent("EnableLocalLogin")]
-        public bool EnableLocalLogin { get; set; } = @default.EnableLocalLogin;
+        public bool EnableLocalLogin { get => enableLocalLogin; set => SetPropertyValue(ref enableLocalLogin, value); }
 
         /// <summary>
         /// Gets or sets a value indicating whether JWT access tokens should include an identifier. Defaults to <c>true</c>.
@@ -382,7 +409,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <c>true</c> to add an id; otherwise, <c>false</c>.
         /// </value>
         [Persistent("IncludeJwtId")]
-        public bool IncludeJwtId { get; set; } = @default.IncludeJwtId;
+        public bool IncludeJwtId { get => includeJwtId; set => SetPropertyValue(ref includeJwtId, value); }
 
         /// <summary>
         /// Gets or sets a value indicating whether client claims should be always included in the access tokens - or only for client credentials flow.
@@ -392,13 +419,13 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <c>true</c> if claims should always be sent; otherwise, <c>false</c>.
         /// </value>
         [Persistent("AlwaysSendClientClaims")]
-        public bool AlwaysSendClientClaims { get; set; } = @default.AlwaysSendClientClaims;
+        public bool AlwaysSendClientClaims { get => alwaysSendClientClaims; set => SetPropertyValue(ref alwaysSendClientClaims, value); }
 
         /// <summary>
         /// The maximum duration (in seconds) since the last time the user authenticated.
         /// </summary>
         [Persistent("UserSsoLifetime")]
-        public int? UserSsoLifetime { get; set; }
+        public int? UserSsoLifetime { get => userSsoLifetime; set => SetPropertyValue(ref userSsoLifetime, value); }
 
         /// <summary>
         /// Gets or sets the device code lifetime.
@@ -407,7 +434,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// The device code lifetime.
         /// </value>
         [Persistent("DeviceCodeLifetime")]
-        public int DeviceCodeLifetime { get; set; } = @default.DeviceCodeLifetime;
+        public int DeviceCodeLifetime { get => deviceCodeLifetime; set => SetPropertyValue(ref deviceCodeLifetime, value); }
 
         #endregion
     }
