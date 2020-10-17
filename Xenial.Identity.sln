@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xenial.Identity.Xpo.Storage
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xenial.Identity.Xpo.Storage.Tests", "src\Xenial.Identity.Xpo.Storage.Tests\Xenial.Identity.Xpo.Storage.Tests.csproj", "{4EFB3C35-EE20-4714-A15F-536AC6A5A421}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xenial.Identity.Xpo", "src\Xenial.Identity.Xpo\Xenial.Identity.Xpo.csproj", "{8F155CB9-132B-4B1E-AFFF-D2820D70B753}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xenial.Identity.Xpo", "src\Xenial.Identity.Xpo\Xenial.Identity.Xpo.csproj", "{8F155CB9-132B-4B1E-AFFF-D2820D70B753}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xenial.AspNetIdentity.Xpo", "src\Xenial.AspNetIdentity.Xpo\Xenial.AspNetIdentity.Xpo.csproj", "{FC700C56-9DBA-452F-B602-D90EA76BDBF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,18 @@ Global
 		{8F155CB9-132B-4B1E-AFFF-D2820D70B753}.Release|x64.Build.0 = Release|Any CPU
 		{8F155CB9-132B-4B1E-AFFF-D2820D70B753}.Release|x86.ActiveCfg = Release|Any CPU
 		{8F155CB9-132B-4B1E-AFFF-D2820D70B753}.Release|x86.Build.0 = Release|Any CPU
+		{FC700C56-9DBA-452F-B602-D90EA76BDBF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC700C56-9DBA-452F-B602-D90EA76BDBF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC700C56-9DBA-452F-B602-D90EA76BDBF7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FC700C56-9DBA-452F-B602-D90EA76BDBF7}.Debug|x64.Build.0 = Debug|Any CPU
+		{FC700C56-9DBA-452F-B602-D90EA76BDBF7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FC700C56-9DBA-452F-B602-D90EA76BDBF7}.Debug|x86.Build.0 = Debug|Any CPU
+		{FC700C56-9DBA-452F-B602-D90EA76BDBF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC700C56-9DBA-452F-B602-D90EA76BDBF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC700C56-9DBA-452F-B602-D90EA76BDBF7}.Release|x64.ActiveCfg = Release|Any CPU
+		{FC700C56-9DBA-452F-B602-D90EA76BDBF7}.Release|x64.Build.0 = Release|Any CPU
+		{FC700C56-9DBA-452F-B602-D90EA76BDBF7}.Release|x86.ActiveCfg = Release|Any CPU
+		{FC700C56-9DBA-452F-B602-D90EA76BDBF7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +94,7 @@ Global
 		{F81E6750-0688-4586-87D5-A736C677196B} = {9F253852-1584-4769-BC8C-EF3EE2B67216}
 		{4EFB3C35-EE20-4714-A15F-536AC6A5A421} = {9F253852-1584-4769-BC8C-EF3EE2B67216}
 		{8F155CB9-132B-4B1E-AFFF-D2820D70B753} = {9F253852-1584-4769-BC8C-EF3EE2B67216}
+		{FC700C56-9DBA-452F-B602-D90EA76BDBF7} = {9F253852-1584-4769-BC8C-EF3EE2B67216}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {54506508-3F71-4603-BEAB-1608975B4484}

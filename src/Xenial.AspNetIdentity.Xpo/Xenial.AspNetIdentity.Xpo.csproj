@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DevExpress.Xpo" Version="20.2.2-*" />
+    <PackageReference Include="DevExpress.Persistent.Base" Version="20.2.2-*" />
+
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.1.9" />
+  </ItemGroup>
+
+</Project>
