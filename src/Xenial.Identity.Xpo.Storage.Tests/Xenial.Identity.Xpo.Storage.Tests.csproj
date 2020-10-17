@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Xenial.Identity.Xpo.Storage\Xenial.Identity.Xpo.Storage.csproj" />
+    <ProjectReference Include="..\Xenial.Identity.Xpo\Xenial.Identity.Xpo.csproj" />
   </ItemGroup>
 
 </Project>
