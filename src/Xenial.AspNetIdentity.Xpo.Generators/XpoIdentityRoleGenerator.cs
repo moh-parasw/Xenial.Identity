@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 namespace Xenial.AspNetIdentity.Xpo.Generators
 {
     [Generator]
-    public class XpoIdentityRoleGenerator : XpoIdentityGenerator, ISourceGenerator
+    public class XpoIdentityRoleGenerator : XpoIdentityGenerator
     {
         //        private const string attributeText = @"
         //using System;
