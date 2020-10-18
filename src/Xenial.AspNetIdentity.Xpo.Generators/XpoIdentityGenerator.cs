@@ -50,8 +50,6 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                 var attributes = classSymbol.GetAttributes();
                 var attributeData = attributes.Single(ad => ad.AttributeClass.Equals(attributeSymbol, SymbolEqualityComparer.Default));
 
-                var userTypeSymbol = attributeData.NamedArguments.FirstOrDefault(a => a.Key == "UserType");
-
                 var textWriter = new StringWriter();
                 var writer = new IndentedTextWriter(textWriter);
 
@@ -84,15 +82,22 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                             writer.WriteLine();
                         }
 
-                        if (userTypeSymbol.Key is not null && userTypeSymbol.Value is TypedConstant userTypedConstant)
+                        foreach (var manyField in ManyFields)
                         {
-                            var userTypeName = userTypedConstant.Value.ToString();
-                            writer.WriteLine();
-                            var propertyDeclaration = $"public XPCollection<{userTypeName}> Users => GetCollection<{userTypeName}>(\"Users\");";
-                            writer.WriteLine("[Association]");
-                            writer.WriteLine(propertyDeclaration);
-                            writer.WriteLine();
+                            var manySymbol = attributeData.NamedArguments.FirstOrDefault(a => a.Key == manyField.attributeFieldName);
+
+                            if (manySymbol.Key is not null && manySymbol.Value is TypedConstant userTypedConstant)
+                            {
+                                var manyTypeName = userTypedConstant.Value.ToString();
+                                writer.WriteLine();
+                                var propertyDeclaration = $"public XPCollection<{manyTypeName}> {manyField.propertyName} => GetCollection<{manyTypeName}>(\"{manyField.propertyName}\");";
+                                writer.WriteLine("[Association]");
+                                writer.WriteLine(propertyDeclaration);
+                                writer.WriteLine();
+                            }
+
                         }
+
 
                         writer.Indent--;
                     }
