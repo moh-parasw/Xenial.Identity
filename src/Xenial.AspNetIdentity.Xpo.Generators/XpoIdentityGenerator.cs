@@ -116,7 +116,7 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                             {
                                 var oneTypeName = userTypedConstant.Value.ToString();
                                 writer.WriteLine();
-                                  writer.WriteLine($"private {oneTypeName} {LowerCaseFirstLetter(oneField.propertyName)};");
+                                writer.WriteLine($"private {oneTypeName} {LowerCaseFirstLetter(oneField.propertyName)};");
                                 var propertyDeclaration = $"public {oneTypeName} {oneField.propertyName} {{ get => {LowerCaseFirstLetter(oneField.propertyName)}; set => SetPropertyValue(\"{oneField.propertyName}\", ref {LowerCaseFirstLetter(oneField.propertyName)}, value); }}";
                                 writer.WriteLine("[Association]");
                                 if (oneField.isAggregated)
