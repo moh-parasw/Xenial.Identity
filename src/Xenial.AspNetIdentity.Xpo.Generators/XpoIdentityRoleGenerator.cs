@@ -115,6 +115,12 @@ namespace Xenial.AspNetIdentity.Xpo
                             writer.WriteLine(propertyDeclaration);
                             writer.WriteLine();
                         }
+
+                        if(userTypeSymbol && userTypeSymbol.Value is TypedConstant userTypedConstant)
+                        {
+                            var userTypeName = userTypedConstant.Value.ToString();
+                        }
+
                         writer.Indent--;
                     }
                     var source = textWriter.ToString();

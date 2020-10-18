@@ -19,7 +19,8 @@ namespace Xenial.AspNetIdentity.Xpo.Models
         public Guid Id { get => id; set => SetPropertyValue(ref id, value); }
     }
 
-    [XPIdentityRole(UserType = typeof(MyUser))]
+    // [XPIdentityRole(UserType = typeof(MyUser))]
+    [XPIdentityRole]
     [Persistent]
     public partial class MyRole : XpoIdentityBaseObject
     {
