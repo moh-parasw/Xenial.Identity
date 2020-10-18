@@ -20,8 +20,8 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
 
         protected virtual IEnumerable<(Type type, string name, int size, string[] additionalAttributes)> Fields { get; }
 
-        protected virtual IEnumerable<(string attributeFieldName, string propertyName, bool isAggregated, string[] additionalAttributes)> ManyFields { get; }
-        protected virtual IEnumerable<(string attributeFieldName, string propertyName, bool isAggregated, string[] additionalAttributes)> OneFields { get; }
+        protected virtual IEnumerable<(string attributeFieldName, string propertyName, bool isAggregated, string[] additionalAttributes)> ManyFields { get { yield break; } }
+        protected virtual IEnumerable<(string attributeFieldName, string propertyName, bool isAggregated, string[] additionalAttributes)> OneFields { get { yield break; } }
 
         public void Execute(GeneratorExecutionContext context)
         {
