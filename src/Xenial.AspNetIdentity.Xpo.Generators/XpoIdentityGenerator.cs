@@ -27,7 +27,7 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
         {
             var attributeSource = SourceText.From(AttributeText, Encoding.UTF8);
 
-            context.AddSource(AttributeFullName, attributeSource);
+            context.AddSource(AttributeName, attributeSource);
 
             var options = (context.Compilation as CSharpCompilation).SyntaxTrees[0].Options as CSharpParseOptions;
             var compilation = context.Compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(attributeSource, options));
