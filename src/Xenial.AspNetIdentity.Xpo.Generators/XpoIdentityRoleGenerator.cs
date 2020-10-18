@@ -116,7 +116,7 @@ namespace Xenial.AspNetIdentity.Xpo
                             writer.WriteLine();
                         }
 
-                        if(userTypeSymbol.Value is TypedConstant userTypedConstant)
+                        if(userTypeSymbol.Key is not null && userTypeSymbol.Value is TypedConstant userTypedConstant)
                         {
                             var userTypeName = userTypedConstant.Value.ToString();
                         }
