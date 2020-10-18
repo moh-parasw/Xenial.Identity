@@ -140,7 +140,7 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                         writer.Indent--;
                     }
                     var source = textWriter.ToString();
-                    var sourceFileName = $"{targetType.Identifier}.XPIdentityRole.generated.cs";
+                    var sourceFileName = $"{targetType.Identifier}.{Name}.generated.cs";
                     context.AddSource(sourceFileName, SourceText.From(source, Encoding.UTF8));
                     File.WriteAllText($@"C:\F\tmp\{sourceFileName}", source);
                 }
