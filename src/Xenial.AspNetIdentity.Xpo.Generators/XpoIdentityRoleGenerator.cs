@@ -34,21 +34,36 @@ namespace Xenial.AspNetIdentity.Xpo
         public void Execute(GeneratorExecutionContext context)
         {
             context.AddSource("XPIdentityRoleAttribute", SourceText.From(attributeText, Encoding.UTF8));
+
+            CSharpParseOptions options = (context.Compilation as CSharpCompilation).SyntaxTrees[0].Options as CSharpParseOptions;
+            Compilation compilation = context.Compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(SourceText.From(attributeText, Encoding.UTF8), options));
+
+            // get the newly bound attribute, and INotifyPropertyChanged
+            INamedTypeSymbol attributeSymbol = compilation.GetTypeByMetadataName("Xenial.AspNetIdentity.Xpo.XPIdentityRoleAttribute");
+
 #if DEBUG
-            //if (!Debugger.IsAttached)
-            //{
-            //    Debugger.Launch();
-            //}
+            if (!System.Diagnostics.Debugger.IsAttached)
+            {
+               System.Diagnostics.Debugger.Launch();
+            }
 #endif
 
             if (context.SyntaxReceiver is SyntaxReceiver syntaxReceiver)
             {
-                var userType = syntaxReceiver.ClassToAugment;
+                var roleType = syntaxReceiver.ClassToAugment;
+
+                var model = context.Compilation.GetSemanticModel(roleType.SyntaxTree);
+                var classSymbol = (INamedTypeSymbol)model.GetDeclaredSymbol(roleType);
+
+                var attributes = classSymbol.GetAttributes();
+                var attributeData = attributes.Single(ad => ad.AttributeClass.Equals(attributeSymbol, SymbolEqualityComparer.Default));
+
+                var userTypeSymbol = attributeData.NamedArguments.FirstOrDefault(a => a.Key == "UserType");
 
                 var textWriter = new StringWriter();
                 var writer = new IndentedTextWriter(textWriter);
 
-                if (userType.Parent.IsKind(SyntaxKind.NamespaceDeclaration) && userType.Parent is NamespaceDeclarationSyntax namespaceDeclarationSyntax)
+                if (roleType.Parent.IsKind(SyntaxKind.NamespaceDeclaration) && roleType.Parent is NamespaceDeclarationSyntax namespaceDeclarationSyntax)
                 {
                     var fields = new[]
                     {
@@ -63,7 +78,7 @@ namespace Xenial.AspNetIdentity.Xpo
                     writer.WriteLine("using Microsoft.AspNetCore.Identity;");
                     writer.WriteLine();
                     using (new CurlyIndenter(writer, $"namespace {namespaceDeclarationSyntax.Name}"))
-                    using (new CurlyIndenter(writer, $"partial class {userType.Identifier}"))
+                    using (new CurlyIndenter(writer, $"partial class {roleType.Identifier}"))
                     {
                         string LowerCaseFirstLetter(string str)
                         {
@@ -103,7 +118,7 @@ namespace Xenial.AspNetIdentity.Xpo
                         writer.Indent--;
                     }
                     var source = textWriter.ToString();
-                    var sourceFileName = $"{userType.Identifier}.XPIdentityRole.generated.cs";
+                    var sourceFileName = $"{roleType.Identifier}.XPIdentityRole.generated.cs";
                     context.AddSource(sourceFileName, SourceText.From(source, Encoding.UTF8));
                     File.WriteAllText($@"C:\F\tmp\{sourceFileName}", source);
                 }

@@ -25,6 +25,7 @@ namespace Xenial.AspNetIdentity.Xpo.Models
     {
         private Guid id;
 
+
         public MyRole(Session session) : base(session) { }
 
         [Persistent]
