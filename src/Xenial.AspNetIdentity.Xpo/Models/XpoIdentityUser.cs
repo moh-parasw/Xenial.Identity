@@ -2,7 +2,10 @@
 
 using DevExpress.Xpo;
 
+
 using Microsoft.AspNetCore.Identity;
+
+using Xenial.AspNetIdentity.Xpo;
 
 namespace Xenial.AspNetIdentity.Xpo.Models
 {
@@ -20,7 +23,6 @@ namespace Xenial.AspNetIdentity.Xpo.Models
     }
 
     [XPIdentityRole(UserType = typeof(MyUser))]
-    // [XPIdentityRole]
     [Persistent]
     public partial class MyRole : XpoIdentityBaseObject
     {
