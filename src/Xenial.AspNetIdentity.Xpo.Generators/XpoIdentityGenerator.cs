@@ -92,6 +92,16 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                                 writer.WriteLine();
                                 var propertyDeclaration = $"public XPCollection<{manyTypeName}> {manyField.propertyName} => GetCollection<{manyTypeName}>(\"{manyField.propertyName}\");";
                                 writer.WriteLine("[Association]");
+                                if(manyField.isAggregated)
+                                {
+                                    writer.WriteLine("[Aggregated]");
+                                }
+
+                                foreach(var additionalAttribute in manyField.additionalAttributes)
+                                {
+                                     writer.WriteLine($"[{additionalAttribute}]");
+                                }
+
                                 writer.WriteLine(propertyDeclaration);
                                 writer.WriteLine();
                             }
