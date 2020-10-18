@@ -35,11 +35,11 @@ namespace Xenial.AspNetIdentity.Xpo
         {
             context.AddSource("XPIdentityRoleAttribute", SourceText.From(attributeText, Encoding.UTF8));
 
-            //CSharpParseOptions options = (context.Compilation as CSharpCompilation).SyntaxTrees[0].Options as CSharpParseOptions;
-            //Compilation compilation = context.Compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(SourceText.From(attributeText, Encoding.UTF8), options));
+            CSharpParseOptions options = (context.Compilation as CSharpCompilation).SyntaxTrees[0].Options as CSharpParseOptions;
+            Compilation compilation = context.Compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(SourceText.From(attributeText, Encoding.UTF8), options));
 
             // get the newly bound attribute, and INotifyPropertyChanged
-            INamedTypeSymbol attributeSymbol = context.Compilation.GetTypeByMetadataName("Xenial.AspNetIdentity.Xpo.XPIdentityRoleAttribute");
+            INamedTypeSymbol attributeSymbol = compilation.GetTypeByMetadataName("Xenial.AspNetIdentity.Xpo.XPIdentityRoleAttribute");
 
 #if DEBUG
             if (!System.Diagnostics.Debugger.IsAttached)
@@ -52,7 +52,8 @@ namespace Xenial.AspNetIdentity.Xpo
             {
                 var roleType = syntaxReceiver.ClassToAugment;
 
-                var model = context.Compilation.GetSemanticModel(roleType.SyntaxTree);
+                context.Compilation.AddSyntaxTrees(roleType.SyntaxTree);
+                var model = compilation.GetSemanticModel(roleType.SyntaxTree);
                 var classSymbol = (INamedTypeSymbol)model.GetDeclaredSymbol(roleType);
 
                 var attributes = classSymbol.GetAttributes();
