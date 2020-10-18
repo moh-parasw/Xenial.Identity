@@ -42,10 +42,10 @@ namespace Xenial.AspNetIdentity.Xpo
             INamedTypeSymbol attributeSymbol = compilation.GetTypeByMetadataName("Xenial.AspNetIdentity.Xpo.XPIdentityRoleAttribute");
 
 #if DEBUG
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-              System.Diagnostics.Debugger.Launch();
-            }
+            // if (!System.Diagnostics.Debugger.IsAttached)
+            // {
+            //     System.Diagnostics.Debugger.Launch();
+            // }
 #endif
 
             if (context.SyntaxReceiver is SyntaxReceiver syntaxReceiver)
@@ -116,7 +116,7 @@ namespace Xenial.AspNetIdentity.Xpo
                             writer.WriteLine();
                         }
 
-                        if(userTypeSymbol.Key is not null && userTypeSymbol.Value is TypedConstant userTypedConstant)
+                        if (userTypeSymbol.Key is not null && userTypeSymbol.Value is TypedConstant userTypedConstant)
                         {
                             var userTypeName = userTypedConstant.Value.ToString();
                             writer.WriteLine();
