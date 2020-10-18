@@ -93,14 +93,14 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                                 writer.WriteLine();
                                 var propertyDeclaration = $"public XPCollection<{manyTypeName}> {manyField.propertyName} => GetCollection<{manyTypeName}>(\"{manyField.propertyName}\");";
                                 writer.WriteLine("[Association]");
-                                if(manyField.isAggregated)
+                                if (manyField.isAggregated)
                                 {
                                     writer.WriteLine("[Aggregated]");
                                 }
 
-                                foreach(var additionalAttribute in manyField.additionalAttributes)
+                                foreach (var additionalAttribute in manyField.additionalAttributes)
                                 {
-                                     writer.WriteLine($"[{additionalAttribute}]");
+                                    writer.WriteLine($"[{additionalAttribute}]");
                                 }
 
                                 writer.WriteLine(propertyDeclaration);
@@ -116,16 +116,17 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                             {
                                 var oneTypeName = userTypedConstant.Value.ToString();
                                 writer.WriteLine();
-                                var propertyDeclaration = $"public XPCollection<{oneTypeName}> {oneField.propertyName} => GetCollection<{oneTypeName}>(\"{oneField.propertyName}\");";
+                                  writer.WriteLine($"private {oneTypeName} {LowerCaseFirstLetter(oneField.propertyName)};");
+                                var propertyDeclaration = $"public {oneTypeName} {oneField.propertyName} {{ get => {LowerCaseFirstLetter(oneField.propertyName)}; set => SetPropertyValue(\"{oneField.propertyName}\", ref {LowerCaseFirstLetter(oneField.propertyName)}, value); }}";
                                 writer.WriteLine("[Association]");
-                                if(oneField.isAggregated)
+                                if (oneField.isAggregated)
                                 {
                                     writer.WriteLine("[Aggregated]");
                                 }
 
-                                foreach(var additionalAttribute in oneField.additionalAttributes)
+                                foreach (var additionalAttribute in oneField.additionalAttributes)
                                 {
-                                     writer.WriteLine($"[{additionalAttribute}]");
+                                    writer.WriteLine($"[{additionalAttribute}]");
                                 }
 
                                 writer.WriteLine(propertyDeclaration);
