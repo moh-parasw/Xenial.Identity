@@ -6,12 +6,84 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Xenial.AspNetIdentity.Xpo.Models
 {
+    [XPIdentityUser]
+    public partial class MyClassWithContent : XpoIdentityBaseObject
+    {
+        private Guid id;
+
+        public MyClassWithContent(Session session) : base(session)
+        {
+        }
+
+        [Persistent]
+        [Key(AutoGenerate = true)]
+        public Guid Id { get => id; set => SetPropertyValue(ref id, value); }
+
+
+
+
+
+    }
+
     [NonPersistent]
-    public abstract class XpoIdentityUser<TKey> : XpoIdentityBaseObject
+    public abstract class XpoIdentityUserGuid : XpoIdentityUserBase<Guid>
+    {
+        public XpoIdentityUserGuid(Session session) : base(session) { }
+
+        [Association]
+        public XPCollection<XpoIdentityUserClaimGuid> Claims => GetCollection<XpoIdentityUserClaimGuid>();
+    }
+
+    [NonPersistent]
+    public abstract class XpoIdentityUserString : XpoIdentityUserBaseNoAuto<string>
+    {
+        public XpoIdentityUserString(Session session) : base(session) { }
+    }
+
+    [NonPersistent]
+    public abstract class XpoIdentityUserInt : XpoIdentityUserBase<int>
+    {
+        public XpoIdentityUserInt(Session session) : base(session) { }
+    }
+
+    [NonPersistent]
+    public abstract class XpoIdentityUserBase<TKey> : XpoIdentityUserBase
         where TKey : IEquatable<TKey>
     {
-        private string userName;
         private TKey id;
+
+        public XpoIdentityUserBase(Session session) : base(session) { }
+
+        /// <summary>
+        /// Gets or sets the primary key for this user.
+        /// </summary>
+        [PersonalData]
+        [Persistent]
+        [Key(AutoGenerate = true)]
+        public TKey Id { get => id; set => SetPropertyValue(ref id, value); }
+    }
+
+    [NonPersistent]
+    public abstract class XpoIdentityUserBaseNoAuto<TKey> : XpoIdentityUserBase
+        where TKey : IEquatable<TKey>
+    {
+        private TKey id;
+
+        public XpoIdentityUserBaseNoAuto(Session session) : base(session) { }
+
+        /// <summary>
+        /// Gets or sets the primary key for this user.
+        /// </summary>
+        [PersonalData]
+        [Persistent]
+        [Key]
+        public TKey Id { get => id; set => SetPropertyValue(ref id, value); }
+    }
+
+    [NonPersistent]
+    public abstract class XpoIdentityUserBase : XpoIdentityBaseObject
+    {
+        private string userName;
         private string normalizedUserName;
         private string email;
         private string normalizedEmail;
@@ -22,21 +94,11 @@ namespace Xenial.AspNetIdentity.Xpo.Models
         private string phoneNumber;
         private bool phoneNumberConfirmed;
         private bool twoFactorEnabled;
-        private DateTimeOffset? lockoutEnd;
+        private DateTime? lockoutEnd;
         private bool lockoutEnabled;
         private int accessFailedCount;
 
-        public XpoIdentityUser(Session session) : base(session) { }
-
-        /// <summary>
-        /// Gets or sets the primary key for this user.
-        /// </summary>
-        [PersonalData]
-        [Persistent("Id")]
-        [Key]
-        //[Key(AutoGenerate = true)]
-        //TODO: Autogenerate for Key
-        public TKey Id { get => id; set => SetPropertyValue(ref id, value); }
+        public XpoIdentityUserBase(Session session) : base(session) { }
 
         /// <summary>
         /// Gets or sets the user name for this user.
@@ -133,7 +195,7 @@ namespace Xenial.AspNetIdentity.Xpo.Models
         /// A value in the past means the user is not locked out.
         /// </remarks>
         [Persistent]
-        public DateTimeOffset? LockoutEnd { get => lockoutEnd; set => SetPropertyValue(ref lockoutEnd, value); }
+        public DateTime? LockoutEnd { get => lockoutEnd; set => SetPropertyValue(ref lockoutEnd, value); }
 
         /// <summary>
         /// Gets or sets a flag indicating if the user could be locked out.

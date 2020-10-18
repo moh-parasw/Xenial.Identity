@@ -11,4 +11,10 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.1.9" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Xenial.AspNetIdentity.Xpo.Generators\Xenial.AspNetIdentity.Xpo.Generators.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
 </Project>
