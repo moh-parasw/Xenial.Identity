@@ -21,6 +21,7 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
         protected virtual IEnumerable<(Type type, string name, int size, string[] additionalAttributes)> Fields { get; }
 
         protected virtual IEnumerable<(string attributeFieldName, string propertyName, bool isAggregated, string[] additionalAttributes)> ManyFields { get; }
+        protected virtual IEnumerable<(string attributeFieldName, string propertyName, bool isAggregated, string[] additionalAttributes)> OneFields { get; }
 
         public void Execute(GeneratorExecutionContext context)
         {
@@ -105,7 +106,31 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                                 writer.WriteLine(propertyDeclaration);
                                 writer.WriteLine();
                             }
+                        }
 
+                        foreach (var oneField in OneFields)
+                        {
+                            var oneSymbol = attributeData.NamedArguments.FirstOrDefault(a => a.Key == oneField.attributeFieldName);
+
+                            if (oneSymbol.Key is not null && oneSymbol.Value is TypedConstant userTypedConstant)
+                            {
+                                var oneTypeName = userTypedConstant.Value.ToString();
+                                writer.WriteLine();
+                                var propertyDeclaration = $"public XPCollection<{oneTypeName}> {oneField.propertyName} => GetCollection<{oneTypeName}>(\"{oneField.propertyName}\");";
+                                writer.WriteLine("[Association]");
+                                if(oneField.isAggregated)
+                                {
+                                    writer.WriteLine("[Aggregated]");
+                                }
+
+                                foreach(var additionalAttribute in oneField.additionalAttributes)
+                                {
+                                     writer.WriteLine($"[{additionalAttribute}]");
+                                }
+
+                                writer.WriteLine(propertyDeclaration);
+                                writer.WriteLine();
+                            }
                         }
 
 
