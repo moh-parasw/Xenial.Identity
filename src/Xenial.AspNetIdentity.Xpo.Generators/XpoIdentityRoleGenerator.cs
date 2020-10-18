@@ -12,20 +12,19 @@ using Microsoft.CodeAnalysis.Text;
 namespace Xenial.AspNetIdentity.Xpo.Generators
 {
     [Generator]
-    public class XpoIdentityUserGenerator : ISourceGenerator
+    public class XpoIdentityRoleGenerator : ISourceGenerator
     {
         private const string attributeText = @"
 using System;
 namespace Xenial.AspNetIdentity.Xpo
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-    sealed class XPIdentityUserAttribute : Attribute
+    sealed class XPIdentityRoleAttribute : Attribute
     {
-        public XPIdentityUserAttribute() { }
+        public XPIdentityRoleAttribute() { }
 
-        public Type RoleType { get; set; }
+        public Type UserType { get; set; }
         public Type ClaimsType { get; set; }
-        public Type LoginType { get; set; }
     }
 }
 ";
@@ -34,7 +33,7 @@ namespace Xenial.AspNetIdentity.Xpo
 
         public void Execute(GeneratorExecutionContext context)
         {
-            context.AddSource("XPIdentityUserAttribute", SourceText.From(attributeText, Encoding.UTF8));
+            context.AddSource("XPIdentityRoleAttribute", SourceText.From(attributeText, Encoding.UTF8));
 #if DEBUG
             //if (!Debugger.IsAttached)
             //{
@@ -53,19 +52,8 @@ namespace Xenial.AspNetIdentity.Xpo
                 {
                     var fields = new[]
                     {
-                        (typeof(string), "UserName", 250, new [] { "Indexed(Unique = true)", "ProtectedPersonalData" }),
-                        (typeof(string), "NormalizedUserName", 250, new [] { "Indexed" }),
-                        (typeof(string), "Email", 250, new [] { "Indexed(Unique = true)", "ProtectedPersonalData" }),
-                        (typeof(string), "NormalizedEmail", 250, new [] { "Indexed" }),
-                        (typeof(bool), "EmailConfirmed", 0, new [] { "PersonalData" }),
-                        (typeof(string), "PasswordHash", 50000, new string[0]),
-                        (typeof(string), "SecurityStamp", 500, new string[0]),
-                        (typeof(string), "PhoneNumber", 50, new [] { "ProtectedPersonalData"}),
-                        (typeof(bool), "PhoneNumberConfirmed", 0, new [] { "PersonalData" }),
-                        (typeof(bool), "TwoFactorEnabled", 0, new string [0]),
-                        (typeof(DateTime?), "LockoutEnd", 0, new string [0]),
-                        (typeof(bool), "LockoutEnabled", 0, new string [0]),
-                        (typeof(int), "AccessFailedCount", 0, new string [0]),
+                        (typeof(string), "Name", 50, new [] { "Indexed(Unique = true)" }),
+                        (typeof(string), "NormalizedName", 50, new [] { "Indexed" }),
                     };
 
                     writer.WriteLine("using System;");
@@ -115,9 +103,9 @@ namespace Xenial.AspNetIdentity.Xpo
                         writer.Indent--;
                     }
                     var source = textWriter.ToString();
-                    var sourceFileName = $"{userType.Identifier}.XPIdentityUser.generated.cs";
+                    var sourceFileName = $"{userType.Identifier}.XPIdentityRole.generated.cs";
                     context.AddSource(sourceFileName, SourceText.From(source, Encoding.UTF8));
-                    //File.WriteAllText($@"C:\F\tmp\{sourceFileName}", source);
+                    File.WriteAllText($@"C:\F\tmp\{sourceFileName}", source);
                 }
             }
         }

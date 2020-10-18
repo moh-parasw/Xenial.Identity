@@ -6,23 +6,30 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Xenial.AspNetIdentity.Xpo.Models
 {
-    [XPIdentityUser]
-    public partial class MyClassWithContent : XpoIdentityBaseObject
+    [XPIdentityUser(RoleType = typeof(MyRole))]
+    [Persistent]
+    public partial class MyUser : XpoIdentityBaseObject
     {
         private Guid id;
 
-        public MyClassWithContent(Session session) : base(session)
-        {
-        }
+        public MyUser(Session session) : base(session) { }
 
         [Persistent]
         [Key(AutoGenerate = true)]
         public Guid Id { get => id; set => SetPropertyValue(ref id, value); }
+    }
 
+    [XPIdentityRole(UserType = typeof(MyUser))]
+    [Persistent]
+    public partial class MyRole : XpoIdentityBaseObject
+    {
+        private Guid id;
 
+        public MyRole(Session session) : base(session) { }
 
-
-
+        [Persistent]
+        [Key(AutoGenerate = true)]
+        public Guid Id { get => id; set => SetPropertyValue(ref id, value); }
     }
 
     [NonPersistent]
