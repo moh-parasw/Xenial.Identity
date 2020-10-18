@@ -120,7 +120,7 @@ namespace Xenial.AspNetIdentity.Xpo
                         {
                             var userTypeName = userTypedConstant.Value.ToString();
                             writer.WriteLine();
-                            var propertyDeclaration = $"public {userTypeName} Users => GetCollection<{userTypeName}>(\"Users\");";
+                            var propertyDeclaration = $"public XPCollection<{userTypeName}> Users => GetCollection<{userTypeName}>(\"Users\");";
                             writer.WriteLine("[Association]");
                             writer.WriteLine(propertyDeclaration);
                             writer.WriteLine();
