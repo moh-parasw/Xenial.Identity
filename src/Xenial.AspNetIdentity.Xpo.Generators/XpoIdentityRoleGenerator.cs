@@ -23,7 +23,7 @@ namespace Xenial.AspNetIdentity.Xpo
 }
 ";
 
-        protected override string AttributeFullName => "Xenial.AspNetIdentity.Xpo.XPIdentityRoleAttribute";
+        protected override string AttributeFullName => $"Xenial.AspNetIdentity.Xpo.{AttributeName}";
         protected override string AttributeName => "XPIdentityRoleAttribute";
         protected override string Name => "XPIdentityRole";
 

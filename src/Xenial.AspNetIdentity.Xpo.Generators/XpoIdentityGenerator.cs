@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
@@ -35,6 +35,7 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
             var attributeSymbol = compilation.GetTypeByMetadataName(AttributeFullName);
 
 #if DEBUG
+
             if (!System.Diagnostics.Debugger.IsAttached)
             {
                 System.Diagnostics.Debugger.Launch();
@@ -43,18 +44,18 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
 
             if (context.SyntaxReceiver is SyntaxReceiver syntaxReceiver)
             {
-                var roleType = syntaxReceiver.ClassToAugment;
+                var targetType = syntaxReceiver.ClassToAugment;
 
-                var model = compilation.GetSemanticModel(roleType.SyntaxTree);
-                var classSymbol = (INamedTypeSymbol)model.GetDeclaredSymbol(roleType);
+                var model = compilation.GetSemanticModel(targetType.SyntaxTree);
+                var classSymbol = (INamedTypeSymbol)model.GetDeclaredSymbol(targetType);
 
                 var attributes = classSymbol.GetAttributes();
-                var attributeData = attributes.Single(ad => ad.AttributeClass.Equals(attributeSymbol, SymbolEqualityComparer.Default));
+                var attributeData = attributes.SingleOrDefault(ad => ad.AttributeClass.Equals(attributeSymbol, SymbolEqualityComparer.Default));
 
                 var textWriter = new StringWriter();
                 var writer = new IndentedTextWriter(textWriter);
 
-                if (roleType.Parent.IsKind(SyntaxKind.NamespaceDeclaration) && roleType.Parent is NamespaceDeclarationSyntax namespaceDeclarationSyntax)
+                if (targetType.Parent.IsKind(SyntaxKind.NamespaceDeclaration) && targetType.Parent is NamespaceDeclarationSyntax namespaceDeclarationSyntax)
                 {
                     writer.WriteLine("using System;");
                     writer.WriteLine();
@@ -63,7 +64,7 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                     writer.WriteLine("using Microsoft.AspNetCore.Identity;");
                     writer.WriteLine();
                     using (new CurlyIndenter(writer, $"namespace {namespaceDeclarationSyntax.Name}"))
-                    using (new CurlyIndenter(writer, $"partial class {roleType.Identifier}"))
+                    using (new CurlyIndenter(writer, $"partial class {targetType.Identifier}"))
                     {
                         writer.Indent++;
                         foreach (var (fieldType, fieldName, size, additionalAttributes) in Fields)
@@ -82,63 +83,64 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                             writer.WriteLine(propertyDeclaration);
                             writer.WriteLine();
                         }
-
-                        foreach (var manyField in ManyFields)
+                        if (attributeData is not null)
                         {
-                            var manySymbol = attributeData.NamedArguments.FirstOrDefault(a => a.Key == manyField.attributeFieldName);
-
-                            if (manySymbol.Key is not null && manySymbol.Value is TypedConstant userTypedConstant)
+                            foreach (var manyField in ManyFields)
                             {
-                                var manyTypeName = userTypedConstant.Value.ToString();
-                                writer.WriteLine();
-                                var propertyDeclaration = $"public XPCollection<{manyTypeName}> {manyField.propertyName} => GetCollection<{manyTypeName}>(\"{manyField.propertyName}\");";
-                                writer.WriteLine("[Association]");
-                                if (manyField.isAggregated)
-                                {
-                                    writer.WriteLine("[Aggregated]");
-                                }
+                                var manySymbol = attributeData.NamedArguments.FirstOrDefault(a => a.Key == manyField.attributeFieldName);
 
-                                foreach (var additionalAttribute in manyField.additionalAttributes)
+                                if (manySymbol.Key is not null && manySymbol.Value is TypedConstant userTypedConstant)
                                 {
-                                    writer.WriteLine($"[{additionalAttribute}]");
-                                }
+                                    var manyTypeName = userTypedConstant.Value.ToString();
+                                    writer.WriteLine();
+                                    var propertyDeclaration = $"public XPCollection<{manyTypeName}> {manyField.propertyName} => GetCollection<{manyTypeName}>(\"{manyField.propertyName}\");";
+                                    writer.WriteLine("[Association]");
+                                    if (manyField.isAggregated)
+                                    {
+                                        writer.WriteLine("[Aggregated]");
+                                    }
 
-                                writer.WriteLine(propertyDeclaration);
-                                writer.WriteLine();
+                                    foreach (var additionalAttribute in manyField.additionalAttributes)
+                                    {
+                                        writer.WriteLine($"[{additionalAttribute}]");
+                                    }
+
+                                    writer.WriteLine(propertyDeclaration);
+                                    writer.WriteLine();
+                                }
+                            }
+
+                            foreach (var oneField in OneFields)
+                            {
+                                var oneSymbol = attributeData.NamedArguments.FirstOrDefault(a => a.Key == oneField.attributeFieldName);
+
+                                if (oneSymbol.Key is not null && oneSymbol.Value is TypedConstant userTypedConstant)
+                                {
+                                    var oneTypeName = userTypedConstant.Value.ToString();
+                                    writer.WriteLine();
+                                    writer.WriteLine($"private {oneTypeName} {LowerCaseFirstLetter(oneField.propertyName)};");
+                                    var propertyDeclaration = $"public {oneTypeName} {oneField.propertyName} {{ get => {LowerCaseFirstLetter(oneField.propertyName)}; set => SetPropertyValue(\"{oneField.propertyName}\", ref {LowerCaseFirstLetter(oneField.propertyName)}, value); }}";
+                                    writer.WriteLine("[Association]");
+                                    if (oneField.isAggregated)
+                                    {
+                                        writer.WriteLine("[Aggregated]");
+                                    }
+
+                                    foreach (var additionalAttribute in oneField.additionalAttributes)
+                                    {
+                                        writer.WriteLine($"[{additionalAttribute}]");
+                                    }
+
+                                    writer.WriteLine(propertyDeclaration);
+                                    writer.WriteLine();
+                                }
                             }
                         }
-
-                        foreach (var oneField in OneFields)
-                        {
-                            var oneSymbol = attributeData.NamedArguments.FirstOrDefault(a => a.Key == oneField.attributeFieldName);
-
-                            if (oneSymbol.Key is not null && oneSymbol.Value is TypedConstant userTypedConstant)
-                            {
-                                var oneTypeName = userTypedConstant.Value.ToString();
-                                writer.WriteLine();
-                                writer.WriteLine($"private {oneTypeName} {LowerCaseFirstLetter(oneField.propertyName)};");
-                                var propertyDeclaration = $"public {oneTypeName} {oneField.propertyName} {{ get => {LowerCaseFirstLetter(oneField.propertyName)}; set => SetPropertyValue(\"{oneField.propertyName}\", ref {LowerCaseFirstLetter(oneField.propertyName)}, value); }}";
-                                writer.WriteLine("[Association]");
-                                if (oneField.isAggregated)
-                                {
-                                    writer.WriteLine("[Aggregated]");
-                                }
-
-                                foreach (var additionalAttribute in oneField.additionalAttributes)
-                                {
-                                    writer.WriteLine($"[{additionalAttribute}]");
-                                }
-
-                                writer.WriteLine(propertyDeclaration);
-                                writer.WriteLine();
-                            }
-                        }
-
 
                         writer.Indent--;
                     }
                     var source = textWriter.ToString();
-                    var sourceFileName = $"{roleType.Identifier}.XPIdentityRole.generated.cs";
+                    var sourceFileName = $"{targetType.Identifier}.XPIdentityRole.generated.cs";
                     context.AddSource(sourceFileName, SourceText.From(source, Encoding.UTF8));
                     File.WriteAllText($@"C:\F\tmp\{sourceFileName}", source);
                 }
