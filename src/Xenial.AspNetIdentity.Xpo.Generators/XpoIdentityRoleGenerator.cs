@@ -52,7 +52,6 @@ namespace Xenial.AspNetIdentity.Xpo
             {
                 var roleType = syntaxReceiver.ClassToAugment;
 
-                compilation.AddSyntaxTrees(roleType.SyntaxTree);
                 var model = compilation.GetSemanticModel(roleType.SyntaxTree);
                 var classSymbol = (INamedTypeSymbol)model.GetDeclaredSymbol(roleType);
 
