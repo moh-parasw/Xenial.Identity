@@ -36,10 +36,10 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
 
 #if DEBUG
 
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-                System.Diagnostics.Debugger.Launch();
-            }
+            //if (!System.Diagnostics.Debugger.IsAttached)
+            //{
+            //    System.Diagnostics.Debugger.Launch();
+            //}
 #endif
 
             if (context.SyntaxReceiver is SyntaxReceiver syntaxReceiver)
