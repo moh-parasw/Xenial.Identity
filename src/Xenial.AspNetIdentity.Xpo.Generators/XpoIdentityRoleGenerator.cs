@@ -177,7 +177,7 @@ namespace Xenial.AspNetIdentity.Xpo
         {
             get
             {
-                yield return ("UserType", "User", false, new string[0]);
+                yield return ("UserType", "Users", false, new string[0]);
             }
         }
     }
