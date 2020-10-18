@@ -1,6 +1,5 @@
 ﻿using System;
 using System.CodeDom.Compiler;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -112,9 +111,9 @@ namespace Xenial.AspNetIdentity.Xpo
                         writer.Indent--;
                     }
                     var source = textWriter.ToString();
-
-                    context.AddSource($"{userType.Identifier}.generated.cs", SourceText.From(source, Encoding.UTF8));
-                    File.WriteAllText(@"C:\F\tmp\1.cs", source);
+                    var sourceFileName = $"{userType.Identifier}.XPIdentityUser.generated.cs";
+                    context.AddSource(sourceFileName, SourceText.From(source, Encoding.UTF8));
+                    //File.WriteAllText($@"C:\F\tmp\{sourceFileName}", source);
                 }
             }
         }
@@ -125,11 +124,9 @@ namespace Xenial.AspNetIdentity.Xpo
 
             public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
             {
-
-                // Business logic to decide what we're interested in goes here
                 if (syntaxNode is ClassDeclarationSyntax cds
                     && cds.AttributeLists.Count > 0
-                    && cds.Modifiers.Any(m => m.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.PartialKeyword))
+                    && cds.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword))
                 )
                 {
                     ClassToAugment = cds;
