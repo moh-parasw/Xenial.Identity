@@ -10,7 +10,12 @@ using Xenial.AspNetIdentity.Xpo;
 
 namespace Xenial.AspNetIdentity.Xpo.Models
 {
-    [XPIdentityUser(RoleType = typeof(XpoIdentityRole), ClaimsType = typeof(XpoIdentityUserClaim), LoginsType = typeof(XpoIdentityUserLogin))]
+    [XPIdentityUser(
+        RoleType = typeof(XpoIdentityRole),
+        ClaimsType = typeof(XpoIdentityUserClaim),
+        LoginsType = typeof(XpoIdentityUserLogin),
+        TokensType = typeof(XpoIdentityUserToken)
+    )]
     [Persistent]
     public partial class XpoIdentityUser : XpoIdentityBaseObjectString
     {
