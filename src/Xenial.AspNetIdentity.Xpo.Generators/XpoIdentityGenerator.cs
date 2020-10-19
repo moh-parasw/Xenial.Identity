@@ -26,17 +26,18 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
 
         public void Execute(GeneratorExecutionContext context)
         {
+            var attributeSource = SourceText.From(AttributeText, Encoding.UTF8);
+
+            context.AddSource(AttributeName, attributeSource);
+
+            var options = (context.Compilation as CSharpCompilation).SyntaxTrees[0].Options as CSharpParseOptions;
+            var compilation = context.Compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(attributeSource, options));
+
+            var attributeSymbol = compilation.GetTypeByMetadataName(AttributeFullName);
+
+
             if (context.SyntaxReceiver is SyntaxReceiver syntaxReceiver)
             {
-                var attributeSource = SourceText.From(AttributeText, Encoding.UTF8);
-
-                context.AddSource(AttributeName, attributeSource);
-
-                var options = (context.Compilation as CSharpCompilation).SyntaxTrees[0].Options as CSharpParseOptions;
-                var compilation = context.Compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(attributeSource, options));
-
-                var attributeSymbol = compilation.GetTypeByMetadataName(AttributeFullName);
-
 #if DEBUG
 
                 //if (!System.Diagnostics.Debugger.IsAttached)
