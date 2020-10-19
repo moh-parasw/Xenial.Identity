@@ -6,6 +6,7 @@ using DevExpress.Xpo;
 using DevExpress.Xpo.DB;
 
 using Xenial.AspNetIdentity.Xpo.Models;
+using Xenial.AspNetIdentity.Xpo.Tests.Stores;
 
 using static Xenial.Tasty;
 
@@ -31,29 +32,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests
 
             foreach (var (name, cs) in databases)
             {
-                It($"Can load XPO Classes 1 {name}", async () =>
-                {
-                    var dataLayer = XpoDefault.GetDataLayer(cs, DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema);
-                    using var uow = new UnitOfWork(dataLayer);
-
-                    await uow.UpdateSchemaAsync();
-
-                    var userName = "Manuel";
-                    var user = new XpoIdentityUser(uow)
-                    {
-                        UserName = userName
-                    };
-
-                    await uow.SaveAsync(user);
-                    await uow.CommitChangesAsync();
-
-                    using var uow2 = new UnitOfWork(dataLayer);
-
-
-                    var result = await uow2.Query<XpoIdentityUser>().FirstAsync(u => u.UserName == userName);
-
-                    return result.UserName == userName;
-                });
+                UserStoreTests.Tests(name, cs);
             }
 
             return await Run(args);

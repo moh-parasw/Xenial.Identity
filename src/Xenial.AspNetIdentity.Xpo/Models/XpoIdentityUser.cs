@@ -12,24 +12,22 @@ namespace Xenial.AspNetIdentity.Xpo.Models
 {
     [XPIdentityUser(RoleType = typeof(XpoIdentityRole), ClaimsType = typeof(XpoIdentityUserClaim), LoginsType = typeof(XpoIdentityUserLogin))]
     [Persistent]
-    public partial class XpoIdentityUser : XpoIdentityBaseObjectGuid
+    public partial class XpoIdentityUser : XpoIdentityBaseObjectString
     {
         public XpoIdentityUser(Session session) : base(session) { }
     }
 
     [XPIdentityUserClaim(UserType = typeof(XpoIdentityUser))]
     [Persistent]
-    public partial class XpoIdentityUserClaim : XpoIdentityBaseObjectGuid
+    public partial class XpoIdentityUserClaim : XpoIdentityBaseObjectString
     {
         public XpoIdentityUserClaim(Session session) : base(session) { }
     }
 
     [XPIdentityUserLogin(UserType = typeof(XpoIdentityUser))]
     [Persistent]
-    public partial class XpoIdentityUserLogin : XpoIdentityBaseObjectGuid
+    public partial class XpoIdentityUserLogin : XpoIdentityBaseObjectString
     {
         public XpoIdentityUserLogin(Session session) : base(session) { }
     }
-
- 
 }

@@ -9,12 +9,11 @@
     <PackageReference Include="DevExpress.Persistent.Base" Version="20.2.2-*" />
 
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.1.9" />
+    <PackageReference Include="AutoMapper" Version="[10.0.0,11.0)" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Xenial.AspNetIdentity.Xpo.Generators\Xenial.AspNetIdentity.Xpo.Generators.csproj"
-                      OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Xenial.AspNetIdentity.Xpo.Generators\Xenial.AspNetIdentity.Xpo.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>
