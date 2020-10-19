@@ -26,25 +26,25 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
 
         public void Execute(GeneratorExecutionContext context)
         {
-            var attributeSource = SourceText.From(AttributeText, Encoding.UTF8);
+            if (context.SyntaxReceiver is SyntaxReceiver syntaxReceiver)
+            {
+                var attributeSource = SourceText.From(AttributeText, Encoding.UTF8);
 
-            context.AddSource(AttributeName, attributeSource);
+                context.AddSource(AttributeName, attributeSource);
 
-            var options = (context.Compilation as CSharpCompilation).SyntaxTrees[0].Options as CSharpParseOptions;
-            var compilation = context.Compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(attributeSource, options));
+                var options = (context.Compilation as CSharpCompilation).SyntaxTrees[0].Options as CSharpParseOptions;
+                var compilation = context.Compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(attributeSource, options));
 
-            var attributeSymbol = compilation.GetTypeByMetadataName(AttributeFullName);
+                var attributeSymbol = compilation.GetTypeByMetadataName(AttributeFullName);
 
 #if DEBUG
 
-            //if (!System.Diagnostics.Debugger.IsAttached)
-            //{
-            //    System.Diagnostics.Debugger.Launch();
-            //}
+                if (!System.Diagnostics.Debugger.IsAttached)
+                {
+                    System.Diagnostics.Debugger.Launch();
+                }
 #endif
 
-            if (context.SyntaxReceiver is SyntaxReceiver syntaxReceiver)
-            {
                 foreach (var canidate in syntaxReceiver.Canidates)
                 {
                     var targetType = canidate;
