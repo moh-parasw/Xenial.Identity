@@ -45,40 +45,36 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         where TUserLogin : IdentityUserLogin<TKey>, new()
         where TUserToken : IdentityUserToken<TKey>, new()
     {
-        public Func<UnitOfWork> UnitOfWorkFactory { get; }
+        public UnitOfWork UnitOfWork { get; }
         public ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser, TXPUserToken>> Logger { get; }
         public IConfigurationProvider MapperConfiguration { get; }
 
         public XPUserStore(
-            Func<UnitOfWork> unitOfWorkFactory,
+            UnitOfWork unitOfWork,
             ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser, TXPUserToken>> logger,
             IdentityErrorDescriber describer
         )
-            : this(unitOfWorkFactory, logger, describer, new MapperConfiguration(cfg => cfg.AddProfile<XPUserMapperProfile>()))
+            : this(unitOfWork, logger, describer, new MapperConfiguration(cfg => cfg.AddProfile<XPUserMapperProfile>()))
         {
         }
 
         public XPUserStore(
-            Func<UnitOfWork> unitOfWorkFactory,
+            UnitOfWork unitOfWork,
             ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser, TXPUserToken>> logger,
             IdentityErrorDescriber describer,
             IConfigurationProvider configurationProvider
         )
             : base(describer)
         {
-            UnitOfWorkFactory = unitOfWorkFactory;
+            UnitOfWork = unitOfWork;
             Logger = logger;
             MapperConfiguration = configurationProvider;
         }
 
         public override IQueryable<TUser> Users
-        {
-            get
-            {
-                using var uow = UnitOfWorkFactory();
-                return uow.Query<XpoIdentityUser>().ProjectTo<TUser>(MapperConfiguration);
-            }
-        }
+            => UnitOfWork
+                .Query<XpoIdentityUser>()
+                .ProjectTo<TUser>(MapperConfiguration);
 
         #region CRUD
         public async override Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken)
@@ -87,11 +83,10 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             ThrowIfDisposed();
             try
             {
-                using var uow = UnitOfWorkFactory();
-                var mapper = MapperConfiguration.CreateMapper(t => uow.GetClassInfo(t).CreateObject(uow));
+                var mapper = MapperConfiguration.CreateMapper(t => UnitOfWork.GetClassInfo(t).CreateObject(UnitOfWork));
                 var persistentUser = mapper.Map<TXPUser>(user);
-                await uow.SaveAsync(persistentUser, cancellationToken);
-                await uow.CommitChangesAsync(cancellationToken);
+                await UnitOfWork.SaveAsync(persistentUser, cancellationToken);
+                await UnitOfWork.CommitChangesAsync(cancellationToken);
                 return IdentityResult.Success;
             }
             catch (LockingException)
@@ -110,12 +105,11 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             ThrowIfDisposed();
             try
             {
-                using var uow = UnitOfWorkFactory();
-                var persistentUser = await uow.GetObjectByKeyAsync<TXPUser>(user.Id, cancellationToken);
+                var persistentUser = await UnitOfWork.GetObjectByKeyAsync<TXPUser>(user.Id, cancellationToken);
                 if (persistentUser != null)
                 {
-                    await uow.DeleteAsync(persistentUser, cancellationToken);
-                    await uow.CommitChangesAsync(cancellationToken);
+                    await UnitOfWork.DeleteAsync(persistentUser, cancellationToken);
+                    await UnitOfWork.CommitChangesAsync(cancellationToken);
                     return IdentityResult.Success;
                 }
                 return IdentityResult.Failed(new IdentityError { Description = "User not found" });
@@ -141,16 +135,15 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
             try
             {
-                using var uow = UnitOfWorkFactory();
-                var existingObject = await uow.GetObjectByKeyAsync<TXPUser>(user.Id, cancellationToken);
+                var existingObject = await UnitOfWork.GetObjectByKeyAsync<TXPUser>(user.Id, cancellationToken);
                 if (existingObject == null)
                 {
                     return IdentityResult.Failed(new IdentityError { Description = $"User with Id: {user.Id} not found" });
                 }
                 var mapper = MapperConfiguration.CreateMapper();
                 var persistentUser = mapper.Map(user, existingObject);
-                await uow.SaveAsync(persistentUser, cancellationToken);
-                await uow.CommitChangesAsync(cancellationToken);
+                await UnitOfWork.SaveAsync(persistentUser, cancellationToken);
+                await UnitOfWork.CommitChangesAsync(cancellationToken);
                 return IdentityResult.Success;
             }
             catch (LockingException)
@@ -176,8 +169,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             ThrowIfDisposed();
             try
             {
-                using var uow = UnitOfWorkFactory();
-                var persistentUser = await uow.GetObjectByKeyAsync<TXPUser>(userId, cancellationToken);
+                var persistentUser = await UnitOfWork.GetObjectByKeyAsync<TXPUser>(userId, cancellationToken);
                 if (persistentUser != null)
                 {
                     var mapper = MapperConfiguration.CreateMapper();
@@ -199,8 +191,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             ThrowIfDisposed();
             try
             {
-                using var uow = UnitOfWorkFactory();
-                var persistentUser = await uow.FindObjectAsync<TXPUser>(CreateUserNameCriteria(normalizedUserName), cancellationToken);
+                var persistentUser = await UnitOfWork.FindObjectAsync<TXPUser>(CreateUserNameCriteria(normalizedUserName), cancellationToken);
 
                 if (persistentUser != null)
                 {
@@ -223,8 +214,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             ThrowIfDisposed();
             try
             {
-                using var uow = UnitOfWorkFactory();
-                var persistentUser = await uow.FindObjectAsync<TXPUser>(CreateEmailCriteria(normalizedEmail), cancellationToken);
+                var persistentUser = await UnitOfWork.FindObjectAsync<TXPUser>(CreateEmailCriteria(normalizedEmail), cancellationToken);
 
                 if (persistentUser != null)
                 {
@@ -288,9 +278,8 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         protected async override Task<TUserToken> FindTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken)
         {
-            using var uow = UnitOfWorkFactory();
-            var userPropertyName = $"User.{uow.GetClassInfo(typeof(TXPUser)).KeyProperty}";
-            var token = await uow.FindObjectAsync<TXPUserToken>(CreateTokenCriteria(userPropertyName, user.Id, loginProvider, name), cancellationToken);
+            var userPropertyName = $"User.{UnitOfWork.GetClassInfo(typeof(TXPUser)).KeyProperty}";
+            var token = await UnitOfWork.FindObjectAsync<TXPUserToken>(CreateTokenCriteria(userPropertyName, user.Id, loginProvider, name), cancellationToken);
             if (token != null)
             {
                 var mapper = MapperConfiguration.CreateMapper();
@@ -302,33 +291,29 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         protected async override Task AddUserTokenAsync(TUserToken token)
         {
-            using var uow = UnitOfWorkFactory();
-            var user = await uow.GetObjectByKeyAsync<TXPUser>(token.UserId);
+            var user = await UnitOfWork.GetObjectByKeyAsync<TXPUser>(token.UserId);
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
-            var tokenClassInfo = uow.GetClassInfo(typeof(TXPUserToken));
-            var persistentToken = (TXPUserToken)tokenClassInfo.CreateNewObject(uow);
+            var tokenClassInfo = UnitOfWork.GetClassInfo(typeof(TXPUserToken));
+            var persistentToken = (TXPUserToken)tokenClassInfo.CreateNewObject(UnitOfWork);
 
             var mapper = MapperConfiguration.CreateMapper();
             persistentToken = mapper.Map(token, persistentToken);
             tokenClassInfo.FindMember("User")?.SetValue(persistentToken, user);
             tokenClassInfo.FindMember("Id")?.SetValue(persistentToken, Guid.NewGuid().ToString());
 
-            await uow.SaveAsync(persistentToken);
-            await uow.CommitChangesAsync();
+            await UnitOfWork.SaveAsync(persistentToken);
         }
 
         protected async override Task RemoveUserTokenAsync(TUserToken token)
         {
-            using var uow = UnitOfWorkFactory();
-            var userPropertyName = $"User.{uow.GetClassInfo(typeof(TXPUser)).KeyProperty}";
-            var persistentToken = await uow.FindObjectAsync<TXPUserToken>(CreateTokenCriteria(userPropertyName, token.UserId, token.LoginProvider, token.Name));
+            var userPropertyName = $"User.{UnitOfWork.GetClassInfo(typeof(TXPUser)).KeyProperty}";
+            var persistentToken = await UnitOfWork.FindObjectAsync<TXPUserToken>(CreateTokenCriteria(userPropertyName, token.UserId, token.LoginProvider, token.Name));
             if (persistentToken != null)
             {
-                await uow.DeleteAsync(persistentToken);
-                await uow.CommitChangesAsync();
+                await UnitOfWork.DeleteAsync(persistentToken);
             }
         }
 
@@ -364,15 +349,13 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         protected async virtual Task UpdateUserTokenAsync(TUserToken token)
         {
-            using var uow = UnitOfWorkFactory();
-            var userPropertyName = $"User.{uow.GetClassInfo(typeof(TXPUser)).KeyProperty}";
-            var persistentToken = await uow.FindObjectAsync<TXPUserToken>(CreateTokenCriteria(userPropertyName, token.UserId, token.LoginProvider, token.Name));
+            var userPropertyName = $"User.{UnitOfWork.GetClassInfo(typeof(TXPUser)).KeyProperty}";
+            var persistentToken = await UnitOfWork.FindObjectAsync<TXPUserToken>(CreateTokenCriteria(userPropertyName, token.UserId, token.LoginProvider, token.Name));
             if (persistentToken != null)
             {
                 var mapper = MapperConfiguration.CreateMapper();
                 mapper.Map(token, persistentToken);
-                await uow.SaveAsync(persistentToken);
-                await uow.CommitChangesAsync();
+                await UnitOfWork.SaveAsync(persistentToken);
             }
         }
 

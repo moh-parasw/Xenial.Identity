@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,9 +21,27 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
         public static void Tests(string dbName, string connectionString) => Describe($"{nameof(XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserToken>)} using {dbName}", () =>
         {
             var dataLayer = XpoDefault.GetDataLayer(connectionString, DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema);
-            Func<UnitOfWork> unitOfWorkFactory = () => new UnitOfWork(dataLayer);
-            var store = new XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserToken>(unitOfWorkFactory, new FakeLogger<XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserToken>>(), new IdentityErrorDescriber());
 
+            UnitOfWork unitOfWorkFactory() => new UnitOfWork(dataLayer);
+
+            (XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserToken> store, UnitOfWork uow) CreateStore()
+            {
+                var uow = new UnitOfWork(dataLayer);
+                var store = new XPUserStore<
+                    IdentityUser,
+                    string,
+                    IdentityUserClaim<string>,
+                    IdentityUserLogin<string>,
+                    IdentityUserToken<string>,
+                    XpoIdentityUser,
+                    XpoIdentityUserToken
+                >(
+                    uow,
+                    new FakeLogger<XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserToken>>(),
+                    new IdentityErrorDescriber()
+                );
+                return (store, uow);
+            }
             XpoIdentityUser CreateUser(UnitOfWork uow, string id = null) => new XpoIdentityUser(uow)
             {
                 Id = id ?? Guid.NewGuid().ToString(),
@@ -33,13 +49,18 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 Email = Guid.NewGuid().ToString(),
             };
 
-            It($"Can {nameof(store.CreateAsync)}", async () =>
+            It($"Can CreateAsync", async () =>
             {
-                var result = await store.CreateAsync(new IdentityUser { Id = Guid.NewGuid().ToString() }, CancellationToken.None);
-                return result.Succeeded;
+                var (store, uow) = CreateStore();
+                using (store)
+                using (uow)
+                {
+                    var result = await store.CreateAsync(new IdentityUser { Id = Guid.NewGuid().ToString() }, CancellationToken.None);
+                    return result.Succeeded;
+                }
             });
 
-            It($"Can {nameof(store.DeleteAsync)}", async () =>
+            It($"Can DeleteAsync", async () =>
             {
                 using var uow = unitOfWorkFactory();
                 var id = Guid.NewGuid().ToString();
@@ -48,11 +69,16 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 await uow.SaveAsync(user);
                 await uow.CommitChangesAsync();
 
-                var result = await store.DeleteAsync(new IdentityUser { Id = id }, CancellationToken.None);
-                return result.Succeeded;
+                var (store, uow1) = CreateStore();
+                using (store)
+                using (uow1)
+                {
+                    var result = await store.DeleteAsync(new IdentityUser { Id = id }, CancellationToken.None);
+                    return result.Succeeded;
+                }
             });
 
-            Describe($"Can {nameof(store.FindByIdAsync)}", () =>
+            Describe($"Can FindByIdAsync", () =>
             {
                 It($"with existing", async () =>
                 {
@@ -63,20 +89,29 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     await uow.SaveAsync(user);
                     await uow.CommitChangesAsync();
 
-                    var result = await store.FindByIdAsync(id, CancellationToken.None);
-                    return result.Id == id;
+                    var (store, uow1) = CreateStore();
+                    using (store)
+                    using (uow1)
+                    {
+                        var result = await store.FindByIdAsync(id, CancellationToken.None);
+                        return result.Id == id;
+                    }
                 });
 
                 It($"with not existing", async () =>
                 {
                     var id = Guid.NewGuid().ToString();
-
-                    var result = await store.FindByIdAsync(id, CancellationToken.None);
-                    return result == null;
+                    var (store, uow) = CreateStore();
+                    using (store)
+                    using (uow)
+                    {
+                        var result = await store.FindByIdAsync(id, CancellationToken.None);
+                        return result == null;
+                    }
                 });
             });
 
-            Describe($"Can {nameof(store.FindByNameAsync)}", () =>
+            Describe($"Can FindByNameAsync", () =>
             {
                 It($"with existing", async () =>
                 {
@@ -88,20 +123,29 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     await uow.SaveAsync(user);
                     await uow.CommitChangesAsync();
 
-                    var result = await store.FindByNameAsync(name, CancellationToken.None);
-                    return result.NormalizedUserName == name;
+                    var (store, uow1) = CreateStore();
+                    using (store)
+                    using (uow1)
+                    {
+                        var result = await store.FindByNameAsync(name, CancellationToken.None);
+                        return result.NormalizedUserName == name;
+                    }
                 });
 
                 It($"with not existing", async () =>
                 {
                     var id = Guid.NewGuid().ToString();
-
-                    var result = await store.FindByNameAsync(id, CancellationToken.None);
-                    return result == null;
+                    var (store, uow) = CreateStore();
+                    using (store)
+                    using (uow)
+                    {
+                        var result = await store.FindByNameAsync(id, CancellationToken.None);
+                        return result == null;
+                    }
                 });
             });
 
-            Describe($"Can {nameof(store.UpdateAsync)}", () =>
+            Describe($"Can UpdateAsync", () =>
             {
                 It($"with existing", async () =>
                 {
@@ -113,27 +157,37 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     await uow.SaveAsync(user);
                     await uow.CommitChangesAsync();
 
-                    var userFromStore = await store.FindByIdAsync(id, CancellationToken.None);
-                    userFromStore.PhoneNumber = Guid.NewGuid().ToString();
-                    var result = await store.UpdateAsync(userFromStore, CancellationToken.None);
+                    var (store, uow1) = CreateStore();
+                    using (store)
+                    using (uow1)
+                    {
+                        var userFromStore = await store.FindByIdAsync(id, CancellationToken.None);
+                        userFromStore.PhoneNumber = Guid.NewGuid().ToString();
+                        var result = await store.UpdateAsync(userFromStore, CancellationToken.None);
 
-                    using var uow2 = unitOfWorkFactory();
-                    var userFromDb = uow2.GetObjectByKey<XpoIdentityUser>(id);
+                        using var uow2 = unitOfWorkFactory();
+                        var userFromDb = uow2.GetObjectByKey<XpoIdentityUser>(id);
 
-                    return result.Succeeded && userFromDb.PhoneNumber == userFromStore.PhoneNumber;
+                        return result.Succeeded && userFromDb.PhoneNumber == userFromStore.PhoneNumber;
+                    }
                 });
 
                 It($"with not existing", async () =>
                 {
                     var id = Guid.NewGuid().ToString();
 
-                    var result = await store.UpdateAsync(new IdentityUser(), CancellationToken.None);
+                    var (store, uow) = CreateStore();
+                    using (store)
+                    using (uow)
+                    {
+                        var result = await store.UpdateAsync(new IdentityUser(), CancellationToken.None);
 
-                    return !result.Succeeded;
+                        return !result.Succeeded;
+                    }
                 });
             });
 
-            Describe($"Can {nameof(store.FindByEmailAsync)}", () =>
+            Describe($"Can FindByEmailAsync", () =>
             {
                 It($"with existing", async () =>
                 {
@@ -145,27 +199,42 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     await uow.SaveAsync(user);
                     await uow.CommitChangesAsync();
 
-                    var result = await store.FindByEmailAsync(name, CancellationToken.None);
-                    return result.NormalizedEmail == name;
+                    var (store, uow1) = CreateStore();
+                    using (store)
+                    using (uow1)
+                    {
+                        var result = await store.FindByEmailAsync(name, CancellationToken.None);
+                        return result.NormalizedEmail == name;
+                    }
                 });
 
                 It($"with not existing", async () =>
                 {
                     var id = Guid.NewGuid().ToString();
 
-                    var result = await store.FindByEmailAsync(id, CancellationToken.None);
-                    return result == null;
+                    var (store, uow) = CreateStore();
+                    using (store)
+                    using (uow)
+                    {
+                        var result = await store.FindByEmailAsync(id, CancellationToken.None);
+                        return result == null;
+                    }
                 });
             });
             Describe("Tokens", () =>
             {
-                Describe(nameof(store.GetTokenAsync), () =>
+                Describe("GetTokenAsync", () =>
                 {
                     It("non existing token", async () =>
                     {
-                        var token = await store.GetTokenAsync(new IdentityUser(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), CancellationToken.None);
+                        var (store, uow) = CreateStore();
+                        using (store)
+                        using (uow)
+                        {
+                            var token = await store.GetTokenAsync(new IdentityUser(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), CancellationToken.None);
 
-                        return token == null;
+                            return token == null;
+                        }
                     });
 
                     It("existing token", async () =>
@@ -187,18 +256,23 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         await uow.SaveAsync(user);
                         await uow.CommitChangesAsync();
 
-                        var token = await store.GetTokenAsync(
-                            new IdentityUser { Id = user.Id },
-                            loginProvider,
-                            loginProviderName,
-                            CancellationToken.None
-                        );
+                        var (store, uow1) = CreateStore();
+                        using (store)
+                        using (uow1)
+                        {
+                            var token = await store.GetTokenAsync(
+                                new IdentityUser { Id = user.Id },
+                                loginProvider,
+                                loginProviderName,
+                                CancellationToken.None
+                            );
 
-                        return expectedToken == token;
+                            return expectedToken == token;
+                        }
                     });
                 });
 
-                Describe(nameof(store.SetTokenAsync), () =>
+                Describe("SetTokenAsync", () =>
                 {
                     It("non existing user and token", async () =>
                     {
@@ -206,8 +280,13 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         var loginProviderName = Guid.NewGuid().ToString();
                         var tokenValue = Guid.NewGuid().ToString();
 
-                        var action = new Func<Task>(async () => await store.SetTokenAsync(new IdentityUser(), loginProvider, loginProviderName, tokenValue, CancellationToken.None));
-                        await action.Should().ThrowAsync<ArgumentNullException>();
+                        var (store, uow) = CreateStore();
+                        using (store)
+                        using (uow)
+                        {
+                            var action = new Func<Task>(async () => await store.SetTokenAsync(new IdentityUser(), loginProvider, loginProviderName, tokenValue, CancellationToken.None));
+                            await action.Should().ThrowAsync<ArgumentNullException>();
+                        }
                     });
 
                     It("adds non existing token", async () =>
@@ -220,8 +299,14 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         await uow.SaveAsync(user);
                         await uow.CommitChangesAsync();
 
-                        await store.SetTokenAsync(new IdentityUser { Id = user.Id }, loginProvider, loginProviderName, tokenValue, CancellationToken.None);
-
+                        var (store, uow1) = CreateStore();
+                        using (store)
+                        using (uow1)
+                        {
+                            var identityUser = await store.FindByIdAsync(user.Id, CancellationToken.None);
+                            await store.SetTokenAsync(identityUser, loginProvider, loginProviderName, tokenValue, CancellationToken.None);
+                            await store.UpdateAsync(identityUser, CancellationToken.None);
+                        }
                         using var uow2 = unitOfWorkFactory();
                         var userInDb = await uow.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
 
@@ -247,8 +332,15 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         await uow.CommitChangesAsync();
 
                         var newTokenValue = Guid.NewGuid().ToString();
-                        await store.SetTokenAsync(new IdentityUser { Id = user.Id }, loginProvider, loginProviderName, newTokenValue, CancellationToken.None);
 
+                        var (store, uow1) = CreateStore();
+                        using (store)
+                        using (uow1)
+                        {
+                            var identityUser = await store.FindByIdAsync(user.Id, CancellationToken.None);
+                            await store.SetTokenAsync(identityUser, loginProvider, loginProviderName, newTokenValue, CancellationToken.None);
+                            await store.UpdateAsync(identityUser, CancellationToken.None);
+                        }
                         using var uow2 = unitOfWorkFactory();
                         var userInDb = await uow.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
 
@@ -258,42 +350,53 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     });
                 });
 
-                Describe(nameof(store.RemoveTokenAsync), () =>
+                Describe("RemoveTokenAsync", () =>
                 {
                     It("non existing user and token", async () =>
                     {
-                       var loginProvider = Guid.NewGuid().ToString();
-                       var loginProviderName = Guid.NewGuid().ToString();
-
-                       var action = new Func<Task>(async () => await store.RemoveTokenAsync(new IdentityUser(), loginProvider, loginProviderName, CancellationToken.None));
-                       await action.Should().NotThrowAsync();
-                    });
-
-                     It("removed existing token", async () =>
-                    {
                         var loginProvider = Guid.NewGuid().ToString();
                         var loginProviderName = Guid.NewGuid().ToString();
-                        var tokenValue = Guid.NewGuid().ToString();
-                        using var uow = unitOfWorkFactory();
-                        var user = CreateUser(uow);
-                        user.Tokens.Add(new XpoIdentityUserToken(uow)
+
+                        var (store, uow) = CreateStore();
+                        using (store)
+                        using (uow)
                         {
-                            Id = Guid.NewGuid().ToString(),
-                            LoginProvider = loginProvider,
-                            Name = loginProviderName,
-                            Value = tokenValue,
-                        });
-                        await uow.SaveAsync(user);
-                        await uow.CommitChangesAsync();
-
-                        var newTokenValue = Guid.NewGuid().ToString();
-                        await store.RemoveTokenAsync(new IdentityUser { Id = user.Id }, loginProvider, loginProviderName, CancellationToken.None);
-
-                        using var uow2 = unitOfWorkFactory();
-                        var userInDb = await uow.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
-
-                        userInDb.Tokens.Should().BeEmpty();
+                            var action = new Func<Task>(async () => await store.RemoveTokenAsync(new IdentityUser(), loginProvider, loginProviderName, CancellationToken.None));
+                            await action.Should().NotThrowAsync();
+                        }
                     });
+
+                    It("removed existing token", async () =>
+                   {
+                       var loginProvider = Guid.NewGuid().ToString();
+                       var loginProviderName = Guid.NewGuid().ToString();
+                       var tokenValue = Guid.NewGuid().ToString();
+                       using var uow = unitOfWorkFactory();
+                       var user = CreateUser(uow);
+                       user.Tokens.Add(new XpoIdentityUserToken(uow)
+                       {
+                           Id = Guid.NewGuid().ToString(),
+                           LoginProvider = loginProvider,
+                           Name = loginProviderName,
+                           Value = tokenValue,
+                       });
+                       await uow.SaveAsync(user);
+                       await uow.CommitChangesAsync();
+
+                       var newTokenValue = Guid.NewGuid().ToString();
+                       var (store, uow1) = CreateStore();
+                       using (store)
+                       using (uow1)
+                       {
+                           var identityUser = await store.FindByIdAsync(user.Id, CancellationToken.None);
+                           await store.RemoveTokenAsync(identityUser, loginProvider, loginProviderName, CancellationToken.None);
+                           await store.UpdateAsync(identityUser, CancellationToken.None);
+                       }
+                       using var uow2 = unitOfWorkFactory();
+                       var userInDb = await uow.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
+
+                       userInDb.Tokens.Should().BeEmpty();
+                   });
                 });
             });
         });
