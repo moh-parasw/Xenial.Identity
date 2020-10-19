@@ -44,11 +44,11 @@ namespace Xenial.AspNetIdentity.Xpo.Models
 
     [XPIdentityUserLogin(UserType = typeof(MyUser))]
     [Persistent]
-    public partial class XPIdentityUserLogin : XpoIdentityBaseObject
+    public partial class MyUserLogin : XpoIdentityBaseObject
     {
         private Guid id;
 
-        public XPIdentityUserLogin(Session session) : base(session) { }
+        public MyUserLogin(Session session) : base(session) { }
 
         [Persistent]
         [Key(AutoGenerate = true)]
