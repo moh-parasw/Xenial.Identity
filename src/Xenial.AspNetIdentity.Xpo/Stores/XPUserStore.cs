@@ -225,17 +225,6 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
             return null;
         }
-        ///// <summary>
-        ///// Dispose the store
-        ///// </summary>
-        //public virtual void Dispose()
-        //{
-        //    disposed = true;
-        //    if (queryUnitOfWork.IsValueCreated)
-        //    {
-        //        queryUnitOfWork.Value.Dispose();
-        //    }
-        //}
 
         private IdentityResult HandleGenericException(string method, Exception ex)
         {
@@ -248,7 +237,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 #endif
                     );
         }
-        
+
         protected override Task<TUserLogin> FindUserLoginAsync(TKey userId, string loginProvider, string providerKey, CancellationToken cancellationToken) => throw new NotImplementedException();
         protected override Task<TUserLogin> FindUserLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken) => throw new NotImplementedException();
         public override Task<IList<Claim>> GetClaimsAsync(TUser user, CancellationToken cancellationToken = default) => throw new NotImplementedException();
