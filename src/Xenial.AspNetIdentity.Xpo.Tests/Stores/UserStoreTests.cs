@@ -22,6 +22,13 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
             Func<UnitOfWork> unitOfWorkFactory = () => new UnitOfWork(dataLayer);
             var store = new XPUserStore<IdentityUser, string, XpoIdentityUser>(unitOfWorkFactory, new FakeLogger<XPUserStore<IdentityUser, string, XpoIdentityUser>>());
 
+            XpoIdentityUser CreateUser(UnitOfWork uow, string id = null) => new XpoIdentityUser(uow)
+            {
+                Id = id ?? Guid.NewGuid().ToString(),
+                UserName = Guid.NewGuid().ToString(),
+                Email = Guid.NewGuid().ToString(),
+            };
+
             It($"Can {nameof(store.CreateAsync)}", async () =>
             {
                 var result = await store.CreateAsync(new IdentityUser { Id = Guid.NewGuid().ToString() }, CancellationToken.None);
@@ -32,18 +39,34 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
             {
                 using var uow = unitOfWorkFactory();
                 var id = Guid.NewGuid().ToString();
-                var user = new XpoIdentityUser(uow)
-                {
-                    Id = id,
-                    UserName = Guid.NewGuid().ToString(),
-                    Email = Guid.NewGuid().ToString(),
-                };
+                var user = CreateUser(uow, id);
 
                 await uow.SaveAsync(user);
                 await uow.CommitChangesAsync();
 
                 var result = await store.DeleteAsync(new IdentityUser { Id = id }, CancellationToken.None);
                 return result.Succeeded;
+            });
+
+            It($"Can {nameof(store.FindByIdAsync)} with existing", async () =>
+            {
+                using var uow = unitOfWorkFactory();
+                var id = Guid.NewGuid().ToString();
+                var user = CreateUser(uow, id);
+
+                await uow.SaveAsync(user);
+                await uow.CommitChangesAsync();
+
+                var result = await store.FindByIdAsync(id, CancellationToken.None);
+                return result.Id == id;
+            });
+
+            It($"Can {nameof(store.FindByIdAsync)} with not existing", async () =>
+            {
+                var id = Guid.NewGuid().ToString();
+
+                var result = await store.FindByIdAsync(id, CancellationToken.None);
+                return result == null;
             });
         });
     }

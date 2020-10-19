@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -18,8 +19,8 @@ using Xenial.AspNetIdentity.Xpo.Models;
 
 namespace Xenial.AspNetIdentity.Xpo.Stores
 {
-    public class XPUserStore<TUser, TUserKey, TXPUser> :
-         IQueryableUserStore<TUser>
+    public class XPUserStore<TUser, TKey, TXPUser> :
+        IQueryableUserStore<TUser>
         //,IUserPasswordStore<TUser>,
         //IUserSecurityStampStore<TUser>,
         //IUserEmailStore<TUser>,
@@ -32,16 +33,16 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         //IUserAuthenticationTokenStore<TUser>,
         //IUserAuthenticatorKeyStore<TUser>,
         //IUserTwoFactorRecoveryCodeStore<TUser>
-        where TUser : IdentityUser<TUserKey>
-        where TUserKey : IEquatable<TUserKey>
+        where TUser : IdentityUser<TKey>
+        where TKey : IEquatable<TKey>
         where TXPUser : IXPObject
     {
         public Func<UnitOfWork> UnitOfWorkFactory { get; }
-        public ILogger<XPUserStore<TUser, TUserKey, TXPUser>> Logger { get; }
+        public ILogger<XPUserStore<TUser, TKey, TXPUser>> Logger { get; }
         public MapperConfiguration MapperConfiguration { get; }
         private readonly Lazy<UnitOfWork> queryUnitOfWork;
 
-        public XPUserStore(Func<UnitOfWork> unitOfWorkFactory, ILogger<XPUserStore<TUser, TUserKey, TXPUser>> logger)
+        public XPUserStore(Func<UnitOfWork> unitOfWorkFactory, ILogger<XPUserStore<TUser, TKey, TXPUser>> logger)
         {
             UnitOfWorkFactory = unitOfWorkFactory;
             Logger = logger;
@@ -58,8 +59,8 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 using var uow = UnitOfWorkFactory();
                 var mapper = MapperConfiguration.CreateMapper(t => uow.GetClassInfo(t).CreateObject(uow));
                 var persistentUser = mapper.Map<TXPUser>(user);
-                await uow.SaveAsync(persistentUser);
-                await uow.CommitChangesAsync();
+                await uow.SaveAsync(persistentUser, cancellationToken);
+                await uow.CommitChangesAsync(cancellationToken);
                 return IdentityResult.Success;
             }
             catch (Exception ex)
@@ -72,10 +73,11 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             try
             {
                 using var uow = UnitOfWorkFactory();
-                var persistentUser = await uow.GetObjectByKeyAsync<TXPUser>(user.Id);
+                var persistentUser = await uow.GetObjectByKeyAsync<TXPUser>(user.Id, cancellationToken);
                 if (persistentUser != null)
                 {
-                    await uow.DeleteAsync(persistentUser);
+                    await uow.DeleteAsync(persistentUser, cancellationToken);
+                    await uow.CommitChangesAsync(cancellationToken);
                     return IdentityResult.Success;
                 }
                 return IdentityResult.Failed(new IdentityError { Description = "User not found" });
@@ -86,7 +88,25 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
 
-        public Task<TUser> FindByIdAsync(string userId, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public async Task<TUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                using var uow = UnitOfWorkFactory();
+                var persistentUser = await uow.GetObjectByKeyAsync<TXPUser>(ConvertIdFromString(userId), cancellationToken);
+                if (persistentUser != null)
+                {
+                    var mapper = MapperConfiguration.CreateMapper();
+                    return mapper.Map<TUser>(persistentUser);
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleGenericException("find by Id", ex);
+            }
+            return null;
+        }
+
         public Task<TUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken) => throw new NotImplementedException();
         public Task<string> GetNormalizedUserNameAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
         public Task<string> GetUserIdAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
@@ -114,5 +134,34 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 #endif
                     );
         }
+
+        /// <summary>
+        /// Converts the provided <paramref name="id"/> to a strongly typed key object.
+        /// </summary>
+        /// <param name="id">The id to convert.</param>
+        /// <returns>An instance of <typeparamref name="TKey"/> representing the provided <paramref name="id"/>.</returns>
+        public virtual TKey ConvertIdFromString(string id)
+        {
+            if (id == null)
+            {
+                return default(TKey);
+            }
+            return (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromInvariantString(id);
+        }
+
+        /// <summary>
+        /// Converts the provided <paramref name="id"/> to its string representation.
+        /// </summary>
+        /// <param name="id">The id to convert.</param>
+        /// <returns>An <see cref="string"/> representation of the provided <paramref name="id"/>.</returns>
+        public virtual string ConvertIdToString(TKey id)
+        {
+            if (object.Equals(id, default(TKey)))
+            {
+                return null;
+            }
+            return id.ToString();
+        }
+
     }
 }
