@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,7 +22,8 @@ using Xenial.AspNetIdentity.Xpo.Models;
 
 namespace Xenial.AspNetIdentity.Xpo.Stores
 {
-    public class XPUserStore<TUser, TKey, TXPUser> :
+    public class XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser> :
+        UserStoreBase<TUser, TKey, TUserClaim, TUserLogin, TUserToken>,
         IQueryableUserStore<TUser>
         //,IUserPasswordStore<TUser>,
         //IUserSecurityStampStore<TUser>,
@@ -38,14 +40,21 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         where TUser : IdentityUser<TKey>
         where TKey : IEquatable<TKey>
         where TXPUser : IXPObject
+        where TUserClaim : IdentityUserClaim<TKey>, new()
+        where TUserLogin : IdentityUserLogin<TKey>, new()
+        where TUserToken : IdentityUserToken<TKey>, new()
     {
-        private bool disposed;
         public Func<UnitOfWork> UnitOfWorkFactory { get; }
-        public ILogger<XPUserStore<TUser, TKey, TXPUser>> Logger { get; }
+        public ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser>> Logger { get; }
         public MapperConfiguration MapperConfiguration { get; }
         private readonly Lazy<UnitOfWork> queryUnitOfWork;
 
-        public XPUserStore(Func<UnitOfWork> unitOfWorkFactory, ILogger<XPUserStore<TUser, TKey, TXPUser>> logger)
+        public XPUserStore(
+            Func<UnitOfWork> unitOfWorkFactory,
+            ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser>> logger,
+            IdentityErrorDescriber describer
+        )
+            : base(describer)
         {
             UnitOfWorkFactory = unitOfWorkFactory;
             Logger = logger;
@@ -53,9 +62,9 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             queryUnitOfWork = new Lazy<UnitOfWork>(unitOfWorkFactory);
         }
 
-        public IQueryable<TUser> Users => queryUnitOfWork.Value.Query<XpoIdentityUser>().ProjectTo<TUser>(MapperConfiguration);
+        public override IQueryable<TUser> Users => queryUnitOfWork.Value.Query<XpoIdentityUser>().ProjectTo<TUser>(MapperConfiguration);
 
-        public async Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken)
+        public async override Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -73,7 +82,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 return HandleGenericException("create", ex);
             }
         }
-        public async Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken)
+        public async override Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -95,7 +104,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
 
-        public async Task<TUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
+        public async override Task<TUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -118,7 +127,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         protected virtual CriteriaOperator CreateUserNameCriteria(string userName) => new BinaryOperator("NormalizedUserName", userName, BinaryOperatorType.Equal);
 
-        public async Task<TUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        public async override Task<TUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -141,7 +150,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         }
 
 
-        public async Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken)
+        public async override Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -170,34 +179,17 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
 
-        public Task<string> GetNormalizedUserNameAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
-        public Task<string> GetUserIdAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
-        public Task<string> GetUserNameAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
-        public Task SetNormalizedUserNameAsync(TUser user, string normalizedName, CancellationToken cancellationToken) => throw new NotImplementedException();
-        public Task SetUserNameAsync(TUser user, string userName, CancellationToken cancellationToken) => throw new NotImplementedException();
-
-        /// <summary>
-        /// Throws if this class has been disposed.
-        /// </summary>
-        protected void ThrowIfDisposed()
-        {
-            if (disposed)
-            {
-                throw new ObjectDisposedException(GetType().Name);
-            }
-        }
-
-        /// <summary>
-        /// Dispose the store
-        /// </summary>
-        public virtual void Dispose()
-        {
-            disposed = true;
-            if (queryUnitOfWork.IsValueCreated)
-            {
-                queryUnitOfWork.Value.Dispose();
-            }
-        }
+        ///// <summary>
+        ///// Dispose the store
+        ///// </summary>
+        //public virtual void Dispose()
+        //{
+        //    disposed = true;
+        //    if (queryUnitOfWork.IsValueCreated)
+        //    {
+        //        queryUnitOfWork.Value.Dispose();
+        //    }
+        //}
 
         private IdentityResult HandleGenericException(string method, Exception ex)
         {
@@ -211,33 +203,20 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                     );
         }
 
-        /// <summary>
-        /// Converts the provided <paramref name="id"/> to a strongly typed key object.
-        /// </summary>
-        /// <param name="id">The id to convert.</param>
-        /// <returns>An instance of <typeparamref name="TKey"/> representing the provided <paramref name="id"/>.</returns>
-        public virtual TKey ConvertIdFromString(string id)
-        {
-            if (id == null)
-            {
-                return default(TKey);
-            }
-            return (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromInvariantString(id);
-        }
-
-        /// <summary>
-        /// Converts the provided <paramref name="id"/> to its string representation.
-        /// </summary>
-        /// <param name="id">The id to convert.</param>
-        /// <returns>An <see cref="string"/> representation of the provided <paramref name="id"/>.</returns>
-        public virtual string ConvertIdToString(TKey id)
-        {
-            if (object.Equals(id, default(TKey)))
-            {
-                return null;
-            }
-            return id.ToString();
-        }
-
+        protected override Task<TUser> FindUserAsync(TKey userId, CancellationToken cancellationToken) => throw new NotImplementedException();
+        protected override Task<TUserLogin> FindUserLoginAsync(TKey userId, string loginProvider, string providerKey, CancellationToken cancellationToken) => throw new NotImplementedException();
+        protected override Task<TUserLogin> FindUserLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public override Task<IList<Claim>> GetClaimsAsync(TUser user, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public override Task AddClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public override Task ReplaceClaimAsync(TUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public override Task RemoveClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public override Task AddLoginAsync(TUser user, UserLoginInfo login, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public override Task RemoveLoginAsync(TUser user, string loginProvider, string providerKey, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public override Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public override Task<TUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public override Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        protected override Task<TUserToken> FindTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken) => throw new NotImplementedException();
+        protected override Task AddUserTokenAsync(TUserToken token) => throw new NotImplementedException();
+        protected override Task RemoveUserTokenAsync(TUserToken token) => throw new NotImplementedException();
     }
 }

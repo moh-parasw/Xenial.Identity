@@ -16,11 +16,11 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
 {
     public static class UserStoreTests
     {
-        public static void Tests(string dbName, string connectionString) => Describe($"{nameof(XPUserStore<IdentityUser, string, XpoIdentityUser>)} using {dbName}", () =>
+        public static void Tests(string dbName, string connectionString) => Describe($"{nameof(XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser>)} using {dbName}", () =>
         {
             var dataLayer = XpoDefault.GetDataLayer(connectionString, DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema);
             Func<UnitOfWork> unitOfWorkFactory = () => new UnitOfWork(dataLayer);
-            var store = new XPUserStore<IdentityUser, string, XpoIdentityUser>(unitOfWorkFactory, new FakeLogger<XPUserStore<IdentityUser, string, XpoIdentityUser>>());
+            var store = new XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser>(unitOfWorkFactory, new FakeLogger<XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser>>(), new IdentityErrorDescriber());
 
             XpoIdentityUser CreateUser(UnitOfWork uow, string id = null) => new XpoIdentityUser(uow)
             {
