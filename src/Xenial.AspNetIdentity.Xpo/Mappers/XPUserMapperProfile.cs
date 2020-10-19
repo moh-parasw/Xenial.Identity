@@ -26,6 +26,7 @@ namespace Xenial.AspNetIdentity.Xpo.Mappers
 
             CreateMap<Models.XpoIdentityUserToken, IdentityUserToken<string>>()
                 .ReverseMap()
+                .ForMember(m => m.User, o => o.Ignore())
                 .ConstructUsingServiceLocator();
         }
     }

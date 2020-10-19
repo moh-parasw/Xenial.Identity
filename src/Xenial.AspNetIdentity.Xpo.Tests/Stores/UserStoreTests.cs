@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 using DevExpress.Xpo;
+
+using FluentAssertions;
 
 using Microsoft.AspNetCore.Identity;
 
@@ -191,6 +195,66 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         );
 
                         return expectedToken == token;
+                    });
+                });
+
+                Describe(nameof(store.SetTokenAsync), () =>
+                {
+                    It("non existing user and token", async () =>
+                    {
+                        var loginProvider = Guid.NewGuid().ToString();
+                        var loginProviderName = Guid.NewGuid().ToString();
+                        var tokenValue = Guid.NewGuid().ToString();
+
+                        var action = new Func<Task>(async () => await store.SetTokenAsync(new IdentityUser(), loginProvider, loginProviderName, tokenValue, CancellationToken.None));
+                        await action.Should().ThrowAsync<ArgumentNullException>();
+                    });
+
+                    It("adds non existing token", async () =>
+                    {
+                        var loginProvider = Guid.NewGuid().ToString();
+                        var loginProviderName = Guid.NewGuid().ToString();
+                        var tokenValue = Guid.NewGuid().ToString();
+                        using var uow = unitOfWorkFactory();
+                        var user = CreateUser(uow);
+                        await uow.SaveAsync(user);
+                        await uow.CommitChangesAsync();
+
+                        await store.SetTokenAsync(new IdentityUser { Id = user.Id }, loginProvider, loginProviderName, tokenValue, CancellationToken.None);
+
+                        using var uow2 = unitOfWorkFactory();
+                        var userInDb = await uow.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
+
+                        userInDb.Tokens.Should().NotBeEmpty();
+                        userInDb.Tokens.First().Value.Should().Be(tokenValue);
+                    });
+
+                    It("updates existing token", async () =>
+                    {
+                        var loginProvider = Guid.NewGuid().ToString();
+                        var loginProviderName = Guid.NewGuid().ToString();
+                        var tokenValue = Guid.NewGuid().ToString();
+                        using var uow = unitOfWorkFactory();
+                        var user = CreateUser(uow);
+                        user.Tokens.Add(new XpoIdentityUserToken(uow)
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            LoginProvider = loginProvider,
+                            Name = loginProviderName,
+                            Value = tokenValue,
+                        });
+                        await uow.SaveAsync(user);
+                        await uow.CommitChangesAsync();
+
+                        var newTokenValue = Guid.NewGuid().ToString();
+                        await store.SetTokenAsync(new IdentityUser { Id = user.Id }, loginProvider, loginProviderName, newTokenValue, CancellationToken.None);
+
+                        using var uow2 = unitOfWorkFactory();
+                        var userInDb = await uow.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
+
+                        userInDb.Tokens.Should().NotBeEmpty();
+                        userInDb.Tokens.Count.Should().Be(1);
+                        userInDb.Tokens.First().Value.Should().Be(newTokenValue);
                     });
                 });
             });

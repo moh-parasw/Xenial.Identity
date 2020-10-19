@@ -285,8 +285,72 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
             return null;
         }
-        protected override Task AddUserTokenAsync(TUserToken token) => throw new NotImplementedException();
+
+        protected async override Task AddUserTokenAsync(TUserToken token)
+        {
+            using var uow = UnitOfWorkFactory();
+            var user = await uow.GetObjectByKeyAsync<TXPUser>(token.UserId);
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            var tokenClassInfo = uow.GetClassInfo(typeof(TXPUserToken));
+            var persistentToken = (TXPUserToken)tokenClassInfo.CreateNewObject(uow);
+
+            var mapper = MapperConfiguration.CreateMapper();
+            persistentToken = mapper.Map(token, persistentToken);
+            tokenClassInfo.FindMember("User")?.SetValue(persistentToken, user);
+            tokenClassInfo.FindMember("Id")?.SetValue(persistentToken, Guid.NewGuid().ToString());
+
+            await uow.SaveAsync(persistentToken);
+            await uow.CommitChangesAsync();
+        }
+
         protected override Task RemoveUserTokenAsync(TUserToken token) => throw new NotImplementedException();
+
+        /// <summary>
+        /// Sets the token value for a particular user.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <param name="loginProvider">The authentication provider for the token.</param>
+        /// <param name="name">The name of the token.</param>
+        /// <param name="value">The value of the token.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
+        /// <returns>The <see cref="Task"/> that represents the asynchronous operation.</returns>
+        public override async Task SetTokenAsync(TUser user, string loginProvider, string name, string value, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            var token = await FindTokenAsync(user, loginProvider, name, cancellationToken);
+            if (token == null)
+            {
+                await AddUserTokenAsync(CreateUserToken(user, loginProvider, name, value));
+            }
+            else
+            {
+                await UpdateUserTokenAsync(CreateUserToken(user, loginProvider, name, value));
+            }
+        }
+
+        protected async virtual Task UpdateUserTokenAsync(TUserToken token)
+        {
+            using var uow = UnitOfWorkFactory();
+            var userPropertyName = $"User.{uow.GetClassInfo(typeof(TXPUser)).KeyProperty}";
+            var persistentToken = await uow.FindObjectAsync<TXPUserToken>(CreateTokenCriteria(userPropertyName, token.UserId, token.LoginProvider, token.Name));
+            if (token != null)
+            {
+                var mapper = MapperConfiguration.CreateMapper();
+                mapper.Map(token, persistentToken);
+                await uow.SaveAsync(persistentToken);
+                await uow.CommitChangesAsync();
+            }
+        }
 
         #endregion
     }
