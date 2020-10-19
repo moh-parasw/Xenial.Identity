@@ -328,25 +328,9 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             return loginInfos;
         }
 
-
-        ///// <summary>
-        ///// Called to create a new instance of a <see cref="IdentityUserLogin{TKey}"/>.
-        ///// </summary>
-        ///// <param name="user">The associated user.</param>
-        ///// <param name="login">The sasociated login.</param>
-        ///// <returns></returns>
-        //protected virtual TUserLogin CreateUserLogin(TXPUser user, UserLoginInfo login)
-        //{
-        //    return new TUserLogin
-        //    {
-        //        UserId = user.Id,
-        //        ProviderKey = login.ProviderKey,
-        //        LoginProvider = login.LoginProvider,
-        //        ProviderDisplayName = login.ProviderDisplayName
-        //    };
-        //}
-
         #endregion
+
+        #region Claims
 
         public override Task<IList<Claim>> GetClaimsAsync(TUser user, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task AddClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default) => throw new NotImplementedException();
@@ -354,6 +338,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         public override Task RemoveClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
+        #endregion
 
         #region Tokens
 
