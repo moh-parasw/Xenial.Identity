@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 
+using DevExpress.Data.Filtering;
 using DevExpress.Xpo;
 
 using Microsoft.AspNetCore.Identity;
@@ -37,6 +38,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         where TKey : IEquatable<TKey>
         where TXPUser : IXPObject
     {
+        private bool disposed;
         public Func<UnitOfWork> UnitOfWorkFactory { get; }
         public ILogger<XPUserStore<TUser, TKey, TXPUser>> Logger { get; }
         public MapperConfiguration MapperConfiguration { get; }
@@ -54,6 +56,8 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         public async Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
             try
             {
                 using var uow = UnitOfWorkFactory();
@@ -70,6 +74,8 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         }
         public async Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
             try
             {
                 using var uow = UnitOfWorkFactory();
@@ -90,6 +96,8 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         public async Task<TUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
             try
             {
                 using var uow = UnitOfWorkFactory();
@@ -107,16 +115,53 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             return null;
         }
 
-        public Task<TUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken) => throw new NotImplementedException();
+        protected virtual CriteriaOperator CreateUserNameCriteria(string userName) => new BinaryOperator("NormalizedUserName", userName, BinaryOperatorType.Equal);
+
+        public async Task<TUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            try
+            {
+                using var uow = UnitOfWorkFactory();
+                var persistentUser = await uow.FindObjectAsync<TXPUser>(CreateUserNameCriteria(normalizedUserName), cancellationToken);
+
+                if (persistentUser != null)
+                {
+                    var mapper = MapperConfiguration.CreateMapper();
+                    return mapper.Map<TUser>(persistentUser);
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleGenericException("find by Name", ex);
+            }
+            return null;
+        }
+
         public Task<string> GetNormalizedUserNameAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
         public Task<string> GetUserIdAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
         public Task<string> GetUserNameAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
         public Task SetNormalizedUserNameAsync(TUser user, string normalizedName, CancellationToken cancellationToken) => throw new NotImplementedException();
         public Task SetUserNameAsync(TUser user, string userName, CancellationToken cancellationToken) => throw new NotImplementedException();
         public Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
-
-        public void Dispose()
+        /// <summary>
+        /// Throws if this class has been disposed.
+        /// </summary>
+        protected void ThrowIfDisposed()
         {
+            if (disposed)
+            {
+                throw new ObjectDisposedException(GetType().Name);
+            }
+        }
+
+        /// <summary>
+        /// Dispose the store
+        /// </summary>
+        public virtual void Dispose()
+        {
+            disposed = true;
             if (queryUnitOfWork.IsValueCreated)
             {
                 queryUnitOfWork.Value.Dispose();

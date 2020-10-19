@@ -48,25 +48,53 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 return result.Succeeded;
             });
 
-            It($"Can {nameof(store.FindByIdAsync)} with existing", async () =>
+            Describe($"Can {nameof(store.FindByIdAsync)}", () =>
             {
-                using var uow = unitOfWorkFactory();
-                var id = Guid.NewGuid().ToString();
-                var user = CreateUser(uow, id);
+                It($"with existing", async () =>
+                {
+                    using var uow = unitOfWorkFactory();
+                    var id = Guid.NewGuid().ToString();
+                    var user = CreateUser(uow, id);
 
-                await uow.SaveAsync(user);
-                await uow.CommitChangesAsync();
+                    await uow.SaveAsync(user);
+                    await uow.CommitChangesAsync();
 
-                var result = await store.FindByIdAsync(id, CancellationToken.None);
-                return result.Id == id;
+                    var result = await store.FindByIdAsync(id, CancellationToken.None);
+                    return result.Id == id;
+                });
+
+                It($"with not existing", async () =>
+                {
+                    var id = Guid.NewGuid().ToString();
+
+                    var result = await store.FindByIdAsync(id, CancellationToken.None);
+                    return result == null;
+                });
             });
 
-            It($"Can {nameof(store.FindByIdAsync)} with not existing", async () =>
+            Describe($"Can {nameof(store.FindByNameAsync)}", () =>
             {
-                var id = Guid.NewGuid().ToString();
+                It($"with existing", async () =>
+                {
+                    using var uow = unitOfWorkFactory();
+                    var name = Guid.NewGuid().ToString();
+                    var user = CreateUser(uow);
+                    user.NormalizedUserName = name;
 
-                var result = await store.FindByIdAsync(id, CancellationToken.None);
-                return result == null;
+                    await uow.SaveAsync(user);
+                    await uow.CommitChangesAsync();
+
+                    var result = await store.FindByNameAsync(name, CancellationToken.None);
+                    return result.NormalizedUserName == name;
+                });
+
+                It($"with not existing", async () =>
+                {
+                    var id = Guid.NewGuid().ToString();
+
+                    var result = await store.FindByNameAsync(id, CancellationToken.None);
+                    return result == null;
+                });
             });
         });
     }

@@ -30,4 +30,11 @@ namespace Xenial.AspNetIdentity.Xpo.Models
     {
         public XpoIdentityUserLogin(Session session) : base(session) { }
     }
+
+    [XPIdentityUserToken(UserType = typeof(XpoIdentityUser))]
+    [Persistent]
+    public partial class XpoIdentityUserToken : XpoIdentityBaseObjectString
+    {
+        public XpoIdentityUserToken(Session session) : base(session) { }
+    }
 }
