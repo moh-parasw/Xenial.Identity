@@ -277,15 +277,22 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         }
         protected override Task<TUserLogin> FindUserLoginAsync(TKey userId, string loginProvider, string providerKey, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-        protected virtual CriteriaOperator CreateTokenCriteria(string loginProvider, string providerKey)
-         => new GroupOperator(GroupOperatorType.And,
-             new BinaryOperator(new OperandProperty("LoginProvider"), new OperandValue(loginProvider), BinaryOperatorType.Equal),
-             new BinaryOperator(new OperandProperty("ProviderKey"), new OperandValue(providerKey), BinaryOperatorType.Equal)
-         );
+        protected virtual CriteriaOperator CreateLoginCriteria(string loginProvider, string providerKey)
+            => new GroupOperator(GroupOperatorType.And,
+                new BinaryOperator(new OperandProperty("LoginProvider"), new OperandValue(loginProvider), BinaryOperatorType.Equal),
+                new BinaryOperator(new OperandProperty("ProviderKey"), new OperandValue(providerKey), BinaryOperatorType.Equal)
+            );
+
+        protected virtual CriteriaOperator CreateLoginCriteria(string userPropertyName, TKey userKey, string loginProvider, string providerKey)
+            => new GroupOperator(GroupOperatorType.And,
+                new BinaryOperator(new OperandProperty(userPropertyName), new OperandValue(userKey), BinaryOperatorType.Equal),
+                new BinaryOperator(new OperandProperty("LoginProvider"), new OperandValue(loginProvider), BinaryOperatorType.Equal),
+                new BinaryOperator(new OperandProperty("ProviderKey"), new OperandValue(providerKey), BinaryOperatorType.Equal)
+            );
 
         protected async override Task<TUserLogin> FindUserLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
-            var userLogin = await UnitOfWork.FindObjectAsync<TXPUserLogin>(CreateTokenCriteria(loginProvider, providerKey), cancellationToken);
+            var userLogin = await UnitOfWork.FindObjectAsync<TXPUserLogin>(CreateLoginCriteria(loginProvider, providerKey), cancellationToken);
             if (userLogin != null)
             {
                 var mapper = MapperConfiguration.CreateMapper();
@@ -293,7 +300,18 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
             return null;
         }
-        public override Task RemoveLoginAsync(TUser user, string loginProvider, string providerKey, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+        public async override Task RemoveLoginAsync(TUser user, string loginProvider, string providerKey, CancellationToken cancellationToken = default)
+        {
+            var userPropertyName = $"User.{UnitOfWork.GetClassInfo(typeof(TXPUser)).KeyProperty}";
+            var userLogin = await UnitOfWork.FindObjectAsync<TXPUserLogin>(CreateLoginCriteria(userPropertyName, user.Id, loginProvider, providerKey), cancellationToken);
+
+            if (userLogin != null)
+            {
+                await UnitOfWork.DeleteAsync(userLogin, cancellationToken);
+            }
+        }
+
         public override Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
 

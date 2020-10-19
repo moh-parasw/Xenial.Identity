@@ -468,8 +468,45 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         using (uow1)
                         {
                             var userFromStore = await store.FindByLoginAsync(loginProvider, providerKey, CancellationToken.None);
-                            return userFromStore != null;
+                            userFromStore.Should().NotBeNull();
                         }
+                        using var uow2 = unitOfWorkFactory();
+                        var userInDb = await uow.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
+
+                        userInDb.Logins.Should().NotBeEmpty();
+                    });
+                });
+
+                Describe("RemoveLoginAsync", () =>
+                {
+                    It("With existent user and login", async () =>
+                    {
+                        var loginProvider = Guid.NewGuid().ToString();
+                        var providerKey = Guid.NewGuid().ToString();
+                        using var uow = unitOfWorkFactory();
+                        var user = CreateUser(uow);
+                        user.Logins.Add(new XpoIdentityUserLogin(uow)
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            LoginProvider = loginProvider,
+                            ProviderKey = providerKey
+                        });
+                        await uow.SaveAsync(user);
+                        await uow.CommitChangesAsync();
+
+                        var (store, uow1) = CreateStore();
+                        using (store)
+                        using (uow1)
+                        {
+                            var userFromStore = await store.FindByIdAsync(user.Id, CancellationToken.None);
+                            await store.RemoveLoginAsync(userFromStore, loginProvider, providerKey, CancellationToken.None);
+                            await store.UpdateAsync(userFromStore, CancellationToken.None);
+                        }
+
+                        using var uow2 = unitOfWorkFactory();
+                        var userInDb = await uow.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
+
+                        userInDb.Logins.Should().BeEmpty();
                     });
                 });
             });
