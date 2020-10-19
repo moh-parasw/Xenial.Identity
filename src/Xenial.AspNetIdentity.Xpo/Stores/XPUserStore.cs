@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -306,7 +303,17 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             await uow.CommitChangesAsync();
         }
 
-        protected override Task RemoveUserTokenAsync(TUserToken token) => throw new NotImplementedException();
+        protected async override Task RemoveUserTokenAsync(TUserToken token)
+        {
+            using var uow = UnitOfWorkFactory();
+            var userPropertyName = $"User.{uow.GetClassInfo(typeof(TXPUser)).KeyProperty}";
+            var persistentToken = await uow.FindObjectAsync<TXPUserToken>(CreateTokenCriteria(userPropertyName, token.UserId, token.LoginProvider, token.Name));
+            if (persistentToken != null)
+            {
+                await uow.DeleteAsync(persistentToken);
+                await uow.CommitChangesAsync();
+            }
+        }
 
         /// <summary>
         /// Sets the token value for a particular user.
@@ -343,7 +350,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             using var uow = UnitOfWorkFactory();
             var userPropertyName = $"User.{uow.GetClassInfo(typeof(TXPUser)).KeyProperty}";
             var persistentToken = await uow.FindObjectAsync<TXPUserToken>(CreateTokenCriteria(userPropertyName, token.UserId, token.LoginProvider, token.Name));
-            if (token != null)
+            if (persistentToken != null)
             {
                 var mapper = MapperConfiguration.CreateMapper();
                 mapper.Map(token, persistentToken);

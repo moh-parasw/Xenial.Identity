@@ -257,6 +257,44 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         userInDb.Tokens.First().Value.Should().Be(newTokenValue);
                     });
                 });
+
+                Describe(nameof(store.RemoveTokenAsync), () =>
+                {
+                    It("non existing user and token", async () =>
+                    {
+                       var loginProvider = Guid.NewGuid().ToString();
+                       var loginProviderName = Guid.NewGuid().ToString();
+
+                       var action = new Func<Task>(async () => await store.RemoveTokenAsync(new IdentityUser(), loginProvider, loginProviderName, CancellationToken.None));
+                       await action.Should().NotThrowAsync();
+                    });
+
+                     It("removed existing token", async () =>
+                    {
+                        var loginProvider = Guid.NewGuid().ToString();
+                        var loginProviderName = Guid.NewGuid().ToString();
+                        var tokenValue = Guid.NewGuid().ToString();
+                        using var uow = unitOfWorkFactory();
+                        var user = CreateUser(uow);
+                        user.Tokens.Add(new XpoIdentityUserToken(uow)
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            LoginProvider = loginProvider,
+                            Name = loginProviderName,
+                            Value = tokenValue,
+                        });
+                        await uow.SaveAsync(user);
+                        await uow.CommitChangesAsync();
+
+                        var newTokenValue = Guid.NewGuid().ToString();
+                        await store.RemoveTokenAsync(new IdentityUser { Id = user.Id }, loginProvider, loginProviderName, CancellationToken.None);
+
+                        using var uow2 = unitOfWorkFactory();
+                        var userInDb = await uow.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
+
+                        userInDb.Tokens.Should().BeEmpty();
+                    });
+                });
             });
         });
     }
