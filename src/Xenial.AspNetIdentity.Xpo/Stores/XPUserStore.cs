@@ -290,6 +290,11 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 new BinaryOperator(new OperandProperty("ProviderKey"), new OperandValue(providerKey), BinaryOperatorType.Equal)
             );
 
+        protected virtual CriteriaOperator CreateLoginCriteria(string userPropertyName, TKey userKey)
+            => new GroupOperator(GroupOperatorType.And,
+                new BinaryOperator(new OperandProperty(userPropertyName), new OperandValue(userKey), BinaryOperatorType.Equal)
+            );
+
         protected async override Task<TUserLogin> FindUserLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
             var userLogin = await UnitOfWork.FindObjectAsync<TXPUserLogin>(CreateLoginCriteria(loginProvider, providerKey), cancellationToken);
@@ -312,7 +317,16 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
 
-        public override Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public async override Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user, CancellationToken cancellationToken = default)
+        {
+            var userPropertyName = $"User.{UnitOfWork.GetClassInfo(typeof(TXPUser)).KeyProperty}";
+            var collection = new XPCollection<TXPUserLogin>(UnitOfWork, CreateLoginCriteria(userPropertyName, user.Id));
+            await collection.LoadAsync(cancellationToken);
+
+            var mapper = MapperConfiguration.CreateMapper();
+            var loginInfos = collection.Select(l => mapper.Map<UserLoginInfo>(l)).ToList();
+            return loginInfos;
+        }
 
 
         ///// <summary>

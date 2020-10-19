@@ -509,6 +509,56 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         userInDb.Logins.Should().BeEmpty();
                     });
                 });
+
+                Describe("GetLoginsAsync", () =>
+                {
+                    It("With non existent user and login", async () =>
+                    {
+                        using var uow = unitOfWorkFactory();
+                        var user = CreateUser(uow);
+                        await uow.SaveAsync(user);
+                        await uow.CommitChangesAsync();
+
+                        var (store, uow1) = CreateStore();
+                        using (store)
+                        using (uow1)
+                        {
+                            var userFromStore = await store.FindByIdAsync(user.Id, CancellationToken.None);
+                            var logins = await store.GetLoginsAsync(userFromStore, CancellationToken.None);
+                            logins.Should().BeEmpty();
+                        }
+                    });
+
+                    It("With existent user and login", async () =>
+                    {
+                        using var uow = unitOfWorkFactory();
+                        var user = CreateUser(uow);
+                        user.Logins.Add(new XpoIdentityUserLogin(uow)
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            LoginProvider = Guid.NewGuid().ToString(),
+                            ProviderKey = Guid.NewGuid().ToString()
+                        });
+                        user.Logins.Add(new XpoIdentityUserLogin(uow)
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            LoginProvider = Guid.NewGuid().ToString(),
+                            ProviderKey = Guid.NewGuid().ToString()
+                        });
+                        await uow.SaveAsync(user);
+                        await uow.CommitChangesAsync();
+
+                        var (store, uow1) = CreateStore();
+                        using (store)
+                        using (uow1)
+                        {
+                            var userFromStore = await store.FindByIdAsync(user.Id, CancellationToken.None);
+                            var logins = await store.GetLoginsAsync(userFromStore, CancellationToken.None);
+                            logins.Should().NotBeEmpty();
+                            logins.Count.Should().Be(2);
+                        }
+                    });
+                });
             });
         });
     }
