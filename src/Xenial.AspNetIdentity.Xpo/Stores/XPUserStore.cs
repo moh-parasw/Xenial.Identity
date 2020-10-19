@@ -23,7 +23,9 @@ using Xenial.AspNetIdentity.Xpo.Models;
 
 namespace Xenial.AspNetIdentity.Xpo.Stores
 {
-    public class XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser> :
+    public class XPUserStore<
+            TUser, TKey, TUserClaim, TUserLogin, TUserToken,
+            TXPUser, TXPUserToken> :
         UserStoreBase<TUser, TKey, TUserClaim, TUserLogin, TUserToken>,
         IQueryableUserStore<TUser>
         //,IUserPasswordStore<TUser>,
@@ -41,17 +43,18 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         where TUser : IdentityUser<TKey>
         where TKey : IEquatable<TKey>
         where TXPUser : IXPObject
+        where TXPUserToken : IXPObject
         where TUserClaim : IdentityUserClaim<TKey>, new()
         where TUserLogin : IdentityUserLogin<TKey>, new()
         where TUserToken : IdentityUserToken<TKey>, new()
     {
         public Func<UnitOfWork> UnitOfWorkFactory { get; }
-        public ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser>> Logger { get; }
+        public ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser, TXPUserToken>> Logger { get; }
         public IConfigurationProvider MapperConfiguration { get; }
 
         public XPUserStore(
             Func<UnitOfWork> unitOfWorkFactory,
-            ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser>> logger,
+            ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser, TXPUserToken>> logger,
             IdentityErrorDescriber describer
         )
             : this(unitOfWorkFactory, logger, describer, new MapperConfiguration(cfg => cfg.AddProfile<XPUserMapperProfile>()))
@@ -60,7 +63,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         public XPUserStore(
             Func<UnitOfWork> unitOfWorkFactory,
-            ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser>> logger,
+            ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser, TXPUserToken>> logger,
             IdentityErrorDescriber describer,
             IConfigurationProvider configurationProvider
         )
@@ -258,8 +261,33 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         public override Task RemoveLoginAsync(TUser user, string loginProvider, string providerKey, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-        protected override Task<TUserToken> FindTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken) => throw new NotImplementedException();
+
+
+        #region Tokens
+
+        protected virtual CriteriaOperator CreateTokenCriteria(string userPropertyName, TKey userKey, string loginProvider, string name)
+            => new GroupOperator(GroupOperatorType.And,
+                new BinaryOperator(new OperandProperty(userPropertyName), new OperandValue(userKey), BinaryOperatorType.Equal),
+                new BinaryOperator(new OperandProperty("LoginProvider"), new OperandValue(loginProvider), BinaryOperatorType.Equal),
+                new BinaryOperator(new OperandProperty("Name"), new OperandValue(name), BinaryOperatorType.Equal)
+            );
+
+        protected async override Task<TUserToken> FindTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken)
+        {
+            using var uow = UnitOfWorkFactory();
+            var userPropertyName = $"User.{uow.GetClassInfo(typeof(TXPUser)).KeyProperty}";
+            var token = await uow.FindObjectAsync<TXPUserToken>(CreateTokenCriteria(userPropertyName, user.Id, loginProvider, name), cancellationToken);
+            if (token != null)
+            {
+                var mapper = MapperConfiguration.CreateMapper();
+                return mapper.Map<TUserToken>(token);
+            }
+
+            return null;
+        }
         protected override Task AddUserTokenAsync(TUserToken token) => throw new NotImplementedException();
         protected override Task RemoveUserTokenAsync(TUserToken token) => throw new NotImplementedException();
+
+        #endregion
     }
 }

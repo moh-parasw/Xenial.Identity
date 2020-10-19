@@ -16,11 +16,11 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
 {
     public static class UserStoreTests
     {
-        public static void Tests(string dbName, string connectionString) => Describe($"{nameof(XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser>)} using {dbName}", () =>
+        public static void Tests(string dbName, string connectionString) => Describe($"{nameof(XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserToken>)} using {dbName}", () =>
         {
             var dataLayer = XpoDefault.GetDataLayer(connectionString, DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema);
             Func<UnitOfWork> unitOfWorkFactory = () => new UnitOfWork(dataLayer);
-            var store = new XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser>(unitOfWorkFactory, new FakeLogger<XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser>>(), new IdentityErrorDescriber());
+            var store = new XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserToken>(unitOfWorkFactory, new FakeLogger<XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserToken>>(), new IdentityErrorDescriber());
 
             XpoIdentityUser CreateUser(UnitOfWork uow, string id = null) => new XpoIdentityUser(uow)
             {
@@ -151,6 +151,47 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
 
                     var result = await store.FindByEmailAsync(id, CancellationToken.None);
                     return result == null;
+                });
+            });
+            Describe("Tokens", () =>
+            {
+                Describe(nameof(store.GetTokenAsync), () =>
+                {
+                    It("non existing token", async () =>
+                    {
+                        var token = await store.GetTokenAsync(new IdentityUser(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), CancellationToken.None);
+
+                        return token == null;
+                    });
+
+                    It("existing token", async () =>
+                    {
+                        using var uow = unitOfWorkFactory();
+                        var name = Guid.NewGuid().ToString();
+                        var user = CreateUser(uow);
+                        var loginProvider = Guid.NewGuid().ToString();
+                        var loginProviderName = Guid.NewGuid().ToString();
+                        var expectedToken = Guid.NewGuid().ToString();
+                        user.Tokens.Add(new XpoIdentityUserToken(uow)
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            LoginProvider = loginProvider,
+                            Name = loginProviderName,
+                            Value = expectedToken
+                        });
+
+                        await uow.SaveAsync(user);
+                        await uow.CommitChangesAsync();
+
+                        var token = await store.GetTokenAsync(
+                            new IdentityUser { Id = user.Id },
+                            loginProvider,
+                            loginProviderName,
+                            CancellationToken.None
+                        );
+
+                        return expectedToken == token;
+                    });
                 });
             });
         });
