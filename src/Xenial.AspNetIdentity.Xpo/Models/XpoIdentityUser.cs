@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 
 using DevExpress.Xpo;
 
@@ -9,7 +10,7 @@ using Xenial.AspNetIdentity.Xpo;
 
 namespace Xenial.AspNetIdentity.Xpo.Models
 {
-    [XPIdentityUser(RoleType = typeof(MyRole))]
+    [XPIdentityUser(RoleType = typeof(MyRole), ClaimType = typeof(MyUserClaim))]
     [Persistent]
     public partial class MyUser : XpoIdentityBaseObject
     {
@@ -24,6 +25,26 @@ namespace Xenial.AspNetIdentity.Xpo.Models
 
 
     }
+
+    [XPIdentityUserClaim(UserType = typeof(MyUser))]
+    [Persistent]
+    public partial class MyUserClaim : XpoIdentityBaseObject
+    {
+        private Guid id;
+
+        public MyUserClaim(Session session) : base(session) { }
+
+        [Persistent]
+        [Key(AutoGenerate = true)]
+        public Guid Id { get => id; set => SetPropertyValue(ref id, value); }
+
+
+
+    }
+
+
+
+
 
     [XPIdentityRole(UserType = typeof(MyUser))]
     [Persistent]
