@@ -10,7 +10,7 @@ using Xenial.AspNetIdentity.Xpo;
 
 namespace Xenial.AspNetIdentity.Xpo.Models
 {
-    [XPIdentityUser(RoleType = typeof(MyRole), ClaimsType = typeof(MyUserClaim))]
+    [XPIdentityUser(RoleType = typeof(MyRole), ClaimsType = typeof(MyUserClaim), LoginsType = typeof(MyUserLogin))]
     [Persistent]
     public partial class MyUser : XpoIdentityBaseObject
     {
@@ -42,7 +42,18 @@ namespace Xenial.AspNetIdentity.Xpo.Models
 
     }
 
+    [XPIdentityUserLogin(UserType = typeof(MyUser))]
+    [Persistent]
+    public partial class XPIdentityUserLogin : XpoIdentityBaseObject
+    {
+        private Guid id;
 
+        public XPIdentityUserLogin(Session session) : base(session) { }
+
+        [Persistent]
+        [Key(AutoGenerate = true)]
+        public Guid Id { get => id; set => SetPropertyValue(ref id, value); }
+    }
 
 
 

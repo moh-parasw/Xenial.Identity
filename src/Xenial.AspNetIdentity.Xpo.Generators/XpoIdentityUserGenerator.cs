@@ -26,7 +26,7 @@ namespace Xenial.AspNetIdentity.Xpo
 
         public Type RoleType { get; set; }
         public Type ClaimsType { get; set; }
-        public Type LoginType { get; set; }
+        public Type LoginsType { get; set; }
     }
 }
 ";
@@ -62,6 +62,7 @@ namespace Xenial.AspNetIdentity.Xpo
             {
                 yield return ("RoleType", "Roles", false, new string[0]);
                 yield return ("ClaimsType", "Claims", true, new string[0]);
+                yield return ("LoginsType", "Logins", true, new string[0]);
             }
         }
     }
