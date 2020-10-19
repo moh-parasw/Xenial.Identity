@@ -13,6 +13,7 @@ using AutoMapper.QueryableExtensions;
 
 using DevExpress.Data.Filtering;
 using DevExpress.Xpo;
+using DevExpress.Xpo.DB.Exceptions;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -47,7 +48,6 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         public Func<UnitOfWork> UnitOfWorkFactory { get; }
         public ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser>> Logger { get; }
         public MapperConfiguration MapperConfiguration { get; }
-        private readonly Lazy<UnitOfWork> queryUnitOfWork;
 
         public XPUserStore(
             Func<UnitOfWork> unitOfWorkFactory,
@@ -59,11 +59,17 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             UnitOfWorkFactory = unitOfWorkFactory;
             Logger = logger;
             MapperConfiguration = new MapperConfiguration(cfg => cfg.AddProfile<XPUserMapperProfile>());
-            queryUnitOfWork = new Lazy<UnitOfWork>(unitOfWorkFactory);
         }
 
-        public override IQueryable<TUser> Users => queryUnitOfWork.Value.Query<XpoIdentityUser>().ProjectTo<TUser>(MapperConfiguration);
-
+        public override IQueryable<TUser> Users
+        {
+            get
+            {
+                using var uow = UnitOfWorkFactory();
+                return uow.Query<XpoIdentityUser>().ProjectTo<TUser>(MapperConfiguration);
+            }
+        }
+        #region CRUD
         public async override Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -77,11 +83,16 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 await uow.CommitChangesAsync(cancellationToken);
                 return IdentityResult.Success;
             }
+            catch (LockingException)
+            {
+                return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
+            }
             catch (Exception ex)
             {
                 return HandleGenericException("create", ex);
             }
         }
+
         public async override Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -98,57 +109,15 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 }
                 return IdentityResult.Failed(new IdentityError { Description = "User not found" });
             }
+            catch (LockingException)
+            {
+                return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
+            }
             catch (Exception ex)
             {
                 return HandleGenericException("delete", ex);
             }
         }
-
-        public async override Task<TUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-            try
-            {
-                using var uow = UnitOfWorkFactory();
-                var persistentUser = await uow.GetObjectByKeyAsync<TXPUser>(ConvertIdFromString(userId), cancellationToken);
-                if (persistentUser != null)
-                {
-                    var mapper = MapperConfiguration.CreateMapper();
-                    return mapper.Map<TUser>(persistentUser);
-                }
-            }
-            catch (Exception ex)
-            {
-                HandleGenericException("find by Id", ex);
-            }
-            return null;
-        }
-
-        protected virtual CriteriaOperator CreateUserNameCriteria(string userName) => new BinaryOperator("NormalizedUserName", userName, BinaryOperatorType.Equal);
-
-        public async override Task<TUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-            try
-            {
-                using var uow = UnitOfWorkFactory();
-                var persistentUser = await uow.FindObjectAsync<TXPUser>(CreateUserNameCriteria(normalizedUserName), cancellationToken);
-
-                if (persistentUser != null)
-                {
-                    var mapper = MapperConfiguration.CreateMapper();
-                    return mapper.Map<TUser>(persistentUser);
-                }
-            }
-            catch (Exception ex)
-            {
-                HandleGenericException("find by Name", ex);
-            }
-            return null;
-        }
-
 
         public async override Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken)
         {
@@ -173,12 +142,89 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 await uow.CommitChangesAsync(cancellationToken);
                 return IdentityResult.Success;
             }
+            catch (LockingException)
+            {
+                return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
+            }
             catch (Exception ex)
             {
                 return HandleGenericException("update", ex);
             }
         }
 
+        #endregion
+
+        public override Task<TUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
+            => FindUserAsync(ConvertIdFromString(userId), cancellationToken);
+
+        protected async override Task<TUser> FindUserAsync(TKey userId, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            try
+            {
+                using var uow = UnitOfWorkFactory();
+                var persistentUser = await uow.GetObjectByKeyAsync<TXPUser>(userId, cancellationToken);
+                if (persistentUser != null)
+                {
+                    var mapper = MapperConfiguration.CreateMapper();
+                    return mapper.Map<TUser>(persistentUser);
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleGenericException("find by Id", ex);
+            }
+            return null;
+        }
+
+        protected virtual CriteriaOperator CreateUserNameCriteria(string normalizedUserName) => new BinaryOperator("NormalizedUserName", normalizedUserName, BinaryOperatorType.Equal);
+
+        public async override Task<TUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            try
+            {
+                using var uow = UnitOfWorkFactory();
+                var persistentUser = await uow.FindObjectAsync<TXPUser>(CreateUserNameCriteria(normalizedUserName), cancellationToken);
+
+                if (persistentUser != null)
+                {
+                    var mapper = MapperConfiguration.CreateMapper();
+                    return mapper.Map<TUser>(persistentUser);
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleGenericException("find by Name", ex);
+            }
+            return null;
+        }
+
+        protected virtual CriteriaOperator CreateEmailCriteria(string normalizedEmail) => new BinaryOperator("NormalizedEmail", normalizedEmail, BinaryOperatorType.Equal);
+
+        public async override Task<TUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            try
+            {
+                using var uow = UnitOfWorkFactory();
+                var persistentUser = await uow.FindObjectAsync<TXPUser>(CreateEmailCriteria(normalizedEmail), cancellationToken);
+
+                if (persistentUser != null)
+                {
+                    var mapper = MapperConfiguration.CreateMapper();
+                    return mapper.Map<TUser>(persistentUser);
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleGenericException("find by Name", ex);
+            }
+            return null;
+        }
         ///// <summary>
         ///// Dispose the store
         ///// </summary>
@@ -202,8 +248,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 #endif
                     );
         }
-
-        protected override Task<TUser> FindUserAsync(TKey userId, CancellationToken cancellationToken) => throw new NotImplementedException();
+        
         protected override Task<TUserLogin> FindUserLoginAsync(TKey userId, string loginProvider, string providerKey, CancellationToken cancellationToken) => throw new NotImplementedException();
         protected override Task<TUserLogin> FindUserLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken) => throw new NotImplementedException();
         public override Task<IList<Claim>> GetClaimsAsync(TUser user, CancellationToken cancellationToken = default) => throw new NotImplementedException();
@@ -213,7 +258,6 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         public override Task AddLoginAsync(TUser user, UserLoginInfo login, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task RemoveLoginAsync(TUser user, string loginProvider, string providerKey, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-        public override Task<TUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         protected override Task<TUserToken> FindTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken) => throw new NotImplementedException();
         protected override Task AddUserTokenAsync(TUserToken token) => throw new NotImplementedException();

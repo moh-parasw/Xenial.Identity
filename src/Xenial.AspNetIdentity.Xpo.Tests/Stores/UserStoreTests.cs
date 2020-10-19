@@ -128,6 +128,31 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     return !result.Succeeded;
                 });
             });
+
+            Describe($"Can {nameof(store.FindByEmailAsync)}", () =>
+            {
+                It($"with existing", async () =>
+                {
+                    using var uow = unitOfWorkFactory();
+                    var name = Guid.NewGuid().ToString();
+                    var user = CreateUser(uow);
+                    user.NormalizedEmail = name;
+
+                    await uow.SaveAsync(user);
+                    await uow.CommitChangesAsync();
+
+                    var result = await store.FindByEmailAsync(name, CancellationToken.None);
+                    return result.NormalizedEmail == name;
+                });
+
+                It($"with not existing", async () =>
+                {
+                    var id = Guid.NewGuid().ToString();
+
+                    var result = await store.FindByEmailAsync(id, CancellationToken.None);
+                    return result == null;
+                });
+            });
         });
     }
 }
