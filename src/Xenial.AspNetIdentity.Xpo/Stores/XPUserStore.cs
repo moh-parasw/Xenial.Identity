@@ -275,7 +275,18 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
             await UnitOfWork.SaveAsync(persistentLogin, cancellationToken);
         }
-        protected override Task<TUserLogin> FindUserLoginAsync(TKey userId, string loginProvider, string providerKey, CancellationToken cancellationToken) => throw new NotImplementedException();
+
+        protected async override Task<TUserLogin> FindUserLoginAsync(TKey userId, string loginProvider, string providerKey, CancellationToken cancellationToken)
+        {
+            var userPropertyName = $"User.{UnitOfWork.GetClassInfo(typeof(TXPUser)).KeyProperty}";
+            var userLogin = await UnitOfWork.FindObjectAsync<TXPUserLogin>(CreateLoginCriteria(userPropertyName, userId, loginProvider, providerKey), cancellationToken);
+            if (userLogin != null)
+            {
+                var mapper = MapperConfiguration.CreateMapper();
+                return mapper.Map<TUserLogin>(userLogin);
+            }
+            return null;
+        }
 
         protected virtual CriteriaOperator CreateLoginCriteria(string loginProvider, string providerKey)
             => new GroupOperator(GroupOperatorType.And,
