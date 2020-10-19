@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -139,12 +140,42 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             return null;
         }
 
+
+        public async Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            try
+            {
+                using var uow = UnitOfWorkFactory();
+                var existingObject = await uow.GetObjectByKeyAsync<TXPUser>(user.Id, cancellationToken);
+                if (existingObject == null)
+                {
+                    return IdentityResult.Failed(new IdentityError { Description = $"User with Id: {user.Id} not found" });
+                }
+                var mapper = MapperConfiguration.CreateMapper();
+                var persistentUser = mapper.Map(user, existingObject);
+                await uow.SaveAsync(persistentUser, cancellationToken);
+                await uow.CommitChangesAsync(cancellationToken);
+                return IdentityResult.Success;
+            }
+            catch (Exception ex)
+            {
+                return HandleGenericException("update", ex);
+            }
+        }
+
         public Task<string> GetNormalizedUserNameAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
         public Task<string> GetUserIdAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
         public Task<string> GetUserNameAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
         public Task SetNormalizedUserNameAsync(TUser user, string normalizedName, CancellationToken cancellationToken) => throw new NotImplementedException();
         public Task SetUserNameAsync(TUser user, string userName, CancellationToken cancellationToken) => throw new NotImplementedException();
-        public Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
+
         /// <summary>
         /// Throws if this class has been disposed.
         /// </summary>

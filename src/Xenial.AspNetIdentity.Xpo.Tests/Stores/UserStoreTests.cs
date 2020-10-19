@@ -16,7 +16,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
 {
     public static class UserStoreTests
     {
-        public static void Tests(string name, string connectionString) => Describe($"{nameof(XPUserStore<IdentityUser, string, XpoIdentityUser>)} using {name}", () =>
+        public static void Tests(string dbName, string connectionString) => Describe($"{nameof(XPUserStore<IdentityUser, string, XpoIdentityUser>)} using {dbName}", () =>
         {
             var dataLayer = XpoDefault.GetDataLayer(connectionString, DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema);
             Func<UnitOfWork> unitOfWorkFactory = () => new UnitOfWork(dataLayer);
@@ -94,6 +94,38 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
 
                     var result = await store.FindByNameAsync(id, CancellationToken.None);
                     return result == null;
+                });
+            });
+
+            Describe($"Can {nameof(store.UpdateAsync)}", () =>
+            {
+                It($"with existing", async () =>
+                {
+                    using var uow = unitOfWorkFactory();
+                    var id = Guid.NewGuid().ToString();
+                    var user = CreateUser(uow, id);
+                    user.NormalizedUserName = dbName;
+
+                    await uow.SaveAsync(user);
+                    await uow.CommitChangesAsync();
+
+                    var userFromStore = await store.FindByIdAsync(id, CancellationToken.None);
+                    userFromStore.PhoneNumber = Guid.NewGuid().ToString();
+                    var result = await store.UpdateAsync(userFromStore, CancellationToken.None);
+
+                    using var uow2 = unitOfWorkFactory();
+                    var userFromDb = uow2.GetObjectByKey<XpoIdentityUser>(id);
+
+                    return result.Succeeded && userFromDb.PhoneNumber == userFromStore.PhoneNumber;
+                });
+
+                It($"with not existing", async () =>
+                {
+                    var id = Guid.NewGuid().ToString();
+
+                    var result = await store.UpdateAsync(new IdentityUser(), CancellationToken.None);
+
+                    return !result.Succeeded;
                 });
             });
         });
