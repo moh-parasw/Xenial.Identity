@@ -56,6 +56,12 @@ namespace Xenial.AspNetIdentity.Xpo
                 yield return (typeof(int), "AccessFailedCount", 0, new string[0]);
             }
         }
-
+        protected override IEnumerable<(string attributeFieldName, string propertyName, bool isAggregated, string[] additionalAttributes)> ManyFields
+        {
+            get
+            {
+                yield return ("RoleType", "Roles", false, new string[0]);
+            }
+        }
     }
 }
