@@ -39,10 +39,10 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
 
 #if DEBUG
 
-                if (!System.Diagnostics.Debugger.IsAttached)
-                {
-                    System.Diagnostics.Debugger.Launch();
-                }
+                //if (!System.Diagnostics.Debugger.IsAttached)
+                //{
+                //    System.Diagnostics.Debugger.Launch();
+                //}
 #endif
 
                 foreach (var canidate in syntaxReceiver.Canidates)
@@ -159,7 +159,7 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
 
         private class SyntaxReceiver : ISyntaxReceiver
         {
-            public List<ClassDeclarationSyntax> Canidates => new List<ClassDeclarationSyntax>();
+            public List<ClassDeclarationSyntax> Canidates { get; } = new List<ClassDeclarationSyntax>();
 
             public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
             {

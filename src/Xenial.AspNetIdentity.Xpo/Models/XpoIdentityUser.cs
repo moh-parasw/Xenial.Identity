@@ -20,6 +20,9 @@ namespace Xenial.AspNetIdentity.Xpo.Models
         [Persistent]
         [Key(AutoGenerate = true)]
         public Guid Id { get => id; set => SetPropertyValue(ref id, value); }
+
+
+
     }
 
     [XPIdentityRole(UserType = typeof(MyUser))]
