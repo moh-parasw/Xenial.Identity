@@ -11,12 +11,6 @@ using static Xenial.Tasty;
 
 namespace Xenial.AspNetIdentity.Xpo.Tests
 {
-    [Persistent]
-    public class XpoIdentityUser : XpoIdentityUserGuid
-    {
-        public XpoIdentityUser(Session session) : base(session) { }
-    }
-
     internal class Program
     {
         internal static async Task<int> Main(string[] args)
@@ -52,7 +46,6 @@ namespace Xenial.AspNetIdentity.Xpo.Tests
 
                     await uow.SaveAsync(user);
                     await uow.CommitChangesAsync();
-
 
                     using var uow2 = new UnitOfWork(dataLayer);
 
