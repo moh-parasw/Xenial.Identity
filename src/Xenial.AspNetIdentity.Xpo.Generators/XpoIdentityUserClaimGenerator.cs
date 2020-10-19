@@ -25,7 +25,6 @@ namespace Xenial.AspNetIdentity.Xpo
         public XPIdentityUserClaimAttribute() { }
 
         public Type UserType { get; set; }
-        public Type ClaimType { get; set; }
     }
 }
 ";
@@ -49,7 +48,6 @@ namespace Xenial.AspNetIdentity.Xpo
             get
             {
                 yield return ("RoleType", "Roles", false, new string[0]);
-                yield return ("ClaimType", "Claimes", true, new string[0]);
             }
         }
     }

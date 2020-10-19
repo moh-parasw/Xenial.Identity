@@ -61,6 +61,7 @@ namespace Xenial.AspNetIdentity.Xpo
             get
             {
                 yield return ("RoleType", "Roles", false, new string[0]);
+                yield return ("ClaimsType", "Claims", true, new string[0]);
             }
         }
     }
