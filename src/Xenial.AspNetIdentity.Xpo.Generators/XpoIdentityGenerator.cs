@@ -76,7 +76,7 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                             writer.Indent++;
                             foreach (var (fieldType, fieldName, size, additionalAttributes) in Fields)
                             {
-                                writer.WriteLine($"private {ToType(fieldType)} {LowerCaseFirstLetter(fieldName)};");
+                                writer.WriteLine($"private {ToType(fieldType)} {GetFieldName(fieldName)};");
                                 writer.WriteLine($"[Persistent(\"{fieldName}\")]");
                                 if (size > 0)
                                 {
@@ -86,7 +86,7 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                                 {
                                     writer.WriteLine($"[{additionalAttribute}]");
                                 }
-                                var propertyDeclaration = $"public {ToType(fieldType)} {fieldName} {{ get => {LowerCaseFirstLetter(fieldName)}; set => SetPropertyValue(\"{fieldName}\", ref {LowerCaseFirstLetter(fieldName)}, value); }}";
+                                var propertyDeclaration = $"public {ToType(fieldType)} {fieldName} {{ get => {GetFieldName(fieldName)}; set => SetPropertyValue(\"{fieldName}\", ref {GetFieldName(fieldName)}, value); }}";
                                 writer.WriteLine(propertyDeclaration);
                                 writer.WriteLine();
                             }
@@ -125,8 +125,8 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                                     {
                                         var oneTypeName = userTypedConstant.Value.ToString();
                                         writer.WriteLine();
-                                        writer.WriteLine($"private {oneTypeName} {LowerCaseFirstLetter(oneField.propertyName)};");
-                                        var propertyDeclaration = $"public {oneTypeName} {oneField.propertyName} {{ get => {LowerCaseFirstLetter(oneField.propertyName)}; set => SetPropertyValue(\"{oneField.propertyName}\", ref {LowerCaseFirstLetter(oneField.propertyName)}, value); }}";
+                                        writer.WriteLine($"private {oneTypeName} {GetFieldName(oneField.propertyName)};");
+                                        var propertyDeclaration = $"public {oneTypeName} {oneField.propertyName} {{ get => {GetFieldName(oneField.propertyName)}; set => SetPropertyValue(\"{oneField.propertyName}\", ref {GetFieldName(oneField.propertyName)}, value); }}";
                                         writer.WriteLine("[Association]");
                                         if (oneField.isAggregated)
                                         {
@@ -174,11 +174,15 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
             }
         }
 
-        private string LowerCaseFirstLetter(string str)
+        private string GetFieldName(string str)
         {
             if (str != string.Empty && char.IsUpper(str[0]))
             {
                 str = char.ToLower(str[0]) + str.Substring(1);
+            }
+            if (str == "value") //Reserved keyword for fieldName
+            {
+                return "val";
             }
             return str;
         }
