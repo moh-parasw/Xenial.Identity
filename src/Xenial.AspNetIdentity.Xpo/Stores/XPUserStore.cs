@@ -47,18 +47,28 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
     {
         public Func<UnitOfWork> UnitOfWorkFactory { get; }
         public ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser>> Logger { get; }
-        public MapperConfiguration MapperConfiguration { get; }
+        public IConfigurationProvider MapperConfiguration { get; }
 
         public XPUserStore(
             Func<UnitOfWork> unitOfWorkFactory,
             ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser>> logger,
             IdentityErrorDescriber describer
         )
+            : this(unitOfWorkFactory, logger, describer, new MapperConfiguration(cfg => cfg.AddProfile<XPUserMapperProfile>()))
+        {
+        }
+
+        public XPUserStore(
+            Func<UnitOfWork> unitOfWorkFactory,
+            ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser>> logger,
+            IdentityErrorDescriber describer,
+            IConfigurationProvider configurationProvider
+        )
             : base(describer)
         {
             UnitOfWorkFactory = unitOfWorkFactory;
             Logger = logger;
-            MapperConfiguration = new MapperConfiguration(cfg => cfg.AddProfile<XPUserMapperProfile>());
+            MapperConfiguration = configurationProvider;
         }
 
         public override IQueryable<TUser> Users
