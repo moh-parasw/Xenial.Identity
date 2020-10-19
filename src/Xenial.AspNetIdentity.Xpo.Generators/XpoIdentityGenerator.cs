@@ -127,6 +127,7 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                                         writer.WriteLine();
                                         writer.WriteLine($"private {oneTypeName} {GetFieldName(oneField.propertyName)};");
                                         var propertyDeclaration = $"public {oneTypeName} {oneField.propertyName} {{ get => {GetFieldName(oneField.propertyName)}; set => SetPropertyValue(\"{oneField.propertyName}\", ref {GetFieldName(oneField.propertyName)}, value); }}";
+                                        writer.WriteLine($"[Persistent(\"{oneField.propertyName}Id\")]");
                                         writer.WriteLine("[Association]");
                                         if (oneField.isAggregated)
                                         {
