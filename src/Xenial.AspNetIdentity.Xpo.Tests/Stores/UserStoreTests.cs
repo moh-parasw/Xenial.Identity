@@ -432,6 +432,46 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         userInDb.Logins.First().LoginProvider.Should().Be(loginInfo.LoginProvider);
                     });
                 });
+
+                Describe("FindByLoginAsync", () =>
+                {
+                    It("With non existent user and login", async () =>
+                    {
+                        var loginProvider = Guid.NewGuid().ToString();
+                        var providerKey = Guid.NewGuid().ToString();
+                        var (store, uow) = CreateStore();
+                        using (store)
+                        using (uow)
+                        {
+                            var user = await store.FindByLoginAsync(loginProvider, providerKey, CancellationToken.None);
+                            return user == null;
+                        }
+                    });
+
+                    It("With existent user and login", async () =>
+                    {
+                        var loginProvider = Guid.NewGuid().ToString();
+                        var providerKey = Guid.NewGuid().ToString();
+                        using var uow = unitOfWorkFactory();
+                        var user = CreateUser(uow);
+                        user.Logins.Add(new XpoIdentityUserLogin(uow)
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            LoginProvider = loginProvider,
+                            ProviderKey = providerKey
+                        });
+                        await uow.SaveAsync(user);
+                        await uow.CommitChangesAsync();
+
+                        var (store, uow1) = CreateStore();
+                        using (store)
+                        using (uow1)
+                        {
+                            var userFromStore = await store.FindByLoginAsync(loginProvider, providerKey, CancellationToken.None);
+                            return userFromStore != null;
+                        }
+                    });
+                });
             });
         });
     }

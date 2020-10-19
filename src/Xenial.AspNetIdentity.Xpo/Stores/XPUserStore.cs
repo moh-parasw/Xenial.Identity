@@ -247,7 +247,6 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         #endregion
 
-
         #region Logins
 
         public async override Task AddLoginAsync(TUser user, UserLoginInfo login, CancellationToken cancellationToken = default)
@@ -277,7 +276,23 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             await UnitOfWork.SaveAsync(persistentLogin, cancellationToken);
         }
         protected override Task<TUserLogin> FindUserLoginAsync(TKey userId, string loginProvider, string providerKey, CancellationToken cancellationToken) => throw new NotImplementedException();
-        protected override Task<TUserLogin> FindUserLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken) => throw new NotImplementedException();
+
+        protected virtual CriteriaOperator CreateTokenCriteria(string loginProvider, string providerKey)
+         => new GroupOperator(GroupOperatorType.And,
+             new BinaryOperator(new OperandProperty("LoginProvider"), new OperandValue(loginProvider), BinaryOperatorType.Equal),
+             new BinaryOperator(new OperandProperty("ProviderKey"), new OperandValue(providerKey), BinaryOperatorType.Equal)
+         );
+
+        protected async override Task<TUserLogin> FindUserLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
+        {
+            var userLogin = await UnitOfWork.FindObjectAsync<TXPUserLogin>(CreateTokenCriteria(loginProvider, providerKey), cancellationToken);
+            if (userLogin != null)
+            {
+                var mapper = MapperConfiguration.CreateMapper();
+                return mapper.Map<TUserLogin>(userLogin);
+            }
+            return null;
+        }
         public override Task RemoveLoginAsync(TUser user, string loginProvider, string providerKey, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
