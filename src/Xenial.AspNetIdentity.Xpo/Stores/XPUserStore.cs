@@ -22,36 +22,48 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 {
     public class XPUserStore<
             TUser, TKey, TUserClaim, TUserLogin, TUserToken,
-            TXPUser, TXPUserToken> :
+            TXPUser, TXPUserLogin, TXPUserToken> :
         UserStoreBase<TUser, TKey, TUserClaim, TUserLogin, TUserToken>,
-        IQueryableUserStore<TUser>
-        //,IUserPasswordStore<TUser>,
-        //IUserSecurityStampStore<TUser>,
-        //IUserEmailStore<TUser>,
-        //IUserPhoneNumberStore<TUser>,
-        //IUserLoginStore<TUser>,
-        //IUserClaimStore<TUser>,
+        IQueryableUserStore<TUser>,
+        IUserPasswordStore<TUser>,
+        IUserSecurityStampStore<TUser>,
+        IUserEmailStore<TUser>,
+        IUserPhoneNumberStore<TUser>,
+        IUserLoginStore<TUser>,
+        IUserClaimStore<TUser>,
         //IUserRoleStore<TUser>,
-        //IUserTwoFactorStore<TUser>,
-        //IUserLockoutStore<TUser>,
-        //IUserAuthenticationTokenStore<TUser>,
-        //IUserAuthenticatorKeyStore<TUser>,
-        //IUserTwoFactorRecoveryCodeStore<TUser>
+        IUserTwoFactorStore<TUser>,
+        IUserLockoutStore<TUser>,
+        IUserAuthenticationTokenStore<TUser>,
+        IUserAuthenticatorKeyStore<TUser>,
+        IUserTwoFactorRecoveryCodeStore<TUser>
         where TUser : IdentityUser<TKey>
         where TKey : IEquatable<TKey>
         where TXPUser : IXPObject
+        where TXPUserLogin : IXPObject
         where TXPUserToken : IXPObject
         where TUserClaim : IdentityUserClaim<TKey>, new()
         where TUserLogin : IdentityUserLogin<TKey>, new()
         where TUserToken : IdentityUserToken<TKey>, new()
     {
         public UnitOfWork UnitOfWork { get; }
-        public ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser, TXPUserToken>> Logger { get; }
+        public ILogger<
+            XPUserStore<
+                TUser, TKey, TUserClaim, TUserLogin, TUserToken,
+                TXPUser, TXPUserLogin, TXPUserToken
+            >
+        > Logger
+        { get; }
+
         public IConfigurationProvider MapperConfiguration { get; }
 
         public XPUserStore(
             UnitOfWork unitOfWork,
-            ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser, TXPUserToken>> logger,
+            ILogger<
+                XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken,
+                TXPUser, TXPUserLogin, TXPUserToken
+                >
+            > logger,
             IdentityErrorDescriber describer
         )
             : this(unitOfWork, logger, describer, new MapperConfiguration(cfg => cfg.AddProfile<XPUserMapperProfile>()))
@@ -60,7 +72,11 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         public XPUserStore(
             UnitOfWork unitOfWork,
-            ILogger<XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken, TXPUser, TXPUserToken>> logger,
+            ILogger<
+                XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken,
+                    TXPUser, TXPUserLogin, TXPUserToken
+                >
+            > logger,
             IdentityErrorDescriber describer,
             IConfigurationProvider configurationProvider
         )
@@ -234,7 +250,32 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         #region Logins
 
-        public override Task AddLoginAsync(TUser user, UserLoginInfo login, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public async override Task AddLoginAsync(TUser user, UserLoginInfo login, CancellationToken cancellationToken = default)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            if (login == null)
+            {
+                throw new ArgumentNullException(nameof(login));
+            }
+
+            var persistentUser = await UnitOfWork.GetObjectByKeyAsync<TXPUser>(user.Id, cancellationToken);
+            if (persistentUser == null)
+            {
+                throw new ArgumentNullException(nameof(persistentUser));
+            }
+
+            var persistentLogin = (TXPUserLogin)UnitOfWork.GetClassInfo<TXPUserLogin>().CreateNewObject(UnitOfWork);
+            var mapper = MapperConfiguration.CreateMapper();
+            persistentLogin = mapper.Map(login, persistentLogin);
+
+            UnitOfWork.GetClassInfo<TXPUserLogin>().FindMember("Id")?.SetValue(persistentLogin, Guid.NewGuid().ToString());
+            UnitOfWork.GetClassInfo<TXPUserLogin>().FindMember("User")?.SetValue(persistentLogin, persistentUser);
+
+            await UnitOfWork.SaveAsync(persistentLogin, cancellationToken);
+        }
         protected override Task<TUserLogin> FindUserLoginAsync(TKey userId, string loginProvider, string providerKey, CancellationToken cancellationToken) => throw new NotImplementedException();
         protected override Task<TUserLogin> FindUserLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken) => throw new NotImplementedException();
         public override Task RemoveLoginAsync(TUser user, string loginProvider, string providerKey, CancellationToken cancellationToken = default) => throw new NotImplementedException();

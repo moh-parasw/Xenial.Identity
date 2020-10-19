@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 using AutoMapper;
 
 using Microsoft.AspNetCore.Identity;
@@ -25,6 +22,11 @@ namespace Xenial.AspNetIdentity.Xpo.Mappers
                 .ConstructUsingServiceLocator();
 
             CreateMap<Models.XpoIdentityUserToken, IdentityUserToken<string>>()
+                .ReverseMap()
+                .ForMember(m => m.User, o => o.Ignore())
+                .ConstructUsingServiceLocator();
+
+            CreateMap<Models.XpoIdentityUserLogin, UserLoginInfo>()
                 .ReverseMap()
                 .ForMember(m => m.User, o => o.Ignore())
                 .ConstructUsingServiceLocator();
