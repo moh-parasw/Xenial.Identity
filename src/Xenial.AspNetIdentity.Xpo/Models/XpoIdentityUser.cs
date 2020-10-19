@@ -46,7 +46,7 @@ namespace Xenial.AspNetIdentity.Xpo.Models
 
 
 
-    [XPIdentityRole(UserType = typeof(MyUser))]
+    [XPIdentityRole(UserType = typeof(MyUser), ClaimsType = typeof(MyRoleClaim))]
     [Persistent]
     public partial class MyRole : XpoIdentityBaseObject
     {
@@ -59,7 +59,21 @@ namespace Xenial.AspNetIdentity.Xpo.Models
         [Key(AutoGenerate = true)]
         public Guid Id { get => id; set => SetPropertyValue(ref id, value); }
     }
+    [XPIdentityRoleClaim(RoleType = typeof(MyRole))]
+    [Persistent]
+    public partial class MyRoleClaim : XpoIdentityBaseObject
+    {
+        private Guid id;
 
+        public MyRoleClaim(Session session) : base(session) { }
+
+        [Persistent]
+        [Key(AutoGenerate = true)]
+        public Guid Id { get => id; set => SetPropertyValue(ref id, value); }
+
+
+
+    }
     [NonPersistent]
     public abstract class XpoIdentityUserGuid : XpoIdentityUserBase<Guid>
     {
