@@ -26,7 +26,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests
 
             var databases = new[]
             {
-                //("InMemory", connectionString),
+                ("InMemory", connectionString),
                 ("Sqlite", SQLiteConnectionProvider.GetConnectionString(Path.Combine(directory, $"{Guid.NewGuid()}.db")))
             };
 
