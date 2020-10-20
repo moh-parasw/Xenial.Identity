@@ -11,9 +11,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.9" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
     <PackageReference Include="WestWind.AspnetCore.LiveReload" Version="0.2.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.9" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Xenial.AspNetIdentity.Xpo\Xenial.AspNetIdentity.Xpo.csproj" />
     <ProjectReference Include="..\Xenial.Identity.Xpo\Xenial.Identity.Xpo.csproj" />
   </ItemGroup>
 

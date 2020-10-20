@@ -3,20 +3,26 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
+using DevExpress.ExpressApp.MiddleTier;
+using DevExpress.Xpo;
+
 using IdentityServer4;
 
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json.Linq;
 
 using Westwind.AspNetCore.LiveReload;
 
+using Xenial.AspNetIdentity.Xpo.Stores;
 using Xenial.Identity.Xpo.Storage;
 
 namespace Xenial.Identity
@@ -62,6 +68,23 @@ namespace Xenial.Identity
             );
 
             services.AddXpoDefaultUnitOfWork();
+
+            services.AddDefaultIdentity<IdentityUser>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = true;
+            }).AddXpoStores();
+
+            services
+                .AddScoped<IUserStore<IdentityUser>>(s => new XPUserStore(
+                       s.GetService<UnitOfWork>(),
+                       s.GetService<ILogger<XPUserStore>>(),
+                       new Microsoft.AspNetCore.Identity.IdentityErrorDescriber()
+               ))
+                .AddScoped<IRoleStore<IdentityRole>>(s => new XPRoleStore(
+                        s.GetService<UnitOfWork>(),
+                        s.GetService<ILogger<XPRoleStore>>(),
+                        new Microsoft.AspNetCore.Identity.IdentityErrorDescriber()
+                ));
 
             var builder = services.AddIdentityServer(options =>
             {
