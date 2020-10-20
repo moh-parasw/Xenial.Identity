@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -675,7 +676,32 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         #region Roles
 
-        public Task AddToRoleAsync(TUser user, string roleName, CancellationToken cancellationToken) => throw new NotImplementedException();
+        protected virtual CriteriaOperator CreateRoleCriteria(string normalizedRoleName)
+            => new BinaryOperator("NormalizedName", normalizedRoleName, BinaryOperatorType.Equal);
+
+        public async Task AddToRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            var role = await UnitOfWork.FindObjectAsync<TXPRole>(CreateRoleCriteria(normalizedRoleName), cancellationToken);
+            if (role == null)
+            {
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Role {0} does not exist.", normalizedRoleName));
+            }
+            var userInDb = await UnitOfWork.GetObjectByKeyAsync<TXPUser>(user.Id, cancellationToken);
+            var rolesInDb = UnitOfWork.GetClassInfo<TXPUser>().FindMember("Roles")?.GetValue(userInDb);
+
+            if (rolesInDb is IList<TXPRole> roles)
+            {
+                roles.Add(role);
+            }
+        }
+
         public Task RemoveFromRoleAsync(TUser user, string roleName, CancellationToken cancellationToken) => throw new NotImplementedException();
         public Task<IList<string>> GetRolesAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
         public Task<bool> IsInRoleAsync(TUser user, string roleName, CancellationToken cancellationToken) => throw new NotImplementedException();

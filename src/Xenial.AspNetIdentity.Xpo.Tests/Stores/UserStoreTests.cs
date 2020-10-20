@@ -750,6 +750,57 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         }
                     });
                 });
+
+                Describe("Roles", () =>
+                {
+                    It("Add to role throws if not existing", async () =>
+                    {
+                        using var uow = unitOfWorkFactory();
+                        var user = CreateUser(uow);
+                        await uow.SaveAsync(user);
+                        await uow.CommitChangesAsync();
+
+                        var (store, uow1) = CreateStore();
+                        using (store)
+                        using (uow1)
+                        {
+                            var identityUser = await store.FindByIdAsync(user.Id, CancellationToken.None);
+
+                            Func<Task> action = async () => await store.AddToRoleAsync(identityUser, "foo", CancellationToken.None);
+                            await action.Should().ThrowAsync<InvalidOperationException>();
+                        }
+                    });
+
+                    It("Add to role", async () =>
+                    {
+                        using var uow = unitOfWorkFactory();
+                        var user = CreateUser(uow);
+                        var role = new XpoIdentityRole(uow)
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            Name = Guid.NewGuid().ToString(),
+                            NormalizedName = Guid.NewGuid().ToString(),
+                        };
+                        await uow.SaveAsync(user);
+                        await uow.CommitChangesAsync();
+
+                        var (store, uow1) = CreateStore();
+                        using (store)
+                        using (uow1)
+                        {
+                            var identityUser = await store.FindByIdAsync(user.Id, CancellationToken.None);
+
+                            await store.AddToRoleAsync(identityUser, role.NormalizedName, CancellationToken.None);
+                            await store.UpdateAsync(identityUser, CancellationToken.None);
+                        }
+
+                        using var uow2 = unitOfWorkFactory();
+                        var userInDb = await uow.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
+
+                        userInDb.Roles.Should().NotBeEmpty();
+                        userInDb.Roles.First().Name.Should().Be(role.Name);
+                    });
+                });
             });
         });
     }
