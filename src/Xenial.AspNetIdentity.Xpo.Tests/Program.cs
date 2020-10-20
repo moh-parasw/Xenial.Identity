@@ -33,6 +33,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests
             foreach (var (name, cs) in databases)
             {
                 UserStoreTests.Tests(name, cs);
+                RoleStoreTests.Tests(name, cs);
             }
 
             return await Run(args);
