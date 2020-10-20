@@ -408,7 +408,41 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
         public override Task<IList<Claim>> GetClaimsAsync(TUser user, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-        public override Task ReplaceClaimAsync(TUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+        protected virtual CriteriaOperator CreateClaimsCriteria(string userPropertyName, TKey userKey, string claimType, string claimValue)
+            => new GroupOperator(GroupOperatorType.And,
+                new BinaryOperator(new OperandProperty(userPropertyName), new OperandValue(userKey), BinaryOperatorType.Equal),
+                new BinaryOperator(new OperandProperty("Type"), new OperandValue(claimType), BinaryOperatorType.Equal),
+                new BinaryOperator(new OperandProperty("Value"), new OperandValue(claimValue), BinaryOperatorType.Equal)
+            );
+        public async override Task ReplaceClaimAsync(TUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken = default)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            if (claim == null)
+            {
+                throw new ArgumentNullException(nameof(claim));
+            }
+            if (newClaim == null)
+            {
+                throw new ArgumentNullException(nameof(newClaim));
+            }
+
+            var userPropertyName = $"User.{UnitOfWork.GetClassInfo(typeof(TXPUser)).KeyProperty}";
+            var claimToReplace = await UnitOfWork.FindObjectAsync<TXPUserClaim>(
+                CreateClaimsCriteria(userPropertyName, user.Id, claim.Type, claim.Value),
+                cancellationToken
+            );
+
+            if (claimToReplace != null)
+            {
+                UnitOfWork.GetClassInfo<TXPUserClaim>().FindMember("Type")?.SetValue(claimToReplace, newClaim.Type);
+                UnitOfWork.GetClassInfo<TXPUserClaim>().FindMember("Value")?.SetValue(claimToReplace, newClaim.Value);
+            }
+        }
+
         public override Task RemoveClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 

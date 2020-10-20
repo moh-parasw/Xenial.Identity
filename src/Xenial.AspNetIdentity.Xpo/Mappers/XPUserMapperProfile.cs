@@ -20,6 +20,7 @@ namespace Xenial.AspNetIdentity.Xpo.Mappers
                 .ConstructUsingServiceLocator();
 
             CreateMap<Models.XpoIdentityUserClaim, Claim>()
+                .ConstructUsing(c => new Claim(c.Type, c.Value))
                 .ReverseMap()
                 .ConstructUsingServiceLocator();
 

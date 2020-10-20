@@ -598,6 +598,48 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         userInDb.Claims.First().Value.Should().Be(claimValue);
                     });
                 });
+
+                Describe("ReplaceClaimAsync", () =>
+                {
+                    It("replaces claims", async () =>
+                    {
+                        var claimType = Guid.NewGuid().ToString();
+                        var claimValue = Guid.NewGuid().ToString();
+                        using var uow = unitOfWorkFactory();
+                        var user = CreateUser(uow);
+                        user.Claims.Add(new XpoIdentityUserClaim(uow)
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            Value = claimValue,
+                            Type = claimType
+                        });
+
+                        await uow.SaveAsync(user);
+                        await uow.CommitChangesAsync();
+
+                        var (store, uow1) = CreateStore();
+                        using (store)
+                        using (uow1)
+                        {
+                            var identityUser = await store.FindByIdAsync(user.Id, CancellationToken.None);
+                            var newClaimType = Guid.NewGuid().ToString();
+                            var newClaimValue = Guid.NewGuid().ToString();
+                            await store.ReplaceClaimAsync(
+                                identityUser,
+                                new Claim(claimType, claimValue),
+                                new Claim(newClaimType, newClaimValue),
+                                CancellationToken.None
+                            );
+                            await store.UpdateAsync(identityUser, CancellationToken.None);
+                            using var uow2 = unitOfWorkFactory();
+                            var userInDb = await uow.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
+
+                            userInDb.Claims.Should().NotBeEmpty();
+                            userInDb.Claims.First().Type.Should().Be(newClaimType);
+                            userInDb.Claims.First().Value.Should().Be(newClaimValue);
+                        }
+                    });
+                });
             });
         });
     }
