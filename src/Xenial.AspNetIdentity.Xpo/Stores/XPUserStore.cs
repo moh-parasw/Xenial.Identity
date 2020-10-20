@@ -768,6 +768,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             var result = (bool)await UnitOfWork.EvaluateAsync(typeof(TXPUser), new AggregateOperand(string.Empty, Aggregate.Exists), criteria);
             return result;
         }
+
         public async Task<IList<TUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
