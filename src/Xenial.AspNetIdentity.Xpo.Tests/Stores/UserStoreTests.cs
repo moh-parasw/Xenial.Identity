@@ -679,6 +679,43 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         }
                     });
                 });
+
+                Describe("GetClaimsAsync", () =>
+                {
+                    It("lists claims", async () =>
+                    {
+                        var claimType = Guid.NewGuid().ToString();
+                        var claimValue = Guid.NewGuid().ToString();
+                        using var uow = unitOfWorkFactory();
+                        var user = CreateUser(uow);
+                        user.Claims.Add(new XpoIdentityUserClaim(uow)
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            Value = claimValue,
+                            Type = claimType
+                        });
+
+                        await uow.SaveAsync(user);
+                        await uow.CommitChangesAsync();
+
+                        var (store, uow1) = CreateStore();
+                        using (store)
+                        using (uow1)
+                        {
+                            var identityUser = await store.FindByIdAsync(user.Id, CancellationToken.None);
+
+                            var claims = await store.GetClaimsAsync(
+                                identityUser,
+                                CancellationToken.None
+                            );
+                            await store.UpdateAsync(identityUser, CancellationToken.None);
+
+                            claims.Should().NotBeEmpty();
+                            claims.First().Type.Should().Be(claimType);
+                            claims.First().Value.Should().Be(claimValue);
+                        }
+                    });
+                });
             });
         });
     }

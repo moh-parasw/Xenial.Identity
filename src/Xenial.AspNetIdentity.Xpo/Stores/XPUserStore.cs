@@ -407,7 +407,26 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 UnitOfWork.GetClassInfo<TXPUserClaim>().FindMember("User")?.SetValue(persistentClaim, persistentUser);
             }
         }
-        public override Task<IList<Claim>> GetClaimsAsync(TUser user, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public async override Task<IList<Claim>> GetClaimsAsync(TUser user, CancellationToken cancellationToken = default)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            var userPropertyName = $"User.{UnitOfWork.GetClassInfo(typeof(TXPUser)).KeyProperty}";
+            var collection = new XPCollection<TXPUserClaim>(UnitOfWork, CreateClaimsCriteria(userPropertyName, user.Id));
+            await collection.LoadAsync(cancellationToken);
+
+            var mapper = MapperConfiguration.CreateMapper();
+            var claims = collection.Select(c => mapper.Map<Claim>(c)).ToList();
+            return claims;
+        }
+
+        protected virtual CriteriaOperator CreateClaimsCriteria(string userPropertyName, TKey userKey)
+           => new GroupOperator(GroupOperatorType.And,
+               new BinaryOperator(new OperandProperty(userPropertyName), new OperandValue(userKey), BinaryOperatorType.Equal)
+           );
 
         protected virtual CriteriaOperator CreateClaimsCriteria(string userPropertyName, TKey userKey, string claimType, string claimValue)
             => new GroupOperator(GroupOperatorType.And,
