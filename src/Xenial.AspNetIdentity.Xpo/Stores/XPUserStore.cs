@@ -90,7 +90,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         public override IQueryable<TUser> Users
             => UnitOfWork
-                .Query<XpoIdentityUser>()
+                .Query<TXPUser>()
                 .ProjectTo<TUser>(MapperConfiguration);
 
         #region CRUD
