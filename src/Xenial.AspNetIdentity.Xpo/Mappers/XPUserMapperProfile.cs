@@ -1,4 +1,6 @@
 ﻿
+using System.Security.Claims;
+
 using AutoMapper;
 
 using Microsoft.AspNetCore.Identity;
@@ -14,6 +16,10 @@ namespace Xenial.AspNetIdentity.Xpo.Mappers
                 .ConstructUsingServiceLocator();
 
             CreateMap<Models.XpoIdentityUserClaim, IdentityUserClaim<string>>()
+                .ReverseMap()
+                .ConstructUsingServiceLocator();
+
+            CreateMap<Models.XpoIdentityUserClaim, Claim>()
                 .ReverseMap()
                 .ConstructUsingServiceLocator();
 

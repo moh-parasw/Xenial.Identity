@@ -9,6 +9,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 
 using DevExpress.Data.Filtering;
+using DevExpress.Pdf.Native.BouncyCastle.Asn1.X509.Qualified;
 using DevExpress.Xpo;
 using DevExpress.Xpo.DB.Exceptions;
 
@@ -22,7 +23,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 {
     public class XPUserStore<
             TUser, TKey, TUserClaim, TUserLogin, TUserToken,
-            TXPUser, TXPUserLogin, TXPUserToken> :
+            TXPUser, TXPUserClaim, TXPUserLogin, TXPUserToken> :
         UserStoreBase<TUser, TKey, TUserClaim, TUserLogin, TUserToken>,
         IQueryableUserStore<TUser>,
         IUserPasswordStore<TUser>,
@@ -40,6 +41,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         where TUser : IdentityUser<TKey>
         where TKey : IEquatable<TKey>
         where TXPUser : IXPObject
+        where TXPUserClaim : IXPObject
         where TXPUserLogin : IXPObject
         where TXPUserToken : IXPObject
         where TUserClaim : IdentityUserClaim<TKey>, new()
@@ -50,7 +52,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         public ILogger<
             XPUserStore<
                 TUser, TKey, TUserClaim, TUserLogin, TUserToken,
-                TXPUser, TXPUserLogin, TXPUserToken
+                TXPUser, TXPUserClaim, TXPUserLogin, TXPUserToken
             >
         > Logger
         { get; }
@@ -61,7 +63,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             UnitOfWork unitOfWork,
             ILogger<
                 XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken,
-                TXPUser, TXPUserLogin, TXPUserToken
+                TXPUser, TXPUserClaim, TXPUserLogin, TXPUserToken
                 >
             > logger,
             IdentityErrorDescriber describer
@@ -74,7 +76,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             UnitOfWork unitOfWork,
             ILogger<
                 XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken,
-                    TXPUser, TXPUserLogin, TXPUserToken
+                    TXPUser, TXPUserClaim, TXPUserLogin, TXPUserToken
                 >
             > logger,
             IdentityErrorDescriber describer,
@@ -383,8 +385,29 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         #region Claims
 
+        public async override Task AddClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            if (claims == null)
+            {
+                throw new ArgumentNullException(nameof(claims));
+            }
+            var persistentUser = await UnitOfWork.GetObjectByKeyAsync<TXPUser>(user.Id, cancellationToken);
+
+            var mapper = MapperConfiguration.CreateMapper();
+            foreach (var claim in claims)
+            {
+                var persistentClaim = (TXPUserClaim)UnitOfWork.GetClassInfo<TXPUserClaim>().CreateNewObject(UnitOfWork);
+                persistentClaim = mapper.Map(claim, persistentClaim);
+
+                UnitOfWork.GetClassInfo<TXPUserClaim>().KeyProperty.SetValue(persistentClaim, Guid.NewGuid().ToString());
+                UnitOfWork.GetClassInfo<TXPUserClaim>().FindMember("User")?.SetValue(persistentClaim, persistentUser);
+            }
+        }
         public override Task<IList<Claim>> GetClaimsAsync(TUser user, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-        public override Task AddClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task ReplaceClaimAsync(TUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task RemoveClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();

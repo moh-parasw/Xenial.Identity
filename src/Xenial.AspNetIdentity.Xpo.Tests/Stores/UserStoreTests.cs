@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,13 +19,13 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
 {
     public static class UserStoreTests
     {
-        public static void Tests(string dbName, string connectionString) => Describe($"{nameof(XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserLogin, XpoIdentityUserToken>)} using {dbName}", () =>
+        public static void Tests(string dbName, string connectionString) => Describe($"{nameof(XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>)} using {dbName}", () =>
         {
             var dataLayer = XpoDefault.GetDataLayer(connectionString, DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema);
 
             UnitOfWork unitOfWorkFactory() => new UnitOfWork(dataLayer);
 
-            (XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserLogin, XpoIdentityUserToken> store, UnitOfWork uow) CreateStore()
+            (XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken> store, UnitOfWork uow) CreateStore()
             {
                 var uow = new UnitOfWork(dataLayer);
                 var store = new XPUserStore<
@@ -34,11 +35,12 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     IdentityUserLogin<string>,
                     IdentityUserToken<string>,
                     XpoIdentityUser,
+                    XpoIdentityUserClaim,
                     XpoIdentityUserLogin,
                     XpoIdentityUserToken
                 >(
                     uow,
-                    new FakeLogger<XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserLogin, XpoIdentityUserToken>>(),
+                    new FakeLogger<XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>>(),
                     new IdentityErrorDescriber()
                 );
                 return (store, uow);
@@ -560,6 +562,40 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                             logins.Should().NotBeEmpty();
                             logins.Count.Should().Be(2);
                         }
+                    });
+                });
+            });
+
+            Describe("Claims", () =>
+            {
+                Describe("AddClaimsAsync", () =>
+                {
+                    It("adds claims", async () =>
+                    {
+                        var claimType = Guid.NewGuid().ToString();
+                        var claimValue = Guid.NewGuid().ToString();
+                        using var uow = unitOfWorkFactory();
+                        var user = CreateUser(uow);
+                        await uow.SaveAsync(user);
+                        await uow.CommitChangesAsync();
+
+                        var (store, uow1) = CreateStore();
+                        using (store)
+                        using (uow1)
+                        {
+                            var identityUser = await store.FindByIdAsync(user.Id, CancellationToken.None);
+                            await store.AddClaimsAsync(identityUser, new[]
+                            {
+                                new Claim(claimType, claimValue)
+                            }, CancellationToken.None);
+                            await store.UpdateAsync(identityUser, CancellationToken.None);
+                        }
+                        using var uow2 = unitOfWorkFactory();
+                        var userInDb = await uow.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
+
+                        userInDb.Claims.Should().NotBeEmpty();
+                        userInDb.Claims.First().Type.Should().Be(claimType);
+                        userInDb.Claims.First().Value.Should().Be(claimValue);
                     });
                 });
             });
