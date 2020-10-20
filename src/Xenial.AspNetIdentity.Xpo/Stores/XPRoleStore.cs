@@ -20,9 +20,22 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 using Xenial.AspNetIdentity.Xpo.Mappers;
+using Xenial.AspNetIdentity.Xpo.Models;
 
 namespace Xenial.AspNetIdentity.Xpo.Stores
 {
+    public class XPRoleStore : XPRoleStore<IdentityRole, string, IdentityUserRole<string>, IdentityRoleClaim<string>,
+        XpoIdentityRole, XpoIdentityUser, XpoIdentityRoleClaim>
+    {
+        public XPRoleStore(UnitOfWork unitOfWork, ILogger<XPRoleStore<IdentityRole, string, IdentityUserRole<string>, IdentityRoleClaim<string>, XpoIdentityRole, XpoIdentityUser, XpoIdentityRoleClaim>> logger, IdentityErrorDescriber describer) : base(unitOfWork, logger, describer)
+        {
+        }
+
+        public XPRoleStore(UnitOfWork unitOfWork, ILogger<XPRoleStore<IdentityRole, string, IdentityUserRole<string>, IdentityRoleClaim<string>, XpoIdentityRole, XpoIdentityUser, XpoIdentityRoleClaim>> logger, IConfigurationProvider mapperConfiguration, IdentityErrorDescriber describer) : base(unitOfWork, logger, mapperConfiguration, describer)
+        {
+        }
+    }
+
     public class XPRoleStore<
             TRole, TKey, TUserRole, TRoleClaim,
             TXPRole, TXPUser, TXPRoleClaim> :
