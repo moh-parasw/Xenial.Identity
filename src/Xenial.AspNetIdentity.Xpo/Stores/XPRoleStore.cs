@@ -206,6 +206,13 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         protected virtual CriteriaOperator CreateRoleClaimOperator(string rolePropertyName, TKey roleKey)
             => new BinaryOperator(new OperandProperty(rolePropertyName), new OperandValue(roleKey), BinaryOperatorType.Equal);
 
+        protected virtual CriteriaOperator CreateRoleClaimOperator(string rolePropertyName, TKey roleKey, string claimType, string claimValue)
+           => new GroupOperator(GroupOperatorType.And,
+               CreateRoleClaimOperator(rolePropertyName, roleKey),
+               new BinaryOperator(new OperandProperty("Type"), new OperandValue(claimType), BinaryOperatorType.Equal),
+               new BinaryOperator(new OperandProperty("Value"), new OperandValue(claimValue), BinaryOperatorType.Equal)
+            );
+
         public async override Task<IList<Claim>> GetClaimsAsync(TRole role, CancellationToken cancellationToken = default)
         {
             ThrowIfDisposed();
@@ -228,7 +235,25 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             return claims;
         }
 
-        public override Task RemoveClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public async override Task RemoveClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default)
+        {
+            ThrowIfDisposed();
+            cancellationToken.ThrowIfCancellationRequested();
+            if (role == null)
+            {
+                throw new ArgumentNullException(nameof(role));
+            }
+            if (claim == null)
+            {
+                throw new ArgumentNullException(nameof(claim));
+            }
+            var rolePropertyName = $"Role.{UnitOfWork.GetClassInfo(typeof(TXPRole)).KeyProperty}";
+            var criteria = CreateRoleClaimOperator(rolePropertyName, role.Id, claim.Type, claim.Value);
+            var collection = new XPCollection<TXPRoleClaim>(UnitOfWork, criteria);
+
+            await collection.LoadAsync(cancellationToken);
+            await UnitOfWork.DeleteAsync(collection, cancellationToken);
+        }
 
         private IdentityResult HandleGenericException(string method, Exception ex)
         {

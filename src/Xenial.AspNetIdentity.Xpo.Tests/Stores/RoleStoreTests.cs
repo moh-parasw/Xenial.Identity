@@ -211,6 +211,36 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         claims.First().Value.Should().Be(claim.Value);
                     }
                 });
+
+                It("remove Claim", async () =>
+                {
+                    using var uow1 = unitOfWorkFactory();
+                    var role = CreateRole(uow1);
+                    var claim = new XpoIdentityRoleClaim(uow1)
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Type = Guid.NewGuid().ToString(),
+                        Value = Guid.NewGuid().ToString(),
+                    };
+                    role.Claims.Add(claim);
+                    await uow1.SaveAsync(role, CancellationToken.None);
+                    await uow1.CommitChangesAsync(CancellationToken.None);
+
+                    var (store, uow) = CreateStore();
+                    using (uow)
+                    using (store)
+                    {
+                        var identityRole = await store.FindByIdAsync(role.Id, CancellationToken.None);
+
+                        await store.RemoveClaimAsync(identityRole, new Claim(claim.Type, claim.Value), CancellationToken.None);
+
+                        await store.UpdateAsync(identityRole, CancellationToken.None);
+                    }
+
+                    using var uow2 = unitOfWorkFactory();
+                    var roleInDb = await uow2.GetObjectByKeyAsync<XpoIdentityRole>(role.Id);
+                    roleInDb.Claims.Should().BeEmpty();
+                });
             });
         });
     }
