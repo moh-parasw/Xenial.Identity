@@ -399,7 +399,10 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         userInDb.Tokens.Should().BeEmpty();
                     });
                 });
+            });
 
+            Describe("Logins", () =>
+            {
                 Describe("AddLoginAsync", () =>
                 {
                     It("adds login", async () =>
@@ -435,7 +438,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
 
                 Describe("FindByLoginAsync", () =>
                 {
-                    It("With non existent user and login", async () =>
+                    It("with non existent user and login", async () =>
                     {
                         var loginProvider = Guid.NewGuid().ToString();
                         var providerKey = Guid.NewGuid().ToString();
@@ -448,7 +451,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         }
                     });
 
-                    It("With existent user and login", async () =>
+                    It("with existent user and login", async () =>
                     {
                         var loginProvider = Guid.NewGuid().ToString();
                         var providerKey = Guid.NewGuid().ToString();
@@ -479,7 +482,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
 
                 Describe("RemoveLoginAsync", () =>
                 {
-                    It("With existent user and login", async () =>
+                    It("with existent user and login", async () =>
                     {
                         var loginProvider = Guid.NewGuid().ToString();
                         var providerKey = Guid.NewGuid().ToString();
