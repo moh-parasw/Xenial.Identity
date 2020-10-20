@@ -19,13 +19,13 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
 {
     public static class UserStoreTests
     {
-        public static void Tests(string dbName, string connectionString) => Describe($"{nameof(XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>)} using {dbName}", () =>
+        public static void Tests(string dbName, string connectionString) => Describe($"{nameof(XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityRole, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>)} using {dbName}", () =>
         {
             var dataLayer = XpoDefault.GetDataLayer(connectionString, DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema);
 
             UnitOfWork unitOfWorkFactory() => new UnitOfWork(dataLayer);
 
-            (XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken> store, UnitOfWork uow) CreateStore()
+            (XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityRole, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken> store, UnitOfWork uow) CreateStore()
             {
                 var uow = new UnitOfWork(dataLayer);
                 var store = new XPUserStore<
@@ -35,12 +35,13 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     IdentityUserLogin<string>,
                     IdentityUserToken<string>,
                     XpoIdentityUser,
+                    XpoIdentityRole,
                     XpoIdentityUserClaim,
                     XpoIdentityUserLogin,
                     XpoIdentityUserToken
                 >(
                     uow,
-                    new FakeLogger<XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>>(),
+                    new FakeLogger<XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityRole, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>>(),
                     new IdentityErrorDescriber()
                 );
                 return (store, uow);

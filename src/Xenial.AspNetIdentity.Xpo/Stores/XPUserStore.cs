@@ -22,7 +22,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 {
     public class XPUserStore<
             TUser, TKey, TUserClaim, TUserLogin, TUserToken,
-            TXPUser, TXPUserClaim, TXPUserLogin, TXPUserToken> :
+            TXPUser, TXPRole, TXPUserClaim, TXPUserLogin, TXPUserToken> :
         UserStoreBase<TUser, TKey, TUserClaim, TUserLogin, TUserToken>,
         IQueryableUserStore<TUser>,
         IUserPasswordStore<TUser>,
@@ -31,7 +31,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         IUserPhoneNumberStore<TUser>,
         IUserLoginStore<TUser>,
         IUserClaimStore<TUser>,
-        //IUserRoleStore<TUser>,
+        IUserRoleStore<TUser>,
         IUserTwoFactorStore<TUser>,
         IUserLockoutStore<TUser>,
         IUserAuthenticationTokenStore<TUser>,
@@ -41,6 +41,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         where TKey : IEquatable<TKey>
         where TXPUser : IXPObject
         where TXPUserClaim : IXPObject
+        where TXPRole : IXPObject
         where TXPUserLogin : IXPObject
         where TXPUserToken : IXPObject
         where TUserClaim : IdentityUserClaim<TKey>, new()
@@ -48,11 +49,9 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         where TUserToken : IdentityUserToken<TKey>, new()
     {
         public UnitOfWork UnitOfWork { get; }
-        public ILogger<
-            XPUserStore<
+        public ILogger<XPUserStore<
                 TUser, TKey, TUserClaim, TUserLogin, TUserToken,
-                TXPUser, TXPUserClaim, TXPUserLogin, TXPUserToken
-            >
+                TXPUser, TXPRole, TXPUserClaim, TXPUserLogin, TXPUserToken>
         > Logger
         { get; }
 
@@ -62,7 +61,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             UnitOfWork unitOfWork,
             ILogger<
                 XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken,
-                TXPUser, TXPUserClaim, TXPUserLogin, TXPUserToken
+                TXPUser, TXPRole, TXPUserClaim, TXPUserLogin, TXPUserToken
                 >
             > logger,
             IdentityErrorDescriber describer
@@ -75,7 +74,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             UnitOfWork unitOfWork,
             ILogger<
                 XPUserStore<TUser, TKey, TUserClaim, TUserLogin, TUserToken,
-                    TXPUser, TXPUserClaim, TXPUserLogin, TXPUserToken
+                    TXPUser, TXPRole, TXPUserClaim, TXPUserLogin, TXPUserToken
                 >
             > logger,
             IdentityErrorDescriber describer,
@@ -671,6 +670,16 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 await UnitOfWork.SaveAsync(persistentToken);
             }
         }
+
+        #endregion
+
+        #region Roles
+
+        public Task AddToRoleAsync(TUser user, string roleName, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task RemoveFromRoleAsync(TUser user, string roleName, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task<IList<string>> GetRolesAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task<bool> IsInRoleAsync(TUser user, string roleName, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task<IList<TUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         #endregion
 
