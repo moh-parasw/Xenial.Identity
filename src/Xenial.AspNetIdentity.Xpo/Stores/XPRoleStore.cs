@@ -77,7 +77,30 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
 
-        public override Task<IdentityResult> DeleteAsync(TRole role, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public async override Task<IdentityResult> DeleteAsync(TRole role, CancellationToken cancellationToken = default)
+        {
+            ThrowIfDisposed();
+            cancellationToken.ThrowIfCancellationRequested();
+            if (role == null)
+            {
+                throw new ArgumentNullException(nameof(role));
+            }
+            try
+            {
+                var persistentRole = await UnitOfWork.GetObjectByKeyAsync<TXPRole>(role.Id, cancellationToken);
+                await UnitOfWork.DeleteAsync(persistentRole, cancellationToken);
+                await UnitOfWork.CommitChangesAsync(cancellationToken);
+                return IdentityResult.Success;
+            }
+            catch (LockingException)
+            {
+                return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
+            }
+            catch (Exception ex)
+            {
+                return HandleGenericException("create", ex);
+            }
+        }
         public override Task<IdentityResult> UpdateAsync(TRole role, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public override Task AddClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();

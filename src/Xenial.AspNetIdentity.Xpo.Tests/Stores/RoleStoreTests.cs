@@ -5,6 +5,8 @@ using System.Threading;
 
 using DevExpress.Xpo;
 
+using FluentAssertions;
+
 using Microsoft.AspNetCore.Identity;
 
 using Xenial.AspNetIdentity.Xpo.Models;
@@ -20,7 +22,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
         {
             var dataLayer = XpoDefault.GetDataLayer(connectionString, DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema);
 
-            //UnitOfWork unitOfWorkFactory() => new UnitOfWork(dataLayer);
+            UnitOfWork unitOfWorkFactory() => new UnitOfWork(dataLayer);
 
             (XPRoleStore<IdentityRole, string, IdentityUserRole<string>, IdentityRoleClaim<string>, XpoIdentityRole, XpoIdentityUser, XpoIdentityRoleClaim> store, UnitOfWork uow) CreateStore()
             {
@@ -41,12 +43,12 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 return (store, uow);
             }
 
-            //XpoIdentityRole CreateRole(UnitOfWork uow, string id = null) => new XpoIdentityRole(uow)
-            //{
-            //    Id = id ?? Guid.NewGuid().ToString(),
-            //    Name = Guid.NewGuid().ToString(),
-            //    NormalizedName = Guid.NewGuid().ToString(),
-            //};
+            XpoIdentityRole CreateRole(UnitOfWork uow, string id = null) => new XpoIdentityRole(uow)
+            {
+                Id = id ?? Guid.NewGuid().ToString(),
+                Name = Guid.NewGuid().ToString(),
+                NormalizedName = Guid.NewGuid().ToString(),
+            };
 
             It("CreateAsync", async () =>
             {
@@ -66,6 +68,27 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     }, CancellationToken.None);
                     return result == IdentityResult.Success;
                 }
+            });
+
+            It("DeleteAsync", async () =>
+            {
+                using var uow1 = unitOfWorkFactory();
+                var role = CreateRole(uow1);
+
+                var (store, uow) = CreateStore();
+                using (uow)
+                using (store)
+                {
+                    var result = await store.DeleteAsync(new IdentityRole
+                    {
+                        Id = role.Id
+                    }, CancellationToken.None);
+                    result.Should().Be(IdentityResult.Success);
+                }
+
+                using var uow2 = unitOfWorkFactory();
+                var roleInDb = await uow2.GetObjectByKeyAsync<XpoIdentityRole>(role.Id);
+                return roleInDb == null;
             });
         });
     }
