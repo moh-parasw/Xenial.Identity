@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 
+using DevExpress.Data.Filtering;
+using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.MiddleTier;
 using DevExpress.Xpo;
 using DevExpress.Xpo.DB.Exceptions;
@@ -88,8 +90,11 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             try
             {
                 var persistentRole = await UnitOfWork.GetObjectByKeyAsync<TXPRole>(role.Id, cancellationToken);
-                await UnitOfWork.DeleteAsync(persistentRole, cancellationToken);
-                await UnitOfWork.CommitChangesAsync(cancellationToken);
+                if (persistentRole != null)
+                {
+                    await UnitOfWork.DeleteAsync(persistentRole, cancellationToken);
+                    await UnitOfWork.CommitChangesAsync(cancellationToken);
+                }
                 return IdentityResult.Success;
             }
             catch (LockingException)
@@ -133,8 +138,37 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
 
-        public override Task<TRole> FindByIdAsync(string id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-        public override Task<TRole> FindByNameAsync(string normalizedName, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public async override Task<TRole> FindByIdAsync(string id, CancellationToken cancellationToken = default)
+        {
+            ThrowIfDisposed();
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var persistentRole = await UnitOfWork.GetObjectByKeyAsync<TXPRole>(ConvertIdFromString(id), cancellationToken);
+            if (persistentRole == null)
+            {
+                return null;
+            }
+
+            var mapper = MapperConfiguration.CreateMapper();
+            return mapper.Map<TRole>(persistentRole);
+        }
+        protected virtual CriteriaOperator CreateRoleOperator(string normalizedName)
+            => new BinaryOperator("NormalizedName", normalizedName, BinaryOperatorType.Equal);
+
+        public async override Task<TRole> FindByNameAsync(string normalizedName, CancellationToken cancellationToken = default)
+        {
+            ThrowIfDisposed();
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var persistentRole = await UnitOfWork.FindObjectAsync<TXPRole>(CreateRoleOperator(normalizedName), cancellationToken);
+            if (persistentRole == null)
+            {
+                return null;
+            }
+
+            var mapper = MapperConfiguration.CreateMapper();
+            return mapper.Map<TRole>(persistentRole);
+        }
 
         public override Task AddClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task<IList<Claim>> GetClaimsAsync(TRole role, CancellationToken cancellationToken = default) => throw new NotImplementedException();

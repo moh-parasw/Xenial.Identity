@@ -117,6 +117,42 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 var roleInDb = await uow2.GetObjectByKeyAsync<XpoIdentityRole>(role.Id);
                 roleInDb.Name.Should().Be(newName);
             });
+
+            It("FindByIdAsync", async () =>
+            {
+                using var uow1 = unitOfWorkFactory();
+                var role = CreateRole(uow1);
+                await uow1.SaveAsync(role, CancellationToken.None);
+                await uow1.CommitChangesAsync(CancellationToken.None);
+
+                var newName = Guid.NewGuid().ToString();
+                var (store, uow) = CreateStore();
+                using (uow)
+                using (store)
+                {
+                    var result = await store.FindByIdAsync(role.Id, CancellationToken.None);
+                    result.Should().NotBeNull();
+                    result.Name.Should().Be(role.Name);
+                }
+            });
+
+            It("FindByNameAsync", async () =>
+            {
+                using var uow1 = unitOfWorkFactory();
+                var role = CreateRole(uow1);
+                await uow1.SaveAsync(role, CancellationToken.None);
+                await uow1.CommitChangesAsync(CancellationToken.None);
+
+                var newName = Guid.NewGuid().ToString();
+                var (store, uow) = CreateStore();
+                using (uow)
+                using (store)
+                {
+                    var result = await store.FindByNameAsync(role.NormalizedName, CancellationToken.None);
+                    result.Should().NotBeNull();
+                    result.Name.Should().Be(role.Name);
+                }
+            });
         });
     }
 }
