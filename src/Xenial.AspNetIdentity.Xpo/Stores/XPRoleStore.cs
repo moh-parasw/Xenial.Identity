@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,8 +10,6 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 
 using DevExpress.Data.Filtering;
-using DevExpress.ExpressApp;
-using DevExpress.ExpressApp.MiddleTier;
 using DevExpress.Xpo;
 using DevExpress.Xpo.DB.Exceptions;
 
