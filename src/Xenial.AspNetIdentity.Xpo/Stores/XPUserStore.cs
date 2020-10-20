@@ -443,7 +443,25 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
 
-        public override Task RemoveClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public async override Task RemoveClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            if (claims == null)
+            {
+                throw new ArgumentNullException(nameof(claims));
+            }
+            var userPropertyName = $"User.{UnitOfWork.GetClassInfo(typeof(TXPUser)).KeyProperty}";
+
+            foreach (var claim in claims)
+            {
+                var collection = new XPCollection<TXPUserClaim>(UnitOfWork, CreateClaimsCriteria(userPropertyName, user.Id, claim.Type, claim.Value));
+                await collection.LoadAsync(cancellationToken);
+                await UnitOfWork.DeleteAsync(collection, cancellationToken);
+            }
+        }
         public override Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         #endregion
