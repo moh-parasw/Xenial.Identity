@@ -74,6 +74,8 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
             {
                 using var uow1 = unitOfWorkFactory();
                 var role = CreateRole(uow1);
+                await uow1.SaveAsync(role, CancellationToken.None);
+                await uow1.CommitChangesAsync(CancellationToken.None);
 
                 var (store, uow) = CreateStore();
                 using (uow)
@@ -89,6 +91,31 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 using var uow2 = unitOfWorkFactory();
                 var roleInDb = await uow2.GetObjectByKeyAsync<XpoIdentityRole>(role.Id);
                 return roleInDb == null;
+            });
+
+            It("UpdateAsync", async () =>
+            {
+                using var uow1 = unitOfWorkFactory();
+                var role = CreateRole(uow1);
+                await uow1.SaveAsync(role, CancellationToken.None);
+                await uow1.CommitChangesAsync(CancellationToken.None);
+
+                var newName = Guid.NewGuid().ToString();
+                var (store, uow) = CreateStore();
+                using (uow)
+                using (store)
+                {
+                    var result = await store.UpdateAsync(new IdentityRole
+                    {
+                        Id = role.Id,
+                        Name = newName,
+                    }, CancellationToken.None);
+                    result.Should().Be(IdentityResult.Success);
+                }
+
+                using var uow2 = unitOfWorkFactory();
+                var roleInDb = await uow2.GetObjectByKeyAsync<XpoIdentityRole>(role.Id);
+                roleInDb.Name.Should().Be(newName);
             });
         });
     }

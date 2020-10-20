@@ -98,14 +98,45 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
             catch (Exception ex)
             {
-                return HandleGenericException("create", ex);
+                return HandleGenericException("delete", ex);
             }
         }
-        public override Task<IdentityResult> UpdateAsync(TRole role, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
-        public override Task AddClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public async override Task<IdentityResult> UpdateAsync(TRole role, CancellationToken cancellationToken = default)
+        {
+            ThrowIfDisposed();
+            cancellationToken.ThrowIfCancellationRequested();
+            if (role == null)
+            {
+                throw new ArgumentNullException(nameof(role));
+            }
+            try
+            {
+                var persistentRole = await UnitOfWork.GetObjectByKeyAsync<TXPRole>(role.Id, cancellationToken);
+                if (persistentRole == null)
+                {
+                    return IdentityResult.Failed(new IdentityError { Description = $"Role with Id: {role.Id} not found" });
+                }
+                var mapper = MapperConfiguration.CreateMapper();
+                persistentRole = mapper.Map(role, persistentRole);
+                await UnitOfWork.SaveAsync(persistentRole, cancellationToken);
+                await UnitOfWork.CommitChangesAsync(cancellationToken);
+                return IdentityResult.Success;
+            }
+            catch (LockingException)
+            {
+                return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
+            }
+            catch (Exception ex)
+            {
+                return HandleGenericException("update", ex);
+            }
+        }
+
         public override Task<TRole> FindByIdAsync(string id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task<TRole> FindByNameAsync(string normalizedName, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+        public override Task AddClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task<IList<Claim>> GetClaimsAsync(TRole role, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task RemoveClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
