@@ -728,7 +728,27 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             await UnitOfWork.SaveAsync(userInDb);
             await UnitOfWork.SaveAsync(role);
         }
-        public Task<IList<string>> GetRolesAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
+
+        public async Task<IList<string>> GetRolesAsync(TUser user, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            var userInDb = await UnitOfWork.GetObjectByKeyAsync<TXPUser>(user.Id, cancellationToken);
+            var rolesInDb = UnitOfWork.GetClassInfo<TXPUser>().FindMember("Roles")?.GetValue(userInDb);
+            if (rolesInDb is IList<TXPRole> roles)
+            {
+                var memberName = UnitOfWork.GetClassInfo<TXPRole>().FindMember("Name");
+                var roleNames = roles.Select(r => memberName.GetValue(r)?.ToString()).ToList();
+                return roleNames;
+            }
+            return new string[0];
+        }
+
         public Task<bool> IsInRoleAsync(TUser user, string roleName, CancellationToken cancellationToken) => throw new NotImplementedException();
         public Task<IList<TUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken) => throw new NotImplementedException();
 

@@ -830,6 +830,33 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
 
                         userInDb.Roles.Should().BeEmpty();
                     });
+
+                    It("GetRoles", async () =>
+                    {
+                        using var uow = unitOfWorkFactory();
+                        var user = CreateUser(uow);
+                        var role = new XpoIdentityRole(uow)
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            Name = Guid.NewGuid().ToString(),
+                            NormalizedName = Guid.NewGuid().ToString(),
+                        };
+                        user.Roles.Add(role);
+                        await uow.SaveAsync(user);
+                        await uow.CommitChangesAsync();
+
+                        var (store, uow1) = CreateStore();
+                        using (store)
+                        using (uow1)
+                        {
+                            var identityUser = await store.FindByIdAsync(user.Id, CancellationToken.None);
+
+                            var roles = await store.GetRolesAsync(identityUser, CancellationToken.None);
+
+                            roles.Should().NotBeEmpty();
+                            roles.Should().Contain(role.Name);
+                        }
+                    });
                 });
             });
         });
