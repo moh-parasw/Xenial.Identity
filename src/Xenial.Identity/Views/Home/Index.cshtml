@@ -1,4 +1,7 @@
-@using System.Diagnostics
+﻿@using System.Diagnostics
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
 
 @{
     var version =
@@ -12,6 +15,20 @@
     <small class="text-muted">(version @version)</small>
 </h1>
 <ul>
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <h1>Hello @User.Identity.Name</h1>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        </li>
+    }
+
     <li>
         IdentityServer publishes a
         <a href="~/.well-known/openid-configuration">discovery document</a>
@@ -26,7 +43,9 @@
     <li>
         Here are links to the
         <a href="https://github.com/identityserver/IdentityServer4">source code repository</a>,
-        and <a href="https://github.com/IdentityServer/IdentityServer4/tree/main/samples">ready to use
-            samples</a>.
+        and <a href="https://github.com/IdentityServer/IdentityServer4/tree/main/samples">
+            ready to use
+            samples
+        </a>.
     </li>
 </ul>
