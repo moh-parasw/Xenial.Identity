@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading;
 
@@ -152,6 +154,36 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     result.Should().NotBeNull();
                     result.Name.Should().Be(role.Name);
                 }
+            });
+
+            Describe("Claims", () =>
+            {
+                It("Add Claim", async () =>
+                {
+                    using var uow1 = unitOfWorkFactory();
+                    var role = CreateRole(uow1);
+                    await uow1.SaveAsync(role, CancellationToken.None);
+                    await uow1.CommitChangesAsync(CancellationToken.None);
+
+                    var claimType = Guid.NewGuid().ToString();
+                    var claimValue = Guid.NewGuid().ToString();
+
+                    var (store, uow) = CreateStore();
+                    using (uow)
+                    using (store)
+                    {
+                        var identityRole = await store.FindByIdAsync(role.Id, CancellationToken.None);
+
+                        await store.AddClaimAsync(identityRole, new Claim(claimType, claimValue), CancellationToken.None);
+                        await store.UpdateAsync(identityRole, CancellationToken.None);
+                    }
+
+                    using var uow2 = unitOfWorkFactory();
+                    var roleInDb = await uow2.GetObjectByKeyAsync<XpoIdentityRole>(role.Id);
+                    roleInDb.Claims.Should().NotBeEmpty();
+                    roleInDb.Claims.First().Type.Should().Be(claimType);
+                    roleInDb.Claims.First().Value.Should().Be(claimValue);
+                });
             });
         });
     }

@@ -170,7 +170,38 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             return mapper.Map<TRole>(persistentRole);
         }
 
-        public override Task AddClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public async override Task AddClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default)
+        {
+            ThrowIfDisposed();
+            cancellationToken.ThrowIfCancellationRequested();
+            if (role == null)
+            {
+                throw new ArgumentNullException(nameof(role));
+            }
+            if (claim == null)
+            {
+                throw new ArgumentNullException(nameof(claim));
+            }
+            try
+            {
+                var roleInDb = await UnitOfWork.GetObjectByKeyAsync<TXPRole>(role.Id, cancellationToken);
+
+                var claimClassInfo = UnitOfWork.GetClassInfo<TXPRoleClaim>();
+                var claimInDb = (TXPRoleClaim)claimClassInfo.CreateNewObject(UnitOfWork);
+
+                var mapper = MapperConfiguration.CreateMapper();
+                claimInDb = mapper.Map(claim, claimInDb);
+
+                claimClassInfo.KeyProperty.SetValue(claimInDb, Guid.NewGuid().ToString());
+                claimClassInfo.FindMember("Role")?.SetValue(claimInDb, roleInDb);
+
+                await UnitOfWork.SaveAsync(claimInDb);
+            }
+            catch (Exception ex)
+            {
+                HandleGenericException("add claim", ex);
+            }
+        }
         public override Task<IList<Claim>> GetClaimsAsync(TRole role, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public override Task RemoveClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
