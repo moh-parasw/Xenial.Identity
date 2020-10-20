@@ -202,7 +202,32 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 HandleGenericException("add claim", ex);
             }
         }
-        public override Task<IList<Claim>> GetClaimsAsync(TRole role, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+        protected virtual CriteriaOperator CreateRoleClaimOperator(string rolePropertyName, TKey roleKey)
+            => new BinaryOperator(new OperandProperty(rolePropertyName), new OperandValue(roleKey), BinaryOperatorType.Equal);
+
+        public async override Task<IList<Claim>> GetClaimsAsync(TRole role, CancellationToken cancellationToken = default)
+        {
+            ThrowIfDisposed();
+            cancellationToken.ThrowIfCancellationRequested();
+            if (role == null)
+            {
+                throw new ArgumentNullException(nameof(role));
+            }
+            var rolePropertyName = $"Role.{UnitOfWork.GetClassInfo(typeof(TXPRole)).KeyProperty}";
+            var criteria = CreateRoleClaimOperator(rolePropertyName, role.Id);
+            var collection = new XPCollection<TXPRoleClaim>(UnitOfWork, criteria);
+
+            await collection.LoadAsync(cancellationToken);
+
+            var mapper = MapperConfiguration.CreateMapper();
+            var claims = collection
+                .Select(c => mapper.Map<Claim>(c))
+                .ToList();
+
+            return claims;
+        }
+
         public override Task RemoveClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         private IdentityResult HandleGenericException(string method, Exception ex)
