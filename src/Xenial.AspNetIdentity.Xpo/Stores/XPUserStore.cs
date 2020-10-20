@@ -752,9 +752,27 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         protected virtual CriteriaOperator CreateRoleCriteria(string normalizedRoleName)
             => CriteriaOperator.Parse($"Roles[{CreateRoleInnerCriteria(normalizedRoleName)}].Count() > 0");
 
-        public Task<bool> IsInRoleAsync(TUser user, string roleName, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public async Task<bool> IsInRoleAsync(TUser user, string roleName, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            var criteria = new GroupOperator(GroupOperatorType.And,
+                new BinaryOperator(UnitOfWork.GetClassInfo<TXPUser>().KeyProperty.Name, user.Id, BinaryOperatorType.Equal),
+                CreateRoleCriteria(roleName)
+            );
+            var result = (bool)await UnitOfWork.EvaluateAsync(typeof(TXPUser), new AggregateOperand(string.Empty, Aggregate.Exists), criteria);
+            return result;
+        }
         public async Task<IList<TUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
             var collection = new XPCollection<TXPUser>(UnitOfWork, CreateRoleCriteria(roleName));
             await collection.LoadAsync(cancellationToken);
 
