@@ -9,7 +9,6 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 
 using DevExpress.Data.Filtering;
-using DevExpress.Pdf.Native.BouncyCastle.Asn1.X509.Qualified;
 using DevExpress.Xpo;
 using DevExpress.Xpo.DB.Exceptions;
 
@@ -99,6 +98,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
+
             try
             {
                 var mapper = MapperConfiguration.CreateMapper(t => UnitOfWork.GetClassInfo(t).CreateObject(UnitOfWork));
@@ -121,6 +121,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
+
             try
             {
                 var persistentUser = await UnitOfWork.GetObjectByKeyAsync<TXPUser>(user.Id, cancellationToken);
@@ -185,6 +186,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
+
             try
             {
                 var persistentUser = await UnitOfWork.GetObjectByKeyAsync<TXPUser>(userId, cancellationToken);
@@ -208,6 +210,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
+
             try
             {
                 var persistentUser = await UnitOfWork.FindObjectAsync<TXPUser>(
@@ -235,6 +238,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
+
             try
             {
                 var persistentUser = await UnitOfWork.FindObjectAsync<TXPUser>(
@@ -265,6 +269,9 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             CancellationToken cancellationToken = default
         )
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
@@ -297,6 +304,9 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             CancellationToken cancellationToken
         )
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
             var userPropertyName = $"User.{UnitOfWork.GetClassInfo(typeof(TXPUser)).KeyProperty}";
             var userLogin = await UnitOfWork.FindObjectAsync<TXPUserLogin>(
                 CreateLoginCriteria(userPropertyName, userId, loginProvider, providerKey),
@@ -334,6 +344,9 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             CancellationToken cancellationToken
         )
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
             var userLogin = await UnitOfWork.FindObjectAsync<TXPUserLogin>(
                 CreateLoginCriteria(loginProvider, providerKey),
                 cancellationToken
@@ -353,6 +366,14 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             CancellationToken cancellationToken = default
         )
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
             var userPropertyName = $"User.{UnitOfWork.GetClassInfo(typeof(TXPUser)).KeyProperty}";
             var userLogin = await UnitOfWork.FindObjectAsync<TXPUserLogin>(
                 CreateLoginCriteria(userPropertyName, user.Id, loginProvider, providerKey),
@@ -367,6 +388,14 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         public async override Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
             var userPropertyName = $"User.{UnitOfWork.GetClassInfo(typeof(TXPUser)).KeyProperty}";
             var collection = new XPCollection<TXPUserLogin>(
                 UnitOfWork,
@@ -387,6 +416,9 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         public async override Task AddClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
@@ -395,6 +427,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             {
                 throw new ArgumentNullException(nameof(claims));
             }
+
             var persistentUser = await UnitOfWork.GetObjectByKeyAsync<TXPUser>(user.Id, cancellationToken);
 
             var mapper = MapperConfiguration.CreateMapper();
@@ -409,6 +442,9 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         }
         public async override Task<IList<Claim>> GetClaimsAsync(TUser user, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
@@ -434,8 +470,17 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 new BinaryOperator(new OperandProperty("Type"), new OperandValue(claimType), BinaryOperatorType.Equal),
                 new BinaryOperator(new OperandProperty("Value"), new OperandValue(claimValue), BinaryOperatorType.Equal)
             );
+        protected virtual CriteriaOperator CreateClaimsCriteria(string claimType, string claimValue)
+            => new GroupOperator(GroupOperatorType.And,
+                new BinaryOperator(new OperandProperty("Type"), new OperandValue(claimType), BinaryOperatorType.Equal),
+                new BinaryOperator(new OperandProperty("Value"), new OperandValue(claimValue), BinaryOperatorType.Equal)
+            );
+
         public async override Task ReplaceClaimAsync(TUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
@@ -464,6 +509,9 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         public async override Task RemoveClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
@@ -472,6 +520,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             {
                 throw new ArgumentNullException(nameof(claims));
             }
+
             var userPropertyName = $"User.{UnitOfWork.GetClassInfo(typeof(TXPUser)).KeyProperty}";
 
             foreach (var claim in claims)
@@ -481,7 +530,29 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 await UnitOfWork.DeleteAsync(collection, cancellationToken);
             }
         }
-        public override Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+        public async override Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (claim == null)
+            {
+                throw new ArgumentNullException(nameof(claim));
+            }
+
+            var collection = new XPCollection<TXPUserClaim>(UnitOfWork, CreateClaimsCriteria(claim.Type, claim.Value));
+            await collection.LoadAsync(cancellationToken);
+            var memberInfo = UnitOfWork.GetClassInfo<TXPUserClaim>().FindMember("User");
+            var mapper = MapperConfiguration.CreateMapper();
+
+            var users = collection
+                .Select(c => memberInfo.GetValue(c))
+                .Select(u => mapper.Map<TUser>(u))
+                .ToList();
+
+            return users;
+        }
 
         #endregion
 
@@ -501,6 +572,14 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             CancellationToken cancellationToken
         )
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
             var userPropertyName = $"User.{UnitOfWork.GetClassInfo(typeof(TXPUser)).KeyProperty}";
             var token = await UnitOfWork.FindObjectAsync<TXPUserToken>(
                 CreateTokenCriteria(userPropertyName, user.Id, loginProvider, name),
