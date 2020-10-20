@@ -676,7 +676,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         #region Roles
 
-        protected virtual CriteriaOperator CreateRoleCriteria(string normalizedRoleName)
+        protected virtual CriteriaOperator CreateRoleInnerCriteria(string normalizedRoleName)
             => new BinaryOperator("NormalizedName", normalizedRoleName, BinaryOperatorType.Equal);
 
         public async Task AddToRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken)
@@ -688,7 +688,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             {
                 throw new ArgumentNullException(nameof(user));
             }
-            var role = await UnitOfWork.FindObjectAsync<TXPRole>(CreateRoleCriteria(normalizedRoleName), cancellationToken);
+            var role = await UnitOfWork.FindObjectAsync<TXPRole>(CreateRoleInnerCriteria(normalizedRoleName), cancellationToken);
             if (role == null)
             {
                 throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Role {0} does not exist.", normalizedRoleName));
@@ -713,7 +713,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             {
                 throw new ArgumentNullException(nameof(user));
             }
-            var role = await UnitOfWork.FindObjectAsync<TXPRole>(CreateRoleCriteria(normalizedRoleName), cancellationToken);
+            var role = await UnitOfWork.FindObjectAsync<TXPRole>(CreateRoleInnerCriteria(normalizedRoleName), cancellationToken);
             if (role == null)
             {
                 throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Role {0} does not exist.", normalizedRoleName));
@@ -749,8 +749,19 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             return new string[0];
         }
 
+        protected virtual CriteriaOperator CreateRoleCriteria(string normalizedRoleName)
+            => CriteriaOperator.Parse($"Roles[{CreateRoleInnerCriteria(normalizedRoleName)}].Count() > 0");
+
         public Task<bool> IsInRoleAsync(TUser user, string roleName, CancellationToken cancellationToken) => throw new NotImplementedException();
-        public Task<IList<TUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public async Task<IList<TUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+        {
+            var collection = new XPCollection<TXPUser>(UnitOfWork, CreateRoleCriteria(roleName));
+            await collection.LoadAsync(cancellationToken);
+
+            var mapper = MapperConfiguration.CreateMapper();
+            var users = collection.Select(u => mapper.Map<TUser>(u)).ToList();
+            return users;
+        }
 
         #endregion
 
