@@ -700,9 +700,34 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             {
                 roles.Add(role);
             }
+            await UnitOfWork.SaveAsync(userInDb);
+            await UnitOfWork.SaveAsync(role);
         }
 
-        public Task RemoveFromRoleAsync(TUser user, string roleName, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public async Task RemoveFromRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            var role = await UnitOfWork.FindObjectAsync<TXPRole>(CreateRoleCriteria(normalizedRoleName), cancellationToken);
+            if (role == null)
+            {
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Role {0} does not exist.", normalizedRoleName));
+            }
+            var userInDb = await UnitOfWork.GetObjectByKeyAsync<TXPUser>(user.Id, cancellationToken);
+            var rolesInDb = UnitOfWork.GetClassInfo<TXPUser>().FindMember("Roles")?.GetValue(userInDb);
+
+            if (rolesInDb is IList<TXPRole> roles)
+            {
+                roles.Remove(role);
+            }
+            await UnitOfWork.SaveAsync(userInDb);
+            await UnitOfWork.SaveAsync(role);
+        }
         public Task<IList<string>> GetRolesAsync(TUser user, CancellationToken cancellationToken) => throw new NotImplementedException();
         public Task<bool> IsInRoleAsync(TUser user, string roleName, CancellationToken cancellationToken) => throw new NotImplementedException();
         public Task<IList<TUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken) => throw new NotImplementedException();
