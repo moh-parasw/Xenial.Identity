@@ -2,10 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace IdentityServerHost.Quickstart.UI
+namespace Xenial.Identity.Quickstart.Account
 {
     public class LoginInputModel
     {
@@ -13,7 +12,6 @@ namespace IdentityServerHost.Quickstart.UI
         public string Username { get; set; }
         [Required]
         public string Password { get; set; }
-        [DisplayName("Remember me")]
         public bool RememberLogin { get; set; }
         public string ReturnUrl { get; set; }
     }
