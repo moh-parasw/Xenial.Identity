@@ -3,13 +3,14 @@
 
 @{
     ViewData["Title"] = "Log in";
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
 }
 
 <div class="login-page">
     <div class="tabs">
 
-        <input type="radio" id="tab1" name="tab-control" checked>
-        <input type="radio" id="tab2" name="tab-control">
+        <input type="radio" id="tab1" name="tab-control" @(Model.SelectedPage == "login" ? "checked" : "")>
+        <input type="radio" id="tab2" name="tab-control" @(Model.SelectedPage == "register" ? "checked" : "")>
         <ul class="tabs__list">
             <li class="tabs__list-item" title="Features">
                 <label class="tabs__list-item-label" for="tab1" role="button">
@@ -29,9 +30,9 @@
                 <h2>Login</h2>
                 @if (Model.ExternalLogins.Any())
                 {
-                    <ul class="login-form__providers">
-                
-                        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                        <ul class="login-form__providers">
+
 
                             @foreach (var provider in Model.ExternalLogins)
                             {
@@ -40,43 +41,68 @@
                                 </li>
                             }
 
-                        </form>
-                    </ul>
+                        </ul>
+                    </form>
                     <span class="login-form-or">or</span>
                 }
-                
-                <form asp-route="Login" class="xenial-form">
+
+                <form method="post" class="xenial-form" asp-page-handler="login">
                     <ul class="xenial-form__list">
                         <li class="xenial-form__list-item">
                             <input type="hidden" asp-for="ReturnUrl" />
-                            <label asp-for="Input.Email"></label>
-                            <input placeholder="Username" asp-for="Input.Email" autofocus>
+                            <label asp-for="LoginInput.Email"></label>
+                            <input placeholder="Email" asp-for="LoginInput.Email" autofocus>
+                            <span asp-validation-for="LoginInput.Email" class="text-danger"></span>
                         </li>
                         <li class="xenial-form__list-item">
-                            <label asp-for="Input.Password"></label>
-                            <input type="password" placeholder="Password" asp-for="Input.Password" autocomplete="off">
-                        </li>            
+                            <label asp-for="LoginInput.Email"></label>
+                            <input type="password" placeholder="Password" asp-for="LoginInput.Password" autocomplete="off">
+                            <span asp-validation-for="LoginInput.Password" class="text-danger"></span>
+                        </li>
                         <li class="xenial-form__list-item">
-                            <label asp-for="Input.RememberMe"></label>
-                            <input class="toggle" asp-for="Input.RememberMe">
+                            <label asp-for="LoginInput.RememberMe"></label>
+                            <input class="toggle" asp-for="LoginInput.RememberMe">
+                            <span asp-validation-for="LoginInput.RememberMe" class="text-danger"></span>
                         </li>
                         <li class="xenial-form__list-item">
                             <button class="btn btn-secondary" name="button" value="cancel">Cancel</button>
                             <button class="xenial-form__list-item-submit" name="button" value="login">Login</button>
                         </li>
                     </ul>
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 </form>
-
-                <partial name="_ValidationSummary" />
             </section>
-            <section>
-                <h2>Delivery Contents</h2>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Autem quas adipisci a accusantium eius ut voluptatibus ad impedit nulla, ipsa qui. Quasi temporibus eos commodi aliquid impedit amet, similique nulla.
+            <section class="login-form">
+                <h2>Register</h2>
+                <form method="post" class="xenial-form" asp-page-handler="register">
+                    <ul class="xenial-form__list">
+                        <li class="xenial-form__list-item">
+                            <input type="hidden" asp-for="ReturnUrl" />
+                            <label asp-for="RegisterInput.Email"></label>
+                            <input asp-for="RegisterInput.Email" class="form-control" />
+                            <span asp-validation-for="RegisterInput.Email" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="RegisterInput.Password"></label>
+                            <input asp-for="RegisterInput.Password" class="form-control" />
+                            <span asp-validation-for="RegisterInput.Password" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="RegisterInput.RegisterConfirmPassword"></label>
+                            <input asp-for="RegisterInput.RegisterConfirmPassword" class="form-control" />
+                            <span asp-validation-for="RegisterInput.RegisterConfirmPassword" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <button type="submit" class="xenial-form__list-item-submit">Register</button>
+                        </li>
+                    </ul>
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                </form>
             </section>
         </div>
     </div>
-
 </div>
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

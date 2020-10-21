@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ using Newtonsoft.Json.Linq;
 using Westwind.AspNetCore.LiveReload;
 
 using Xenial.AspNetIdentity.Xpo.Mappers;
+using Xenial.AspNetIdentity.Xpo.Models;
 using Xenial.AspNetIdentity.Xpo.Stores;
 using Xenial.Identity.Data;
 using Xenial.Identity.Xpo.Storage;
@@ -64,10 +66,14 @@ namespace Xenial.Identity
 
             services.AddXpoDefaultDataLayer(ServiceLifetime.Singleton, dl => dl
                 .UseConnectionString(Configuration.GetConnectionString("DefaultConnection"))
-                .UseThreadSafeDataLayer(false)
+                .UseThreadSafeDataLayer(true)
                 .UseConnectionPool(false) // Remove this line if you use a database server like SQL Server, Oracle, PostgreSql, etc.
                 .UseAutoCreationOption(DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema)
-                .UseEntityTypes(IdentityXpoTypes.PersistentTypes)
+                .UseEntityTypes(
+                    IdentityXpoTypes.PersistentTypes
+                        .Concat(IdentityModelTypeList.ModelTypes)
+                        .ToArray()
+                )
             );
 
             services.AddXpoDefaultUnitOfWork();
