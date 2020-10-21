@@ -1,5 +1,13 @@
 @import "forms";
 
+@mixin icon {
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+}
+
 .login-page {
   .tabs {
     margin-left: auto;
@@ -12,7 +20,9 @@
       &__providers {
         margin: 0;
         padding: 0;
+        
         &-item {
+          
           margin: 0;
           &::before {
             content: none;
@@ -37,10 +47,16 @@
             color: var(--xenial-darker-color);
             cursor: pointer;
             text-align: center;
+            width: 90%;
             margin: {
-              left: 2rem;
-              right: 2rem;
+              left: auto;
+              right: auto;
             }
+          }
+          &-button.github::before {
+            @include icon();
+            font-family: "Font Awesome 5 Brands"; content: "\f09b";
+            padding-right: 0.25rem;
           }
         }
       }
