@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xenial.AspNetIdentity.Xpo",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xenial.AspNetIdentity.Xpo.Tests", "src\Xenial.AspNetIdentity.Xpo.Tests\Xenial.AspNetIdentity.Xpo.Tests.csproj", "{02363DDF-6C4D-4703-8554-F680154F70C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xenial.AspNetIdentity.Xpo.Generators", "src\Xenial.AspNetIdentity.Xpo.Generators\Xenial.AspNetIdentity.Xpo.Generators.csproj", "{98110FE3-FACB-4A9F-B7DD-14861C993BDD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xenial.AspNetIdentity.Xpo.Generators", "src\Xenial.AspNetIdentity.Xpo.Generators\Xenial.AspNetIdentity.Xpo.Generators.csproj", "{98110FE3-FACB-4A9F-B7DD-14861C993BDD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

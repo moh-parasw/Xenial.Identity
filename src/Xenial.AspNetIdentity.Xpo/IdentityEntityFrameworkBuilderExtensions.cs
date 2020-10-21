@@ -3,8 +3,8 @@
 
 using System;
 using System.Reflection;
+
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

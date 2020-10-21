@@ -3,6 +3,8 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
+using AutoMapper;
+
 using DevExpress.Xpo;
 
 using IdentityServer4;
@@ -21,7 +23,9 @@ using Newtonsoft.Json.Linq;
 
 using Westwind.AspNetCore.LiveReload;
 
+using Xenial.AspNetIdentity.Xpo.Mappers;
 using Xenial.AspNetIdentity.Xpo.Stores;
+using Xenial.Identity.Data;
 using Xenial.Identity.Xpo.Storage;
 
 namespace Xenial.Identity
@@ -60,7 +64,7 @@ namespace Xenial.Identity
 
             services.AddXpoDefaultDataLayer(ServiceLifetime.Singleton, dl => dl
                 .UseConnectionString(Configuration.GetConnectionString("DefaultConnection"))
-                .UseThreadSafeDataLayer(true)
+                .UseThreadSafeDataLayer(false)
                 .UseConnectionPool(false) // Remove this line if you use a database server like SQL Server, Oracle, PostgreSql, etc.
                 .UseAutoCreationOption(DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema)
                 .UseEntityTypes(IdentityXpoTypes.PersistentTypes)
@@ -68,16 +72,18 @@ namespace Xenial.Identity
 
             services.AddXpoDefaultUnitOfWork();
 
-            services.AddDefaultIdentity<IdentityUser>(options =>
+            services.AddDefaultIdentity<XenialIdentityUser>(options =>
             {
-                options.SignIn.RequireConfirmedAccount = true;
+                //TODO: Email Sender
+                options.SignIn.RequireConfirmedAccount = false;
             }).AddXpoStores();
 
             services
-                .AddScoped<IUserStore<IdentityUser>>(s => new XPUserStore(
+                .AddScoped<IUserStore<XenialIdentityUser>>(s => new XPUserStore<XenialIdentityUser>(
                        s.GetService<UnitOfWork>(),
-                       s.GetService<ILogger<XPUserStore>>(),
-                       new Microsoft.AspNetCore.Identity.IdentityErrorDescriber()
+                       s.GetService<ILogger<XPUserStore<XenialIdentityUser>>>(),
+                       new Microsoft.AspNetCore.Identity.IdentityErrorDescriber(),
+                       new MapperConfiguration(cfg => cfg.AddProfile<XPUserMapperProfile<XenialIdentityUser>>())
                ))
                 .AddScoped<IRoleStore<IdentityRole>>(s => new XPRoleStore(
                         s.GetService<UnitOfWork>(),
@@ -94,7 +100,9 @@ namespace Xenial.Identity
 
                 // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
                 options.EmitStaticAudienceClaim = true;
-            }).AddXpoIdentityStore();
+            })
+                .AddAspNetIdentity<XenialIdentityUser>()
+                .AddXpoIdentityStore();
 
             // in-memory, code config
             builder.AddInMemoryIdentityResources(Config.IdentityResources);

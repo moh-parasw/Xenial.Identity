@@ -7,11 +7,14 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Xenial.AspNetIdentity.Xpo.Mappers
 {
-    public class XPUserMapperProfile : Profile
+    public class XPUserMapperProfile : XPUserMapperProfile<IdentityUser> { }
+
+    public class XPUserMapperProfile<TUser> : Profile
+        where TUser : IdentityUser
     {
         public XPUserMapperProfile()
         {
-            CreateMap<Models.XpoIdentityUser, IdentityUser>()
+            CreateMap<Models.XpoIdentityUser, TUser>()
                 .ReverseMap()
                 .ConstructUsingServiceLocator();
 

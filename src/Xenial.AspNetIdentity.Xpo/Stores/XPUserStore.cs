@@ -24,11 +24,42 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
     public class XPUserStore : XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>,
         XpoIdentityUser, XpoIdentityRole, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>
     {
-        public XPUserStore(UnitOfWork unitOfWork, ILogger<XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityRole, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>> logger, IdentityErrorDescriber describer) : base(unitOfWork, logger, describer)
+        public XPUserStore(
+            UnitOfWork unitOfWork,
+            ILogger<XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityRole, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>> logger,
+            IdentityErrorDescriber describer
+        ) : base(unitOfWork, logger, describer)
         {
         }
 
-        public XPUserStore(UnitOfWork unitOfWork, ILogger<XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityRole, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>> logger, IdentityErrorDescriber describer, IConfigurationProvider configurationProvider) : base(unitOfWork, logger, describer, configurationProvider)
+        public XPUserStore(
+            UnitOfWork unitOfWork,
+            ILogger<XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityRole, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>> logger,
+            IdentityErrorDescriber describer,
+            IConfigurationProvider configurationProvider
+        ) : base(unitOfWork, logger, describer, configurationProvider)
+        {
+        }
+    }
+
+    public class XPUserStore<TUser> : XPUserStore<TUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>,
+       XpoIdentityUser, XpoIdentityRole, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>
+        where TUser : IdentityUser
+    {
+        public XPUserStore(
+            UnitOfWork unitOfWork,
+            ILogger<XPUserStore<TUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityRole, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>> logger,
+            IdentityErrorDescriber describer
+        ) : base(unitOfWork, logger, describer)
+        {
+        }
+
+        public XPUserStore(
+            UnitOfWork unitOfWork,
+            ILogger<XPUserStore<TUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityRole, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>> logger,
+            IdentityErrorDescriber describer,
+            IConfigurationProvider configurationProvider
+        ) : base(unitOfWork, logger, describer, configurationProvider)
         {
         }
     }
