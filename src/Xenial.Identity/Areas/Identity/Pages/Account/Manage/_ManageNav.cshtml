@@ -2,14 +2,65 @@
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }
-<ul class="nav nav-pills flex-column">
-    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">Profile</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">Email</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">Password</a></li>
-    @if (hasExternalLogins)
-    {
-        <li id="external-logins" class="nav-item"><a id="external-login" class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-page="./ExternalLogins">External logins</a></li>
-    }
-    <li class="nav-item"><a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">Personal data</a></li>
-</ul>
+
+<nav>
+    <ul>
+        <li class="@ManageNavPages.ChangePasswordNavClass(ViewContext)">
+            <a class="profile-page__cards__change" asp-page="./ChangePassword">
+                <span class="profile-page__cards__change-image"><i class="fas fa-key"></i></span>
+                <span class="profile-page__cards__change-details">
+                    <span class="profile-page__cards__change-details-header">Change password</span>
+                    <span class="profile-page__cards__change-details-section">Security</span>
+                </span>
+            </a>
+        </li>
+        <li class="@ManageNavPages.EmailNavClass(ViewContext)">
+            <a class="profile-page__cards__change" asp-page="./Email">
+                <span class="profile-page__cards__change-image"><i class="fas fa-envelope"></i></span>
+                <span class="profile-page__cards__change-details">
+                    <span class="profile-page__cards__change-details-header">Change Email</span>
+                    <span class="profile-page__cards__change-details-section">Security</span>
+                </span>
+            </a>
+        </li>
+        <li class="@ManageNavPages.PhoneNavClass(ViewContext)">
+            <a class="profile-page__cards__change" asp-page="./Phone">
+                <span class="profile-page__cards__change-image"><i class="fas fa-phone"></i></span>
+                <span class="profile-page__cards__change-details">
+                    <span class="profile-page__cards__change-details-header">Change Phone</span>
+                    <span class="profile-page__cards__change-details-section">Security</span>
+                </span>
+            </a>
+        </li>
+        <li class="@ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)">
+            <a class="profile-page__cards__change" asp-page="./TwoFactorAuthentication">
+                <span class="profile-page__cards__change-image"><i class="fas fa-mobile"></i></span>
+                <span class="profile-page__cards__change-details">
+                    <span class="profile-page__cards__change-details-header">Two-factor Auth.</span>
+                    <span class="profile-page__cards__change-details-section">Security</span>
+                </span>
+            </a>
+        </li>
+        @if (hasExternalLogins)
+        {
+            <li class="@ManageNavPages.ExternalLoginsNavClass(ViewContext)">
+                <a class="profile-page__cards__change" asp-page="./ExternalLogins">
+                    <span class="profile-page__cards__change-image"><i class="fab fa-github"></i></span>
+                    <span class="profile-page__cards__change-details">
+                        <span class="profile-page__cards__change-details-header">External Logins</span>
+                        <span class="profile-page__cards__change-details-section">Security</span>
+                    </span>
+                </a>
+            </li>
+        }
+        <li class="@ManageNavPages.PersonalDataNavClass(ViewContext)">
+            <a class="profile-page__cards__change" asp-page="./PersonalData">
+                <span class="profile-page__cards__change-image"><i class="fas fa-book-open"></i></span>
+                <span class="profile-page__cards__change-details">
+                    <span class="profile-page__cards__change-details-header">Personal data</span>
+                    <span class="profile-page__cards__change-details-section">Data</span>
+                </span>
+            </a>
+        </li>
+    </ul>
+</nav>

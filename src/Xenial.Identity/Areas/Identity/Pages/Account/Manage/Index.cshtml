@@ -5,7 +5,24 @@
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
 
-<h4>@ViewData["Title"]</h4>
+<h1>@ViewData["Title"]</h1>
+
+<div class="profile-page">
+    <div class="profile-page__cards">
+        <div class="profile-card">
+            <div class="profile-card__image"><a href="#"><i class="fas fa-user"></i></a></div>
+            <div class="profile-card__details">
+                <span class="profile-card__details-name"><a href="#">Manuel Grundner</a></span>
+                <span class="profile-card__details-email">
+                    <a href="#">
+                        <i class="fa fa-envelope"></i>&nbsp;<span>m.grundner@delegate.at</span>
+                    </a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <partial name="_StatusMessage" model="Model.StatusMessage" />
 <div class="row">
     <div class="col-md-6">

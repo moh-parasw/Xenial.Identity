@@ -2,8 +2,12 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 
-<partial name="_ManageNav" />
-@RenderBody()
+<div class="profile-page">
+    <div class="profile-page__cards">
+        <partial name="_ManageNav" />
+        @RenderBody()
+    </div>
+</div>
 
 @section Scripts {
     @RenderSection("Scripts", required: false)

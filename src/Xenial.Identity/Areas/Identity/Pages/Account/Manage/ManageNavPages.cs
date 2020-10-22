@@ -10,6 +10,8 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
 
         public static string Email => "Email";
 
+        public static string Phone => "Phone";
+
         public static string ChangePassword => "ChangePassword";
 
         public static string DownloadPersonalData => "DownloadPersonalData";
@@ -25,6 +27,8 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
         public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
 
         public static string EmailNavClass(ViewContext viewContext) => PageNavClass(viewContext, Email);
+
+        public static string PhoneNavClass(ViewContext viewContext) => PageNavClass(viewContext, Phone);
 
         public static string ChangePasswordNavClass(ViewContext viewContext) => PageNavClass(viewContext, ChangePassword);
 
