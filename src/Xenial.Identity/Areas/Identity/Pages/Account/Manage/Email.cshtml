@@ -6,8 +6,6 @@
     ViewData["ActivePage"] = ManageNavPages.Email;
 }
 
-<partial name="_StatusMessage" model="Model.StatusMessage" />
-<div></div>
 <div class="manage-email-page">
     <div class="manage-email-page-tabs">
         <input type="radio" id="tab1" name="tab-control" checked>
@@ -22,6 +20,7 @@
         <div class="manage-email-page-tabs__slider"><div class="indicator"></div></div>
         <div class="manage-email-page-tabs__content">
             <form class="xenial-form" id="email-form" method="post">
+                <partial name="_StatusMessage" model="Model.StatusMessage" />
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <ul class="xenial-form__list">
                     <li class="xenial-form__list-item">
