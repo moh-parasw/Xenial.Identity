@@ -2,39 +2,52 @@
 @model LoginWith2faModel
 @{
     ViewData["Title"] = "Two-factor authentication";
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
 }
 
-<h1>@ViewData["Title"]</h1>
-<hr />
-<p>Your login is protected with an authenticator app. Enter your authenticator code below.</p>
-<div class="row">
-    <div class="col-md-4">
-        <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
-            <input asp-for="RememberMe" type="hidden" />
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Input.TwoFactorCode"></label>
-                <input asp-for="Input.TwoFactorCode" class="form-control" autocomplete="off" />
-                <span asp-validation-for="Input.TwoFactorCode" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <div class="checkbox">
-                    <label asp-for="Input.RememberMachine">
-                        <input asp-for="Input.RememberMachine" />
-                        @Html.DisplayNameFor(m => m.Input.RememberMachine)
-                    </label>
-                </div>
-            </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">Log in</button>
-            </div>
-        </form>
+<div class="login-with-2fa-page">
+    
+    <div class="login-with-2fa-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <ul class="login-with-2fa-page-tabs__list">
+            <li class="login-with-2fa-page-tabs__list-item" title="Features">
+                <label class="login-with-2fa-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-key"></i> <span>@ViewData["Title"]</span>
+                </label>
+            </li>
+        </ul>
+
+        <div class="login-with-2fa-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="login-with-2fa-page-tabs__content">
+            <p>Your login is protected with an authenticator app. Enter your authenticator code below.</p>
+            <form class="xenial-form" method="post" asp-route-returnUrl="@Model.ReturnUrl">
+                <input asp-for="RememberMe" type="hidden" />
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <ul class="xenial-form__list">
+                    <li class="xenial-form__list-item">
+                        <label asp-for="Input.TwoFactorCode"></label>
+                        <input asp-for="Input.TwoFactorCode" class="form-control" autocomplete="off" />
+                        <span asp-validation-for="Input.TwoFactorCode" class="text-danger"></span>
+                    </li>
+                    <li class="xenial-form__list-item">
+                        <label asp-for="Input.RememberMachine">
+                            @Html.DisplayNameFor(m => m.Input.RememberMachine)
+                        </label>
+                        <input class="toggle" asp-for="Input.RememberMachine" />
+                    </li>
+                    <li class="xenial-form__list-item">
+                        <button type="submit" class="xenial-form__list-item-submit">Log in</button>
+                    </li>
+                </ul>
+            </form>
+            <p>
+                Don't have access to your authenticator device?<br />
+                You can <a id="recovery-code-login" asp-page="./LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl">log in with a recovery code</a>.
+            </p>
+        </div>
     </div>
 </div>
-<p>
-    Don't have access to your authenticator device? You can
-    <a id="recovery-code-login" asp-page="./LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl">log in with a recovery code</a>.
-</p>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
