@@ -1,4 +1,4 @@
-@using IdentityServer4.Extensions
+﻿@using IdentityServer4.Extensions
 
 @{
     string name = null;
@@ -50,12 +50,10 @@
         class="xenial-header__togglenavbar-label"
         for="xenial-toggle-navbar"
     >
-        <div>
         <span class="middle">
             <span class="before"></span>
             <span class="after"></span>
         </span>
-        </div>
     </label>
     <nav class="xenial-header__nav">
         <ul class="xenial-header__navlist">
@@ -66,8 +64,8 @@
             </a>
         </li>
         <li>
-            <a href="/profile">
-            <i class="fas fa-user"></i>
+            <a asp-area="Identity" asp-page="/Account/Manage/Index">
+                <i class="fas fa-user"></i>
                 @if (!string.IsNullOrWhiteSpace(name))
                 {
                     <span>@name</span>
