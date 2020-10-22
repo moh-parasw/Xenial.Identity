@@ -1,0 +1,94 @@
+.xenial-body {
+  .profile-nav {
+    &__list {
+      margin: 0;
+      padding: 0;
+
+      &-item {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        &-link {
+          &:hover,
+          &:link,
+          &:visited,
+          &:active {
+            text-decoration: none;
+          }
+
+          --height: 2rem;
+          --small-size: 0.8rem;
+
+          --space-left: calc(calc(var(--profile-card-height) / 4) - 0.25rem);
+          --space--right: calc(
+            calc(var(--profile-card-small-size) / 4) + 0.75rem
+          );
+
+          display: flex;
+          flex-direction: row;
+          max-width: 400px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          margin-left: var(--space-left);
+
+          @media (min-width: 281px) {
+            --space--right: calc(
+              calc(var(--profile-card-small-size) / 4) + 1.25rem
+            );
+          }
+
+          &-image {
+            font-size: calc(var(--height) / 2);
+            display: inline-flex;
+            margin: {
+              left: 0.5rem;
+              right: var(--space--right);
+              top: 0.5rem;
+            }
+            width: var(--height);
+            height: var(--height);
+            border-radius: 50%;
+            background-color: var(--xenial-dark-color);
+
+            > * {
+              display: flex;
+              line-height: 1;
+              margin: auto;
+              padding: 0;
+              align-content: center;
+            }
+          }
+
+          &-details {
+            display: flex;
+            flex-direction: column;
+
+            &-header {
+              font-weight: bold;
+            }
+            &-section {
+              font-size: 0.8rem;
+            }
+          }
+        }
+        &-link {
+          &:hover,
+          &:active {
+            .profile-nav__list-item-link-image,
+            .profile-nav__list-item-link-details {
+              color: var(--xenial-highlight-color);
+            }
+          }
+        }
+
+        @media (min-width: 768px) {
+          &-link {
+            margin-left: auto;
+            --space--right: 0.5rem;
+          }
+        }
+      }
+    }
+  }
+}

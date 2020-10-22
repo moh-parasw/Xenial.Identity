@@ -10,8 +10,10 @@
 
 //Specific
 @import "pages/login";
+@import "pages/profile-nav";
 @import "pages/profile";
 @import "pages/forgot-password";
 @import "pages/forgot-password-confirmation";
 @import "pages/login-with-2fa";
 @import "pages/login-with-2fa-recovery";
+@import "pages/external-login";

@@ -1,30 +1,43 @@
 ﻿@page
 @model ExternalLoginModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = $"Associate your {Model.ProviderDisplayName} account.";
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
 }
 
-<h1>@ViewData["Title"]</h1>
-<h4 id="external-login-title">Associate your @Model.ProviderDisplayName account.</h4>
-<hr />
+<div class="external-login-page">
+    <div class="external-login-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <ul class="external-login-page-tabs__list">
+            <li class="external-login-page-tabs__list-item" title="Features">
+                <label class="external-login-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-key"></i> <span>@ViewData["Title"]</span>
+                </label>
+            </li>
+        </ul>
 
-<p id="external-login-description" class="text-info">
-    You've successfully authenticated with <strong>@Model.ProviderDisplayName</strong>.
-    Please enter an email address for this site below and click the Register button to finish
-    logging in.
-</p>
+        <div class="external-login-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="external-login-page-tabs__content">
+            <p>
+                You've successfully authenticated with <strong>@Model.ProviderDisplayName</strong>.
+                Please enter an email address for this site below and click the Register button to finish
+                logging in.
+            </p>
+            <form class="xenial-form" asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <ul class="xenial-form__list">
+                    <li class="xenial-form__list-item">
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Input.Email"></label>
-                <input asp-for="Input.Email" class="form-control" />
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <button type="submit" class="btn btn-primary">Register</button>
-        </form>
+                        <label asp-for="Input.Email"></label>
+                        <input asp-for="Input.Email" class="form-control" />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </li>
+                    <li class="xenial-form__list-item">
+                        <button type="submit" class="xenial-form__list-item-submit">Register</button>
+                    </li>
+                </ul>
+            </form>
+        </div>
     </div>
 </div>
 

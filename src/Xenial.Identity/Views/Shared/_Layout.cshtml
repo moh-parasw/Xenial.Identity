@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -23,7 +23,7 @@
     
         <main>
             <div class="article-wrapper">
-                <aside></aside>
+                <aside> @RenderSection("aside", required: false)</aside>
                 <article>
                     @RenderBody()
                 </article>
