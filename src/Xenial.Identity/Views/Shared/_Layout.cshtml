@@ -23,7 +23,7 @@
     
         <main>
             <div class="article-wrapper">
-                <aside> @RenderSection("aside", required: false)</aside>
+                <aside class="@(ViewContext.ViewData["ASideClass"])"> @RenderSection("aside", required: false)</aside>
                 <article>
                     @RenderBody()
                 </article>

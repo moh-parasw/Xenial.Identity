@@ -1,4 +1,12 @@
 .xenial-body {
+  .article-wrapper {
+    display: flex;
+    flex-direction: column-reverse;
+    .show-aside {
+      display: block;
+    }
+  }
+
   .profile-page {
     display: flex;
     flex-direction: column;
@@ -18,6 +26,15 @@
     &__cards {
       display: flex;
       flex-direction: column;
+    }
+  }
+  @media (min-width: 768px) {
+    .article-wrapper {
+      display: flex;
+      flex-direction: row-reverse;
+      .show-aside {
+        display: block;
+      }
     }
   }
 }
