@@ -7,50 +7,98 @@
 }
 
 <partial name="_StatusMessage" for="StatusMessage" />
-<h4>@ViewData["Title"]</h4>
-<div>
-    <p>To use an authenticator app go through the following steps:</p>
-    <ol class="list">
-        <li>
-            <p>
-                Download a two-factor authenticator app like Microsoft Authenticator for
-                <a href="https://go.microsoft.com/fwlink/?Linkid=825072">Android</a> and
-                <a href="https://go.microsoft.com/fwlink/?Linkid=825073">iOS</a> or
-                Google Authenticator for
-                <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en">Android</a> and
-                <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">iOS</a>.
-            </p>
-        </li>
-        <li>
-            <p>Scan the QR Code or enter this key <kbd>@Model.SharedKey</kbd> into your two factor authenticator app. Spaces and casing do not matter.</p>
-            <canvas data-qrcode="@Html.Raw(Model.AuthenticatorUri)"></canvas>
-        </li>
-        <li>
-            <p>
-                Once you have scanned the QR code or input the key above, your two factor authentication app will provide you
-                with a unique code. Enter the code in the confirmation box below.
-            </p>
-            <div class="row">
-                <div class="col-md-6">
-                    <form id="send-code" method="post" class="xenial-form">
-                        <ul class="xenial-form__list">
-                            <li class="xenial-form__list-item">
-                                <label asp-for="Input.Code" class="control-label">Verification Code</label>
-                                <input asp-for="Input.Code" class="form-control" autocomplete="off" />
-                                <span asp-validation-for="Input.Code" class="text-danger"></span>
-                            </li>
-                            <li class="xenial-form__list-item">
-                                <button type="submit" class="xenial-form__list-item-submit">Verify</button>
-                            </li>
-                        </ul>
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    </form>
-                </div>
-            </div>
-        </li>
-    </ol>
-</div>
+<div class="authentificator-page">
+    <div class="authentificator-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <input type="radio" id="tab2" name="tab-control">
+        <input type="radio" id="tab3" name="tab-control">
+        <ul class="authentificator-page-tabs__list">
+            <li class="authentificator-page-tabs__list-item" title="Download App">
+                <label class="authentificator-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-download"></i> <span>1. Download App</span>
+                </label>
+            </li>
+            <li class="authentificator-page-tabs__list-item" title="Scan QR-Code">
+                <label class="authentificator-page-tabs__list-item-label" for="tab2" role="button">
+                    <i class="fas fa-qrcode"></i> <span>2. Scan QRCode</span>
+                </label>
+            </li>
+            <li class="authentificator-page-tabs__list-item" title="Enter Code">
+                <label class="authentificator-page-tabs__list-item-label" for="tab3" role="button">
+                    <i class="fas fa-mobile"></i> <span>3. Enter Code</span>
+                </label>
+            </li>
+        </ul>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+        <div class="authentificator-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="authentificator-page-tabs__content">
+            <section>
+                <h2>1. Download App</h2>
+                <p class="text-center">
+                    Download one of the two-factor authenticator apps
+                </p>
+                <p>
+                    <ul class="app-list">
+                        <li>
+                            <h3>Microsoft Authenticator</h3>
+                            <img src="~/img/ms-auth.webp" />
+
+                            <ul class="app-downloads">
+                                <li>
+                                    <a href='https://play.google.com/store/apps/details?id=com.azure.authenticator&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src="~/img/google-badge.png" /></a>
+                                </li>
+                                <li class="apple">
+                                    <a href="https://go.microsoft.com/fwlink/?Linkid=825073"><img src="~/img/apple-badge.svg" alt="Apple Store" title="Apple Store" /></a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <h3>Google Authenticator</h3>
+                            <img src="~/img/google-auth.webp" />
+
+                            <ul class="app-downloads">
+                                <li>
+                                    <a href='https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src="~/img/google-badge.png" /></a>
+                                </li>
+                                <li class="apple">
+                                    <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8"><img src="~/img/apple-badge.svg" alt="Apple Store" title="Apple Store" /></a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </p>
+
+            </section>
+            <section>
+                <h2>2. Scan QR-Code</h2>
+
+                <p class="text-center">Scan the QR Code or enter this key</p>
+                <p class="text-center"><code class="text-center center-image">@Model.SharedKey</code></p>
+                <p>into your two factor authenticator app. Spaces and casing do not matter.</p>
+                <canvas class="center-image" data-qrcode="@Html.Raw(Model.AuthenticatorUri)"></canvas>
+            </section>
+            <section class="enter-code">
+                <h2>Enter Code</h2>
+                <p>
+                    Once you have scanned the QR code or input the key above, your two factor authentication app will provide you
+                    with a unique code. Enter the code in the confirmation box below.
+                </p>
+                <form id="send-code" method="post" class="xenial-form">
+                    <ul class="xenial-form__list">
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.Code" class="control-label">Verification Code</label>
+                            <input asp-for="Input.Code" class="form-control" autocomplete="off" />
+                            <span asp-validation-for="Input.Code" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <button type="submit" class="xenial-form__list-item-submit">Verify</button>
+                        </li>
+                    </ul>
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                </form>
+            </section>
+        </div>
+    </div>
+</div>
+<partial name="_ValidationScriptsPartial" />
+

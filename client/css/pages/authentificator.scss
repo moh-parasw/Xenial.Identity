@@ -2,7 +2,63 @@
 @import "tabs2";
 
 .authentificator-page {
-    max-width: 370px;
-    @include tab-pages(3);
-    @include xenial-form(1000rem);
+  max-width: 500px;
+  @include tab-pages(3);
+  @include xenial-form(1000rem);
+
+  .enter-code .xenial-form {
+    display: block;
+    width: 100%;
+  }
+
+  .center-image {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .text-center {
+    text-align: center;
+  }
+
+  .app-list {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    h3 {
+      margin-top: 2rem;
+      text-align: center;
+    }
+    li {
+      margin: 0;
+      padding: 0;
+      &::before {
+        content: none;
+      }
+      img {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        cursor: auto;
+      }
+      a img {
+          cursor: pointer;
+      }
+      .app-downloads {
+        display: flex;
+        flex-direction: column;
+        max-width: 200px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 0;
+        img {
+          width: 100%;
+          margin: 0;
+        }
+        .apple {
+          padding-left: 15px;
+          padding-right: 15px;
+        }
+      }
+    }
+  }
 }

@@ -13,11 +13,9 @@ $indicator-width: 50px;
 $indicator-height: 4px;
 
 /* selectors relative to radio inputs */
-$label-selector: "~ ul > li";
-$slider-selector: "~ .slider";
-$content-selector: "~ .content > section";
 
 @mixin tabs(
+  $tab-count: $tab-count,
   $label-selector: $label-selector,
   $slider-selector: $slider-selector,
   $content-selector: $content-selector
@@ -141,9 +139,14 @@ $content-selector: "~ .content > section";
         }
       }
     }
+    $slider: "#{&}__slider";
+    $content: "#{&}__content";
+    $label-selector: "~ ul > li";
+    $slider-selector: "~ #{&}__slider";
+    $content-selector: "~ #{&}__content > section";
 
     input[name="tab-control"] {
-      @include tabs {
+      @include tabs($tab-count, $label-selector, $slider-selector, $content-selector) {
         > label {
           cursor: default;
           color: var(--xenial-tag-color);
@@ -168,7 +171,7 @@ $content-selector: "~ .content > section";
 
     @media (max-width: map-get($breakpoints, medium)) {
       ul li label {
-        white-space: initial;
+        white-space: nowrap;
 
         br {
           display: initial;
@@ -190,11 +193,11 @@ $content-selector: "~ .content > section";
         }
       }
 
-      .slider {
+      #{$slider} {
         display: none;
       }
 
-      .content {
+      #{$content} {
         margin-top: 20px;
         section h2 {
           display: block;
