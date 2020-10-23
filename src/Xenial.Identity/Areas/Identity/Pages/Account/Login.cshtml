@@ -7,43 +7,40 @@
 }
 
 <div class="login-page">
-    <div class="tabs">
+    <div class="login-page-tabs">
 
         <input type="radio" id="tab1" name="tab-control" @(Model.SelectedPage == "login" ? "checked" : "")>
         <input type="radio" id="tab2" name="tab-control" @(Model.SelectedPage == "register" ? "checked" : "")>
-        <ul class="tabs__list">
-            <li class="tabs__list-item" title="Features">
-                <label class="tabs__list-item-label" for="tab1" role="button">
+        <ul class="login-page-tabs__list">
+            <li class="login-page-tabs__list-item" title="Features">
+                <label class="login-page-tabs__list-item-label" for="tab1" role="button">
                     <i class="fas fa-sign-in-alt"></i> <span>Login</span>
                 </label>
             </li>
-            <li class="tabs__list-item" title="Delivery Contents">
-                <label class="tabs__list-item-label" for="tab2" role="button">
+            <li class="login-page-tabs__list-item" title="Delivery Contents">
+                <label class="login-page-tabs__list-item-label" for="tab2" role="button">
                     <i class="fas fa-user-plus"></i> <span>Signup</span>
                 </label>
             </li>
         </ul>
 
-        <div class="slider"><div class="indicator"></div></div>
-        <div class="content">
+        <div class="login-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="login-page-tabs__content">
             <section class="login-form">
                 <h2>Login</h2>
                 @if (Model.ExternalLogins.Any())
                 {
                     <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <ul class="login-form__providers">
-
-
+                        <ul class="login-page__providers">
                             @foreach (var provider in Model.ExternalLogins)
                             {
-                                <li class="login-form__providers-item">
-                                    <button type="submit" class="login-form__providers-item-button @provider.Name.ToLower()" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                                <li class="login-page__providers-item">
+                                    <button type="submit" class="login-page__providers-item-button @provider.Name.ToLower()" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
                                 </li>
                             }
-
                         </ul>
                     </form>
-                    <span class="login-form-or">or</span>
+                    <span class="login-page-or">or</span>
                 }
 
                 <form method="post" class="xenial-form" asp-page-handler="login">

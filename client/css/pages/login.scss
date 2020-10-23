@@ -1,4 +1,5 @@
 @import "forms";
+@import "tabs";
 
 @mixin icon {
   display: inline-block;
@@ -9,65 +10,61 @@
 }
 
 .login-page {
-  .tabs {
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 370px;
-    .login-form {
-      max-width: 370px;
-      @include xenial-form(1000rem);
+  @include tab-pages(2);
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 370px;
+  @include xenial-form(1000rem);
 
-      &__providers {
-        margin: 0;
-        padding: 0;
-        
-        &-item {
-          
-          margin: 0;
-          &::before {
-            content: none;
-          }
+  &__providers {
+    margin: 0;
+    padding: 0;
 
-          &-button,
-          &-button:link,
-          &-button:hover,
-          &-button:visited {
-            text-decoration: none;
-            cursor: pointer;
-            background-color: var(--xenial-lighter-color);
-            color: var(--xenial-darker-color);
-            border-radius: 2px;
-            display: block;
-            margin-left: 0;
-            margin-bottom: 0.5rem;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 3px;
-            background-color: var(--xenial-lighter-color);
-            color: var(--xenial-darker-color);
-            cursor: pointer;
-            text-align: center;
-            width: 90%;
-            margin: {
-              left: auto;
-              right: auto;
-            }
-          }
-          &-button.github::before {
-            @include icon();
-            font-family: "Font Awesome 5 Brands"; content: "\f09b";
-            padding-right: 0.25rem;
-          }
-        }
+    &-item {
+      margin: 0;
+      &::before {
+        content: none;
       }
-      &-or {
+
+      &-button,
+      &-button:link,
+      &-button:hover,
+      &-button:visited {
+        text-decoration: none;
+        cursor: pointer;
+        background-color: var(--xenial-lighter-color);
+        color: var(--xenial-darker-color);
+        border-radius: 2px;
         display: block;
+        margin-left: 0;
+        margin-bottom: 0.5rem;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 3px;
+        background-color: var(--xenial-lighter-color);
+        color: var(--xenial-darker-color);
+        cursor: pointer;
         text-align: center;
+        width: 90%;
         margin: {
-          top: 0.5rem;
-          bottom: 0.5rem;
+          left: auto;
+          right: auto;
         }
       }
+      &-button.github::before {
+        @include icon();
+        font-family: "Font Awesome 5 Brands";
+        content: "\f09b";
+        padding-right: 0.25rem;
+      }
+    }
+  }
+  &-or {
+    display: block;
+    text-align: center;
+    margin: {
+      top: 0.5rem;
+      bottom: 0.5rem;
     }
   }
 }
