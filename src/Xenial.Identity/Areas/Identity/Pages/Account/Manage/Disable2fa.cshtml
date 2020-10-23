@@ -26,12 +26,15 @@
                 <p>
                     Disabling two-factor authentication does not change the keys used in authenticator apps.<br /><br />
                     If you wish to change the key used in an authenticator app you should rather <br /><br />
-                    <a asp-page="./ResetAuthenticator">reset your authenticator keys.</a>
+                    
                 </p>
                 <form class="xenial-form" method="post">
                     <ul class="xenial-form__list">
                         <li class="xenial-form__list-item">
-                            <button class="xenial-form__list-item-submit" type="submit">Disable two-factor authentication</button>
+                            <a asp-page="./ResetAuthenticator" class="button">reset your authenticator keys</a>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <button class="xenial-form__list-item-danger" type="submit">Disable two-factor authentication</button>
                         </li>
                     </ul>
 

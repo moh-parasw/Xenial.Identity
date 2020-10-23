@@ -1,0 +1,12 @@
+@import "forms";
+@import "tabs2";
+
+.recovery-codes-page {
+    max-width: 370px;
+    @include tab-pages(1);
+    @include xenial-form(1000rem);
+
+    .text-center {
+        text-align: center;
+    }
+}

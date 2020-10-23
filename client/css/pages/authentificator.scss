@@ -1,0 +1,8 @@
+@import "forms";
+@import "tabs2";
+
+.authentificator-page {
+    max-width: 370px;
+    @include tab-pages(3);
+    @include xenial-form(1000rem);
+}

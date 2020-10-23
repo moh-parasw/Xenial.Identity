@@ -7,51 +7,80 @@
 }
 
 <partial name="_StatusMessage" for="StatusMessage" />
-<h4>@ViewData["Title"]</h4>
-@if (Model.Is2faEnabled)
-{
-    if (Model.RecoveryCodesLeft == 0)
-    {
-        <div class="alert alert-danger">
-            <strong>You have no recovery codes left.</strong>
-            <p>You must <a asp-page="./GenerateRecoveryCodes">generate a new set of recovery codes</a> before you can log in with a recovery code.</p>
-        </div>
-    }
-    else if (Model.RecoveryCodesLeft == 1)
-    {
-        <div class="alert alert-danger">
-            <strong>You have 1 recovery code left.</strong>
-            <p>You can <a asp-page="./GenerateRecoveryCodes">generate a new set of recovery codes</a>.</p>
-        </div>
-    }
-    else if (Model.RecoveryCodesLeft <= 3)
-    {
-        <div class="alert alert-warning">
-            <strong>You have @Model.RecoveryCodesLeft recovery codes left.</strong>
-            <p>You should <a asp-page="./GenerateRecoveryCodes">generate a new set of recovery codes</a>.</p>
-        </div>
-    }
+<div class="enable-2fa-page">
+    <div class="enable-2fa-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <ul class="enable-2fa-page-tabs__list">
+            <li class="enable-2fa-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="enable-2fa-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-mobile"></i> <span>@ViewData["Title"]</span>
+                </label>
+            </li>
+        </ul>
 
-    if (Model.IsMachineRemembered)
-    {
-        <form method="post" style="display: inline-block">
-            <button type="submit" class="btn btn-default">Forget this browser</button>
-        </form>
-    }
-    <a asp-page="./Disable2fa" class="btn btn-default">Disable 2FA</a>
-    <a asp-page="./GenerateRecoveryCodes" class="btn btn-default">Reset recovery codes</a>
-}
+        <div class="enable-2fa-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="enable-2fa-page-tabs__content">
+            @if (Model.Is2faEnabled)
+            {
+                if (Model.RecoveryCodesLeft == 0)
+                {
+                    <div class="alert alert-danger">
+                        <strong>You have no recovery codes left.</strong>
+                        <p>You must <a asp-page="./GenerateRecoveryCodes">generate a new set of recovery codes</a> before you can log in with a recovery code.</p>
+                    </div>
+                }
+                else if (Model.RecoveryCodesLeft == 1)
+                {
+                    <div class="alert alert-danger">
+                        <strong>You have 1 recovery code left.</strong>
+                        <p>You can <a asp-page="./GenerateRecoveryCodes">generate a new set of recovery codes</a>.</p>
+                    </div>
+                }
+                else if (Model.RecoveryCodesLeft <= 3)
+                {
+                    <div class="alert alert-warning">
+                        <strong>You have @Model.RecoveryCodesLeft recovery codes left.</strong>
+                        <p>You should <a asp-page="./GenerateRecoveryCodes">generate a new set of recovery codes</a>.</p>
+                    </div>
+                }
 
-<h5>Authenticator app</h5>
-@if (!Model.HasAuthenticator)
-{
-    <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-default">Add authenticator app</a>
-}
-else
-{
-    <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-default">Setup authenticator app</a>
-    <a id="reset-authenticator" asp-page="./ResetAuthenticator" class="btn btn-default">Reset authenticator app</a>
-}
+                if (Model.IsMachineRemembered)
+                {
+                    <form method="post" style="display: inline-block">
+                        <button type="submit" class="btn btn-default">Forget this browser</button>
+                    </form>
+                }
+                <ul class="xenial-form__list">
+                    <li class="xenial-form__list-item">
+                        <a asp-page="./Disable2fa" class="button xenial-form__list-item-danger">Disable 2FA</a>
+                    </li>
+                    <li class="xenial-form__list-item">
+                        <a asp-page="./GenerateRecoveryCodes" class="button">Reset recovery codes</a>
+                    </li>
+                </ul>
+            }
+
+            <h5>Authenticator app</h5>
+            <ul class="xenial-form__list">
+                @if (!Model.HasAuthenticator)
+                {
+                    <li class="xenial-form__list-item">
+                        <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="button">Add authenticator app</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="xenial-form__list-item">
+                        <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="button xenial-form__list-item-submit">Setup authenticator app</a>
+                    </li>
+                    <li class="xenial-form__list-item">
+                        <a id="reset-authenticator" asp-page="./ResetAuthenticator" class="button xenial-form__list-item-danger">Reset authenticator app</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
