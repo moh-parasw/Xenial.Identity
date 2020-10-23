@@ -7,22 +7,44 @@
 }
 
 <partial name="_StatusMessage" for="StatusMessage" />
-<h4>@ViewData["Title"]</h4>
-<div class="alert alert-warning" role="alert">
-    <p>
-        <span class="glyphicon glyphicon-warning-sign"></span>
-        <strong>Put these codes in a safe place.</strong>
-    </p>
-    <p>
-        If you lose your device and don't have the recovery codes you will lose access to your account.
-    </p>
-    <p>
-        Generating new recovery codes does not change the keys used in authenticator apps. If you wish to change the key
-        used in an authenticator app you should <a asp-page="./ResetAuthenticator">reset your authenticator keys.</a>
-    </p>
-</div>
-<div>
-    <form method="post" class="form-group">
-        <button class="btn btn-danger" type="submit">Generate Recovery Codes</button>
-    </form>
+<div class="disable-2fa-page">
+    <div class="disable-2fa-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <ul class="disable-2fa-page-tabs__list">
+            <li class="disable-2fa-page-tabs__list-item" title="<h4>@ViewData["Title"]</h4>">
+                <label class="disable-2fa-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-key"></i> <span>Generate two-factor recovery codes</span>
+                </label>
+            </li>
+        </ul>
+        <div class="disable-2fa-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="disable-2fa-page-tabs__content">
+
+            <div class="alert alert-warning" role="alert">
+                <p>
+                    <span class="glyphicon glyphicon-warning-sign"></span>
+                    <strong>Put these codes in a safe place.</strong>
+                </p>
+                <p>
+                    If you lose your device and don't have the recovery codes you will lose access to your account.
+                </p>
+                <p>
+                    Generating new recovery codes does not change the keys used in authenticator apps. <br />
+                    If you wish to change the key used in an authenticator app you should reset the keys.
+                </p>
+            </div>
+            <div>
+                <form method="post" class="xenial-form">
+                    <ul class="xenial-form__list">
+                        <li class="xenial-form__list-item">
+                            <a asp-page="./ResetAuthenticator" class="button">reset your authenticator keys.</a>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <button class="xenial-form__list-item-danger" type="submit">Generate Recovery Codes</button>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
