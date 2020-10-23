@@ -1,4 +1,4 @@
-import "../css/main.scss";
+﻿import "../css/main.scss";
 import { xenial } from "@xenial-io/xenial-template";
 import QRCode from "qrcode/build/qrcode";
 

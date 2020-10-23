@@ -6,27 +6,39 @@
     ViewData["ActivePage"] = ManageNavPages.PersonalData;
 }
 
-<h4>@ViewData["Title"]</h4>
+<div class="personal-data-page">
+    <div class="personal-data-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <ul class="personal-data-page-tabs__list">
+            <li class="personal-data-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="personal-data-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-book-open"></i> <span>@ViewData["Title"]</span>
+                </label>
+            </li>
+        </ul>
+        <div class="alert alert-warning" role="alert">
+            <p>
+                <strong>Deleting this data will permanently remove your account.<br />This cannot be recovered.</strong>
+            </p>
+        </div>
 
-<div class="alert alert-warning" role="alert">
-    <p>
-        <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
-    </p>
-</div>
-
-<div>
-    <form id="delete-user" method="post" class="form-group">
-        <div asp-validation-summary="All" class="text-danger"></div>
-        @if (Model.RequirePassword)
-        {
-            <div class="form-group">
-                <label asp-for="Input.Password"></label>
-                <input asp-for="Input.Password" class="form-control" />
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-        }
-        <button class="btn btn-danger" type="submit">Delete data and close my account</button>
-    </form>
+        <form id="delete-user" method="post" class="xenial-form">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <ul class="xenial-form__list">
+                @if (Model.RequirePassword)
+                {
+                    <li class="xenial-form__list-item">
+                        <label asp-for="Input.Password"></label>
+                        <input asp-for="Input.Password" class="form-control" />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </li>
+                }
+                <li class="xenial-form__list-item">
+                    <button class="xenial-form__list-item-danger" type="submit">Delete data and close my account</button>
+                </li>
+            </ul>
+        </form>
+    </div>
 </div>
 
 @section Scripts {

@@ -139,15 +139,19 @@
           height: 8rem;
         }
 
-        button {
+        button,
+        .button {
           margin: {
             left: 0;
             bottom: 0.5rem;
           }
+          font-size: 0.8rem;
           padding: 8px 16px;
+          letter-spacing: 0.09em;
           border: none;
           border-radius: 3px;
           text-transform: uppercase;
+          text-align: center;
           font-weight: bold;
           background-color: var(--xenial-lighter-color);
           color: var(--xenial-darker-color);
@@ -156,6 +160,11 @@
           &.xenial-form__list-item-submit {
             background-color: var(--xenial-highlight-color);
             color: var(--xenial-darker-color);
+          }
+
+          &.xenial-form__list-item-danger {
+            background-color: var(--xenial-austria-red-color);
+            color: #fff;
           }
 
           &:disabled {
