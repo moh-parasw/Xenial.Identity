@@ -1,0 +1,63 @@
+﻿@page
+@model PhoneModel
+@{
+    ViewData["ASideClass"] = "show-aside";
+    ViewData["Title"] = "Manage Phone";
+    ViewData["ActivePage"] = ManageNavPages.Phone;
+}
+
+<div class="manage-email-page">
+    <div class="manage-email-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <ul class="manage-email-page-tabs__list">
+            <li class="manage-email-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="manage-email-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-phone"></i> <span>@ViewData["Title"]</span>
+                </label>
+            </li>
+        </ul>
+
+        <div class="manage-email-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="manage-email-page-tabs__content">
+            <form class="xenial-form" id="email-form" method="post">
+                <partial name="_StatusMessage" model="Model.StatusMessage" />
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <ul class="xenial-form__list">
+                    @*@if (!string.IsNullOrEmpty(Model.Phone))
+                    {
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Phone"></label>
+                            @if (Model.IsPhoneConfirmed)
+                            {
+                                <div class="input-group">
+                                    <input asp-for="Phone" class="form-control" disabled />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text text-success font-weight-bold">✓</span>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <input asp-for="Phone" class="form-control" disabled />
+                                <button id="email-verification" type="submit" asp-page-handler="SendVerificationPhone" class="btn btn-link">Send verification message</button>
+                            }
+                        </li>
+                    }*@
+                    <li class="xenial-form__list-item">
+                        <label asp-for="Input.NewPhone"></label>
+                        <input asp-for="Input.NewPhone" class="form-control" />
+                        <span asp-validation-for="Input.NewPhone" class="text-danger"></span>
+                    </li>
+                    <li class="xenial-form__list-item">
+                        <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="xenial-form__list-item-submit">Change phone number</button>
+                    </li>
+                </ul>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
