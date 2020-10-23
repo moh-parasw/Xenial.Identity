@@ -1,0 +1,8 @@
+@import "forms";
+@import "tabs";
+
+.add-logins-page {
+  max-width: 370px;
+  @include tab-pages(1);
+  @include xenial-form(1000rem);
+}
