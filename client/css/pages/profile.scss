@@ -1,8 +1,8 @@
-.xenial-body {
+.xenial-body.show-aside {
   .article-wrapper {
     display: flex;
     flex-direction: column-reverse;
-    .show-aside {
+    aside {
       display: block;
       width: auto;
       padding: 0;
@@ -10,11 +10,29 @@
       overflow: auto;
       position: static;
       max-height: unset;
-      top:unset;
-
+      top: unset;
     }
   }
+}
+@media (min-width: 768px) {
+  .xenial-body.show-aside {
+    .article-wrapper {
+      display: flex;
+      flex-direction: row-reverse;
+      aside {
+        display: block;
+        margin-top: 3rem;
+        margin-right: auto;
+      }
+      article {
+        margin-top: 3rem;
+        margin-left: auto;
+      }
+    }
+  }
+}
 
+.xenial-body {
   .profile-page {
     display: flex;
     flex-direction: column;
@@ -34,21 +52,6 @@
     &__cards {
       display: flex;
       flex-direction: column;
-    }
-  }
-  @media (min-width: 768px) {
-    .article-wrapper {
-      display: flex;
-      flex-direction: row-reverse;
-      .show-aside {
-        display: block;
-        margin-top: 3rem;
-        margin-right: auto;
-      }
-      article {
-        margin-top: 3rem;
-        margin-left: auto;
-      }
     }
   }
 }

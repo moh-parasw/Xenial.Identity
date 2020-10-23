@@ -18,12 +18,12 @@
 </head>
 <body>
     <input class="xenial__toggletheme-checkbox" id="xenial-toggle-theme" type="checkbox" aria-hidden="true">
-    <div class="xenial-body">
+    <div class="xenial-body @ViewContext.ViewData["ASideClass"]">
         <partial name="_Nav" />
     
         <main>
             <div class="article-wrapper">
-                <aside class="@(ViewContext.ViewData["ASideClass"])"> @RenderSection("aside", required: false)</aside>
+                <aside>@RenderSection("aside", required: false)</aside>
                 <article>
                     @RenderBody()
                 </article>
