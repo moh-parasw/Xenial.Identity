@@ -201,6 +201,8 @@ namespace Xenial.Identity
             //        }
             //    }
             //});
+
+            services.AddServerSideBlazor();
         }
 
         public void Configure(IApplicationBuilder app)
@@ -218,6 +220,7 @@ namespace Xenial.Identity
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapBlazorHub();
                 endpoints.MapRazorPages();
                 endpoints.MapDefaultControllerRoute();
             });

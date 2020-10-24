@@ -30,6 +30,8 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
             public string FirstName { get; set; }
             [Display(Name = "Last Name")]
             public string LastName { get; set; }
+
+            [BindProperty(SupportsGet = true)]
             public string Color { get; set; }
             public string Initials { get; set; }
 
@@ -108,14 +110,20 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                 await SetOrUpdateClaimAsync(user, new Claim("name", user.FullName ?? string.Empty));
                 await SetOrUpdateClaimAsync(user, new Claim("family_name", user.LastName ?? string.Empty));
                 await SetOrUpdateClaimAsync(user, new Claim("given_name", user.FirstName ?? string.Empty));
-                //await SetOrUpdateClaimAsync(user, new Claim("profile", absProfileUrl));
+                //TODO: Picture and Public Profile
                 //await SetOrUpdateClaimAsync(user, new Claim("picture", absProfilePictureUrl));
                 //await SetOrUpdateClaimAsync(user, new Claim("website", user.Website ?? string.Empty));
+                //await SetOrUpdateClaimAsync(user, new Claim("profile", absProfileUrl));
+
+                //TODO: Map if needed
                 //await SetOrUpdateClaimAsync(user, new Claim("gender", user.Gender ?? string.Empty));
                 //await SetOrUpdateClaimAsync(user, new Claim("birthdate", user.Birthdate?.ToString("YYYY-MM-DD") ?? string.Empty));
                 //await SetOrUpdateClaimAsync(user, new Claim("zoneinfo", user.Zoneinfo ?? string.Empty));
                 //await SetOrUpdateClaimAsync(user, new Claim("locale", user.Locale ?? string.Empty));
                 await SetOrUpdateClaimAsync(user, new Claim("updated_at", ConvertToUnixTimestamp(user.UpdatedAt)?.ToString() ?? string.Empty));
+
+                await SetOrUpdateClaimAsync(user, new Claim("backcolor", user.Color ?? string.Empty));
+                await SetOrUpdateClaimAsync(user, new Claim("forecolor", (Xenial.Identity.Components.MaterialColorPicker.ColorIsDark(user.Color) ? "#FFFFFF" : "#000000") ?? string.Empty));
 
                 var streetAddress = string.Join(" ", new[] { user.AddressStreetAddress1, user.AddressStreetAddress2 }.Where(s => !string.IsNullOrWhiteSpace(s)));
                 var postalAddress = string.Join(" ", new[] { user.AddressPostalCode, user.AddressLocality }.Where(s => !string.IsNullOrWhiteSpace(s)));
@@ -139,6 +147,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                 else
                 {
                     StatusMessage = "Profile was updated successfully.";
+                    await signInManager.RefreshSignInAsync(user);
                 }
             }
             else

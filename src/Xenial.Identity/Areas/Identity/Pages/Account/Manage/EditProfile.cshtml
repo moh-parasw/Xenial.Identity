@@ -35,12 +35,12 @@
                             <input asp-for="Input.FullName" type="text" />
                         </li>
                         <li class="xenial-form__list-item inline">
-                            <div>
+                            <div class="inline">
                                 <label asp-for="Input.FirstName"></label>
                                 <input asp-for="Input.FirstName" />
                                 <span asp-validation-for="Input.FirstName" class="text-danger"></span>
                             </div>
-                            <div>
+                            <div class="inline">
                                 <label asp-for="Input.LastName"></label>
                                 <input asp-for="Input.LastName" />
                                 <span asp-validation-for="Input.LastName" class="text-danger"></span>
@@ -49,10 +49,12 @@
                         <li class="xenial-form__list-item inline">
                             <div>
                                 <label asp-for="Input.Color"></label>
-                                <input asp-for="Input.Color" />
+                                <component type="typeof(MaterialColorPicker)" render-mode="ServerPrerendered"
+                                           param-Value="Model.Input.Color" param-InputName="@("Input.Color")" param-InputId="@("Input_Color")" />
+
                                 <span asp-validation-for="Input.Color" class="text-danger"></span>
                             </div>
-                            <div>
+                            <div class="inline">
                                 <label asp-for="Input.Initials"></label>
                                 <input asp-for="Input.Initials" />
                                 <span asp-validation-for="Input.Initials" class="text-danger"></span>
@@ -81,24 +83,24 @@
                             <span asp-validation-for="Input.AddressStreetAddress2" class="text-danger"></span>
                         </li>
                         <li class="xenial-form__list-item inline">
-                            <div>
+                            <div class="inline">
                                 <label asp-for="Input.AddressLocality"></label>
                                 <input asp-for="Input.AddressLocality" />
                                 <span asp-validation-for="Input.AddressLocality" class="text-danger"></span>
                             </div>
-                            <div>
+                            <div class="inline">
                                 <label asp-for="Input.AddressPostalCode"></label>
                                 <input asp-for="Input.AddressPostalCode" />
                                 <span asp-validation-for="Input.AddressPostalCode" class="text-danger"></span>
                             </div>
                         </li>
                         <li class="xenial-form__list-item inline">
-                            <div>
+                            <div class="inline">
                                 <label asp-for="Input.AddressRegion"></label>
                                 <input asp-for="Input.AddressRegion" />
                                 <span asp-validation-for="Input.AddressRegion" class="text-danger"></span>
                             </div>
-                            <div>
+                            <div class="inline">
                                 <label asp-for="Input.AddressCountry"></label>
                                 <input asp-for="Input.AddressCountry" />
                                 <span asp-validation-for="Input.AddressCountry" class="text-danger"></span>

@@ -1,0 +1,734 @@
+﻿
+<div class="material-color-picker">
+    <OutsideHandleContainer OnClickOutside="() => ShowPopUp = false">
+        @if (CurrentColor != null)
+        {
+            <div @onclick="() => OnCurrentColorClicked(CurrentColor)"
+                 @onfocusout="@(() => ShowPopUp = false)"
+                 class="material-color-picker__color material-color-picker__current-color"
+                 style="@GetColorStyle(CurrentColor)"
+                 title="@CurrentColor.Name">
+            </div>
+        }
+        else
+        {
+            <div @onclick="() => OnCurrentColorClicked(null)"
+                 @onfocusout="@(() => ShowPopUp = false)"
+                 class="material-color-picker__color material-color-picker__current-color"
+                 style="@GetColorStyle(new ColorPalette
+                         {
+                             Value = "black"
+                         })"
+                 title="Please pick a color">
+            </div>
+        }
+        @if (ShowPopUp)
+        {
+            <div class="material-color-picker__color-wrapper"
+                 style="@((FixedMinHeight ? $"width: {WrapperWidth}; min-height: {WrapperMinHeight}" : $"width: {WrapperWidth}"))">
+                @if (!string.IsNullOrEmpty(SubPalette))
+                {
+                    <div @onclick="() => SubPalette = null"
+                         class="material-color-picker__back-icon"
+                         style="@(($"margin: {ColorMargin}px; height: {ColorSizePx}; width: {ColorSizePx}"))">
+                        <svg fill="#000000"
+                             height="@ColorSize"
+                             viewBox="0 0 24 24"
+                             width="@((ColorSize / 2))"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 0h24v24H0z" fill="none" />
+                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+                        </svg>
+                    </div>
+                }
+
+                @foreach (var color in Colors)
+                {
+                    <div @onclick="() => ColorClicked(color)"
+                         class="material-color-picker__color"
+                         style="@GetColorStyle(color)"
+                         title="@color.Name">
+
+                        <span class="@(($"{GetClass("visible", color.Value.ToLower() == Value.ToLower() || IsTintOfSelected(color))} {GetClass("is-light", ColorIsLight(color.Value))}"))">
+                            <span style="@(($"width: {ColorSize - 8}px; height: {ColorSize - 8}px"))"
+                                  class="material-color-picker__outer-circle"></span>
+
+                            <span style="@(($"width: {ColorSize - 22}px; height: {ColorSize - 22}px"))"
+                                  class="material-color-picker__inner-circle"></span>
+                        </span>
+                    </div>
+                }
+            </div>
+        }
+
+    </OutsideHandleContainer>
+    <input type="hidden" id="@InputId" name="@InputName" value="@Value" />
+</div>
+
+@code {
+
+    private bool showPopUp;
+    private bool ShowPopUp
+    {
+        get => showPopUp; set
+        {
+            showPopUp = value;
+            StateHasChanged();
+        }
+    }
+
+    string GetClass(string @class, bool value)
+    {
+        if (value)
+        {
+            return @class;
+        }
+        return string.Empty;
+    }
+
+    private string _Value = string.Empty;
+    [Parameter]
+    public string Value
+    {
+        get => _Value ?? string.Empty;
+        set
+        {
+            _Value = value;
+            CurrentColor = string.IsNullOrEmpty(value)
+            ? null
+            : new ColorPalette
+            {
+                Value = value
+            };
+        }
+    }
+
+    [Parameter]
+    public string InputId { get; set; }
+    [Parameter]
+    public string InputName { get; set; }
+
+    [Parameter]
+    public ColorPalette Palette { get; set; } = MaterialPaletteFull;
+    [Parameter]
+    public int ColorSize { get; set; } = 54;
+    [Parameter]
+    public int ColorsPerRow { get; set; } = 5;
+    [Parameter]
+    public int ColorMargin { get; set; } = 6;
+    [Parameter]
+    public int DefaultTint { get; set; } = 500;
+    [Parameter]
+    public bool FixedMinHeight { get; set; } = true;
+    [Parameter]
+    public bool UseSpectrumPicker { get; set; } = true;
+
+    private ColorPalette CurrentColor { get; set; }
+
+    private string SubPalette { get; set; }
+
+    public string SelectedColorName { get; set; }
+
+    string WrapperMinHeight
+    {
+        get
+        {
+            var numberOfRows = (Palette?.Keys?.Count ?? 0) / this.ColorsPerRow;
+            return ((this.ColorSize * numberOfRows) + (this.ColorMargin * numberOfRows * 2)) + "px";
+        }
+    }
+
+    string WrapperWidth => ((this.ColorSize * this.ColorsPerRow) + (this.ColorMargin * this.ColorsPerRow * 2)) + "px";
+
+    string ColorSizePx => ColorSize + "px";
+
+    string GetColorStyle(ColorPalette color)
+    {
+        return $@"
+background: {color.Value};
+margin: {ColorMargin}px;
+height: {ColorSizePx};
+width: {ColorSizePx};
+";
+    }
+
+    IList<ColorPalette> Colors
+    {
+        get
+        {
+            IEnumerable<ColorPalette> GetColors()
+            {
+                var palette = !string.IsNullOrEmpty(SubPalette) ? Palette[SubPalette] : Palette;
+                var subName = !string.IsNullOrEmpty(SubPalette) ? SubPalette + " - " : string.Empty;
+
+                foreach (var pair in palette)
+                {
+
+                    yield return new ColorPalette
+                    {
+                        Value = palette.ContainsKey(pair.Key) && !string.IsNullOrEmpty(palette[pair.Key].Value)
+                        ? palette[pair.Key].Value
+                        : GetDefaultColor(palette[pair.Key]),
+                        Name = subName + pair.Key
+                    };
+                }
+            }
+            return GetColors().ToList();
+        }
+    }
+
+    string GetDefaultColor(ColorPalette colorObj)
+    {
+        if (colorObj.ContainsKey(this.DefaultTint.ToString()))
+            return colorObj[this.DefaultTint.ToString()].Value;
+
+        return colorObj[Math.Round(colorObj.Keys.Count / 2d - 1).ToString()]?.Value;
+    }
+
+    [System.Diagnostics.DebuggerDisplay("Name: {Name} Value: {Value} Count: {Count}")]
+    public class ColorPalette : Dictionary<string, ColorPalette>
+    {
+        public string Value { get; set; }
+        public string Name { get; set; }
+    }
+
+    public bool IsTintOfSelected(ColorPalette color)
+    {
+        return this.SelectedColorName == color.Name && this.Palette[this.SelectedColorName].Values.Select(v => v.Name).ToList().Contains(this.Value);
+    }
+
+    public static bool ColorIsLight(string color) => ColorIsLight(color, 210);
+
+    public static bool ColorIsLight(string color, int differenceRange = 125)
+    {
+        System.Diagnostics.Debug.Assert(color.Length == 7, "color must have a length of 7 hex numbers");
+        var c = System.Drawing.ColorTranslator.FromHtml(color);
+
+        return ((c.R * 320 + c.G * 560 + c.B * 110) / 1000) > differenceRange; // suggested by w3
+    }
+
+    public static bool ColorIsDark(string color, int differenceRange = 125)
+        => !ColorIsLight(color, differenceRange);
+
+    void ColorClicked(ColorPalette color)
+    {
+        if (UseSpectrumPicker)
+        {
+            if (Palette.ContainsKey(color.Name) && Palette[color.Name] is ColorPalette)
+            {
+                SubPalette = color.Name;
+                if (IsTintOfSelected(color)) return;
+                SelectedColorName = color.Name;
+            }
+            else
+            {
+                ShowPopUp = false;
+            }
+            Value = color.Value;
+            CurrentColor = color;
+        }
+        else
+        {
+            Value = color.Value;
+            CurrentColor = color;
+            ShowPopUp = false;
+        }
+    }
+
+    void OnCurrentColorClicked(ColorPalette color)
+    {
+        ShowPopUp = !ShowPopUp;
+    }
+
+    #region ColorPalettes
+
+    public static ColorPalette MaterialPalette = new ColorPalette
+    {
+        ["red"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#ffebee" },
+            ["100"] = new ColorPalette { Value = "#ffcdd2" },
+            ["200"] = new ColorPalette { Value = "#ef9a9a" },
+            ["300"] = new ColorPalette { Value = "#e57373" },
+            ["400"] = new ColorPalette { Value = "#ef5350" },
+            ["500"] = new ColorPalette { Value = "#f44336" },
+            ["600"] = new ColorPalette { Value = "#e53935" },
+            ["700"] = new ColorPalette { Value = "#d32f2f" },
+            ["800"] = new ColorPalette { Value = "#c62828" },
+            ["900"] = new ColorPalette { Value = "#b71c1c" },
+        },
+        ["pink"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#fce4ec" },
+            ["100"] = new ColorPalette { Value = "#f8bbd0" },
+            ["200"] = new ColorPalette { Value = "#f48fb1" },
+            ["300"] = new ColorPalette { Value = "#f06292" },
+            ["400"] = new ColorPalette { Value = "#ec407a" },
+            ["500"] = new ColorPalette { Value = "#e91e63" },
+            ["600"] = new ColorPalette { Value = "#d81b60" },
+            ["700"] = new ColorPalette { Value = "#c2185b" },
+            ["800"] = new ColorPalette { Value = "#ad1457" },
+            ["900"] = new ColorPalette { Value = "#880e4f" },
+        },
+        ["purple"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#f3e5f5" },
+            ["100"] = new ColorPalette { Value = "#e1bee7" },
+            ["200"] = new ColorPalette { Value = "#ce93d8" },
+            ["300"] = new ColorPalette { Value = "#ba68c8" },
+            ["400"] = new ColorPalette { Value = "#ab47bc" },
+            ["500"] = new ColorPalette { Value = "#9c27b0" },
+            ["600"] = new ColorPalette { Value = "#8e24aa" },
+            ["700"] = new ColorPalette { Value = "#7b1fa2" },
+            ["800"] = new ColorPalette { Value = "#6a1b9a" },
+            ["900"] = new ColorPalette { Value = "#4a148c" },
+        },
+        ["deep-purple"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#ede7f6" },
+            ["100"] = new ColorPalette { Value = "#d1c4e9" },
+            ["200"] = new ColorPalette { Value = "#b39ddb" },
+            ["300"] = new ColorPalette { Value = "#9575cd" },
+            ["400"] = new ColorPalette { Value = "#7e57c2" },
+            ["500"] = new ColorPalette { Value = "#673ab7" },
+            ["600"] = new ColorPalette { Value = "#5e35b1" },
+            ["700"] = new ColorPalette { Value = "#512da8" },
+            ["800"] = new ColorPalette { Value = "#4527a0" },
+            ["900"] = new ColorPalette { Value = "#311b92" },
+        },
+        ["indigo"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#e8eaf6" },
+            ["100"] = new ColorPalette { Value = "#c5cae9" },
+            ["200"] = new ColorPalette { Value = "#9fa8da" },
+            ["300"] = new ColorPalette { Value = "#7986cb" },
+            ["400"] = new ColorPalette { Value = "#5c6bc0" },
+            ["500"] = new ColorPalette { Value = "#3f51b5" },
+            ["600"] = new ColorPalette { Value = "#3949ab" },
+            ["700"] = new ColorPalette { Value = "#303f9f" },
+            ["800"] = new ColorPalette { Value = "#283593" },
+            ["900"] = new ColorPalette { Value = "#1a237e" },
+        },
+        ["blue"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#e3f2fd" },
+            ["100"] = new ColorPalette { Value = "#bbdefb" },
+            ["200"] = new ColorPalette { Value = "#90caf9" },
+            ["300"] = new ColorPalette { Value = "#64b5f6" },
+            ["400"] = new ColorPalette { Value = "#42a5f5" },
+            ["500"] = new ColorPalette { Value = "#2196f3" },
+            ["600"] = new ColorPalette { Value = "#1e88e5" },
+            ["700"] = new ColorPalette { Value = "#1976d2" },
+            ["800"] = new ColorPalette { Value = "#1565c0" },
+            ["900"] = new ColorPalette { Value = "#0d47a1" },
+        },
+        ["light-blue"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#e1f5fe" },
+            ["100"] = new ColorPalette { Value = "#b3e5fc" },
+            ["200"] = new ColorPalette { Value = "#81d4fa" },
+            ["300"] = new ColorPalette { Value = "#4fc3f7" },
+            ["400"] = new ColorPalette { Value = "#29b6f6" },
+            ["500"] = new ColorPalette { Value = "#03a9f4" },
+            ["600"] = new ColorPalette { Value = "#039be5" },
+            ["700"] = new ColorPalette { Value = "#0288d1" },
+            ["800"] = new ColorPalette { Value = "#0277bd" },
+            ["900"] = new ColorPalette { Value = "#01579b" },
+        },
+        ["cyan"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#e0f7fa" },
+            ["100"] = new ColorPalette { Value = "#b2ebf2" },
+            ["200"] = new ColorPalette { Value = "#80deea" },
+            ["300"] = new ColorPalette { Value = "#4dd0e1" },
+            ["400"] = new ColorPalette { Value = "#26c6da" },
+            ["500"] = new ColorPalette { Value = "#00bcd4" },
+            ["600"] = new ColorPalette { Value = "#00acc1" },
+            ["700"] = new ColorPalette { Value = "#0097a7" },
+            ["800"] = new ColorPalette { Value = "#00838f" },
+            ["900"] = new ColorPalette { Value = "#006064" },
+        },
+        ["teal"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#e0f2f1" },
+            ["100"] = new ColorPalette { Value = "#b2dfdb" },
+            ["200"] = new ColorPalette { Value = "#80cbc4" },
+            ["300"] = new ColorPalette { Value = "#4db6ac" },
+            ["400"] = new ColorPalette { Value = "#26a69a" },
+            ["500"] = new ColorPalette { Value = "#009688" },
+            ["600"] = new ColorPalette { Value = "#00897b" },
+            ["700"] = new ColorPalette { Value = "#00796b" },
+            ["800"] = new ColorPalette { Value = "#00695c" },
+            ["900"] = new ColorPalette { Value = "#004d40" },
+        },
+        ["green"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#e8f5e9" },
+            ["100"] = new ColorPalette { Value = "#c8e6c9" },
+            ["200"] = new ColorPalette { Value = "#a5d6a7" },
+            ["300"] = new ColorPalette { Value = "#81c784" },
+            ["400"] = new ColorPalette { Value = "#66bb6a" },
+            ["500"] = new ColorPalette { Value = "#4caf50" },
+            ["600"] = new ColorPalette { Value = "#43a047" },
+            ["700"] = new ColorPalette { Value = "#388e3c" },
+            ["800"] = new ColorPalette { Value = "#2e7d32" },
+            ["900"] = new ColorPalette { Value = "#1b5e20" },
+        },
+        ["light-green"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#f1f8e9" },
+            ["100"] = new ColorPalette { Value = "#dcedc8" },
+            ["200"] = new ColorPalette { Value = "#c5e1a5" },
+            ["300"] = new ColorPalette { Value = "#aed581" },
+            ["400"] = new ColorPalette { Value = "#9ccc65" },
+            ["500"] = new ColorPalette { Value = "#8bc34a" },
+            ["600"] = new ColorPalette { Value = "#7cb342" },
+            ["700"] = new ColorPalette { Value = "#689f38" },
+            ["800"] = new ColorPalette { Value = "#558b2f" },
+            ["900"] = new ColorPalette { Value = "#33691e" },
+        },
+        ["lime"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#f9fbe7" },
+            ["100"] = new ColorPalette { Value = "#f0f4c3" },
+            ["200"] = new ColorPalette { Value = "#e6ee9c" },
+            ["300"] = new ColorPalette { Value = "#dce775" },
+            ["400"] = new ColorPalette { Value = "#d4e157" },
+            ["500"] = new ColorPalette { Value = "#cddc39" },
+            ["600"] = new ColorPalette { Value = "#c0ca33" },
+            ["700"] = new ColorPalette { Value = "#afb42b" },
+            ["800"] = new ColorPalette { Value = "#9e9d24" },
+            ["900"] = new ColorPalette { Value = "#827717" },
+        },
+        ["yellow"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#fffde7" },
+            ["100"] = new ColorPalette { Value = "#fff9c4" },
+            ["200"] = new ColorPalette { Value = "#fff59d" },
+            ["300"] = new ColorPalette { Value = "#fff176" },
+            ["400"] = new ColorPalette { Value = "#ffee58" },
+            ["500"] = new ColorPalette { Value = "#ffeb3b" },
+            ["600"] = new ColorPalette { Value = "#fdd835" },
+            ["700"] = new ColorPalette { Value = "#fbc02d" },
+            ["800"] = new ColorPalette { Value = "#f9a825" },
+            ["900"] = new ColorPalette { Value = "#f57f17" },
+        },
+        ["amber"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#fff8e1" },
+            ["100"] = new ColorPalette { Value = "#ffecb3" },
+            ["200"] = new ColorPalette { Value = "#ffe082" },
+            ["300"] = new ColorPalette { Value = "#ffd54f" },
+            ["400"] = new ColorPalette { Value = "#ffca28" },
+            ["500"] = new ColorPalette { Value = "#ffc107" },
+            ["600"] = new ColorPalette { Value = "#ffb300" },
+            ["700"] = new ColorPalette { Value = "#ffa000" },
+            ["800"] = new ColorPalette { Value = "#ff8f00" },
+            ["900"] = new ColorPalette { Value = "#ff6f00" },
+        },
+        ["orange"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#fff3e0" },
+            ["100"] = new ColorPalette { Value = "#ffe0b2" },
+            ["200"] = new ColorPalette { Value = "#ffcc80" },
+            ["300"] = new ColorPalette { Value = "#ffb74d" },
+            ["400"] = new ColorPalette { Value = "#ffa726" },
+            ["500"] = new ColorPalette { Value = "#ff9800" },
+            ["600"] = new ColorPalette { Value = "#fb8c00" },
+            ["700"] = new ColorPalette { Value = "#f57c00" },
+            ["800"] = new ColorPalette { Value = "#ef6c00" },
+            ["900"] = new ColorPalette { Value = "#e65100" },
+        },
+        ["deep-orange"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#fbe9e7" },
+            ["100"] = new ColorPalette { Value = "#ffccbc" },
+            ["200"] = new ColorPalette { Value = "#ffab91" },
+            ["300"] = new ColorPalette { Value = "#ff8a65" },
+            ["400"] = new ColorPalette { Value = "#ff7043" },
+            ["500"] = new ColorPalette { Value = "#ff5722" },
+            ["600"] = new ColorPalette { Value = "#f4511e" },
+            ["700"] = new ColorPalette { Value = "#e64a19" },
+            ["800"] = new ColorPalette { Value = "#d84315" },
+            ["900"] = new ColorPalette { Value = "#bf360c" },
+        },
+        ["brown"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#efebe9" },
+            ["100"] = new ColorPalette { Value = "#d7ccc8" },
+            ["200"] = new ColorPalette { Value = "#bcaaa4" },
+            ["300"] = new ColorPalette { Value = "#a1887f" },
+            ["400"] = new ColorPalette { Value = "#8d6e63" },
+            ["500"] = new ColorPalette { Value = "#795548" },
+            ["600"] = new ColorPalette { Value = "#6d4c41" },
+            ["700"] = new ColorPalette { Value = "#5d4037" },
+            ["800"] = new ColorPalette { Value = "#4e342e" },
+            ["900"] = new ColorPalette { Value = "#3e2723" },
+        },
+        ["grey"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#fafafa" },
+            ["100"] = new ColorPalette { Value = "#f5f5f5" },
+            ["200"] = new ColorPalette { Value = "#eeeeee" },
+            ["300"] = new ColorPalette { Value = "#e0e0e0" },
+            ["400"] = new ColorPalette { Value = "#bdbdbd" },
+            ["500"] = new ColorPalette { Value = "#9e9e9e" },
+            ["600"] = new ColorPalette { Value = "#757575" },
+            ["700"] = new ColorPalette { Value = "#616161" },
+            ["800"] = new ColorPalette { Value = "#424242" },
+            ["900"] = new ColorPalette { Value = "#212121" },
+        },
+        ["blue-grey"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#eceff1" },
+            ["100"] = new ColorPalette { Value = "#cfd8dc" },
+            ["200"] = new ColorPalette { Value = "#b0bec5" },
+            ["300"] = new ColorPalette { Value = "#90a4ae" },
+            ["400"] = new ColorPalette { Value = "#78909c" },
+            ["500"] = new ColorPalette { Value = "#607d8b" },
+            ["600"] = new ColorPalette { Value = "#546e7a" },
+            ["700"] = new ColorPalette { Value = "#455a64" },
+            ["800"] = new ColorPalette { Value = "#37474f" },
+            ["900"] = new ColorPalette { Value = "#263238" },
+        },
+    };
+
+    public static ColorPalette MaterialPaletteAccent = new ColorPalette
+    {
+        ["red"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#ffebee" },
+            ["100"] = new ColorPalette { Value = "#ffcdd2" },
+            ["200"] = new ColorPalette { Value = "#ef9a9a" },
+            ["300"] = new ColorPalette { Value = "#e57373" },
+            ["400"] = new ColorPalette { Value = "#ef5350" },
+            ["500"] = new ColorPalette { Value = "#f44336" },
+            ["600"] = new ColorPalette { Value = "#e53935" },
+            ["700"] = new ColorPalette { Value = "#d32f2f" },
+            ["800"] = new ColorPalette { Value = "#c62828" },
+            ["900"] = new ColorPalette { Value = "#b71c1c" },
+        },
+        ["pink"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#fce4ec" },
+            ["100"] = new ColorPalette { Value = "#f8bbd0" },
+            ["200"] = new ColorPalette { Value = "#f48fb1" },
+            ["300"] = new ColorPalette { Value = "#f06292" },
+            ["400"] = new ColorPalette { Value = "#ec407a" },
+            ["500"] = new ColorPalette { Value = "#e91e63" },
+            ["600"] = new ColorPalette { Value = "#d81b60" },
+            ["700"] = new ColorPalette { Value = "#c2185b" },
+            ["800"] = new ColorPalette { Value = "#ad1457" },
+            ["900"] = new ColorPalette { Value = "#880e4f" },
+        },
+        ["purple"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#f3e5f5" },
+            ["100"] = new ColorPalette { Value = "#e1bee7" },
+            ["200"] = new ColorPalette { Value = "#ce93d8" },
+            ["300"] = new ColorPalette { Value = "#ba68c8" },
+            ["400"] = new ColorPalette { Value = "#ab47bc" },
+            ["500"] = new ColorPalette { Value = "#9c27b0" },
+            ["600"] = new ColorPalette { Value = "#8e24aa" },
+            ["700"] = new ColorPalette { Value = "#7b1fa2" },
+            ["800"] = new ColorPalette { Value = "#6a1b9a" },
+            ["900"] = new ColorPalette { Value = "#4a148c" },
+        },
+        ["deep-purple"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#ede7f6" },
+            ["100"] = new ColorPalette { Value = "#d1c4e9" },
+            ["200"] = new ColorPalette { Value = "#b39ddb" },
+            ["300"] = new ColorPalette { Value = "#9575cd" },
+            ["400"] = new ColorPalette { Value = "#7e57c2" },
+            ["500"] = new ColorPalette { Value = "#673ab7" },
+            ["600"] = new ColorPalette { Value = "#5e35b1" },
+            ["700"] = new ColorPalette { Value = "#512da8" },
+            ["800"] = new ColorPalette { Value = "#4527a0" },
+            ["900"] = new ColorPalette { Value = "#311b92" },
+        },
+        ["indigo"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#e8eaf6" },
+            ["100"] = new ColorPalette { Value = "#c5cae9" },
+            ["200"] = new ColorPalette { Value = "#9fa8da" },
+            ["300"] = new ColorPalette { Value = "#7986cb" },
+            ["400"] = new ColorPalette { Value = "#5c6bc0" },
+            ["500"] = new ColorPalette { Value = "#3f51b5" },
+            ["600"] = new ColorPalette { Value = "#3949ab" },
+            ["700"] = new ColorPalette { Value = "#303f9f" },
+            ["800"] = new ColorPalette { Value = "#283593" },
+            ["900"] = new ColorPalette { Value = "#1a237e" },
+        },
+        ["blue"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#e3f2fd" },
+            ["100"] = new ColorPalette { Value = "#bbdefb" },
+            ["200"] = new ColorPalette { Value = "#90caf9" },
+            ["300"] = new ColorPalette { Value = "#64b5f6" },
+            ["400"] = new ColorPalette { Value = "#42a5f5" },
+            ["500"] = new ColorPalette { Value = "#2196f3" },
+            ["600"] = new ColorPalette { Value = "#1e88e5" },
+            ["700"] = new ColorPalette { Value = "#1976d2" },
+            ["800"] = new ColorPalette { Value = "#1565c0" },
+            ["900"] = new ColorPalette { Value = "#0d47a1" },
+        },
+        ["light-blue"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#e1f5fe" },
+            ["100"] = new ColorPalette { Value = "#b3e5fc" },
+            ["200"] = new ColorPalette { Value = "#81d4fa" },
+            ["300"] = new ColorPalette { Value = "#4fc3f7" },
+            ["400"] = new ColorPalette { Value = "#29b6f6" },
+            ["500"] = new ColorPalette { Value = "#03a9f4" },
+            ["600"] = new ColorPalette { Value = "#039be5" },
+            ["700"] = new ColorPalette { Value = "#0288d1" },
+            ["800"] = new ColorPalette { Value = "#0277bd" },
+            ["900"] = new ColorPalette { Value = "#01579b" },
+        },
+        ["cyan"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#e0f7fa" },
+            ["100"] = new ColorPalette { Value = "#b2ebf2" },
+            ["200"] = new ColorPalette { Value = "#80deea" },
+            ["300"] = new ColorPalette { Value = "#4dd0e1" },
+            ["400"] = new ColorPalette { Value = "#26c6da" },
+            ["500"] = new ColorPalette { Value = "#00bcd4" },
+            ["600"] = new ColorPalette { Value = "#00acc1" },
+            ["700"] = new ColorPalette { Value = "#0097a7" },
+            ["800"] = new ColorPalette { Value = "#00838f" },
+            ["900"] = new ColorPalette { Value = "#006064" },
+        },
+        ["teal"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#e0f2f1" },
+            ["100"] = new ColorPalette { Value = "#b2dfdb" },
+            ["200"] = new ColorPalette { Value = "#80cbc4" },
+            ["300"] = new ColorPalette { Value = "#4db6ac" },
+            ["400"] = new ColorPalette { Value = "#26a69a" },
+            ["500"] = new ColorPalette { Value = "#009688" },
+            ["600"] = new ColorPalette { Value = "#00897b" },
+            ["700"] = new ColorPalette { Value = "#00796b" },
+            ["800"] = new ColorPalette { Value = "#00695c" },
+            ["900"] = new ColorPalette { Value = "#004d40" },
+        },
+        ["green"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#e8f5e9" },
+            ["100"] = new ColorPalette { Value = "#c8e6c9" },
+            ["200"] = new ColorPalette { Value = "#a5d6a7" },
+            ["300"] = new ColorPalette { Value = "#81c784" },
+            ["400"] = new ColorPalette { Value = "#66bb6a" },
+            ["500"] = new ColorPalette { Value = "#4caf50" },
+            ["600"] = new ColorPalette { Value = "#43a047" },
+            ["700"] = new ColorPalette { Value = "#388e3c" },
+            ["800"] = new ColorPalette { Value = "#2e7d32" },
+            ["900"] = new ColorPalette { Value = "#1b5e20" },
+        },
+        ["light-green"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#f1f8e9" },
+            ["100"] = new ColorPalette { Value = "#dcedc8" },
+            ["200"] = new ColorPalette { Value = "#c5e1a5" },
+            ["300"] = new ColorPalette { Value = "#aed581" },
+            ["400"] = new ColorPalette { Value = "#9ccc65" },
+            ["500"] = new ColorPalette { Value = "#8bc34a" },
+            ["600"] = new ColorPalette { Value = "#7cb342" },
+            ["700"] = new ColorPalette { Value = "#689f38" },
+            ["800"] = new ColorPalette { Value = "#558b2f" },
+            ["900"] = new ColorPalette { Value = "#33691e" },
+        },
+        ["lime"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#f9fbe7" },
+            ["100"] = new ColorPalette { Value = "#f0f4c3" },
+            ["200"] = new ColorPalette { Value = "#e6ee9c" },
+            ["300"] = new ColorPalette { Value = "#dce775" },
+            ["400"] = new ColorPalette { Value = "#d4e157" },
+            ["500"] = new ColorPalette { Value = "#cddc39" },
+            ["600"] = new ColorPalette { Value = "#c0ca33" },
+            ["700"] = new ColorPalette { Value = "#afb42b" },
+            ["800"] = new ColorPalette { Value = "#9e9d24" },
+            ["900"] = new ColorPalette { Value = "#827717" },
+        },
+        ["yellow"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#fffde7" },
+            ["100"] = new ColorPalette { Value = "#fff9c4" },
+            ["200"] = new ColorPalette { Value = "#fff59d" },
+            ["300"] = new ColorPalette { Value = "#fff176" },
+            ["400"] = new ColorPalette { Value = "#ffee58" },
+            ["500"] = new ColorPalette { Value = "#ffeb3b" },
+            ["600"] = new ColorPalette { Value = "#fdd835" },
+            ["700"] = new ColorPalette { Value = "#fbc02d" },
+            ["800"] = new ColorPalette { Value = "#f9a825" },
+            ["900"] = new ColorPalette { Value = "#f57f17" },
+        },
+        ["amber"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#fff8e1" },
+            ["100"] = new ColorPalette { Value = "#ffecb3" },
+            ["200"] = new ColorPalette { Value = "#ffe082" },
+            ["300"] = new ColorPalette { Value = "#ffd54f" },
+            ["400"] = new ColorPalette { Value = "#ffca28" },
+            ["500"] = new ColorPalette { Value = "#ffc107" },
+            ["600"] = new ColorPalette { Value = "#ffb300" },
+            ["700"] = new ColorPalette { Value = "#ffa000" },
+            ["800"] = new ColorPalette { Value = "#ff8f00" },
+            ["900"] = new ColorPalette { Value = "#ff6f00" },
+        },
+        ["orange"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#fff3e0" },
+            ["100"] = new ColorPalette { Value = "#ffe0b2" },
+            ["200"] = new ColorPalette { Value = "#ffcc80" },
+            ["300"] = new ColorPalette { Value = "#ffb74d" },
+            ["400"] = new ColorPalette { Value = "#ffa726" },
+            ["500"] = new ColorPalette { Value = "#ff9800" },
+            ["600"] = new ColorPalette { Value = "#fb8c00" },
+            ["700"] = new ColorPalette { Value = "#f57c00" },
+            ["800"] = new ColorPalette { Value = "#ef6c00" },
+            ["900"] = new ColorPalette { Value = "#e65100" },
+        },
+        ["deep-orange"] = new ColorPalette
+        {
+            ["50"] = new ColorPalette { Value = "#fbe9e7" },
+            ["100"] = new ColorPalette { Value = "#ffccbc" },
+            ["200"] = new ColorPalette { Value = "#ffab91" },
+            ["300"] = new ColorPalette { Value = "#ff8a65" },
+            ["400"] = new ColorPalette { Value = "#ff7043" },
+            ["500"] = new ColorPalette { Value = "#ff5722" },
+            ["600"] = new ColorPalette { Value = "#f4511e" },
+            ["700"] = new ColorPalette { Value = "#e64a19" },
+            ["800"] = new ColorPalette { Value = "#d84315" },
+            ["900"] = new ColorPalette { Value = "#bf360c" },
+        },
+    };
+
+    static ColorPalette _MaterialPaletteFull;
+    public static ColorPalette MaterialPaletteFull
+    {
+        get
+        {
+            if (_MaterialPaletteFull == null)
+            {
+                _MaterialPaletteFull = new ColorPalette();
+                foreach (var item in MaterialPalette)
+                {
+                    _MaterialPaletteFull[item.Key] = item.Value;
+                    if (MaterialPaletteAccent.ContainsKey(item.Key))
+                    {
+                        foreach (var item2 in MaterialPaletteAccent[item.Key])
+                        {
+                            item.Value[item2.Key] = item2.Value;
+                        }
+                    }
+                }
+            }
+
+            return _MaterialPaletteFull;
+        }
+    }
+
+    #endregion
+}

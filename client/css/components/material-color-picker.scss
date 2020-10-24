@@ -1,0 +1,102 @@
+.material-color-picker {
+  position: relative;
+
+  &__color-wrapper {
+    position: absolute;
+    border: 1px solid;
+    border-color: var(--xenial-dark-color);
+    z-index: 9999;
+    background-color: var(--xenial-darker-color);
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    border-radius: 3px;
+    overflow: hidden;
+    max-width: calc(100vw - 2rem);
+
+    box-sizing: content-box;
+    text-align: left;
+    line-height: 1;
+    font-size: 0;
+
+    * {
+      box-sizing: content-box;
+      text-align: left;
+      line-height: 1;
+      font-size: 0;
+    }
+  }
+
+  &__color,
+  &__back-icon {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-touch-callout: none;
+    tap-highlight-color: transparent;
+    user-select: none;
+    outline-style: none;
+    cursor: pointer;
+  }
+
+  &__color {
+    display: inline-block;
+    border-radius: 100%;
+    position: relative;
+  }
+
+  &__back-icon {
+    display: inline-block;
+    text-align: center;
+    float: left;
+    border-radius: 100%;
+    position: relative;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.19);
+    }
+  }
+
+  &__inner-circle {
+    position: absolute;
+    border: 4px solid rgba(0, 0, 0, 0);
+    border-radius: 100%;
+    margin: 7px;
+    transition: all 0.45s;
+  }
+
+  &__visible &__inner-circle {
+    border: 4px solid rgba(255, 255, 255, 1);
+    transition: all 1s;
+  }
+
+  &__visible &__outer-circle {
+    border: 4px solid rgba(0, 0, 0, 0.17);
+    transition: all 1s;
+  }
+
+  &__visible.is-light &__inner-circle {
+    border-color: #555555;
+    transition: all 1s;
+  }
+
+  &__outer-circle {
+    position: absolute;
+    border: 4px solid rgba(0, 0, 0, 0);
+    border-radius: 100%;
+    margin: 0;
+    transition: all 0.45s;
+  }
+
+  &__back-icon &__back-icon.back-icon-active {
+    background: transparent;
+    cursor: none;
+  }
+
+  &__back-icon.back-icon-active:hover {
+    background: transparent;
+    cursor: none;
+  }
+}

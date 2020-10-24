@@ -38,3 +38,13 @@ document.querySelectorAll("[data-success]").forEach((el: HTMLElement) => {
 document.querySelectorAll("[data-error]").forEach((el: HTMLElement) => {
     notyf.error(el.getAttribute("data-error"));
 });
+
+(window as any).outsideClickHandler = {
+    addEvent: (elementId, dotnetHelper) => {
+        window.addEventListener("click", async (e: any) => {
+            if (!document.getElementById(elementId).contains(e.target)) {
+                await dotnetHelper.invokeMethodAsync("InvokeClickOutside");
+            } 
+        });
+    }
+};
