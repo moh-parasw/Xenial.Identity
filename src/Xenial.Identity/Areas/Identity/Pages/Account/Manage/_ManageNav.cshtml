@@ -5,6 +5,15 @@
 
 <nav class="profile-nav">
     <ul class="profile-nav__list">
+        <li class="profile-nav__list-item @ManageNavPages.EditNavClass(ViewContext)">
+            <a class="profile-nav__list-item-link" asp-page="./EditProfile">
+                <span class="profile-nav__list-item-link-image"><i class="fas fa-user"></i></span>
+                <span class="profile-nav__list-item-link-details">
+                    <span class="profile-nav__list-item-link-details-header">Edit profile</span>
+                    <span class="profile-nav__list-item-link-details-section">Profile</span>
+                </span>
+            </a>
+        </li>
         <li class="profile-nav__list-item @ManageNavPages.ChangePasswordNavClass(ViewContext)">
             <a class="profile-nav__list-item-link" asp-page="./ChangePassword">
                 <span class="profile-nav__list-item-link-image"><i class="fas fa-key"></i></span>

@@ -90,5 +90,14 @@
         }
       }
     }
+    .profile-nav__list-item.active {
+      a.profile-nav__list-item-link,
+      a.profile-nav__list-item-link:link,
+      a.profile-nav__list-item-link:hover,
+      a.profile-nav__list-item-link:visited,
+      a.profile-nav__list-item-link:active {
+        color: var(--xenial-highlight-color);
+      }
+    }
   }
 }

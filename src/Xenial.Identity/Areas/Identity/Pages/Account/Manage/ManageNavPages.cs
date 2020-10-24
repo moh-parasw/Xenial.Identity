@@ -8,6 +8,8 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
     {
         public static string Index => "Index";
 
+        public static string Edit => "Edit";
+
         public static string Email => "Email";
 
         public static string Phone => "Phone";
@@ -25,6 +27,8 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
         public static string TwoFactorAuthentication => "TwoFactorAuthentication";
 
         public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
+
+        public static string EditNavClass(ViewContext viewContext) => PageNavClass(viewContext, Edit);
 
         public static string EmailNavClass(ViewContext viewContext) => PageNavClass(viewContext, Email);
 
