@@ -5,4 +5,100 @@
     ViewData["Title"] = "Manage Profile";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="edit-profile-page">
+    <form class="xenial-form" id="email-form" method="post">
+        <div class="edit-profile-page-tabs">
+            <input type="radio" id="tab1" name="tab-control">
+            <input type="radio" id="tab2" name="tab-control">
+            <input type="radio" id="tab3" name="tab-control" checked>
+            <input type="radio" id="tab4" name="tab-control">
+            <ul class="edit-profile-page-tabs__list">
+                <li class="edit-profile-page-tabs__list-item" title="Profile">
+                    <label class="edit-profile-page-tabs__list-item-label" for="tab1" role="button">
+                        <i class="fas fa-user-circle"></i> <span>Profile</span>
+                    </label>
+                </li>
+                <li class="edit-profile-page-tabs__list-item" title="Person">
+                    <label class="edit-profile-page-tabs__list-item-label" for="tab2" role="button">
+                        <i class="fas fa-smile"></i> <span>Person</span>
+                    </label>
+                </li>
+                <li class="edit-profile-page-tabs__list-item" title="Address">
+                    <label class="edit-profile-page-tabs__list-item-label" for="tab3" role="button">
+                        <i class="fas fa-address-card"></i> <span>Address</span>
+                    </label>
+                </li>
+                <li class="edit-profile-page-tabs__list-item" title="Settings">
+                    <label class="edit-profile-page-tabs__list-item-label" for="tab4" role="button">
+                        <i class="fas fa-cog"></i> <span>Settings</span>
+                    </label>
+                </li>
+            </ul>
+
+            <div class="edit-profile-page-tabs__slider"><div class="indicator"></div></div>
+
+            <div class="edit-profile-page-tabs__content">
+                <section>
+                    <ul class="xenial-form__list">
+                        <li class="xenial-form__list-item">
+                            <button type="submit" class="xenial-form__list-item-submit">Save Changes</button>
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <ul class="xenial-form__list">
+                        <li class="xenial-form__list-item">
+                            <button type="submit" class="xenial-form__list-item-submit">Save Changes</button>
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <ul class="xenial-form__list">
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.AddressStreetAddress1"></label>
+                            <input asp-for="Input.AddressStreetAddress1" />
+                            <span asp-validation-for="Input.AddressStreetAddress1" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.AddressStreetAddress2"></label>
+                            <input asp-for="Input.AddressStreetAddress2" />
+                            <span asp-validation-for="Input.AddressStreetAddress2" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item inline">
+                            <div>
+                                <label asp-for="Input.AddressLocality"></label>
+                                <input asp-for="Input.AddressLocality" />
+                            </div>
+                            <div>
+                                <label asp-for="Input.AddressPostalCode"></label>
+                                <input asp-for="Input.AddressPostalCode" />
+                            </div>
+                            <span asp-validation-for="Input.AddressPostalCode" class="text-danger"></span>
+                            <span asp-validation-for="Input.AddressLocality" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.AddressRegion"></label>
+                            <input asp-for="Input.AddressRegion" />
+                            <span asp-validation-for="Input.AddressRegion" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.AddressCountry"></label>
+                            <input asp-for="Input.AddressCountry" />
+                            <span asp-validation-for="Input.AddressCountry" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <button type="submit" class="xenial-form__list-item-submit">Save Changes</button>
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <ul class="xenial-form__list">
+                        <li class="xenial-form__list-item">
+                            <button type="submit" class="xenial-form__list-item-submit">Save Changes</button>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </form>
+</div>

@@ -12,15 +12,10 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
     public partial class IndexModel : PageModel
     {
         private readonly UserManager<XenialIdentityUser> userManager;
-        private readonly SignInManager<XenialIdentityUser> signInManager;
 
         public IndexModel(
-            UserManager<XenialIdentityUser> userManager,
-            SignInManager<XenialIdentityUser> signInManager)
-        {
-            this.userManager = userManager;
-            this.signInManager = signInManager;
-        }
+            UserManager<XenialIdentityUser> userManager)
+            => this.userManager = userManager;
 
         public string Username { get; set; }
         public string Email { get; set; }

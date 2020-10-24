@@ -1,0 +1,25 @@
+@import "forms";
+@import "tabs";
+
+.edit-profile-page {
+  max-width: 600px;
+  @include tab-pages(4);
+  @include xenial-form(1000rem);
+
+  .xenial-form__list-item.inline {
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+    flex-wrap: wrap;
+    div {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        flex-grow: 1;
+        margin-right: 1rem;
+    }
+    div:last-of-type{
+        margin-right: 0;
+    }
+  }
+}

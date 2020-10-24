@@ -64,6 +64,29 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         }
     }
 
+    public class XPUserStore<TUser, TXPUser> : XPUserStore<TUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>,
+       TXPUser, XpoIdentityRole, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>
+        where TUser : IdentityUser
+        where TXPUser : IXPObject
+    {
+        public XPUserStore(
+            UnitOfWork unitOfWork,
+            ILogger<XPUserStore<TUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, TXPUser, XpoIdentityRole, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>> logger,
+            IdentityErrorDescriber describer
+        ) : base(unitOfWork, logger, describer)
+        {
+        }
+
+        public XPUserStore(
+            UnitOfWork unitOfWork,
+            ILogger<XPUserStore<TUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, TXPUser, XpoIdentityRole, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken>> logger,
+            IdentityErrorDescriber describer,
+            IConfigurationProvider configurationProvider
+        ) : base(unitOfWork, logger, describer, configurationProvider)
+        {
+        }
+    }
+
     public class XPUserStore<
             TUser, TKey, TUserClaim, TUserLogin, TUserToken,
             TXPUser, TXPRole, TXPUserClaim, TXPUserLogin, TXPUserToken> :
@@ -110,7 +133,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             > logger,
             IdentityErrorDescriber describer
         )
-            : this(unitOfWork, logger, describer, new MapperConfiguration(cfg => cfg.AddProfile<XPUserMapperProfile>()))
+            : this(unitOfWork, logger, describer, new MapperConfiguration(cfg => cfg.AddProfile<XPIdentityMapperProfile>()))
         {
         }
 

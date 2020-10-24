@@ -3,18 +3,27 @@ using System.Security.Claims;
 
 using AutoMapper;
 
+using DevExpress.Xpo;
+
 using Microsoft.AspNetCore.Identity;
 
 namespace Xenial.AspNetIdentity.Xpo.Mappers
 {
-    public class XPUserMapperProfile : XPUserMapperProfile<IdentityUser> { }
+    public class XPIdentityMapperProfile : XPIdentityMapperProfile<
+        IdentityUser, IdentityRole,
+        Models.XpoIdentityUser, Models.XpoIdentityRole
+    >
+    { }
 
-    public class XPUserMapperProfile<TUser> : Profile
+    public class XPIdentityMapperProfile<TUser, TRole, TXPUser, TXPRole> : Profile
         where TUser : IdentityUser
+        where TRole : IdentityRole
+        where TXPUser : IXPObject
+        where TXPRole : IXPObject
     {
-        public XPUserMapperProfile()
+        public XPIdentityMapperProfile()
         {
-            CreateMap<Models.XpoIdentityUser, TUser>()
+            CreateMap<TXPUser, TUser>()
                 .ReverseMap()
                 .ConstructUsingServiceLocator();
 
@@ -40,6 +49,19 @@ namespace Xenial.AspNetIdentity.Xpo.Mappers
                 .ConstructUsing(l => new UserLoginInfo(l.LoginProvider, l.ProviderKey, l.ProviderDisplayName))
                 .ReverseMap()
                 .ForMember(m => m.User, o => o.Ignore())
+                .ConstructUsingServiceLocator();
+
+            CreateMap<TXPRole, TRole>()
+                .ReverseMap()
+                .ConstructUsingServiceLocator();
+
+            CreateMap<Models.XpoIdentityRoleClaim, IdentityRoleClaim<string>>()
+                .ReverseMap()
+                .ConstructUsingServiceLocator();
+
+            CreateMap<Models.XpoIdentityRoleClaim, Claim>()
+                .ConstructUsing(c => new Claim(c.Type, c.Value))
+                .ReverseMap()
                 .ConstructUsingServiceLocator();
         }
     }

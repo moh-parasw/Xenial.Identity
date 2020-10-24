@@ -28,6 +28,7 @@ using Xenial.AspNetIdentity.Xpo.Mappers;
 using Xenial.AspNetIdentity.Xpo.Models;
 using Xenial.AspNetIdentity.Xpo.Stores;
 using Xenial.Identity.Data;
+using Xenial.Identity.Models;
 using Xenial.Identity.Xpo.Storage;
 
 namespace Xenial.Identity
@@ -72,6 +73,7 @@ namespace Xenial.Identity
                 .UseEntityTypes(
                     IdentityXpoTypes.PersistentTypes
                         .Concat(IdentityModelTypeList.ModelTypes)
+                        .Concat(XenialIdentityModelTypeList.ModelTypes)
                         .ToArray()
                 )
             );
@@ -86,11 +88,11 @@ namespace Xenial.Identity
               .AddDefaultTokenProviders();
 
             services
-                .AddScoped<IUserStore<XenialIdentityUser>>(s => new XPUserStore<XenialIdentityUser>(
+                .AddScoped<IUserStore<XenialIdentityUser>>(s => new XPUserStore<XenialIdentityUser, XpoXeniaIIdentityUser>(
                        s.GetService<UnitOfWork>(),
-                       s.GetService<ILogger<XPUserStore<XenialIdentityUser>>>(),
+                       s.GetService<ILogger<XPUserStore<XenialIdentityUser, XpoXeniaIIdentityUser>>>(),
                        new Microsoft.AspNetCore.Identity.IdentityErrorDescriber(),
-                       new MapperConfiguration(cfg => cfg.AddProfile<XPUserMapperProfile<XenialIdentityUser>>())
+                       new MapperConfiguration(cfg => cfg.AddProfile<XPIdentityMapperProfile<XenialIdentityUser, IdentityRole, XpoXeniaIIdentityUser, XpoIdentityRole>>())
                ))
                 .AddScoped<IRoleStore<IdentityRole>>(s => new XPRoleStore(
                         s.GetService<UnitOfWork>(),

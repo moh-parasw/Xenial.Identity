@@ -13,7 +13,7 @@
         <div class="profile-card">
             <div class="profile-card__image"><a href="#"><i class="fas fa-user"></i></a></div>
             <div class="profile-card__details">
-                <span class="profile-card__details-name"><a asp-page="./EditProfile">@Model.Username</a></span>
+                <span class="profile-card__details-name"><a asp-page="./EditProfile">@Model.Username <i style="font-size: 0.8rem" class="fas fa-pencil-alt"></i></a></span>
                 <span class="profile-card__details-email">
                     <a asp-page="./Email">
                         <i class="fa fa-envelope"></i>&nbsp;<span>@Model.Email</span>

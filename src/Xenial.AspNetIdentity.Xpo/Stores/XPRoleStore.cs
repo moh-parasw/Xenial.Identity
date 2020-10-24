@@ -56,7 +56,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         }
 
         public XPRoleStore(UnitOfWork unitOfWork, ILogger<XPRoleStore<TRole, TKey, TUserRole, TRoleClaim, TXPRole, TXPUser, TXPRoleClaim>> logger, IdentityErrorDescriber describer)
-            : this(unitOfWork, logger, new MapperConfiguration(opt => opt.AddProfile<XPRoleMapperProfile>()), describer) { }
+            : this(unitOfWork, logger, new MapperConfiguration(opt => opt.AddProfile<XPIdentityMapperProfile>()), describer) { }
 
         public override IQueryable<TRole> Roles
             => UnitOfWork
