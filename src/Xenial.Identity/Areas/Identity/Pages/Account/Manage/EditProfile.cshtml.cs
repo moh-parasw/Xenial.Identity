@@ -2,10 +2,19 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
+using AutoMapper;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
+
+using Newtonsoft.Json;
+
+using Xenial.Identity.Data;
 
 namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
 {
@@ -15,11 +24,11 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
         public InputModel Input { get; set; } = new InputModel();
         public class InputModel
         {
-            [Display(Name = "Full Name"), Required]
+            [Display(Name = "Full Name")]
             public string FullName { get; set; }
-            [Display(Name = "First Name"), Required]
+            [Display(Name = "First Name")]
             public string FirstName { get; set; }
-            [Display(Name = "Last Name"), Required]
+            [Display(Name = "Last Name")]
             public string LastName { get; set; }
             public string Color { get; set; }
             public string Initials { get; set; }
@@ -28,13 +37,13 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Company Name")]
             public string CompanyName { get; set; }
 
-            [Display(Name = "Address 1"), Required]
+            [Display(Name = "Address 1")]
             public string AddressStreetAddress1 { get; set; }
 
             [Display(Name = "Address 2")]
             public string AddressStreetAddress2 { get; set; }
 
-            [Display(Name = "City"), Required]
+            [Display(Name = "City")]
             public string AddressLocality { get; set; }
 
             [Display(Name = "State or Province")]
@@ -46,8 +55,120 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
             public string AddressCountry { get; set; }
         }
 
-        public void OnGet()
+        public string StatusMessage { get; set; }
+
+        private readonly UserManager<XenialIdentityUser> userManager;
+        private readonly SignInManager<XenialIdentityUser> signInManager;
+        private readonly ILogger<EditProfileModel> logger;
+
+        public EditProfileModel(
+            UserManager<XenialIdentityUser> userManager,
+            SignInManager<XenialIdentityUser> signInManager,
+            ILogger<EditProfileModel> logger)
         {
+            this.userManager = userManager;
+            this.signInManager = signInManager;
+            this.logger = logger;
+        }
+
+        public async Task OnGet()
+        {
+            var user = await userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                logger.LogWarning("No user found {User}", User);
+                return;
+            }
+            var mapper = mapperConfiguration.CreateMapper();
+            Input = mapper.Map(user, Input);
+        }
+
+        private class ModelMapperProfile : Profile
+        {
+            public ModelMapperProfile()
+                => CreateMap<InputModel, XenialIdentityUser>().ReverseMap();
+        }
+
+        private static readonly IConfigurationProvider mapperConfiguration = new MapperConfiguration(o => o.AddProfile<ModelMapperProfile>());
+
+        public async Task OnPost()
+        {
+            var user = await userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                logger.LogWarning("No user found {User}", User);
+                return;
+            }
+            if (ModelState.IsValid)
+            {
+                var mapper = mapperConfiguration.CreateMapper();
+                user = mapper.Map(Input, user);
+                user.UpdatedAt = DateTime.Now;
+
+                await SetOrUpdateClaimAsync(user, new Claim("name", user.FullName ?? string.Empty));
+                await SetOrUpdateClaimAsync(user, new Claim("family_name", user.LastName ?? string.Empty));
+                await SetOrUpdateClaimAsync(user, new Claim("given_name", user.FirstName ?? string.Empty));
+                //await SetOrUpdateClaimAsync(user, new Claim("profile", absProfileUrl));
+                //await SetOrUpdateClaimAsync(user, new Claim("picture", absProfilePictureUrl));
+                //await SetOrUpdateClaimAsync(user, new Claim("website", user.Website ?? string.Empty));
+                //await SetOrUpdateClaimAsync(user, new Claim("gender", user.Gender ?? string.Empty));
+                //await SetOrUpdateClaimAsync(user, new Claim("birthdate", user.Birthdate?.ToString("YYYY-MM-DD") ?? string.Empty));
+                //await SetOrUpdateClaimAsync(user, new Claim("zoneinfo", user.Zoneinfo ?? string.Empty));
+                //await SetOrUpdateClaimAsync(user, new Claim("locale", user.Locale ?? string.Empty));
+                await SetOrUpdateClaimAsync(user, new Claim("updated_at", ConvertToUnixTimestamp(user.UpdatedAt)?.ToString() ?? string.Empty));
+
+                var streetAddress = string.Join(" ", new[] { user.AddressStreetAddress1, user.AddressStreetAddress2 }.Where(s => !string.IsNullOrWhiteSpace(s)));
+                var postalAddress = string.Join(" ", new[] { user.AddressPostalCode, user.AddressLocality }.Where(s => !string.IsNullOrWhiteSpace(s)));
+
+                await SetOrUpdateClaimAsync(user, new Claim("address", JsonConvert.SerializeObject(new
+                {
+                    formatted = string.Join(Environment.NewLine, new[] { streetAddress, postalAddress, user.AddressRegion, user.AddressCountry }.Where(s => !string.IsNullOrWhiteSpace(s))) ?? string.Empty,
+                    street_address = streetAddress ?? string.Empty,
+                    locality = user.AddressLocality ?? string.Empty,
+                    region = user.AddressRegion ?? string.Empty,
+                    postal_code = user.AddressPostalCode ?? string.Empty,
+                    country = user.AddressCountry ?? string.Empty,
+                }, Formatting.Indented)));
+
+                var result = await userManager.UpdateAsync(user);
+                if (!result.Succeeded)
+                {
+                    StatusMessage = "Error updating user";
+                    ModelState.AddModelError("User", "Error updating user");
+                }
+                else
+                {
+                    StatusMessage = "Profile was updated successfully.";
+                }
+            }
+            else
+            {
+                StatusMessage = "Error: Validation failed. Please check your inputs.";
+            }
+        }
+
+        private async Task SetOrUpdateClaimAsync(XenialIdentityUser user, Claim newClaim)
+        {
+            var claims = await userManager.GetClaimsAsync(user);
+            if (claims.Any(c => c.Type == newClaim.Type))
+            {
+                var claim = claims.First(c => c.Type == newClaim.Type);
+                await userManager.ReplaceClaimAsync(user, claim, newClaim);
+            }
+            else
+            {
+                await userManager.AddClaimAsync(user, newClaim);
+            }
+        }
+        private static double? ConvertToUnixTimestamp(DateTime? date)
+        {
+            if (date.HasValue)
+            {
+                var origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                var diff = date.Value.ToUniversalTime() - origin;
+                return Math.Floor(diff.TotalSeconds);
+            }
+            return null;
         }
     }
 }
