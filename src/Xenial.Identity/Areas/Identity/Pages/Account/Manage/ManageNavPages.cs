@@ -10,6 +10,8 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
 
         public static string Edit => "Edit";
 
+        public static string EditPicture => "EditPicture";
+
         public static string Email => "Email";
 
         public static string Phone => "Phone";
@@ -29,6 +31,8 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
         public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
 
         public static string EditNavClass(ViewContext viewContext) => PageNavClass(viewContext, Edit);
+
+        public static string EditPictureNavClass(ViewContext viewContext) => PageNavClass(viewContext, EditPicture);
 
         public static string EmailNavClass(ViewContext viewContext) => PageNavClass(viewContext, Email);
 

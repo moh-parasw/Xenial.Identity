@@ -3,7 +3,7 @@
 @{
     ViewData["ASideClass"] = "show-aside";
     ViewData["Title"] = "Edit Picture";
-    ViewData["ActivePage"] = ManageNavPages.Edit;
+    ViewData["ActivePage"] = ManageNavPages.EditPicture;
 }
 
 <partial name="_StatusMessage" for="StatusMessage" />
@@ -24,12 +24,28 @@
             {
                 <img class="edit-picture-page__image" src="@Model.ImageUri" />
             }
+            else
+            {
 
-            <form method="post" enctype="multipart/form-data" class="xenial-form">
+            }
+
+            @if (!string.IsNullOrEmpty(Model.ImageUri))
+            {
+                <form method="post" class="xenial-form" asp-page-handler="delete">
+                    <ul class="xenial-form__list">
+                        <li class="xenial-form__list-item">
+                            <button type="submit" class="xenial-form__list-item-danger">Delete Picture</button>
+                        </li>
+                    </ul>
+                </form>
+            }
+
+            <form method="post" enctype="multipart/form-data" class="xenial-form" asp-page-handler="upload">
                 <ul class="xenial-form__list">
                     <li class="xenial-form__list-item">
                         <label asp-for="Upload"></label>
                         <input type="file" asp-for="Upload" accept="image/x-png,image/gif,image/jpeg,image/svg+xml" />
+                        <span asp-validation-for="Upload" class="text-danger"></span>
                     </li>
                     <li class="xenial-form__list-item">
                         <button type="submit" class="xenial-form__list-item-submit">Upload Picture</button>
