@@ -24,6 +24,7 @@ namespace Xenial.Identity.Models
         private string lastName;
         private string firstName;
         private string fullName;
+        private byte[] picture;
         private DateTime? updatedAt;
 
         public XpoXeniaIIdentityUser(Session session) : base(session) { }
@@ -65,6 +66,10 @@ namespace Xenial.Identity.Models
         [Persistent]
         [Size(100)]
         public string AddressCountry { get => addressCountry; set => SetPropertyValue(ref addressCountry, value); }
+
+        [Persistent]
+        public byte[] Picture { get => picture; set => SetPropertyValue(ref picture, value); }
+
 
         [Persistent]
         public DateTime? UpdatedAt { get => updatedAt; set => SetPropertyValue(ref updatedAt, value); }

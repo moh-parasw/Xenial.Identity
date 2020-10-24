@@ -1,0 +1,41 @@
+﻿@page
+@model EditPictureModel
+@{
+    ViewData["ASideClass"] = "show-aside";
+    ViewData["Title"] = "Edit Picture";
+    ViewData["ActivePage"] = ManageNavPages.Edit;
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+<div class="edit-picture-page">
+    <div class="edit-picture-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <ul class="edit-picture-page-tabs__list">
+            <li class="edit-picture-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="edit-picture-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-key"></i> <span>@ViewData["Title"]</span>
+                </label>
+            </li>
+        </ul>
+        <div class="edit-picture-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="edit-picture-page-tabs__content">
+            @if (!string.IsNullOrEmpty(Model.ImageUri))
+            {
+                <img class="edit-picture-page__image" src="@Model.ImageUri" />
+            }
+
+            <form method="post" enctype="multipart/form-data" class="xenial-form">
+                <ul class="xenial-form__list">
+                    <li class="xenial-form__list-item">
+                        <label asp-for="Upload"></label>
+                        <input type="file" asp-for="Upload" accept="image/x-png,image/gif,image/jpeg,image/svg+xml" />
+                    </li>
+                    <li class="xenial-form__list-item">
+                        <button type="submit" class="xenial-form__list-item-submit">Upload Picture</button>
+                    </li>
+                </ul>
+            </form>
+        </div>
+    </div>
+</div>

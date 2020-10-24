@@ -21,6 +21,8 @@ namespace Xenial.Identity.Data
         public string AddressPostalCode { get; set; }
         public string AddressCountry { get; set; }
 
+        public byte[] Picture { get; set; }
+
         public DateTime? UpdatedAt { get; set; }
     }
 }
