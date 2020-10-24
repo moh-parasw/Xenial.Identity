@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,9 +41,9 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
 
         private static string CreateImageUri(XenialIdentityUser user)
         {
-            if (user.Picture != null && user.Picture.Length > 0)
+            if (user.Picture != null && user.Picture.Length > 0 && !string.IsNullOrEmpty(user.PictureMimeType))
             {
-                return $"data:image/png;base64,{Convert.ToBase64String(user.Picture)}";
+                return $"data:{user.PictureMimeType};base64,{Convert.ToBase64String(user.Picture)}";
             }
             return null;
         }
@@ -69,6 +71,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                 return;
             }
 
+            //TODO: CHECK FOR IMAGE TYPE
             if (ModelState.IsValid)
             {
                 using (var stream = new MemoryStream())
@@ -76,6 +79,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                     await Upload.CopyToAsync(stream);
                     stream.Position = 0;
                     user.Picture = stream.ToArray();
+                    user.PictureMimeType = GeMimeTypeFromImageByteArray(user.Picture);
                 }
                 var result = await userManager.UpdateAsync(user);
                 if (result.Succeeded)
@@ -90,6 +94,24 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
             ImageUri = CreateImageUri(user);
         }
 
+        public string GeMimeTypeFromImageByteArray(byte[] byteArray)
+        {
+            try
+            {
+                using (var stream = new MemoryStream(byteArray))
+                using (var image = Image.FromStream(stream))
+                {
+                    return ImageCodecInfo.GetImageEncoders().FirstOrDefault(codec => codec.FormatID == image.RawFormat.Guid).MimeType;
+                }
+            }
+            catch (Exception ex)
+            {
+                var svgMimeType = "image/svg+xml";
+                logger.LogError(ex, $"Cannot infer image mime type, set to {svgMimeType} {{Message}}", ex.Message);
+                return svgMimeType;
+            }
+        }
+
         public async Task OnPostDeleteAsync()
         {
             var user = await userManager.GetUserAsync(User);
@@ -99,6 +121,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                 return;
             }
             user.Picture = new byte[0];
+            user.PictureMimeType = null;
             var result = await userManager.UpdateAsync(user);
             if (result.Succeeded)
             {

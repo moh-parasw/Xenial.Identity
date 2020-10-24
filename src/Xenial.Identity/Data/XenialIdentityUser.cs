@@ -22,6 +22,7 @@ namespace Xenial.Identity.Data
         public string AddressCountry { get; set; }
 
         public byte[] Picture { get; set; }
+        public string PictureMimeType { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
     }
