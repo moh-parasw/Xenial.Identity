@@ -3,7 +3,7 @@
 
 .edit-profile-page {
   max-width: 600px;
-  @include tab-pages(4);
+  @include tab-pages(2);
   @include xenial-form(1000rem);
 
   .xenial-form__list-item.inline {
