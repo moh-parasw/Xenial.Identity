@@ -54,21 +54,28 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
         [BindProperty, Required]
         public IFormFile Upload { get; set; }
 
-        public async Task OnPostUploadAsync()
+        public async Task<ActionResult> OnPostUploadAsync()
         {
             var user = await userManager.GetUserAsync(User);
             if (user == null)
             {
                 logger.LogWarning("No user found {User}", User);
-                return;
+                return Page();
             }
 
             ImageUri = CreateImageUri(user);
+            var isJson = Request.GetTypedHeaders().Accept.Contains(new Microsoft.Net.Http.Headers.MediaTypeHeaderValue("application/json"));
 
             if (Upload == null)
             {
                 StatusMessage = "Error: Upload is empty. Please select a picture.";
-                return;
+                return isJson ? new JsonResult(new
+                {
+                    StatusMessage
+                })
+                {
+                    StatusCode = 400
+                } : Page();
             }
 
             //TODO: CHECK FOR IMAGE TYPE
@@ -92,6 +99,22 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                 }
             }
             ImageUri = CreateImageUri(user);
+            if (!ModelState.IsValid)
+            {
+                return isJson ? new JsonResult(ModelState)
+                {
+                    StatusCode = 400
+                } : Page();
+            }
+
+            return isJson ? new JsonResult(new
+            {
+                StatusMessage,
+                ImageUri
+            })
+            {
+                StatusCode = 200
+            } : Page();
         }
 
         public string GeMimeTypeFromImageByteArray(byte[] byteArray)
@@ -132,6 +155,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                 StatusMessage = "Error: Profile image deletion failed";
             }
             ImageUri = CreateImageUri(user);
+            ModelState.Clear();
         }
     }
 }

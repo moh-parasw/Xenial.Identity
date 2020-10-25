@@ -2,17 +2,22 @@
 import 'notyf/notyf.min.css';
 import { xenial } from "@xenial-io/xenial-template";
 import QRCode from "qrcode/build/qrcode";
-import { Notyf } from "notyf";
+import { notyf } from "./notify";
+
+import "./file-upload";
+
 xenial();
 
-document.querySelectorAll(".egg").forEach((el: HTMLElement) => {
-    el.onclick = async () => {
-        window.open("https://unsplash.com/s/photos/austria", "_blank");
-    };
+document.querySelectorAll(".egg").forEach((el) => {
+    if (el instanceof HTMLElement) {
+        el.onclick = async () => {
+            window.open("https://unsplash.com/s/photos/austria", "_blank");
+        };
+    }
 });
 
-document.querySelectorAll("[data-qrcode]").forEach((el: HTMLElement) => {
-    QRCode.toCanvas(el, el.getAttribute("data-qrcode"), (error) => {
+document.querySelectorAll("[data-qrcode]").forEach((el) => {
+    QRCode.toCanvas(el, el.getAttribute("data-qrcode"), (error: string | Error) => {
         if (error) {
             console.error(error);
         }
@@ -22,29 +27,21 @@ document.querySelectorAll("[data-qrcode]").forEach((el: HTMLElement) => {
     });
 });
 
-const notyf = new Notyf({
-    position: {
-        x: "center",
-        y: "top"
-    },
-    duration: 2500,
-    dismissible: true
+document.querySelectorAll("[data-success]").forEach((el) => {
+    notyf.success(el.getAttribute("data-success")!);
 });
 
-document.querySelectorAll("[data-success]").forEach((el: HTMLElement) => {
-    notyf.success(el.getAttribute("data-success"));
-});
-
-document.querySelectorAll("[data-error]").forEach((el: HTMLElement) => {
-    notyf.error(el.getAttribute("data-error"));
+document.querySelectorAll("[data-error]").forEach((el) => {
+    notyf.error(el.getAttribute("data-error")!);
 });
 
 (window as any).outsideClickHandler = {
-    addEvent: (elementId, dotnetHelper) => {
+    addEvent: (elementId: string, dotnetHelper: any) => {
         window.addEventListener("click", async (e: any) => {
-            if (!document.getElementById(elementId).contains(e.target)) {
+            const el = document.getElementById(elementId);
+            if (el && !el.contains(e.target)) {
                 await dotnetHelper.invokeMethodAsync("InvokeClickOutside");
-            } 
+            }
         });
     }
 };

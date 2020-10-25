@@ -6,6 +6,18 @@
   @include tab-pages(1);
   @include xenial-form(1000rem);
 
+  border-radius: 3px;
+  border: 2px solid transparent;
+  transition: border-color 250ms ease-in;
+
+  &.highlight {
+    border-color: var(--xenial-highlight-color);
+  }
+
+  input[type="file"] {
+    border: none;
+  }
+
   &__image {
     width: 4rem;
     height: 4rem;

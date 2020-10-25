@@ -14,7 +14,7 @@
         <ul class="edit-picture-page-tabs__list">
             <li class="edit-picture-page-tabs__list-item" title="@ViewData["Title"]">
                 <label class="edit-picture-page-tabs__list-item-label" for="tab1" role="button">
-                    <i class="fas fa-key"></i> <span>@ViewData["Title"]</span>
+                    <i class="fas fa-portrait"></i> <span>@ViewData["Title"]</span>
                 </label>
             </li>
         </ul>
@@ -40,7 +40,7 @@
                 </form>
             }
 
-            <form method="post" enctype="multipart/form-data" class="xenial-form" asp-page-handler="upload">
+            <form id="upload-form" method="post" enctype="multipart/form-data" class="xenial-form" asp-page-handler="upload">
                 <ul class="xenial-form__list">
                     <li class="xenial-form__list-item">
                         <label asp-for="Upload"></label>
