@@ -92,6 +92,7 @@ namespace Xenial.Identity
                 ))
                 .AddScoped<UserManager<XenialIdentityUser>>()
                 .AddScoped<RoleManager<IdentityRole>>()
+                .AddScoped<IUserClaimsPrincipalFactory<XenialIdentityUser>, UserClaimsPrincipalFactory<XenialIdentityUser, IdentityRole>>()
             ;
 
 
