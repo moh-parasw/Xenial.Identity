@@ -1,33 +1,23 @@
 ﻿using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 using AutoMapper;
 
 using DevExpress.Xpo;
 
-using IdentityServer4;
 
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-using Newtonsoft.Json.Linq;
-
 using Westwind.AspNetCore.LiveReload;
 
 using Xenial.AspNetIdentity.Xpo.Mappers;
 using Xenial.AspNetIdentity.Xpo.Models;
 using Xenial.AspNetIdentity.Xpo.Stores;
-using Xenial.Identity.Areas.Identity.Pages.Account.Manage;
 using Xenial.Identity.Data;
 using Xenial.Identity.Models;
 using Xenial.Identity.Xpo.Storage;
@@ -92,14 +82,15 @@ namespace Xenial.Identity
                 .AddScoped<IUserStore<XenialIdentityUser>>(s => new XPUserStore<XenialIdentityUser, XpoXeniaIIdentityUser>(
                        s.GetService<UnitOfWork>(),
                        s.GetService<ILogger<XPUserStore<XenialIdentityUser, XpoXeniaIIdentityUser>>>(),
-                       new Microsoft.AspNetCore.Identity.IdentityErrorDescriber(),
+                       new IdentityErrorDescriber(),
                        new MapperConfiguration(cfg => cfg.AddProfile<XPIdentityMapperProfile<XenialIdentityUser, IdentityRole, XpoXeniaIIdentityUser, XpoIdentityRole>>())
                ))
                 .AddScoped<IRoleStore<IdentityRole>>(s => new XPRoleStore(
                         s.GetService<UnitOfWork>(),
                         s.GetService<ILogger<XPRoleStore>>(),
-                        new Microsoft.AspNetCore.Identity.IdentityErrorDescriber()
-                ));
+                        new IdentityErrorDescriber()
+                ))
+                .AddScoped<RoleManager<IdentityRole>>();
 
             var builder = services.AddIdentityServer(options =>
             {

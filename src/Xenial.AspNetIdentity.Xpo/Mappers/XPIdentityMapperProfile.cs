@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Security.Claims;
 
 using AutoMapper;
@@ -24,6 +25,8 @@ namespace Xenial.AspNetIdentity.Xpo.Mappers
         public XPIdentityMapperProfile()
         {
             CreateMap<TXPUser, TUser>()
+                //TODO: Convert from DateTimeOffset to DateTime and via versa
+                .ForMember(o => o.LockoutEnd, o => o.Ignore())
                 .ReverseMap()
                 .ConstructUsingServiceLocator();
 

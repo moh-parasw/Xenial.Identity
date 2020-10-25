@@ -201,6 +201,10 @@ width: {ColorSizePx};
 
     public static bool ColorIsLight(string color, int differenceRange = 125)
     {
+        if (string.IsNullOrEmpty(color))
+        {
+            return true;
+        }
         System.Diagnostics.Debug.Assert(color.Length == 7, "color must have a length of 7 hex numbers");
         var c = System.Drawing.ColorTranslator.FromHtml(color);
 

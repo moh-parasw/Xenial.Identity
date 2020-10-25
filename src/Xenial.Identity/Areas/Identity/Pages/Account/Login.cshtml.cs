@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using System.Text;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using DevExpress.Xpo;
 
 namespace Xenial.Identity.Areas.Identity.Pages.Account
 {
@@ -21,6 +22,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
     public class LoginModel : PageModel
     {
         private readonly UserManager<XenialIdentityUser> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
         private readonly SignInManager<XenialIdentityUser> signInManager;
         private readonly ILogger<LoginModel> logger;
         private readonly IEmailSender emailSender;
@@ -28,9 +30,11 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
         public LoginModel(SignInManager<XenialIdentityUser> signInManager,
             ILogger<LoginModel> logger,
             UserManager<XenialIdentityUser> userManager,
+            RoleManager<IdentityRole> roleManager,
             IEmailSender emailSender)
         {
             this.userManager = userManager;
+            this.roleManager = roleManager;
             this.signInManager = signInManager;
             this.logger = logger;
             this.emailSender = emailSender;
@@ -155,11 +159,36 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
             MarkAllFieldsAsSkipped(nameof(RegisterInput));
             if (ModelState.IsValid)
             {
+                //We don't have any users yet. First should be admin.
+                const string AdminRole = "Administrator";
+
+                var shouldAddAdminRole = !await userManager.Users.AnyAsync();
+                if (shouldAddAdminRole)
+                {
+                    if (!await roleManager.RoleExistsAsync(AdminRole))
+                    {
+                        await roleManager.CreateAsync(new IdentityRole(AdminRole));
+                        logger.LogInformation($"Created new '{AdminRole}' role.");
+                    }
+                }
+
                 var user = new XenialIdentityUser { UserName = RegisterInput.Email, Email = RegisterInput.Email };
                 var result = await userManager.CreateAsync(user, RegisterInput.Password);
                 if (result.Succeeded)
                 {
                     logger.LogInformation("User created a new account with password.");
+                    if (shouldAddAdminRole)
+                    {
+                        var roleResult = await userManager.AddToRoleAsync(user, AdminRole);
+                        if (roleResult.Succeeded)
+                        {
+                            roleResult = await userManager.UpdateAsync(user);
+                            if (roleResult.Succeeded)
+                            {
+                                logger.LogInformation("Added '{User}' to the '{AdminRole}' role.", user, AdminRole);
+                            }
+                        }
+                    }
 
                     var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));

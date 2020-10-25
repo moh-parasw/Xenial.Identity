@@ -1,8 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+
+using DevExpress.Xpo;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -19,21 +22,24 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
     [AllowAnonymous]
     public class ExternalLoginModel : PageModel
     {
-        private readonly SignInManager<XenialIdentityUser> _signInManager;
-        private readonly UserManager<XenialIdentityUser> _userManager;
-        private readonly IEmailSender _emailSender;
-        private readonly ILogger<ExternalLoginModel> _logger;
+        private readonly SignInManager<XenialIdentityUser> signInManager;
+        private readonly UserManager<XenialIdentityUser> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
+        private readonly IEmailSender emailSender;
+        private readonly ILogger<ExternalLoginModel> logger;
 
         public ExternalLoginModel(
             SignInManager<XenialIdentityUser> signInManager,
             UserManager<XenialIdentityUser> userManager,
+            RoleManager<IdentityRole> roleManager,
             ILogger<ExternalLoginModel> logger,
             IEmailSender emailSender)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
-            _logger = logger;
-            _emailSender = emailSender;
+            this.signInManager = signInManager;
+            this.userManager = userManager;
+            this.roleManager = roleManager;
+            this.logger = logger;
+            this.emailSender = emailSender;
         }
 
         [BindProperty]
@@ -54,15 +60,13 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
         }
 
         public IActionResult OnGetAsync()
-        {
-            return RedirectToPage("./Login");
-        }
+            => RedirectToPage("./Login");
 
         public IActionResult OnPost(string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Page("./ExternalLogin", pageHandler: "Callback", values: new { returnUrl });
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            var properties = signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return new ChallengeResult(provider, properties);
         }
 
@@ -72,9 +76,9 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
             if (remoteError != null)
             {
                 ErrorMessage = $"Error from external provider: {remoteError}";
-                return RedirectToPage("./Login", new {ReturnUrl = returnUrl });
+                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
-            var info = await _signInManager.GetExternalLoginInfoAsync();
+            var info = await signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
                 ErrorMessage = "Error loading external login information.";
@@ -82,10 +86,10 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
             }
 
             // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor : true);
+            var result = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
+                logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
                 return LocalRedirect(returnUrl);
             }
             if (result.IsLockedOut)
@@ -112,7 +116,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
         {
             returnUrl = returnUrl ?? Url.Content("~/");
             // Get the information about the user from the external login provider
-            var info = await _signInManager.GetExternalLoginInfoAsync();
+            var info = await signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
                 ErrorMessage = "Error loading external login information during confirmation.";
@@ -121,18 +125,44 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
+                //We don't have any users yet. First should be admin.
+                const string AdminRole = "Administrator";
+
+                var shouldAddAdminRole = !await userManager.Users.AnyAsync();
+                if (shouldAddAdminRole)
+                {
+                    if (!await roleManager.RoleExistsAsync(AdminRole))
+                    {
+                        await roleManager.CreateAsync(new IdentityRole(AdminRole));
+                        logger.LogInformation($"Created new '{AdminRole}' role.");
+                    }
+                }
+
                 var user = new XenialIdentityUser { UserName = Input.Email, Email = Input.Email };
 
-                var result = await _userManager.CreateAsync(user);
+                var result = await userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
-                    result = await _userManager.AddLoginAsync(user, info);
+                    if (shouldAddAdminRole)
+                    {
+                        var roleResult = await userManager.AddToRoleAsync(user, AdminRole);
+                        if (roleResult.Succeeded)
+                        {
+                            roleResult = await userManager.UpdateAsync(user);
+                            if (roleResult.Succeeded)
+                            {
+                                logger.LogInformation("Added '{User}' to the '{AdminRole}' role.", user, AdminRole);
+                            }
+                        }
+                    }
+
+                    result = await userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {
-                        _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+                        logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
 
-                        var userId = await _userManager.GetUserIdAsync(user);
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        var userId = await userManager.GetUserIdAsync(user);
+                        var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
                         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                         var callbackUrl = Url.Page(
                             "/Account/ConfirmEmail",
@@ -140,16 +170,16 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
                             values: new { area = "Identity", userId = userId, code = code },
                             protocol: Request.Scheme);
 
-                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                        await emailSender.SendEmailAsync(Input.Email, "Confirm your email",
                             $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                         // If account confirmation is required, we need to show the link if we don't have a real email sender
-                        if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                        if (userManager.Options.SignIn.RequireConfirmedAccount)
                         {
                             return RedirectToPage("./RegisterConfirmation", new { Email = Input.Email });
                         }
 
-                        await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
+                        await signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
 
                         return LocalRedirect(returnUrl);
                     }
