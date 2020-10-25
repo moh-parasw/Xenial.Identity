@@ -6,11 +6,14 @@ using IdentityServer4.Services;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using System.Threading.Tasks;
+
+using Xenial.Identity.Data;
 
 namespace Xenial.Identity.Quickstart.Home
 {
@@ -18,27 +21,30 @@ namespace Xenial.Identity.Quickstart.Home
     [AllowAnonymous]
     public class HomeController : Controller
     {
-        private readonly IIdentityServerInteractionService _interaction;
-        private readonly IWebHostEnvironment _environment;
-        private readonly ILogger _logger;
+        private readonly IIdentityServerInteractionService interaction;
+        private readonly IWebHostEnvironment environment;
+        private readonly ILogger logger;
+        private readonly SignInManager<XenialIdentityUser> signInManager;
 
-        public HomeController(IIdentityServerInteractionService interaction, IWebHostEnvironment environment, ILogger<HomeController> logger)
+        public HomeController(
+            IIdentityServerInteractionService interaction,
+            IWebHostEnvironment environment,
+            ILogger<HomeController> logger,
+            SignInManager<XenialIdentityUser> signInManager)
         {
-            _interaction = interaction;
-            _environment = environment;
-            _logger = logger;
+            this.interaction = interaction;
+            this.environment = environment;
+            this.logger = logger;
+            this.signInManager = signInManager;
         }
 
         public IActionResult Index()
         {
-            if (_environment.IsDevelopment())
+            if (signInManager.IsSignedIn(User))
             {
-                // only show in development
-                return View();
+                return Redirect("~/Identity/Account/Manage");
             }
-
-            _logger.LogInformation("Homepage is disabled in production. Returning 404.");
-            return NotFound();
+            return Redirect("~/Identity/Account/Login");
         }
 
         /// <summary>
@@ -49,12 +55,12 @@ namespace Xenial.Identity.Quickstart.Home
             var vm = new ErrorViewModel();
 
             // retrieve error details from identityserver
-            var message = await _interaction.GetErrorContextAsync(errorId);
+            var message = await interaction.GetErrorContextAsync(errorId);
             if (message != null)
             {
                 vm.Error = message;
 
-                if (!_environment.IsDevelopment())
+                if (!environment.IsDevelopment())
                 {
                     // only show in development
                     message.ErrorDescription = null;
