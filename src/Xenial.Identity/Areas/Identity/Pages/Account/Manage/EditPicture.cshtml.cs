@@ -28,14 +28,12 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<XenialIdentityUser> userManager;
         private readonly ILogger<EditPictureModel> logger;
-        private readonly IHtmlHelper<EditPictureModel> htmlHelper;
         public EditPictureModel(
             UserManager<XenialIdentityUser> userManager,
-            ILogger<EditPictureModel> logger,
-            IHtmlHelper<EditPictureModel> htmlHelper
+            ILogger<EditPictureModel> logger
 
         )
-            => (this.userManager, this.logger, this.htmlHelper) = (userManager, logger, htmlHelper);
+            => (this.userManager, this.logger) = (userManager, logger);
 
         public ProfilePictureModel ProfilePicture { get; set; }
 

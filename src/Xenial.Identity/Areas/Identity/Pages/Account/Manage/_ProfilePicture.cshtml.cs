@@ -18,7 +18,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
             if (string.IsNullOrEmpty(ImageUri))
             {
                 BackColor = user.Color;
-                ForeColor = MaterialColorPicker.ColorIsLight(user.Color) ? "#000000" : "#FFFFFF";
+                ForeColor = MaterialColorPicker.ColorIsLight(user.Color) ? "var(--xenial-darker-color)" : "var(--xenial-lighter-color)";
             }
             Inititals = user.Initials;
         }
