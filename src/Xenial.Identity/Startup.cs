@@ -90,7 +90,10 @@ namespace Xenial.Identity
                         s.GetService<ILogger<XPRoleStore>>(),
                         new IdentityErrorDescriber()
                 ))
-                .AddScoped<RoleManager<IdentityRole>>();
+                .AddScoped<UserManager<XenialIdentityUser>>()
+                .AddScoped<RoleManager<IdentityRole>>()
+            ;
+
 
             var builder = services.AddIdentityServer(options =>
             {
@@ -119,6 +122,16 @@ namespace Xenial.Identity
                     options.ClientId = Configuration["GitHub:ClientId"];
                     options.ClientSecret = Configuration["GitHub:ClientSecret"];
                 });
+
+            services.AddAuthorization(o =>
+            {
+                o.AddPolicy("Administrator", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireRole("Administrator");
+                });
+            });
+
             //.AddOAuth("github", "Github", options =>
             //{
             //    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
