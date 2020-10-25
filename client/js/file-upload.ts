@@ -86,10 +86,23 @@ if (dropArea && dropArea instanceof HTMLElement) {
                         if (payload.statusMessage) {
                             notyf.success(payload.statusMessage);
                         }
-                        if (payload.imageUri) {
-                            const imgElement = dropArea.querySelector(".edit-picture-page__image");
-                            if (imgElement && imgElement instanceof HTMLImageElement) {
-                                imgElement.src = payload.imageUri;
+                        const href = dropArea.querySelector(".profile-card__image a");
+                        const itemToReplace = dropArea.querySelector(".profile-card__image-item");
+                        if (href && itemToReplace) {
+                            if (payload.profilePicture) {
+                                const picture = payload.profilePicture;
+                                if (picture.imageUri) {
+                                    const imgElement = document.createElement("img");
+                                    imgElement.src = picture.imageUri;
+                                    href.replaceChild(imgElement, itemToReplace);
+                                }
+                            }
+
+                            if (payload.imageUri) {
+                                const imgElement = dropArea.querySelector(".edit-picture-page__image");
+                                if (imgElement && imgElement instanceof HTMLImageElement) {
+                                    imgElement.src = payload.imageUri;
+                                }
                             }
                         }
                     }

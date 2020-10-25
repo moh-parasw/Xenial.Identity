@@ -23,6 +23,8 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
         [TempData]
         public string StatusMessage { get; set; }
 
+        public ProfilePictureModel ProfilePicture { get; set; }
+
         private async Task LoadAsync(XenialIdentityUser user)
         {
             var userName = await userManager.GetUserNameAsync(user);
@@ -35,6 +37,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
         public async Task<IActionResult> OnGetAsync()
         {
             var user = await userManager.GetUserAsync(User);
+            ProfilePicture = new ProfilePictureModel(user);
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{userManager.GetUserId(User)}'.");

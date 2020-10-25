@@ -27,6 +27,7 @@ using Westwind.AspNetCore.LiveReload;
 using Xenial.AspNetIdentity.Xpo.Mappers;
 using Xenial.AspNetIdentity.Xpo.Models;
 using Xenial.AspNetIdentity.Xpo.Stores;
+using Xenial.Identity.Areas.Identity.Pages.Account.Manage;
 using Xenial.Identity.Data;
 using Xenial.Identity.Models;
 using Xenial.Identity.Xpo.Storage;

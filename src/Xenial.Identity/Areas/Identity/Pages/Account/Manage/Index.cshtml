@@ -11,7 +11,7 @@
 <div class="profile-page">
     <div class="profile-page__cards">
         <div class="profile-card">
-            <div class="profile-card__image"><a asp-page="./EditPicture"><i class="fas fa-user"></i></a></div>
+            <partial name="_ProfilePicture" for="ProfilePicture" />
             <div class="profile-card__details">
                 <span class="profile-card__details-name"><a asp-page="./EditProfile">@Model.Username <i style="font-size: 0.8rem" class="fas fa-pencil-alt"></i></a></span>
                 <span class="profile-card__details-email">

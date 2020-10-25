@@ -5,12 +5,19 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
+using DevExpress.XtraReports.Design;
+
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 
 using Xenial.Identity.Data;
@@ -21,11 +28,16 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<XenialIdentityUser> userManager;
         private readonly ILogger<EditPictureModel> logger;
+        private readonly IHtmlHelper<EditPictureModel> htmlHelper;
         public EditPictureModel(
             UserManager<XenialIdentityUser> userManager,
-            ILogger<EditPictureModel> logger
+            ILogger<EditPictureModel> logger,
+            IHtmlHelper<EditPictureModel> htmlHelper
+
         )
-            => (this.userManager, this.logger) = (userManager, logger);
+            => (this.userManager, this.logger, this.htmlHelper) = (userManager, logger, htmlHelper);
+
+        public ProfilePictureModel ProfilePicture { get; set; }
 
         public async Task OnGet()
         {
@@ -36,19 +48,9 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                 return;
             }
 
-            ImageUri = CreateImageUri(user);
+            ProfilePicture = new ProfilePictureModel(user);
         }
 
-        private static string CreateImageUri(XenialIdentityUser user)
-        {
-            if (user.Picture != null && user.Picture.Length > 0 && !string.IsNullOrEmpty(user.PictureMimeType))
-            {
-                return $"data:{user.PictureMimeType};base64,{Convert.ToBase64String(user.Picture)}";
-            }
-            return null;
-        }
-
-        public string ImageUri { get; set; }
         public string StatusMessage { get; set; }
 
         [BindProperty, Required]
@@ -63,7 +65,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
-            ImageUri = CreateImageUri(user);
+            ProfilePicture = new ProfilePictureModel(user);
             var isJson = Request.GetTypedHeaders().Accept.Contains(new Microsoft.Net.Http.Headers.MediaTypeHeaderValue("application/json"));
 
             if (Upload == null)
@@ -98,7 +100,8 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Error: Profile image upload failed";
                 }
             }
-            ImageUri = CreateImageUri(user);
+
+            ProfilePicture = new ProfilePictureModel(user);
             if (!ModelState.IsValid)
             {
                 return isJson ? new JsonResult(ModelState)
@@ -110,7 +113,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
             return isJson ? new JsonResult(new
             {
                 StatusMessage,
-                ImageUri
+                ProfilePicture
             })
             {
                 StatusCode = 200
@@ -135,13 +138,13 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
             }
         }
 
-        public async Task OnPostDeleteAsync()
+        public async Task<IActionResult> OnPostDeleteAsync()
         {
             var user = await userManager.GetUserAsync(User);
             if (user == null)
             {
                 logger.LogWarning("No user found {User}", User);
-                return;
+                return Page();
             }
             user.Picture = new byte[0];
             user.PictureMimeType = null;
@@ -154,8 +157,9 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
             {
                 StatusMessage = "Error: Profile image deletion failed";
             }
-            ImageUri = CreateImageUri(user);
+            ProfilePicture = new ProfilePictureModel(user);
             ModelState.Clear();
+            return RedirectToPage("./EditPicture");
         }
     }
 }

@@ -20,16 +20,9 @@
         </ul>
         <div class="edit-picture-page-tabs__slider"><div class="indicator"></div></div>
         <div class="edit-picture-page-tabs__content">
-            @if (!string.IsNullOrEmpty(Model.ImageUri))
-            {
-                <img class="edit-picture-page__image" src="@Model.ImageUri" />
-            }
-            else
-            {
+            <partial name="_ProfilePicture" for="ProfilePicture" />
 
-            }
-
-            @if (!string.IsNullOrEmpty(Model.ImageUri))
+            @if (!string.IsNullOrEmpty(Model.ProfilePicture.ImageUri))
             {
                 <form method="post" class="xenial-form" asp-page-handler="delete">
                     <ul class="xenial-form__list">
