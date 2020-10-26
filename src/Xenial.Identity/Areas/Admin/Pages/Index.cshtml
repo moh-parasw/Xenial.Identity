@@ -1,10 +1,9 @@
 ﻿@page
 @model Xenial.Identity.Areas.Admin.Pages.IndexModel
 @{
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
 }
 
-
-<h1>Hello Admin</h1>
-
-
-<partial name="_AdminNavCards"></partial>
+<div class="area-admin-index">
+    <partial name="_AdminNavCards" />
+</div>

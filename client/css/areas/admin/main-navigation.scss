@@ -1,0 +1,55 @@
+.area-admin-index {
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+
+  .admin-nav {
+    margin-left: auto;
+    margin-right: auto;
+
+    &__card-list {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 0;
+
+      &-item {
+        min-width: 7rem;
+        height: 7rem;
+        margin: 1rem;
+
+        &::before {
+          content: none;
+        }
+
+        &-link {
+          &:link,
+          &:visited,
+          &:hover,
+          &:active {
+            text-decoration: none;
+          }
+
+          &:hover,
+          &:active {
+            color: var(--xenial-highlight-color);
+          }
+
+          display: flex;
+          flex-direction: column-reverse;
+          align-items: center;
+          text-align: center;
+
+          &-image {
+            display: inline-block;
+            font-size: 4rem;
+            line-height: 4rem;
+          }
+        }
+      }
+    }
+  }
+}
