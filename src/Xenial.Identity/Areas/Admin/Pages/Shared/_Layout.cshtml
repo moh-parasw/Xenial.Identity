@@ -1,0 +1,15 @@
+﻿@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+@section aside {
+    @*<partial name="_ManageNav" />*@
+}
+
+<div class="admin-page">
+    @RenderBody()
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

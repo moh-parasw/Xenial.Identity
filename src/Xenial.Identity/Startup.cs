@@ -49,7 +49,10 @@ namespace Xenial.Identity
                 mvcBuilder.AddRazorRuntimeCompilation();
             }
 
-            var razorPagesBuilder = services.AddRazorPages();
+            var razorPagesBuilder = services.AddRazorPages(o =>
+            {
+                o.Conventions.AuthorizeAreaFolder("Admin", "/", "Administrator");
+            });
 
             if (Environment.IsDevelopment())
             {
