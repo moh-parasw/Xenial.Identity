@@ -113,9 +113,11 @@ namespace Xenial.Identity
                 .AddXpoIdentityStore();
 
             // in-memory, code config
-            builder.AddInMemoryIdentityResources(Config.IdentityResources);
-            builder.AddInMemoryApiScopes(Config.ApiScopes);
-            builder.AddInMemoryClients(Config.Clients);
+            //builder.AddInMemoryIdentityResources(Config.IdentityResources);
+            //builder.AddInMemoryApiResources(Config.IdentityResources);
+            //builder.AddInMemoryApiScopes(Config.ApiScopes);
+            //builder.AddInMemoryClients(Config.Clients);
+            //builder.AddInMemory(Config.Clients);
 
             // not recommended for production - you need to store your key material somewhere secure
             builder.AddDeveloperSigningCredential();

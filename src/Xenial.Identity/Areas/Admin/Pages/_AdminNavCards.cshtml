@@ -1,0 +1,63 @@
+﻿@{
+}
+
+<nav class="admin-nav">
+    <ul class="admin-nav__card-list">
+        @*<li class="admin-nav__card-list-item @AdminNavigation.IndexNavClass(ViewContext)">
+        <a class="admin-nav__card-list-item-link" asp-page="./EditProfile">
+        <span class="admin-nav__card-list-item-link-image"><i class="fas fa-user"></i></span>
+        <span class="admin-nav__card-list-item-link-details">
+        <span class="admin-nav__card-list-item-link-details-header">Edit profile</span>
+        </span>
+        </a>
+        </li>*@
+        <li class="admin-nav__card-list-item @AdminNavigation.ClientsNavClass(ViewContext)">
+            <a class="admin-nav__card-list-item-link" asp-page="./Clients">
+                <span class="admin-nav__card-list-item-link-image"><i class="fas fa-desktop"></i></span>
+                <span class="admin-nav__card-list-item-link-details">
+                    <span class="admin-nav__card-list-item-link-details-header">Clients</span>
+                </span>
+            </a>
+        </li>
+        <li class="admin-nav__card-list-item @AdminNavigation.IdentityResourcesNavClass(ViewContext)">
+            <a class="admin-nav__card-list-item-link" asp-page="./IdentityResources">
+                <span class="admin-nav__card-list-item-link-image"><i class="fas fa-id-badge"></i></span>
+                <span class="admin-nav__card-list-item-link-details">
+                    <span class="admin-nav__card-list-item-link-details-header">Identity Resources</span>
+                </span>
+            </a>
+        </li>
+        <li class="admin-nav__card-list-item @AdminNavigation.ApiResourcesNavClass(ViewContext)">
+            <a class="admin-nav__card-list-item-link" asp-page="./ApiResources">
+                <span class="admin-nav__card-list-item-link-image"><i class="fas fa-cloud"></i></span>
+                <span class="admin-nav__card-list-item-link-details">
+                    <span class="admin-nav__card-list-item-link-details-header">API Resources</span>
+                </span>
+            </a>
+        </li>
+        <li class="admin-nav__card-list-item @AdminNavigation.PersistedGrantsNavClass(ViewContext)">
+            <a class="admin-nav__card-list-item-link" asp-page="./PersistedGrants">
+                <span class="admin-nav__card-list-item-link-image"><i class="fas fa-key"></i></span>
+                <span class="admin-nav__card-list-item-link-details">
+                    <span class="admin-nav__card-list-item-link-details-header">Persisted Grants</span>
+                </span>
+            </a>
+        </li>
+         <li class="admin-nav__card-list-item @AdminNavigation.UsersNavClass(ViewContext)">
+            <a class="admin-nav__card-list-item-link" asp-page="./Users">
+                <span class="admin-nav__card-list-item-link-image"><i class="fas fa-users"></i></span>
+                <span class="admin-nav__card-list-item-link-details">
+                    <span class="admin-nav__card-list-item-link-details-header">Users</span>
+                </span>
+            </a>
+        </li>
+        <li class="admin-nav__card-list-item @AdminNavigation.RolesNavClass(ViewContext)">
+            <a class="admin-nav__card-list-item-link" asp-page="./Roles">
+                <span class="admin-nav__card-list-item-link-image"><i class="fas fa-lock"></i></span>
+                <span class="admin-nav__card-list-item-link-details">
+                    <span class="admin-nav__card-list-item-link-details-header">Roles</span>
+                </span>
+            </a>
+        </li>
+    </ul>
+</nav>
