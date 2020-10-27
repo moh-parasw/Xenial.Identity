@@ -14,7 +14,7 @@
     columns.Add(model => $"<div class=\"actions-container\"><button class=\"button\" data-id=\"{model.Id}\"><i class=\"fas fa-times\"></i></button><button data-id=\"{model.Id}\" class=\"button\"><i class=\"fas fa-pen\"></i></button></div>")
         .Encoded(false)
         .Css("actions")
-        .Titled("<div class=\"actions-container\"><button class=\"button\"><i class=\"fas fa-plus\"></i></button></div>");
+        .Titled("<div class=\"actions-container\"><a class=\"button\" href=\"/Admin/Roles/Add\"><i class=\"fas fa-plus\"></i></button></div>");
     })
     .Using(GridFilterMode.Header)
     .Empty("No data found")

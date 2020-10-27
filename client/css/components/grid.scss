@@ -19,9 +19,16 @@
         padding-left: 0.1rem;
         align-items: center;
         justify-content: center;
+        background-color: var(--xenial-lighter-color);
+        color: var(--xenial-darker-color);
+        text-decoration: none;
+
         &:hover {
           color: var(--xenial-highlight-color);
         }
+      }
+      .button:first-of-type {
+        margin-left: auto;
       }
     }
   }
