@@ -1,4 +1,26 @@
 ﻿@page
 @model Xenial.Identity.Areas.Admin.Pages.UsersModel
 @{
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
 }
+
+<div class="admin-users-page">
+    <h1>Users</h1>
+    
+    @(Html.Grid(Model.Users).Build(columns =>
+    {
+    columns.Add(model => model.UserName).Titled("Username");
+    columns.Add(model => model.FirstName).Titled("Firstname");
+    columns.Add(model => model.LastName).Titled("Lastname");
+
+    columns.Add(model => $"<div class=\"actions-container\"><button class=\"button\" data-id=\"{model.Id}\"><i class=\"fas fa-times\"></i></button><button data-id=\"{model.Id}\" class=\"button\"><i class=\"fas fa-pen\"></i></button></div>")
+        .Encoded(false)
+        .Css("actions")
+        .Titled("<div class=\"actions-container\"><button class=\"button\"><i class=\"fas fa-plus\"></i></button></div>");
+    })
+    .Using(GridFilterMode.Header)
+    .Empty("No data found")
+    .Filterable(GridFilterCase.Lower)
+    .Sortable()
+    )
+</div>

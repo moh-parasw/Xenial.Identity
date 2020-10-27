@@ -1,4 +1,5 @@
+@import "grid-style";
+
 .admin-roles-page {
-  max-width: 500px;
-  margin: auto;
+    @include grid-style;
 }
