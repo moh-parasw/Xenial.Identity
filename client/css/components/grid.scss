@@ -1,0 +1,28 @@
+.mvc-grid {
+  .mvc-grid-title {
+    display: unset;
+  }
+  .actions {
+    max-width: 125px;
+    width: 1%;
+    .actions-container {
+      display: flex;
+      align-items: flex-end;
+
+      .button {
+        cursor: pointer;
+        border-radius: 50%;
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        padding: 0;
+        padding-left: 0.1rem;
+        align-items: center;
+        justify-content: center;
+        &:hover {
+          color: var(--xenial-highlight-color);
+        }
+      }
+    }
+  }
+}

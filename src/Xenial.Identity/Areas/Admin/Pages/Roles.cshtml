@@ -4,23 +4,21 @@
     Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
 }
 
-<div class"admin-roles-page">
+<div class="admin-roles-page">
     <h1>Roles</h1>
+    
+    @(Html.Grid(Model.Roles).Build(columns =>
+    {
+    columns.Add(model => model.Name).Titled("Name");
 
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var role in Model.Roles)
-            {
-            <tr>
-                <td>
-                    @role.Name
-                </td>
-            </tr>
-            }
-        </tbody>
-    </table>
+    columns.Add(model => $"<div class=\"actions-container\"><button class=\"button\" data-id=\"{model.Id}\"><i class=\"fas fa-times\"></i></button><button data-id=\"{model.Id}\" class=\"button\"><i class=\"fas fa-pen\"></i></button></div>")
+        .Encoded(false)
+        .Css("actions")
+        .Titled("<div class=\"actions-container\"><button class=\"button\"><i class=\"fas fa-plus\"></i></button></div>");
+    })
+    .Using(GridFilterMode.Header)
+    .Empty("No data found")
+    .Filterable(GridFilterCase.Lower)
+    .Sortable()
+    )
+</div>

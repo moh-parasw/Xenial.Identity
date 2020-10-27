@@ -3,7 +3,7 @@ import 'notyf/notyf.min.css';
 import { xenial } from "@xenial-io/xenial-template";
 import QRCode from "qrcode/build/qrcode";
 import { notyf } from "./notify";
-
+import { MvcGrid } from "./components/mvc-grid-6-2-1/mvc-grid";
 import "./file-upload";
 
 xenial();
@@ -45,3 +45,9 @@ document.querySelectorAll("[data-error]").forEach((el) => {
         });
     }
 };
+
+document.querySelectorAll(".mvc-grid").forEach(element => {
+    if (element instanceof HTMLElement) {
+        new MvcGrid(element);
+    }
+});

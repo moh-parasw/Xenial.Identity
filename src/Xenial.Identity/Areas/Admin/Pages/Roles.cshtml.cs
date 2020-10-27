@@ -21,7 +21,7 @@ namespace Xenial.Identity.Areas.Admin.Pages
         public RolesModel(RoleManager<IdentityRole> roleManager)
             => this.roleManager = roleManager;
 
-        public IList<RoleOutputModel> Roles { get; private set; } = new RoleOutputModel[0];
+        public IQueryable<RoleOutputModel> Roles { get; private set; } = new RoleOutputModel[0].AsQueryable();
         public class RoleOutputModel
         {
             public string Id { get; set; }
@@ -33,7 +33,7 @@ namespace Xenial.Identity.Areas.Admin.Pages
             {
                 Id = r.Id,
                 Name = r.Name
-            }).ToList();
+            }).AsQueryable();
 
     }
 }
