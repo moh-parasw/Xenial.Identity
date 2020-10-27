@@ -1,4 +1,26 @@
 ﻿@page
 @model Xenial.Identity.Areas.Admin.Pages.RolesModel
 @{
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
 }
+
+<div class"admin-roles-page">
+    <h1>Roles</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var role in Model.Roles)
+            {
+            <tr>
+                <td>
+                    @role.Name
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
