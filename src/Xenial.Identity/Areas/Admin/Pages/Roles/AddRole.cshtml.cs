@@ -52,6 +52,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Roles
                         ModelState.AddModelError(error.Description, error.Description);
                     }
                     StatusMessage = "Error saving role";
+                    return Page();
                 }
             }
 

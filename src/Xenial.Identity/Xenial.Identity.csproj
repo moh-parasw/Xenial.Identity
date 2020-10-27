@@ -24,4 +24,19 @@
     <ProjectReference Include="..\Xenial.Identity.Xpo\Xenial.Identity.Xpo.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Areas\Admin\Pages\Roles\AddRole - Copy - Copy %282%29.cshtml.cs">
+      <DependentUpon>AddRole - Copy.cshtml.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Areas\Admin\Pages\Roles\AddRole - Copy - Copy - Copy.cshtml.cs">
+      <DependentUpon>AddRole - Copy - Copy.cshtml.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Areas\Admin\Pages\Roles\AddRole - Copy - Copy.cshtml.cs">
+      <DependentUpon>AddRole - Copy.cshtml.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Areas\Admin\Pages\Roles\AddRole - Copy.cshtml.cs">
+      <DependentUpon>AddRole.cshtml.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 </Project>

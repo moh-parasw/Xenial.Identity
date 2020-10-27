@@ -11,7 +11,7 @@
     {
     columns.Add(model => model.Name).Titled("Name");
 
-    columns.Add(model => $"<div class=\"actions-container\"><button class=\"button\" data-id=\"{model.Id}\"><i class=\"fas fa-times\"></i></button><button data-id=\"{model.Id}\" class=\"button\"><i class=\"fas fa-pen\"></i></button></div>")
+    columns.Add(model => $"<div class=\"actions-container\"><button data-id=\"{model.Id}\" class=\"button\"><i class=\"fas fa-times\"></i></button><a class=\"button\" href=\"/Admin/Roles/Edit/{model.Id}\"><i class=\"fas fa-pen\"></i></a></div>")
         .Encoded(false)
         .Css("actions")
         .Titled("<div class=\"actions-container\"><a class=\"button\" href=\"/Admin/Roles/Add\"><i class=\"fas fa-plus\"></i></button></div>");
