@@ -8,24 +8,26 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
+using Xenial.Identity.Data;
+
 namespace Xenial.Identity.Areas.Admin.Pages.Users
 {
     public class EditUserModel : PageModel
     {
-        private readonly RoleManager<IdentityRole> roleManager;
+        private readonly UserManager<XenialIdentityUser> userManager;
 
-        public EditUserModel(RoleManager<IdentityRole> roleManager)
-            => this.roleManager = roleManager;
+        public EditUserModel(UserManager<XenialIdentityUser> userManager)
+            => this.userManager = userManager;
 
-        public class RoleInputModel
+        public class UserInputModel
         {
             [Required]
-            public string Name { get; set; }
+            public string UserName { get; set; }
         }
 
 
         [Required, BindProperty]
-        public RoleInputModel Input { get; set; }
+        public UserInputModel Input { get; set; }
 
         public string StatusMessage { get; set; }
 
@@ -33,17 +35,17 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
         {
             if (Input == null)
             {
-                var role = await roleManager.FindByIdAsync(id);
-                if (role == null)
+                var user = await userManager.FindByIdAsync(id);
+                if (user == null)
                 {
-                    StatusMessage = "Cannot find role";
+                    StatusMessage = "Error: Cannot find user";
                     return Page();
                 }
-                if (role != null)
+                if (user != null)
                 {
-                    Input = new RoleInputModel
+                    Input = new UserInputModel
                     {
-                        Name = role.Name
+                        UserName = user.UserName
                     };
                 }
             }
@@ -54,20 +56,20 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
         {
             if (ModelState.IsValid)
             {
-                var role = await roleManager.FindByIdAsync(id);
-                if (role == null)
+                var user = await userManager.FindByIdAsync(id);
+                if (user == null)
                 {
-                    StatusMessage = "Cannot find role";
+                    StatusMessage = "Error: Cannot find user";
                     return Page();
                 }
-                var result = await roleManager.SetRoleNameAsync(role, Input.Name);
+                var result = await userManager.SetUserNameAsync(user, Input.UserName);
                 if (result.Succeeded)
                 {
-                    var updateResult = await roleManager.UpdateAsync(role);
+                    var updateResult = await userManager.UpdateAsync(user);
 
                     if (updateResult.Succeeded)
                     {
-                        return Redirect("/Admin/Roles");
+                        return Redirect("/Admin/Users");
                     }
                     else
                     {
@@ -75,7 +77,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
                         {
                             ModelState.AddModelError(error.Description, error.Description);
                         }
-                        StatusMessage = "Error saving role";
+                        StatusMessage = "Error saving user";
                         return Page();
                     }
                 }
