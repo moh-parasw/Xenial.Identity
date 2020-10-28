@@ -1,4 +1,35 @@
 ﻿@page
 @model Xenial.Identity.Areas.Admin.Pages.ApiResourcesModel
 @{
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
 }
+
+<div class="admin-users-page">
+    <h1>Users</h1>
+
+    @(Html.Grid(Model.ApiResources).Build(columns =>
+    {
+        columns.Add(model => $"<i class=\"fa fa-fingerprint\" data-copy=\"{model.Id}\" title=\"{model.Id}\"></i>")
+            .Named(nameof(ApiResourcesModel.ApiResourceOutputModel.Id))
+            .Encoded(false)
+            .Titled("Id")
+            .Css("user-image");
+
+        columns.Add(model => $"<a href=\"/Admin/ApiResources/View/{model.Id}\">{model.Name}</a>")
+            .Named(nameof(ApiResourcesModel.ApiResourceOutputModel.Name))
+            .Encoded(false)
+            .Sortable(true)
+            .Filterable(true)
+            .Titled("Username");
+
+        columns.Add(model => $"<div class=\"actions-container\"><a href=\"/Admin/ApiResources/Delete/{model.Id}\" class=\"button\"><i class=\"fas fa-times\"></i></a><a class=\"button\" href=\"/Admin/ApiResources/Edit/{model.Id}\"><i class=\"fas fa-pen\"></i></a></div>")
+            .Encoded(false)
+            .Css("actions")
+            .Titled("<div class=\"actions-container\"><a class=\"button\" href=\"/Admin/ApiResources/Add\"><i class=\"fas fa-plus\"></i></button></div>");
+    })
+    .Using(GridFilterMode.Header)
+    .Empty("No data found")
+    .Filterable(GridFilterCase.Lower)
+    .Sortable()
+    )
+</div>

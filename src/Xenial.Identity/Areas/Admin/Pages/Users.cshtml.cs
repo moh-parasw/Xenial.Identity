@@ -34,8 +34,8 @@ namespace Xenial.Identity.Areas.Admin.Pages
             public string UserImageTag { get; set; }
         }
 
-        public async Task OnGet(CancellationToken cancellationToken = default)
-            => Users = (await userManager.Users.ToListAsync(cancellationToken)).Select(r => new UserOutputModel
+        public async Task OnGet()
+            => Users = (await userManager.Users.ToListAsync()).Select(r => new UserOutputModel
             {
                 Id = r.Id,
                 UserName = r.UserName,

@@ -1,0 +1,9 @@
+@import "forms";
+@import "tabs";
+
+.admin-delete-api-resources-page {
+  max-width: 370px;
+  margin: auto;
+  @include tab-pages(1);
+  @include xenial-form(1000rem);
+}

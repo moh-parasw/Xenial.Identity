@@ -1,0 +1,35 @@
+﻿@page "/Admin/Users/Delete/{id}"
+
+@model Xenial.Identity.Areas.Admin.Pages.ApiResources.DeleteApiResourceModel
+@{
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
+    ViewData["Title"] = "Delete Api Resource";
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="admin-delete-api-resources-page">
+    <div class="admin-delete-api-resources-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <ul class="admin-delete-api-resources-page-tabs__list">
+            <li class="admin-delete-api-resources-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="admin-delete-api-resources-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-key"></i> <span>@ViewData["Title"]</span>
+                </label>
+            </li>
+        </ul>
+        <div class="admin-delete-api-resources-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="admin-delete-api-resources-page-tabs__content">
+            <form class="xenial-form" method="post">
+                <ul class="xenial-form__list">
+                    <li class="xenial-form__list-item">
+                        <label asp-for="Input.UserName"></label>
+                        <input asp-for="Input.UserName" disabled />
+                    </li>
+                    <li class="xenial-form__list-item">
+                        <button type="submit" class="xenial-form__list-item-danger">@ViewData["Title"]</button>
+                    </li>
+                </ul>
+            </form>
+        </div>
+    </div>
+</div>
