@@ -28,8 +28,8 @@ namespace Xenial.Identity.Areas.Admin.Pages
             public string Name { get; set; }
         }
 
-        public async Task OnGet(CancellationToken cancellationToken = default)
-            => Roles = (await roleManager.Roles.ToListAsync(cancellationToken)).Select(r => new RoleOutputModel
+        public async Task OnGet()
+            => Roles = (await roleManager.Roles.ToListAsync()).Select(r => new RoleOutputModel
             {
                 Id = r.Id,
                 Name = r.Name

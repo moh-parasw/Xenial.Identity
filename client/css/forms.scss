@@ -156,6 +156,8 @@
           background-color: var(--xenial-lighter-color);
           color: var(--xenial-darker-color);
           cursor: pointer;
+          max-width: unset;
+          text-decoration: none;
 
           &.xenial-form__list-item-submit {
             background-color: var(--xenial-highlight-color);

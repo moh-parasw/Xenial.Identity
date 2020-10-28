@@ -9,7 +9,7 @@
     
     @(Html.Grid(Model.Roles).Build(columns =>
     {
-    columns.Add(model => model.Name).Titled("Name");
+    columns.Add(model => $"<a href=\"Admin/Roles/View/{model.Id}\">{model.Name}</a>").Encoded(false).Titled("Name");
 
     columns.Add(model => $"<div class=\"actions-container\"><button data-id=\"{model.Id}\" class=\"button\"><i class=\"fas fa-times\"></i></button><a class=\"button\" href=\"/Admin/Roles/Edit/{model.Id}\"><i class=\"fas fa-pen\"></i></a></div>")
         .Encoded(false)

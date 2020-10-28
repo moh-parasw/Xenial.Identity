@@ -1,0 +1,83 @@
+﻿@page "/Admin/Roles/View/{id}"
+
+@model Xenial.Identity.Areas.Admin.Pages.Roles.ViewRoleModel
+@{
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
+    ViewData["Title"] = "Edit Role";
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="admin-view-role-page">
+    <div class="admin-view-role-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <input type="radio" id="tab2" name="tab-control">
+        <input type="radio" id="tab3" name="tab-control">
+        <ul class="admin-view-role-page-tabs__list">
+            <li class="admin-view-role-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="admin-view-role-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-key"></i> <span>@ViewData["Title"]</span>
+                </label>
+            </li>
+            <li class="admin-view-role-page-tabs__list-item" title="Claims">
+                <label class="admin-view-role-page-tabs__list-item-label" for="tab2" role="button">
+                    <i class="fas fa-file-alt"></i> <span>Claims</span>
+                </label>
+            </li>
+            <li class="admin-view-role-page-tabs__list-item" title="Users">
+                <label class="admin-view-role-page-tabs__list-item-label" for="tab3" role="button">
+                    <i class="fas fa-user"></i> <span>Users</span>
+                </label>
+            </li>
+        </ul>
+        <div class="admin-view-role-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="admin-view-role-page-tabs__content">
+            <section>
+                <ul class="xenial-form__list">
+                    <li class="xenial-form__list-item">
+                        <label asp-for="Output.Name"></label>
+                        <input asp-for="Output.Name" disabled />
+                    </li>
+                    <li class="xenial-form__list-item">
+                        <label class="button" for="tab2" role="button">
+                            <i class="fas fa-file-alt"></i> <span>Claims</span>
+                        </label>
+                    </li>
+                    <li class="xenial-form__list-item">
+                        <label class="button" for="tab3" role="button">
+                            <i class="fas fa-user"></i> <span>Users</span>
+                        </label>
+                    </li>
+                    <li class="xenial-form__list-item">
+                        <a href="/Admin/Roles/Edit/@Model.Output.Id" class="button xenial-form__list-item-submit" role="button">
+                            <i class="fas fa-pen"></i> <span>Edit</span>
+                        </a>
+                    </li>
+                    <li class="xenial-form__list-item">
+                        <a href="/Admin/Roles/Delete/@Model.Output.Id" class="button xenial-form__list-item-danger" role="button">
+                            <i class="fas fa-times"></i> <span>Delete</span>
+                        </a>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                @(Html.Grid(Model.Output.Claims).Build(columns =>
+                {
+                    columns.Add(model => model.Issuer).Titled("Issuer");
+                    columns.Add(model => model.Type).Titled("Type");
+                    columns.Add(model => model.Value).Titled("Value");
+                })
+                .Empty("No data found")
+                )
+            </section>
+            <section>
+                @(Html.Grid(Model.Output.Users).Build(columns =>
+                {
+                    columns.Add(model => model.ImageTag).Encoded(false).Titled(string.Empty).Css("user-image");
+                    columns.Add(model => $"<a href=\"/Admin/Users/View/{model.Id}\">{model.UserName}</a>").Encoded(false).Titled("Username");
+                })
+                .Empty("No data found")
+                )
+            </section>
+        </div>
+    </div>
+</div>

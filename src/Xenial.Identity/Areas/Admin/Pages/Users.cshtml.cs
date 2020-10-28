@@ -44,7 +44,7 @@ namespace Xenial.Identity.Areas.Admin.Pages
                 UserImageTag = UserImageTag(r)
             }).AsQueryable();
 
-        private string UserImageTag(XenialIdentityUser user)
+        public static string UserImageTag(XenialIdentityUser user)
         {
             var model = new ProfilePictureModel(user);
             var userImageTag = @$"<div class=""profile-card__image"" style=""--profile-card-height: 2.5rem;"">";
