@@ -40,13 +40,13 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
         {
             if (ModelState.IsValid)
             {
-                var identityResource = new XpoApiResource(unitOfWork)
+                var apiResource = new XpoApiResource(unitOfWork)
                 {
                     Name = Input.Name
                 };
                 try
                 {
-                    await unitOfWork.SaveAsync(identityResource);
+                    await unitOfWork.SaveAsync(apiResource);
                     await unitOfWork.CommitChangesAsync();
                     return Redirect("/Admin/ApiResources");
                 }

@@ -4,74 +4,80 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
+using DevExpress.Xpo;
+using DevExpress.Xpo.DB.Exceptions;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
 using Xenial.Identity.Data;
+using Xenial.Identity.Xpo.Storage.Models;
 
 namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
 {
     public class DeleteApiResourceModel : PageModel
     {
-        private readonly UserManager<XenialIdentityUser> userManager;
-
-        public DeleteApiResourceModel(UserManager<XenialIdentityUser> userManager)
-            => this.userManager = (userManager);
+        private readonly UnitOfWork unitOfWork;
+        private readonly ILogger<DeleteApiResourceModel> logger;
+        public DeleteApiResourceModel(UnitOfWork unitOfWork, ILogger<DeleteApiResourceModel> logger)
+            => (this.unitOfWork, this.logger) = (unitOfWork, logger);
 
         public class ApiResourceOutputModel
         {
-            public string UserName { get; set; }
+            public string Name { get; set; }
         }
 
         public ApiResourceOutputModel Input { get; set; }
 
         public string StatusMessage { get; set; }
 
-        public async Task<IActionResult> OnGet([FromRoute] string id)
+        public async Task<IActionResult> OnGet([FromRoute] int id)
         {
-            if (Input == null)
+            var apiResource = await unitOfWork.GetObjectByKeyAsync<XpoApiResource>(id);
+            if (apiResource == null)
             {
-                var user = await userManager.FindByIdAsync(id);
-                if (user == null)
-                {
-                    StatusMessage = "Cannot find api resource";
-                    return Page();
-                }
-                if (user != null)
-                {
-                    Input = new ApiResourceOutputModel
-                    {
-                        UserName = user.UserName
-                    };
-                }
+                StatusMessage = "Cannot find api resource";
+                return Page();
             }
+            if (apiResource != null)
+            {
+                Input = new ApiResourceOutputModel
+                {
+                    Name = apiResource.Name
+                };
+            }
+
             return Page();
         }
 
-        public async Task<IActionResult> OnPost([FromRoute] string id)
+        public async Task<IActionResult> OnPost([FromRoute] int id)
         {
             if (ModelState.IsValid)
             {
-                var user = await userManager.FindByIdAsync(id);
-                if (user == null)
+                var apiResource = await unitOfWork.GetObjectByKeyAsync<XpoApiResource>(id);
+                if (apiResource == null)
                 {
                     StatusMessage = "Error: Cannot find api resource";
                     return Page();
                 }
 
-                var result = await userManager.DeleteAsync(user);
-                if (result.Succeeded)
+                try
                 {
+                    await unitOfWork.DeleteAsync(apiResource);
+                    await unitOfWork.CommitChangesAsync();
                     return Redirect("/Admin/ApiResources");
                 }
-                else
+                catch (ConstraintViolationException ex)
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(error.Description, error.Description);
-                    }
-                    StatusMessage = "Error deleting api resource";
+                    logger.LogWarning(ex, "Error deleting ApiResource with {Name}", Input?.Name);
+                    ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.Name)}", "Api resource name must be unique");
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Error deleting ApiResource with {Name}", Input?.Name);
+                    StatusMessage = $"Error saving api resource: {ex.Message}";
                     return Page();
                 }
             }
