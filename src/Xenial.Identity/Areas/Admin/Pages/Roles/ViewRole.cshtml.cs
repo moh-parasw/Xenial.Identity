@@ -48,45 +48,40 @@ namespace Xenial.Identity.Areas.Admin.Pages.Roles
             }
         }
 
-        public RoleOutputModel Output { get; set; }
+        public RoleOutputModel Output { get; set; } = new RoleOutputModel();
 
         public string StatusMessage { get; set; }
 
         public async Task<IActionResult> OnGet([FromRoute] string id)
         {
-            if (Output == null)
+            var role = await roleManager.FindByIdAsync(id);
+            if (role == null)
             {
-                var role = await roleManager.FindByIdAsync(id);
-
-                var claims = await roleManager.GetClaimsAsync(role);
-                var users = await userManager.GetUsersInRoleAsync(role.NormalizedName);
-
-                if (role == null)
-                {
-                    StatusMessage = "Cannot find role";
-                    return Page();
-                }
-                if (role != null)
-                {
-                    Output = new RoleOutputModel
-                    {
-                        Name = role.Name,
-                        Id = role.Id,
-                        Claims = claims.Select(c => new RoleOutputModel.ClaimModel
-                        {
-                            Type = c.Type,
-                            Value = c.Value,
-                            Issuer = c.Issuer,
-                        }).ToList(),
-                        Users = users.Select(u => new RoleOutputModel.UserModel
-                        {
-                            Id = u.Id,
-                            UserName = u.UserName,
-                            ImageTag = UsersModel.UserImageTag(u)
-                        }).ToList()
-                    };
-                }
+                StatusMessage = "Error: Cannot find role";
+                return Page();
             }
+
+            var claims = await roleManager.GetClaimsAsync(role);
+            var users = await userManager.GetUsersInRoleAsync(role.NormalizedName);
+
+            Output = new RoleOutputModel
+            {
+                Name = role.Name,
+                Id = role.Id,
+                Claims = claims.Select(c => new RoleOutputModel.ClaimModel
+                {
+                    Type = c.Type,
+                    Value = c.Value,
+                    Issuer = c.Issuer,
+                }).ToList(),
+                Users = users.Select(u => new RoleOutputModel.UserModel
+                {
+                    Id = u.Id,
+                    UserName = u.UserName,
+                    ImageTag = UsersModel.UserImageTag(u)
+                }).ToList()
+            };
+
             return Page();
         }
     }

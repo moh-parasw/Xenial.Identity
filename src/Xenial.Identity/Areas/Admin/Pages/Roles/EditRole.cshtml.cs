@@ -36,7 +36,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Roles
                 var role = await roleManager.FindByIdAsync(id);
                 if (role == null)
                 {
-                    StatusMessage = "Cannot find role";
+                    StatusMessage = "Error: Cannot find role";
                     return Page();
                 }
                 if (role != null)
@@ -57,7 +57,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Roles
                 var role = await roleManager.FindByIdAsync(id);
                 if (role == null)
                 {
-                    StatusMessage = "Cannot find role";
+                    StatusMessage = "Error: Cannot find role";
                     return Page();
                 }
                 var result = await roleManager.SetRoleNameAsync(role, Input.Name);

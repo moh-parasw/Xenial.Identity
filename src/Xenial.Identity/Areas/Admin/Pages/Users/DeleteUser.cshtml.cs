@@ -8,13 +8,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Xenial.Identity.Areas.Admin.Pages.Roles
+namespace Xenial.Identity.Areas.Admin.Pages.Users
 {
-    public class DeleteRoleModel : PageModel
+    public class DeleteUserModel : PageModel
     {
         private readonly RoleManager<IdentityRole> roleManager;
 
-        public DeleteRoleModel(RoleManager<IdentityRole> roleManager)
+        public DeleteUserModel(RoleManager<IdentityRole> roleManager)
             => this.roleManager = roleManager;
 
         public class RoleOutputModel
@@ -33,7 +33,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Roles
                 var role = await roleManager.FindByIdAsync(id);
                 if (role == null)
                 {
-                    StatusMessage = "Error: Cannot find role";
+                    StatusMessage = "Cannot find role";
                     return Page();
                 }
                 if (role != null)
@@ -54,7 +54,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Roles
                 var role = await roleManager.FindByIdAsync(id);
                 if (role == null)
                 {
-                    StatusMessage = "Error: Cannot find role";
+                    StatusMessage = "Cannot find role";
                     return Page();
                 }
                 if (role.Name == "Administrator")

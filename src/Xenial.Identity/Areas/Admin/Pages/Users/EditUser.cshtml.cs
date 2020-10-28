@@ -8,21 +8,24 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Xenial.Identity.Areas.Admin.Pages.Roles
+namespace Xenial.Identity.Areas.Admin.Pages.Users
 {
-    public class DeleteRoleModel : PageModel
+    public class EditUserModel : PageModel
     {
         private readonly RoleManager<IdentityRole> roleManager;
 
-        public DeleteRoleModel(RoleManager<IdentityRole> roleManager)
+        public EditUserModel(RoleManager<IdentityRole> roleManager)
             => this.roleManager = roleManager;
 
-        public class RoleOutputModel
+        public class RoleInputModel
         {
+            [Required]
             public string Name { get; set; }
         }
 
-        public RoleOutputModel Input { get; set; }
+
+        [Required, BindProperty]
+        public RoleInputModel Input { get; set; }
 
         public string StatusMessage { get; set; }
 
@@ -33,12 +36,12 @@ namespace Xenial.Identity.Areas.Admin.Pages.Roles
                 var role = await roleManager.FindByIdAsync(id);
                 if (role == null)
                 {
-                    StatusMessage = "Error: Cannot find role";
+                    StatusMessage = "Cannot find role";
                     return Page();
                 }
                 if (role != null)
                 {
-                    Input = new RoleOutputModel
+                    Input = new RoleInputModel
                     {
                         Name = role.Name
                     };
@@ -54,22 +57,27 @@ namespace Xenial.Identity.Areas.Admin.Pages.Roles
                 var role = await roleManager.FindByIdAsync(id);
                 if (role == null)
                 {
-                    StatusMessage = "Error: Cannot find role";
+                    StatusMessage = "Cannot find role";
                     return Page();
                 }
-                if (role.Name == "Administrator")
-                {
-                    StatusMessage = "Cannot delete 'Administrator' role";
-                    Input = new RoleOutputModel
-                    {
-                        Name = role.Name
-                    };
-                    return Page();
-                }
-                var result = await roleManager.DeleteAsync(role);
+                var result = await roleManager.SetRoleNameAsync(role, Input.Name);
                 if (result.Succeeded)
                 {
-                    return Redirect("/Admin/Roles");
+                    var updateResult = await roleManager.UpdateAsync(role);
+
+                    if (updateResult.Succeeded)
+                    {
+                        return Redirect("/Admin/Roles");
+                    }
+                    else
+                    {
+                        foreach (var error in updateResult.Errors)
+                        {
+                            ModelState.AddModelError(error.Description, error.Description);
+                        }
+                        StatusMessage = "Error saving role";
+                        return Page();
+                    }
                 }
                 else
                 {
@@ -77,7 +85,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Roles
                     {
                         ModelState.AddModelError(error.Description, error.Description);
                     }
-                    StatusMessage = "Error deleting role";
+                    StatusMessage = "Error setting role name";
                     return Page();
                 }
             }

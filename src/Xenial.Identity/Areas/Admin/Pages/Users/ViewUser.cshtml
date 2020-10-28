@@ -1,9 +1,9 @@
-﻿@page "/Admin/Roles/View/{id}"
+﻿@page "/Admin/Users/View/{id}"
 
-@model Xenial.Identity.Areas.Admin.Pages.Roles.ViewRoleModel
+@model Xenial.Identity.Areas.Admin.Pages.Users.ViewUserModel
 @{
     Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
-    ViewData["Title"] = "Role";
+    ViewData["Title"] = "User";
 }
 
 <partial name="_StatusMessage" model="Model.StatusMessage" />
@@ -23,9 +23,9 @@
                     <i class="fas fa-file-alt"></i> <span>Claims</span>
                 </label>
             </li>
-            <li class="admin-view-role-page-tabs__list-item" title="Users">
+            <li class="admin-view-role-page-tabs__list-item" title="Roles">
                 <label class="admin-view-role-page-tabs__list-item-label" for="tab3" role="button">
-                    <i class="fas fa-user"></i> <span>Users</span>
+                    <i class="fas fa-lock"></i> <span>Roles</span>
                 </label>
             </li>
         </ul>
@@ -38,8 +38,8 @@
                         <input asp-for="Output.Id" disabled />
                     </li>
                     <li class="xenial-form__list-item">
-                        <label asp-for="Output.Name"></label>
-                        <input asp-for="Output.Name" disabled />
+                        <label asp-for="Output.UserName"></label>
+                        <input asp-for="Output.UserName" disabled />
                     </li>
                     <li class="xenial-form__list-item">
                         <label class="button" for="tab2" role="button">
@@ -48,16 +48,16 @@
                     </li>
                     <li class="xenial-form__list-item">
                         <label class="button" for="tab3" role="button">
-                            <i class="fas fa-user"></i> <span>Users</span>
+                            <i class="fas fa-lock"></i> <span>Roles</span>
                         </label>
                     </li>
                     <li class="xenial-form__list-item">
-                        <a href="/Admin/Roles/Edit/@Model.Output.Id" class="button xenial-form__list-item-submit" role="button">
+                        <a href="/Admin/Users/Edit/@Model.Output.Id" class="button xenial-form__list-item-submit" role="button">
                             <i class="fas fa-pen"></i> <span>Edit</span>
                         </a>
                     </li>
                     <li class="xenial-form__list-item">
-                        <a href="/Admin/Roles/Delete/@Model.Output.Id" class="button xenial-form__list-item-danger" role="button">
+                        <a href="/Admin/Users/Delete/@Model.Output.Id" class="button xenial-form__list-item-danger" role="button">
                             <i class="fas fa-times"></i> <span>Delete</span>
                         </a>
                     </li>
@@ -74,16 +74,15 @@
                 )
             </section>
             <section>
-                @(Html.Grid(Model.Output.Users).Build(columns =>
+                @(Html.Grid(Model.Output.Roles).Build(columns =>
                 {
                     columns.Add(model => $"<i class=\"fa fa-fingerprint\" data-copy=\"{model.Id}\" title=\"{model.Id}\"></i>")
-                        .Named(nameof(Xenial.Identity.Areas.Admin.Pages.Roles.ViewRoleModel.RoleOutputModel.UserModel.Id))
+                        .Named(nameof(Xenial.Identity.Areas.Admin.Pages.Users.ViewUserModel.UserOutputModel.RoleModel.Id))
                         .Encoded(false)
                         .Titled("Id")
                         .Css("user-image");
 
-                    columns.Add(model => model.ImageTag).Encoded(false).Titled(string.Empty).Css("user-image");
-                    columns.Add(model => $"<a href=\"/Admin/Users/View/{model.Id}\">{model.UserName}</a>").Encoded(false).Titled("Username");
+                    columns.Add(model => $"<a href=\"/Admin/Roles/View/{model.Id}\">{model.Name}</a>").Encoded(false).Titled("Name");
                 })
                 .Empty("No data found")
                 )
