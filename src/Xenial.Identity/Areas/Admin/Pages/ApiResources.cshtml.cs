@@ -19,7 +19,7 @@ namespace Xenial.Identity.Areas.Admin.Pages
             => this.unitOfWork = unitOfWork;
 
 
-        public IQueryable<ApiResourceOutputModel> ApiResources { get; private set; } = new ApiResourceOutputModel[0].AsQueryable();
+        public IQueryable<ApiResourceOutputModel> ApiResources { get; set; } = new ApiResourceOutputModel[0].AsQueryable();
 
         public class ApiResourceOutputModel
         {
@@ -27,11 +27,11 @@ namespace Xenial.Identity.Areas.Admin.Pages
             public string Name { get; set; }
         }
 
-        public void OnGet()
-            => ApiResources = unitOfWork.Query<XpoApiResource>().Select(r => new ApiResourceOutputModel
+        public async Task OnGet()
+            => ApiResources = (await unitOfWork.Query<XpoApiResource>().Select(r => new ApiResourceOutputModel
             {
                 Id = r.Id,
                 Name = r.Name
-            }).AsQueryable();
+            }).ToListAsync()).AsQueryable();
     }
 }
