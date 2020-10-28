@@ -1,0 +1,9 @@
+@import "forms";
+@import "tabs";
+@import "view-style";
+
+.admin-view-user-page {
+  @include view-style();
+  @include tab-pages(3);
+  @include xenial-form(1000rem);
+}

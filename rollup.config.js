@@ -40,6 +40,7 @@ export default (commandLineArgs) => {
         babel({
           extensions,
           exclude: "node_modules/**",
+          babelHelpers: 'bundled'
         }),
         scss({
           output: `src/Xenial.Identity/wwwroot/css/bundle.css`,

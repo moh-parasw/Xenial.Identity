@@ -7,18 +7,18 @@
 }
 
 <partial name="_StatusMessage" model="Model.StatusMessage" />
-<div class="admin-add-role-page">
-    <div class="admin-add-role-page-tabs">
+<div class="admin-add-user-page">
+    <div class="admin-add-user-page-tabs">
         <input type="radio" id="tab1" name="tab-control" checked>
-        <ul class="admin-add-role-page-tabs__list">
-            <li class="admin-add-role-page-tabs__list-item" title="@ViewData["Title"]">
-                <label class="admin-add-role-page-tabs__list-item-label" for="tab1" role="button">
+        <ul class="admin-add-user-page-tabs__list">
+            <li class="admin-add-user-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="admin-add-user-page-tabs__list-item-label" for="tab1" role="button">
                     <i class="fas fa-key"></i> <span>@ViewData["Title"]</span>
                 </label>
             </li>
         </ul>
-        <div class="admin-add-role-page-tabs__slider"><div class="indicator"></div></div>
-        <div class="admin-add-role-page-tabs__content">
+        <div class="admin-add-user-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="admin-add-user-page-tabs__content">
             <form class="xenial-form" method="post">
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <ul class="xenial-form__list">
