@@ -8,24 +8,26 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
+using Xenial.Identity.Data;
+
 namespace Xenial.Identity.Areas.Admin.Pages.Users
 {
     public class AddUserModel : PageModel
     {
-        private readonly RoleManager<IdentityRole> roleManager;
+        private readonly UserManager<XenialIdentityUser> userManager;
 
-        public AddUserModel(RoleManager<IdentityRole> roleManager)
-            => this.roleManager = roleManager;
+        public AddUserModel(UserManager<XenialIdentityUser> userManager)
+            => this.userManager = userManager;
 
-        public class RoleInputModel
+        public class UserInputModel
         {
             [Required]
-            public string Name { get; set; }
+            public string UserName { get; set; }
         }
 
 
         [Required, BindProperty]
-        public RoleInputModel Input { get; set; }
+        public UserInputModel Input { get; set; }
 
         public string StatusMessage { get; set; }
 
@@ -33,13 +35,13 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
         {
             if (ModelState.IsValid)
             {
-                var role = new IdentityRole
+                var role = new XenialIdentityUser
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = Input.Name
+                    UserName = Input.UserName
                 };
 
-                var result = await roleManager.CreateAsync(role);
+                var result = await userManager.CreateAsync(role);
 
                 if (result.Succeeded)
                 {
@@ -51,7 +53,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
                     {
                         ModelState.AddModelError(error.Description, error.Description);
                     }
-                    StatusMessage = "Error saving role";
+                    StatusMessage = "Error saving user";
                     return Page();
                 }
             }
