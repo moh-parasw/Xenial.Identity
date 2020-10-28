@@ -34,6 +34,11 @@
             <section>
                 <ul class="xenial-form__list">
                     <li class="xenial-form__list-item">
+                        <label asp-for="Output.Id"></label>
+                        <input asp-for="Output.Id" disabled />
+                        <i class=\"fa fa-fingerprint\" data-copy="@Model.Output.Id"></i>
+                    </li>
+                    <li class="xenial-form__list-item">
                         <label asp-for="Output.Name"></label>
                         <input asp-for="Output.Name" disabled />
                     </li>

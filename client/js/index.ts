@@ -5,6 +5,7 @@ import QRCode from "qrcode/build/qrcode";
 import { notyf } from "./notify";
 import { MvcGrid } from "./components/mvc-grid-6-2-1/mvc-grid";
 import "./file-upload";
+import copy from "copy-to-clipboard";
 
 xenial();
 
@@ -49,5 +50,19 @@ document.querySelectorAll("[data-error]").forEach((el) => {
 document.querySelectorAll(".mvc-grid").forEach(element => {
     if (element instanceof HTMLElement) {
         new MvcGrid(element);
+    }
+});
+document.querySelectorAll("[data-copy]").forEach(element => {
+    if (element instanceof HTMLElement) {
+        element.style.cursor = "pointer";
+        const dataToCopy = element.getAttribute("data-copy");
+        element.title = `copy ${dataToCopy} to clipboard`;
+        element.onclick = () => {
+            const dataToCopy = element.getAttribute("data-copy");
+            if (dataToCopy) {
+                copy(dataToCopy);
+                notyf.success(`<div style="text-align: center;">Copied <br>${dataToCopy}<br>to clipboard</div>`)
+            }
+        };
     }
 });
