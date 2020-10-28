@@ -8,21 +8,23 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
+using Xenial.Identity.Data;
+
 namespace Xenial.Identity.Areas.Admin.Pages.Users
 {
     public class DeleteUserModel : PageModel
     {
-        private readonly RoleManager<IdentityRole> roleManager;
+        private readonly UserManager<XenialIdentityUser> userManager;
 
-        public DeleteUserModel(RoleManager<IdentityRole> roleManager)
-            => this.roleManager = roleManager;
+        public DeleteUserModel(UserManager<XenialIdentityUser> userManager)
+            => this.userManager = (userManager);
 
-        public class RoleOutputModel
+        public class UserOutputModel
         {
-            public string Name { get; set; }
+            public string UserName { get; set; }
         }
 
-        public RoleOutputModel Input { get; set; }
+        public UserOutputModel Input { get; set; }
 
         public string StatusMessage { get; set; }
 
@@ -30,17 +32,17 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
         {
             if (Input == null)
             {
-                var role = await roleManager.FindByIdAsync(id);
-                if (role == null)
+                var user = await userManager.FindByIdAsync(id);
+                if (user == null)
                 {
                     StatusMessage = "Cannot find role";
                     return Page();
                 }
-                if (role != null)
+                if (user != null)
                 {
-                    Input = new RoleOutputModel
+                    Input = new UserOutputModel
                     {
-                        Name = role.Name
+                        UserName = user.UserName
                     };
                 }
             }
@@ -51,25 +53,27 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
         {
             if (ModelState.IsValid)
             {
-                var role = await roleManager.FindByIdAsync(id);
-                if (role == null)
+                var user = await userManager.FindByIdAsync(id);
+                var currentUser = await userManager.GetUserAsync(User);
+                if (user == null || currentUser == null)
                 {
-                    StatusMessage = "Cannot find role";
+                    StatusMessage = "Error: Cannot find user";
                     return Page();
                 }
-                if (role.Name == "Administrator")
+
+                if (user.Id == currentUser.Id)
                 {
-                    StatusMessage = "Cannot delete 'Administrator' role";
-                    Input = new RoleOutputModel
+                    StatusMessage = "Error: Cannot delete current user";
+                    Input = new UserOutputModel
                     {
-                        Name = role.Name
+                        UserName = user.UserName
                     };
                     return Page();
                 }
-                var result = await roleManager.DeleteAsync(role);
+                var result = await userManager.DeleteAsync(user);
                 if (result.Succeeded)
                 {
-                    return Redirect("/Admin/Roles");
+                    return Redirect("/Admin/Users");
                 }
                 else
                 {
@@ -77,7 +81,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
                     {
                         ModelState.AddModelError(error.Description, error.Description);
                     }
-                    StatusMessage = "Error deleting role";
+                    StatusMessage = "Error deleting user";
                     return Page();
                 }
             }
