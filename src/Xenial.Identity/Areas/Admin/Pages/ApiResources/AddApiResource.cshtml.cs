@@ -4,25 +4,30 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
+using DevExpress.Xpo;
+using DevExpress.Xpo.DB.Exceptions;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
 using Xenial.Identity.Data;
+using Xenial.Identity.Xpo.Storage.Models;
 
 namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
 {
     public class AddApiResourceModel : PageModel
     {
-        private readonly UserManager<XenialIdentityUser> userManager;
-
-        public AddApiResourceModel(UserManager<XenialIdentityUser> userManager)
-            => this.userManager = userManager;
+        private readonly UnitOfWork unitOfWork;
+        private readonly ILogger<AddApiResourceModel> logger;
+        public AddApiResourceModel(UnitOfWork unitOfWork, ILogger<AddApiResourceModel> logger)
+            => (this.unitOfWork, this.logger) = (unitOfWork, logger);
 
         public class ApiResourceInputModel
         {
             [Required]
-            public string UserName { get; set; }
+            public string Name { get; set; }
         }
 
 
@@ -35,25 +40,25 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
         {
             if (ModelState.IsValid)
             {
-                var role = new XenialIdentityUser
+                var identityResource = new XpoApiResource(unitOfWork)
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    UserName = Input.UserName
+                    Name = Input.Name
                 };
-
-                var result = await userManager.CreateAsync(role);
-
-                if (result.Succeeded)
+                try
                 {
+                    await unitOfWork.SaveAsync(identityResource);
+                    await unitOfWork.CommitChangesAsync();
                     return Redirect("/Admin/ApiResources");
                 }
-                else
+                catch (ConstraintViolationException ex)
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(error.Description, error.Description);
-                    }
-                    StatusMessage = "Error saving api resource";
+                    logger.LogWarning(ex, "Error saving ApiResource with {Name}", Input?.Name);
+                    ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.Name)}", "Api resource name must be unique");
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Error saving ApiResource with {Name}", Input?.Name);
+                    StatusMessage = $"Error saving api resource: {ex.Message}";
                     return Page();
                 }
             }

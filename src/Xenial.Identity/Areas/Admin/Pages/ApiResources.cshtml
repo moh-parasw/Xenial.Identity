@@ -20,7 +20,7 @@
             .Encoded(false)
             .Sortable(true)
             .Filterable(true)
-            .Titled("Username");
+            .Titled("Name");
 
         columns.Add(model => $"<div class=\"actions-container\"><a href=\"/Admin/ApiResources/Delete/{model.Id}\" class=\"button\"><i class=\"fas fa-times\"></i></a><a class=\"button\" href=\"/Admin/ApiResources/Edit/{model.Id}\"><i class=\"fas fa-pen\"></i></a></div>")
             .Encoded(false)

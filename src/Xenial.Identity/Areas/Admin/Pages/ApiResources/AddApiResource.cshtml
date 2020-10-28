@@ -13,7 +13,7 @@
         <ul class="admin-add-api-resources-page-tabs__list">
             <li class="admin-add-api-resources-page-tabs__list-item" title="@ViewData["Title"]">
                 <label class="admin-add-api-resources-page-tabs__list-item-label" for="tab1" role="button">
-                    <i class="fas fa-key"></i> <span>@ViewData["Title"]</span>
+                    <i class="fas fa-cloud"></i> <span>@ViewData["Title"]</span>
                 </label>
             </li>
         </ul>
@@ -23,9 +23,9 @@
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <ul class="xenial-form__list">
                     <li class="xenial-form__list-item">
-                        <label asp-for="Input.UserName"></label>
-                        <input asp-for="Input.UserName" class="form-control" />
-                        <span asp-validation-for="Input.UserName" class="text-danger"></span>
+                        <label asp-for="Input.Name"></label>
+                        <input asp-for="Input.Name" class="form-control" />
+                        <span asp-validation-for="Input.Name" class="text-danger"></span>
                     </li>
                     <li class="xenial-form__list-item">
                         <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>
