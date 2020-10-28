@@ -3,7 +3,7 @@
 @model Xenial.Identity.Areas.Admin.Pages.Roles.ViewRoleModel
 @{
     Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
-    ViewData["Title"] = "Edit Role";
+    ViewData["Title"] = "Role";
 }
 
 <partial name="_StatusMessage" model="Model.StatusMessage" />
@@ -15,7 +15,7 @@
         <ul class="admin-view-role-page-tabs__list">
             <li class="admin-view-role-page-tabs__list-item" title="@ViewData["Title"]">
                 <label class="admin-view-role-page-tabs__list-item-label" for="tab1" role="button">
-                    <i class="fas fa-key"></i> <span>@ViewData["Title"]</span>
+                    <i class="fas fa-lock"></i> <span>@ViewData["Title"]</span>
                 </label>
             </li>
             <li class="admin-view-role-page-tabs__list-item" title="Claims">
