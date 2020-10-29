@@ -16,7 +16,7 @@
             .Titled("Id")
             .Css("user-image");
 
-        columns.Add(model => $"<a href=\"/Admin/ApiResources/View/{model.Id}\">{model.Name}</a>")
+        columns.Add(model => $"<a href=\"/Admin/ApiResources/Edit/{model.Id}\">{model.Name}</a>")
             .Named(nameof(ApiResourcesModel.ApiResourceOutputModel.Name))
             .Encoded(false)
             .Sortable(true)
