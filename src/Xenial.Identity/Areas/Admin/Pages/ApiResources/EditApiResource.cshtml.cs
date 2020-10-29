@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -36,14 +37,44 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
             public string ApiScopes { get; set; }
         }
 
+        public IList<SecretsOutputModel> Secrets { get; set; } = new List<SecretsOutputModel>();
+        public IList<PropertiesOutputModel> Properties { get; set; } = new List<PropertiesOutputModel>();
+
+        public class SecretsOutputModel
+        {
+            public int Id { get; set; }
+            public string Description { get; set; }
+            public string Value { get; set; }
+            public string Type { get; set; }
+            public DateTime Created { get; set; }
+            public DateTime? Expiration { get; set; }
+        }
+
+        public class PropertiesOutputModel
+        {
+            public int Id { get; set; }
+            public string Key { get; set; }
+            public string Value { get; set; }
+        }
+
         internal class ApiResourceMappingConfiguration : Profile
         {
             public ApiResourceMappingConfiguration()
-                => CreateMap<ApiResourceInputModel, XpoApiResource>()
-                    .ForMember(api => api.UserClaims, o => o.Ignore())
-                    .ForMember(api => api.Scopes, o => o.Ignore())
-                    .ReverseMap()
-                ;
+            {
+                CreateMap<ApiResourceInputModel, XpoApiResource>()
+                                   .ForMember(api => api.UserClaims, o => o.Ignore())
+                                   .ForMember(api => api.Scopes, o => o.Ignore())
+                                   .ForMember(api => api.Secrets, o => o.Ignore())
+                                   .ForMember(api => api.Properties, o => o.Ignore())
+                                   .ReverseMap()
+                               ;
+
+                CreateMap<SecretsOutputModel, XpoApiResourceSecret>()
+                    .ReverseMap();
+
+                CreateMap<PropertiesOutputModel, XpoApiResourceProperty>()
+                    .ReverseMap();
+            }
         }
 
         internal static IMapper Mapper { get; }
@@ -56,6 +87,8 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
         public string StatusMessage { get; set; }
 
         public string ApiScopes { get; set; }
+        public int Id { get; set; }
+        public string SelectedPage { get; set; }
 
         private async Task FetchScopes()
         {
@@ -63,8 +96,11 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
             ApiScopes = string.Join(",", scopeNames);
         }
 
-        public async Task<IActionResult> OnGet([FromRoute] int id)
+        public async Task<IActionResult> OnGet([FromRoute] int id, [FromQuery] string selectedPage)
         {
+            Id = id;
+            SelectedPage = selectedPage;
+
             await FetchScopes();
             var apiResource = await unitOfWork.GetObjectByKeyAsync<XpoApiResource>(id);
             if (apiResource == null)
@@ -78,11 +114,15 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
             Input.UserClaims = string.Join(",", apiResource.UserClaims.Select(userClaim => userClaim.Type));
             Input.ApiScopes = string.Join(",", apiResource.Scopes.Select(scope => scope.Scope));
 
+            Secrets = apiResource.Secrets.Select(secret => Mapper.Map<SecretsOutputModel>(secret)).ToList();
+            Properties = apiResource.Properties.Select(propertey => Mapper.Map<PropertiesOutputModel>(propertey)).ToList();
+
             return Page();
         }
 
         public async Task<IActionResult> OnPost([FromRoute] int id)
         {
+            Id = id;
             await FetchScopes();
             if (ModelState.IsValid)
             {
