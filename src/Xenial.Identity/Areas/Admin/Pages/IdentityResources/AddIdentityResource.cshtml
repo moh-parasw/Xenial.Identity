@@ -1,0 +1,79 @@
+﻿@page "/Admin/IdentityResources/Add"
+
+@model Xenial.Identity.Areas.Admin.Pages.IdentityResources.AddIdentityResourceModel
+@{
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
+    ViewData["Title"] = "Add Identity Resource";
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="admin-add-identity-resources-page">
+    <div class="admin-add-identity-resources-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <ul class="admin-add-identity-resources-page-tabs__list">
+            <li class="admin-add-identity-resources-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="admin-add-identity-resources-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-cloud"></i> <span>@ViewData["Title"]</span>
+                </label>
+            </li>
+        </ul>
+        <div class="admin-add-identity-resources-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="admin-add-identity-resources-page-tabs__content">
+            <section>
+                <form class="xenial-form" method="post">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <ul class="xenial-form__list">
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.Name"></label>
+                            <input asp-for="Input.Name" class="form-control" />
+                            <span asp-validation-for="Input.Name" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.DisplayName"></label>
+                            <input asp-for="Input.DisplayName" class="form-control" />
+                            <span asp-validation-for="Input.DisplayName" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.Description"></label>
+                            <input asp-for="Input.Description" class="form-control" />
+                            <span asp-validation-for="Input.Description" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.Enabled"></label>
+                            <input asp-for="Input.Enabled" class="toggle" />
+                            <span asp-validation-for="Input.Enabled" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.ShowInDiscoveryDocument"></label>
+                            <input asp-for="Input.ShowInDiscoveryDocument" class="toggle" />
+                            <span asp-validation-for="Input.ShowInDiscoveryDocument" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.Required"></label>
+                            <input asp-for="Input.Required" class="toggle" />
+                            <span asp-validation-for="Input.Required" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.Emphasize"></label>
+                            <input asp-for="Input.Emphasize" class="toggle" />
+                            <span asp-validation-for="Input.Emphasize" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.NonEditable"></label>
+                            <input asp-for="Input.NonEditable" class="toggle" />
+                            <span asp-validation-for="Input.NonEditable" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.UserClaims"></label>
+                            <input asp-for="Input.UserClaims" data-tags="@string.Join(",", ClientConstants.StandardClaims)" data-tags-simple="true" />
+                            <span asp-validation-for="Input.UserClaims" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>
+                        </li>
+                    </ul>
+                </form>
+            </section>
+        </div>
+    </div>
+</div>

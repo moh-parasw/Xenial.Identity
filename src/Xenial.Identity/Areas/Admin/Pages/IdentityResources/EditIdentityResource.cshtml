@@ -1,0 +1,134 @@
+﻿@page "/Admin/IdentityResources/Edit/{id}"
+
+@model Xenial.Identity.Areas.Admin.Pages.IdentityResources.EditIdentityResourceModel
+@{
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
+    ViewData["Title"] = "Edit Identity Resource";
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="admin-edit-identity-resources-page">
+    <div class="admin-edit-identity-resources-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" @(Model.SelectedPage == null || Model.SelectedPage == "IdentityResource" ? "checked" : "")>
+        <input type="radio" id="tab2" name="tab-control" @(Model.SelectedPage == "Secrets   " ? "checked" : "")>
+        <input type="radio" id="tab3" name="tab-control" @(Model.SelectedPage == "Properties" ? "checked" : "")>
+        <ul class="admin-edit-identity-resources-page-tabs__list">
+            <li class="admin-edit-identity-resources-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="admin-edit-identity-resources-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-key"></i> <span>@ViewData["Title"]</span>
+                </label>
+            </li>
+            <li class="admin-edit-identity-resources-page-tabs__list-item" title="Secrets">
+                <label class="admin-edit-identity-resources-page-tabs__list-item-label" for="tab2" role="button">
+                    <i class="fas fa-key"></i> <span>Secrets</span>
+                </label>
+            </li>
+            <li class="admin-edit-identity-resources-page-tabs__list-item" title="Properties">
+                <label class="admin-edit-identity-resources-page-tabs__list-item-label" for="tab3" role="button">
+                    <i class="fas fa-cogs"></i> <span>Properties</span>
+                </label>
+            </li>
+        </ul>
+        <div class="admin-edit-identity-resources-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="admin-edit-identity-resources-page-tabs__content">
+            <section>
+                <form class="xenial-form" method="post">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <ul class="xenial-form__list">
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.Name"></label>
+                            <input asp-for="Input.Name" class="form-control" />
+                            <span asp-validation-for="Input.Name" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.DisplayName"></label>
+                            <input asp-for="Input.DisplayName" class="form-control" />
+                            <span asp-validation-for="Input.DisplayName" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.Description"></label>
+                            <input asp-for="Input.Description" class="form-control" />
+                            <span asp-validation-for="Input.Description" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.Enabled"></label>
+                            <input asp-for="Input.Enabled" class="toggle" />
+                            <span asp-validation-for="Input.Enabled" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.ShowInDiscoveryDocument"></label>
+                            <input asp-for="Input.ShowInDiscoveryDocument" class="toggle" />
+                            <span asp-validation-for="Input.ShowInDiscoveryDocument" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.NonEditable"></label>
+                            <input asp-for="Input.NonEditable" class="toggle" />
+                            <span asp-validation-for="Input.NonEditable" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.UserClaims"></label>
+                            <input asp-for="Input.UserClaims" data-tags="@string.Join(",", ClientConstants.StandardClaims)" data-tags-simple="true" />
+                            <span asp-validation-for="Input.UserClaims" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.IdentityScopes"></label>
+                            <input asp-for="Input.IdentityScopes" data-tags="@Model.IdentityScopes" data-tags-simple="true" />
+                            <span asp-validation-for="Input.IdentityScopes" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>
+                        </li>
+                    </ul>
+                </form>
+            </section>
+            <section>
+                @(Html.Grid(Model.Secrets).Build(columns =>
+                {
+                    columns.Add(model => $"<i class=\"fa fa-fingerprint\" data-copy=\"{model.Id}\" title=\"{model.Id}\"></i>")
+                        .Encoded(false)
+                        .Titled("Id")
+                        .Css("user-image");
+
+                    columns.Add(model => model.Description).Titled("Description");
+                    columns.Add(model => model.Type).Titled("Type");
+
+                    columns.Add(model => $"<i class=\"fa fa-fingerprint\" data-copy=\"{model.Value}\" title=\"{model.Value}\"></i>")
+                        .Encoded(false)
+                        .Titled("Value")
+                        .Css("user-image");
+
+                    
+                    columns.Add(model => model.Created).Titled("Created");
+                    columns.Add(model => model.Expiration).Titled("Expiration");
+
+                    columns.Add(model => $"<div class=\"actions-container\"><a href=\"/Admin/IdentityResources/{Model.Id}/Secrets/{model.Id}/Delete\" class=\"button\"><i class=\"fas fa-times\"></i></a><a class=\"button\" href=\"/Admin/IdentityResources/{Model.Id}/Secrets/{model.Id}/Edit\"><i class=\"fas fa-pen\"></i></a></div>")
+                        .Encoded(false)
+                        .Css("actions")
+                        .Titled($"<div class=\"actions-container\"><a class=\"button\" href=\"/Admin/IdentityResources/{Model.Id}/Secrets/Add\"><i class=\"fas fa-plus\"></i></button></div>");
+                })
+                .Empty("No data found")
+                )
+            </section>
+            <section>
+                @(Html.Grid(Model.Properties).Build(columns =>
+                {
+                    columns.Add(model => $"<i class=\"fa fa-fingerprint\" data-copy=\"{model.Id}\" title=\"{model.Id}\"></i>")
+                        .Named(nameof(UsersModel.UserOutputModel.Id))
+                        .Encoded(false)
+                        .Titled("Id")
+                        .Css("user-image");
+
+                    columns.Add(model => model.Key).Titled("Key");
+                    columns.Add(model => model.Value).Titled("Value");
+
+                    columns.Add(model => $"<div class=\"actions-container\"><a href=\"/Admin/IdentityResources/{Model.Id}/Properties/{model.Id}/Delete\" class=\"button\"><i class=\"fas fa-times\"></i></a><a class=\"button\" href=\"/Admin/IdentityResources/{Model.Id}/Properties/{model.Id}/Edit\"><i class=\"fas fa-pen\"></i></a></div>")
+                        .Encoded(false)
+                        .Css("actions")
+                        .Titled($"<div class=\"actions-container\"><a class=\"button\" href=\"/Admin/IdentityResources/{Model.Id}/Properties/Add\"><i class=\"fas fa-plus\"></i></button></div>");
+                })
+                .Empty("No data found")
+                )
+            </section>
+        </div>
+    </div>
+</div>
