@@ -1,9 +1,9 @@
 @import "forms";
 @import "tabs";
+@import "view-style";
 
 .admin-edit-api-resources-page {
-  max-width: 370px;
-  margin: auto;
-  @include tab-pages(1);
+  @include view-style();
+  @include tab-pages(3);
   @include xenial-form(1000rem);
 }
