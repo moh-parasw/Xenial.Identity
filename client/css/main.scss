@@ -1,4 +1,10 @@
 ﻿@import "@xenial-io/xenial-template/src/css/main.scss";
+@import "tagify.colors.scss";
+@import "@yaireo/tagify/src/tagify.scss";
+
+:root {
+    --tagify-dd-color-primary: var(--xenial-highlight-color);
+}
 
 //Generic
 // @import "tabs";

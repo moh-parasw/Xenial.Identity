@@ -1,11 +1,13 @@
 ﻿import "../css/main.scss";
 import 'notyf/notyf.min.css';
+
 import { xenial } from "@xenial-io/xenial-template";
 import QRCode from "qrcode/build/qrcode";
 import { notyf } from "./notify";
 import { MvcGrid } from "./components/mvc-grid-6-2-1/mvc-grid";
 import "./file-upload";
 import copy from "copy-to-clipboard";
+import Tagify from '@yaireo/tagify'
 
 xenial();
 
@@ -64,5 +66,26 @@ document.querySelectorAll("[data-copy]").forEach(element => {
                 notyf.success(`<div style="text-align: center;">Copied <br>${dataToCopy}<br>to clipboard</div>`)
             }
         };
+    }
+});
+
+document.querySelectorAll("[data-tags]").forEach(element => {
+    if (element instanceof HTMLElement) {
+        const dataTags = element.getAttribute("data-tags")?.split(",")?.map(s => s.trim());
+        if (dataTags) {
+            const isSimple = element.getAttribute("data-tags-simple");
+            new Tagify(element, {
+                whitelist: dataTags,
+                dropdown: {
+                    maxItems: 20,           // <- mixumum allowed rendered suggestions
+                    enabled: 0,             // <- show suggestions on focus
+                    closeOnSelect: true    // <- do not hide the suggestions dropdown once an item has been selected
+                },
+                originalInputValueFormat: 
+                    isSimple 
+                    ? (valuesArr: any[]) => valuesArr.map(item => item.value).join(',')
+                    : undefined
+            });
+        }
     }
 });

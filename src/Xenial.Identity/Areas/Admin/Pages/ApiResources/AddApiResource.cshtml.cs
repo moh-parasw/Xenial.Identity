@@ -35,12 +35,14 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
             public bool Enabled { get; set; } = true;
             public bool ShowInDiscoveryDocument { get; set; } = true;
             public bool NonEditable { get; set; }
+            public string UserClaims { get; set; }
         }
 
         internal class ApiResourceMappingConfiguration : Profile
         {
             public ApiResourceMappingConfiguration()
-                => CreateMap<ApiResourceInputModel, XpoApiResource>();
+                => CreateMap<ApiResourceInputModel, XpoApiResource>()
+                    .ForMember(api => api.UserClaims, o => o.Ignore());
         }
 
         internal static IMapper Mapper { get; }
@@ -59,6 +61,14 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
                 try
                 {
                     var apiResource = Mapper.Map(Input, new XpoApiResource(unitOfWork));
+
+                    var userClaimString = string.IsNullOrEmpty(Input.UserClaims) ? string.Empty : Input.UserClaims;
+                    var userClaims = userClaimString.Split(",").Select(s => s.Trim()).ToList();
+                    apiResource.UserClaims.AddRange(userClaims.Select(userClaim => new XpoApiResourceClaim(unitOfWork)
+                    {
+                        Type = userClaim
+                    }));
+
                     await unitOfWork.SaveAsync(apiResource);
                     await unitOfWork.CommitChangesAsync();
                     return Redirect("/Admin/ApiResources");
