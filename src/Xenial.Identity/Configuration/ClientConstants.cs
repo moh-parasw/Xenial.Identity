@@ -24,7 +24,13 @@ namespace Xenial.Identity.Configuration
             "zoneinfo",
             "locale",
             "address",
-            "updated_at"
+            "updated_at",
+            "email",
+            "email_verified",
+            "phone",
+            "phone_verified",
+            "sub",
+            "openid",
         };
     }
 }
