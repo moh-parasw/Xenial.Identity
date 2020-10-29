@@ -1,0 +1,36 @@
+﻿@page
+@model Xenial.Identity.Areas.Admin.Pages.ApiScopesModel
+@{
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
+}
+
+<div class="admin-api-scopes-page">
+    <h1>Api Resources</h1>
+
+    @(Html.Grid(Model.ApiScopes).Build(columns =>
+    {
+        columns.Add(model => $"<i class=\"fa fa-fingerprint\" data-copy=\"{model.Id}\" title=\"{model.Id}\"></i>")
+            .Filterable(false)
+            .Sortable(false)
+            .Encoded(false)
+            .Titled("Id")
+            .Css("user-image");
+
+        columns.Add(model => $"<a href=\"/Admin/ApiScopes/View/{model.Id}\">{model.Name}</a>")
+            .Named(nameof(ApiScopesModel.ApiScopeOutputModel.Name))
+            .Encoded(false)
+            .Sortable(true)
+            .Filterable(true)
+            .Titled("Name");
+
+        columns.Add(model => $"<div class=\"actions-container\"><a href=\"/Admin/ApiScopes/Delete/{model.Id}\" class=\"button\"><i class=\"fas fa-times\"></i></a><a class=\"button\" href=\"/Admin/ApiScopes/Edit/{model.Id}\"><i class=\"fas fa-pen\"></i></a></div>")
+            .Encoded(false)
+            .Css("actions")
+            .Titled("<div class=\"actions-container\"><a class=\"button\" href=\"/Admin/ApiScopes/Add\"><i class=\"fas fa-plus\"></i></button></div>");
+    })
+    .Using(GridFilterMode.Header)
+    .Empty("No data found")
+    .Filterable(GridFilterCase.Lower)
+    .Sortable()
+    )
+</div>

@@ -35,6 +35,14 @@
                 </span>
             </a>
         </li>
+        <li class="admin-nav__card-list-item @AdminNavigation.ApiScopesNavClass(ViewContext)">
+            <a class="admin-nav__card-list-item-link" asp-page="./ApiScopes">
+                <span class="admin-nav__card-list-item-link-image"><i class="fas fa-puzzle-piece"></i></span>
+                <span class="admin-nav__card-list-item-link-details">
+                    <span class="admin-nav__card-list-item-link-details-header">Api Scopes</span>
+                </span>
+            </a>
+        </li>
         <li class="admin-nav__card-list-item @AdminNavigation.PersistedGrantsNavClass(ViewContext)">
             <a class="admin-nav__card-list-item-link" asp-page="./PersistedGrants">
                 <span class="admin-nav__card-list-item-link-image"><i class="fas fa-key"></i></span>
@@ -43,7 +51,7 @@
                 </span>
             </a>
         </li>
-         <li class="admin-nav__card-list-item @AdminNavigation.UsersNavClass(ViewContext)">
+        <li class="admin-nav__card-list-item @AdminNavigation.UsersNavClass(ViewContext)">
             <a class="admin-nav__card-list-item-link" asp-page="./Users">
                 <span class="admin-nav__card-list-item-link-image"><i class="fas fa-users"></i></span>
                 <span class="admin-nav__card-list-item-link-details">

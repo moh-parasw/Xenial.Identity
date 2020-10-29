@@ -1,24 +1,24 @@
-﻿@page "/Admin/ApiResources/Add"
+﻿@page "/Admin/ApiScopes/Add"
 
-@model Xenial.Identity.Areas.Admin.Pages.ApiResources.AddApiResourceModel
+@model Xenial.Identity.Areas.Admin.Pages.ApiScopes.AddApiScopeModel
 @{
     Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
-    ViewData["Title"] = "Add Api Resource";
+    ViewData["Title"] = "Add Api Scope";
 }
 
 <partial name="_StatusMessage" model="Model.StatusMessage" />
-<div class="admin-add-api-resources-page">
-    <div class="admin-add-api-resources-page-tabs">
+<div class="admin-add-api-scopes-page">
+    <div class="admin-add-api-scopes-page-tabs">
         <input type="radio" id="tab1" name="tab-control" checked>
-        <ul class="admin-add-api-resources-page-tabs__list">
-            <li class="admin-add-api-resources-page-tabs__list-item" title="@ViewData["Title"]">
-                <label class="admin-add-api-resources-page-tabs__list-item-label" for="tab1" role="button">
+        <ul class="admin-add-api-scopes-page-tabs__list">
+            <li class="admin-add-api-scopes-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="admin-add-api-scopes-page-tabs__list-item-label" for="tab1" role="button">
                     <i class="fas fa-cloud"></i> <span>@ViewData["Title"]</span>
                 </label>
             </li>
         </ul>
-        <div class="admin-add-api-resources-page-tabs__slider"><div class="indicator"></div></div>
-        <div class="admin-add-api-resources-page-tabs__content">
+        <div class="admin-add-api-scopes-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="admin-add-api-scopes-page-tabs__content">
             <section>
                 <form class="xenial-form" method="post">
                     <div asp-validation-summary="All" class="text-danger"></div>
@@ -56,13 +56,9 @@
                         <li class="xenial-form__list-item">
                             <label asp-for="Input.UserClaims"></label>
                             <input asp-for="Input.UserClaims" data-tags="@string.Join(",", ClientConstants.StandardClaims)" data-tags-simple="true" />
-                            <span asp-validation-for="Input.UserClaims" class="text-danger"></span>
+                            <span asp-validation-for="Input.NonEditable" class="text-danger"></span>
                         </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.ApiScopes"></label>
-                            <input asp-for="Input.ApiScopes" data-tags="@Model.ApiScopes" data-tags-simple="true" />
-                            <span asp-validation-for="Input.ApiScopes" class="text-danger"></span>
-                        </li>
+
                         <li class="xenial-form__list-item">
                             <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>
                         </li>

@@ -17,6 +17,8 @@ namespace Xenial.Identity.Areas.Admin.Pages
 
         public static string ApiResources => "ApiResources";
 
+        public static string ApiScopes => "ApiScopes";
+
         public static string PersistedGrants => "PersistedGrants";
 
         public static string Users => "Users";
@@ -30,6 +32,7 @@ namespace Xenial.Identity.Areas.Admin.Pages
         public static string IdentityResourcesNavClass(ViewContext viewContext) => PageNavClass(viewContext, IdentityResources);
 
         public static string ApiResourcesNavClass(ViewContext viewContext) => PageNavClass(viewContext, ApiResources);
+        public static string ApiScopesNavClass(ViewContext viewContext) => PageNavClass(viewContext, ApiScopes);
 
         public static string PersistedGrantsNavClass(ViewContext viewContext) => PageNavClass(viewContext, PersistedGrants);
 

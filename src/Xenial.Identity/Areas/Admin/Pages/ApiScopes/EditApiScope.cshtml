@@ -1,0 +1,37 @@
+﻿@page "/Admin/ApiScopes/Edit/{id}"
+
+@model Xenial.Identity.Areas.Admin.Pages.ApiScopes.EditApiScopeModel
+@{
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
+    ViewData["Title"] = "Edit Api Scope";
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="admin-edit-api-scopes-page">
+    <div class="admin-edit-api-scopes-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <ul class="admin-edit-api-scopes-page-tabs__list">
+            <li class="admin-edit-api-scopes-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="admin-edit-api-scopes-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-key"></i> <span>@ViewData["Title"]</span>
+                </label>
+            </li>
+        </ul>
+        <div class="admin-edit-api-scopes-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="admin-edit-api-scopes-page-tabs__content">
+            <form class="xenial-form" method="post">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <ul class="xenial-form__list">
+                    <li class="xenial-form__list-item">
+                        <label asp-for="Input.UserName"></label>
+                        <input asp-for="Input.UserName" class="form-control" />
+                        <span asp-validation-for="Input.UserName" class="text-danger"></span>
+                    </li>
+                    <li class="xenial-form__list-item">
+                        <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>
+                    </li>
+                </ul>
+            </form>
+        </div>
+    </div>
+</div>
