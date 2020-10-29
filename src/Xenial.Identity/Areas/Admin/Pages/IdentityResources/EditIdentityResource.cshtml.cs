@@ -63,14 +63,9 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
             {
                 CreateMap<IdentityResourceInputModel, XpoIdentityResource>()
                                    .ForMember(api => api.UserClaims, o => o.Ignore())
-                                   .ForMember(api => api.Scopes, o => o.Ignore())
-                                   .ForMember(api => api.Secrets, o => o.Ignore())
                                    .ForMember(api => api.Properties, o => o.Ignore())
                                    .ReverseMap()
                                ;
-
-                CreateMap<SecretsOutputModel, XpoIdentityResourceSecret>()
-                    .ReverseMap();
 
                 CreateMap<PropertiesOutputModel, XpoIdentityResourceProperty>()
                     .ReverseMap();
@@ -95,7 +90,6 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
             Id = id;
             SelectedPage = selectedPage;
 
-            await FetchScopes();
             var apiResource = await unitOfWork.GetObjectByKeyAsync<XpoIdentityResource>(id);
             if (apiResource == null)
             {
@@ -106,9 +100,6 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
             Input = Mapper.Map<IdentityResourceInputModel>(apiResource);
 
             Input.UserClaims = string.Join(",", apiResource.UserClaims.Select(userClaim => userClaim.Type));
-            Input.IdentityScopes = string.Join(",", apiResource.Scopes.Select(scope => scope.Scope));
-
-            Secrets = apiResource.Secrets.Select(secret => Mapper.Map<SecretsOutputModel>(secret)).ToList();
             Properties = apiResource.Properties.Select(propertey => Mapper.Map<PropertiesOutputModel>(propertey)).ToList();
 
             return Page();
@@ -117,7 +108,6 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
         public async Task<IActionResult> OnPost([FromRoute] int id)
         {
             Id = id;
-            await FetchScopes();
             if (ModelState.IsValid)
             {
                 try
@@ -139,18 +129,6 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
                     apiResource.UserClaims.AddRange(userClaims.Select(userClaim => new XpoIdentityResourceClaim(unitOfWork)
                     {
                         Type = userClaim
-                    }));
-
-                    foreach (var scope in apiResource.Scopes.ToList())
-                    {
-                        apiResource.Scopes.Remove(scope);
-                    }
-
-                    var apiScopesString = string.IsNullOrEmpty(Input.IdentityScopes) ? string.Empty : Input.IdentityScopes;
-                    var apiScopes = apiScopesString.Split(",").Select(s => s.Trim()).ToList();
-                    apiResource.Scopes.AddRange(apiScopes.Select(scope => new XpoIdentityResourceScope(unitOfWork)
-                    {
-                        Scope = scope
                     }));
 
                     await unitOfWork.SaveAsync(apiResource);
