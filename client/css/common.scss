@@ -25,4 +25,13 @@
       opacity: 0.5;
     }
   }
+  .tagify[readonly]:not(.tagify--mix) .tagify__tag > div::before {
+    background: var(--xenial-dark-color);
+  }
+  .tagify[readonly]:not(.tagify--mix) .tagify__tag > div {
+    color: var(--xenial-lighter-color);
+  }
+  .tagify[readonly] {
+    border-color: transparent;
+  }
 }

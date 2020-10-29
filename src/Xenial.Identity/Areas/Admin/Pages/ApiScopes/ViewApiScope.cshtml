@@ -1,4 +1,4 @@
-﻿@page "/Admin/ApiScopes/View/{id}"
+﻿@page "/Admin/ApiScopes/View/{id:int}"
 
 @model Xenial.Identity.Areas.Admin.Pages.ApiScopes.ViewApiScopeModel
 @{
@@ -10,22 +10,10 @@
 <div class="admin-view-api-scopes-page">
     <div class="admin-view-api-scopes-page-tabs">
         <input type="radio" id="tab1" name="tab-control" checked>
-        <input type="radio" id="tab2" name="tab-control">
-        <input type="radio" id="tab3" name="tab-control">
         <ul class="admin-view-api-scopes-page-tabs__list">
             <li class="admin-view-api-scopes-page-tabs__list-item" title="@ViewData["Title"]">
                 <label class="admin-view-api-scopes-page-tabs__list-item-label" for="tab1" role="button">
-                    <i class="fas fa-lock"></i> <span>@ViewData["Title"]</span>
-                </label>
-            </li>
-            <li class="admin-view-api-scopes-page-tabs__list-item" title="Claims">
-                <label class="admin-view-api-scopes-page-tabs__list-item-label" for="tab2" role="button">
-                    <i class="fas fa-file-alt"></i> <span>Claims</span>
-                </label>
-            </li>
-            <li class="admin-view-api-scopes-page-tabs__list-item" title="Roles">
-                <label class="admin-view-api-scopes-page-tabs__list-item-label" for="tab3" role="button">
-                    <i class="fas fa-lock"></i> <span>Roles</span>
+                    <i class="fas fa-puzzle-piece"></i> <span>@ViewData["Title"]</span>
                 </label>
             </li>
         </ul>
@@ -34,58 +22,52 @@
             <section>
                 <ul class="xenial-form__list">
                     <li class="xenial-form__list-item">
-                        <label asp-for="Output.Id">Id <i class="fa fa-fingerprint" data-copy="@Model.Output.Id"></i></label>
-                        <input asp-for="Output.Id" disabled />
+                        <label asp-for="Output.Name"></label>
+                        <input readonly disabled asp-for="Output.Name" class="form-control" />
+                        <span asp-validation-for="Output.Name" class="text-danger"></span>
                     </li>
                     <li class="xenial-form__list-item">
-                        <label asp-for="Output.UserName"></label>
-                        <input asp-for="Output.UserName" disabled />
+                        <label asp-for="Output.DisplayName"></label>
+                        <input readonly disabled asp-for="Output.DisplayName" class="form-control" />
+                        <span asp-validation-for="Output.DisplayName" class="text-danger"></span>
                     </li>
                     <li class="xenial-form__list-item">
-                        <label class="button" for="tab2" role="button">
-                            <i class="fas fa-file-alt"></i> <span>Claims</span>
-                        </label>
+                        <label asp-for="Output.Description"></label>
+                        <input readonly disabled asp-for="Output.Description" class="form-control" />
+                        <span asp-validation-for="Output.Description" class="text-danger"></span>
                     </li>
                     <li class="xenial-form__list-item">
-                        <label class="button" for="tab3" role="button">
-                            <i class="fas fa-lock"></i> <span>Roles</span>
-                        </label>
+                        <label asp-for="Output.Enabled"></label>
+                        <input readonly disabled asp-for="Output.Enabled" class="toggle" />
+                        <span asp-validation-for="Output.Enabled" class="text-danger"></span>
                     </li>
                     <li class="xenial-form__list-item">
-                        <a href="/Admin/Users/Edit/@Model.Output.Id" class="button xenial-form__list-item-submit" role="button">
+                        <label asp-for="Output.ShowInDiscoveryDocument"></label>
+                        <input readonly disabled asp-for="Output.ShowInDiscoveryDocument" class="toggle" />
+                        <span asp-validation-for="Output.ShowInDiscoveryDocument" class="text-danger"></span>
+                    </li>
+                    <li class="xenial-form__list-item">
+                        <label asp-for="Output.NonEditable"></label>
+                        <input readonly disabled asp-for="Output.NonEditable" class="toggle" />
+                        <span asp-validation-for="Output.NonEditable" class="text-danger"></span>
+                    </li>
+                    <li class="xenial-form__list-item">
+                        <label asp-for="Output.UserClaims"></label>
+                        <input readonly asp-for="Output.UserClaims" data-tags="" data-tags-simple="true" />
+                        <span asp-validation-for="Output.UserClaims" class="text-danger"></span>
+                    </li>
+
+                    <li class="xenial-form__list-item">
+                        <a href="/Admin/ApiScopes/Edit/@Model.Output.Id" class="button xenial-form__list-item-submit" role="button">
                             <i class="fas fa-pen"></i> <span>Edit</span>
                         </a>
                     </li>
                     <li class="xenial-form__list-item">
-                        <a href="/Admin/Users/Delete/@Model.Output.Id" class="button xenial-form__list-item-danger" role="button">
+                        <a href="/Admin/ApiScopes/Delete/@Model.Output.Id" class="button xenial-form__list-item-danger" role="button">
                             <i class="fas fa-times"></i> <span>Delete</span>
                         </a>
                     </li>
                 </ul>
-            </section>
-            <section>
-                @(Html.Grid(Model.Output.Claims).Build(columns =>
-                {
-                    columns.Add(model => model.Issuer).Titled("Issuer");
-                    columns.Add(model => model.Type).Titled("Type");
-                    columns.Add(model => model.Value).Titled("Value");
-                })
-                .Empty("No data found")
-                )
-            </section>
-            <section>
-                @(Html.Grid(Model.Output.Roles).Build(columns =>
-                {
-                    columns.Add(model => $"<i class=\"fa fa-fingerprint\" data-copy=\"{model.Id}\" title=\"{model.Id}\"></i>")
-                        .Named(nameof(Xenial.Identity.Areas.Admin.Pages.Users.ViewUserModel.UserOutputModel.RoleModel.Id))
-                        .Encoded(false)
-                        .Titled("Id")
-                        .Css("user-image");
-
-                    columns.Add(model => $"<a href=\"/Admin/Roles/View/{model.Id}\">{model.Name}</a>").Encoded(false).Titled("Name");
-                })
-                .Empty("No data found")
-                )
             </section>
         </div>
     </div>

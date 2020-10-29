@@ -4,90 +4,111 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Identity;
+using AutoMapper;
+
+using DevExpress.Xpo;
+using DevExpress.Xpo.DB.Exceptions;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
-using Xenial.Identity.Data;
+using Xenial.Identity.Xpo.Storage.Models;
 
 namespace Xenial.Identity.Areas.Admin.Pages.ApiScopes
 {
     public class EditApiScopeModel : PageModel
     {
-        private readonly UserManager<XenialIdentityUser> userManager;
-
-        public EditApiScopeModel(UserManager<XenialIdentityUser> userManager)
-            => this.userManager = userManager;
+        private readonly UnitOfWork unitOfWork;
+        private readonly ILogger<EditApiScopeModel> logger;
+        public EditApiScopeModel(UnitOfWork unitOfWork, ILogger<EditApiScopeModel> logger)
+            => (this.unitOfWork, this.logger) = (unitOfWork, logger);
 
         public class ApiScopeInputModel
         {
             [Required]
-            public string UserName { get; set; }
+            public string Name { get; set; }
+            public string DisplayName { get; set; }
+            public string Description { get; set; }
+            public bool Enabled { get; set; } = true;
+            public bool ShowInDiscoveryDocument { get; set; } = true;
+            public bool NonEditable { get; set; }
+            public string UserClaims { get; set; } = "profile";
         }
 
+        internal class ApiScopeMappingConfiguration : Profile
+        {
+            public ApiScopeMappingConfiguration()
+                => CreateMap<ApiScopeInputModel, XpoApiScope>()
+                    .ForMember(api => api.UserClaims, o => o.Ignore())
+                    .ReverseMap();
+        }
+
+        internal static IMapper Mapper { get; }
+            = new MapperConfiguration(cfg => cfg.AddProfile<ApiScopeMappingConfiguration>())
+                .CreateMapper();
 
         [Required, BindProperty]
-        public ApiScopeInputModel Input { get; set; }
+        public ApiScopeInputModel Input { get; set; } = new ApiScopeInputModel();
 
         public string StatusMessage { get; set; }
 
-        public async Task<IActionResult> OnGet([FromRoute] string id)
+        public async Task<IActionResult> OnGet([FromRoute] int id)
         {
-            if (Input == null)
+            var scope = await unitOfWork.GetObjectByKeyAsync<XpoApiScope>(id);
+            if (scope == null)
             {
-                var user = await userManager.FindByIdAsync(id);
-                if (user == null)
-                {
-                    StatusMessage = "Error: Cannot find api Scope";
-                    return Page();
-                }
-                if (user != null)
-                {
-                    Input = new ApiScopeInputModel
-                    {
-                        UserName = user.UserName
-                    };
-                }
+                StatusMessage = "Error: Cannot find api scope";
+                return Page();
             }
+
+            Input = Mapper.Map<ApiScopeInputModel>(scope);
+            Input.UserClaims = string.Join(",", scope.UserClaims.Select(userClaim => userClaim.Type));
+
             return Page();
         }
 
-        public async Task<IActionResult> OnPost([FromRoute] string id)
+        public async Task<IActionResult> OnPost([FromRoute] int id)
         {
             if (ModelState.IsValid)
             {
-                var user = await userManager.FindByIdAsync(id);
-                if (user == null)
+                try
                 {
-                    StatusMessage = "Error: Cannot find api Scope";
-                    return Page();
-                }
-                var result = await userManager.SetUserNameAsync(user, Input.UserName);
-                if (result.Succeeded)
-                {
-                    var updateResult = await userManager.UpdateAsync(user);
-
-                    if (updateResult.Succeeded)
+                    var scope = await unitOfWork.GetObjectByKeyAsync<XpoApiScope>(id);
+                    if (scope == null)
                     {
-                        return Redirect("/Admin/ApiScopes");
-                    }
-                    else
-                    {
-                        foreach (var error in updateResult.Errors)
-                        {
-                            ModelState.AddModelError(error.Description, error.Description);
-                        }
-                        StatusMessage = "Error saving api Scope";
+                        StatusMessage = "Error: Cannot find api scope";
                         return Page();
                     }
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
+
+                    var apiScope = Mapper.Map(Input, scope);
+
+                    var userClaimString = string.IsNullOrEmpty(Input.UserClaims) ? string.Empty : Input.UserClaims;
+                    var userClaims = userClaimString.Split(",").Select(s => s.Trim()).ToList();
+
+                    foreach (var userClaim in apiScope.UserClaims.ToList())
                     {
-                        ModelState.AddModelError(error.Description, error.Description);
+                        apiScope.UserClaims.Remove(userClaim);
                     }
-                    StatusMessage = "Error setting api Scope name";
+
+                    apiScope.UserClaims.AddRange(userClaims.Select(userClaim => new XpoApiScopeClaim(unitOfWork)
+                    {
+                        Type = userClaim
+                    }));
+
+                    await unitOfWork.SaveAsync(apiScope);
+                    await unitOfWork.CommitChangesAsync();
+                    return Redirect("/Admin/ApiScopes");
+                }
+                catch (ConstraintViolationException ex)
+                {
+                    logger.LogWarning(ex, "Error saving ApiScope with {Name}", Input?.Name);
+                    ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.Name)}", "Api Scope name must be unique");
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Error saving ApiScope with {Name}", Input?.Name);
+                    StatusMessage = $"Error saving api Scope: {ex.Message}";
                     return Page();
                 }
             }

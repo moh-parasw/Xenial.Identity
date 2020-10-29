@@ -124,6 +124,13 @@
               transform: translatex(2rem);
             }
           }
+          &:disabled {
+            cursor: default;
+            border-color: var(--xenial-dark-color);
+            &:after {
+              background: var(--xenial-dark-color);
+            }
+          }
         }
 
         .validation-message {
@@ -191,8 +198,4 @@
       }
     }
   }
-}
-
-.xenial-body {
-  // @include xenial-form();
 }

@@ -1,9 +1,9 @@
 @import "forms";
 @import "tabs";
-@import "view-style";
 
 .admin-view-api-scopes-page {
-  @include view-style();
-  @include tab-pages(3);
+  max-width: 370px;
+  margin: auto;
+  @include tab-pages(1);
   @include xenial-form(1000rem);
 }
