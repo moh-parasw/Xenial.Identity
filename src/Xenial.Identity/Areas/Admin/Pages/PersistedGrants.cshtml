@@ -1,4 +1,28 @@
 ﻿@page
 @model Xenial.Identity.Areas.Admin.Pages.PersistedGrantsModel
 @{
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
 }
+
+<div class="admin-persistent-grants-page">
+    <h1>Persisted Grants</h1>
+
+    @(Html.Grid(Model.PersistedGrants).Build(columns =>
+    {
+        columns.Add(model => $"<i class=\"fa fa-fingerprint\" data-copy=\"{model.Key}\" title=\"{model.Key}\"></i>").Encoded(false).Titled("Key").Css("user-image");
+        //columns.Add(model => $"<a href=\"Admin/Roles/View/{model.Id}\">{model.Name}</a>").Encoded(false).Titled("Name");
+
+        columns.Add(model => model.Type).Titled("Type");
+        columns.Add(model => model.ClientId).Titled("Client");
+
+        columns.Add(model => $"<div class=\"actions-container\"><a href=\"/Admin/Roles/Delete/{model.Key}\" class=\"button\"><i class=\"fas fa-times\"></i></a><a class=\"button\" href=\"/Admin/Roles/Edit/{model.Key}\"><i class=\"fas fa-pen\"></i></a></div>")
+        .Encoded(false)
+        .Css("actions")
+        .Titled("<div class=\"actions-container\"><a class=\"button\" href=\"/Admin/Roles/Add\"><i class=\"fas fa-plus\"></i></button></div>");
+    })
+    .Using(GridFilterMode.Header)
+    .Empty("No data found")
+    .Filterable(GridFilterCase.Lower)
+    .Sortable()
+    )
+</div>
