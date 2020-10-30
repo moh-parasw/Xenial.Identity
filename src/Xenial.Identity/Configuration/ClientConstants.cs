@@ -1,12 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Xenial.Identity.Configuration
 {
     public static class ClientConstants
     {
+        public const string SharedSecret = nameof(SharedSecret);
+
+        public static readonly IList<string> SecretTypes = new[]
+        {
+            SharedSecret,
+            "X509Thumbprint",
+            "X509Name",
+            "X509CertificateBase64"
+        };
+
         //http://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
         public static readonly IList<string> StandardClaims = new[]
         {

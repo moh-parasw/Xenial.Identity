@@ -64,7 +64,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources.Properties
             var IdentityResourceProperty = IdentityResource.Properties.FirstOrDefault(property => property.Id == id);
             if (IdentityResourceProperty == null)
             {
-                StatusMessage = "Error: cannot find Identity resource propterty";
+                StatusMessage = "Error: cannot find Identity resource property";
                 return Page();
             }
 
@@ -88,7 +88,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources.Properties
 
                 if (IdentityResourceProperty == null)
                 {
-                    StatusMessage = "Error: cannot find Identity resource propterty";
+                    StatusMessage = "Error: cannot find Identity resource property";
                     return Page();
                 }
 

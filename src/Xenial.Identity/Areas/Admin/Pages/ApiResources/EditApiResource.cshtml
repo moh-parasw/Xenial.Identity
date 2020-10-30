@@ -10,7 +10,7 @@
 <div class="admin-edit-api-resources-page">
     <div class="admin-edit-api-resources-page-tabs">
         <input type="radio" id="tab1" name="tab-control" @(Model.SelectedPage == null || Model.SelectedPage == "ApiResource" ? "checked" : "")>
-        <input type="radio" id="tab2" name="tab-control" @(Model.SelectedPage == "Secrets   " ? "checked" : "")>
+        <input type="radio" id="tab2" name="tab-control" @(Model.SelectedPage == "Secrets" ? "checked" : "")>
         <input type="radio" id="tab3" name="tab-control" @(Model.SelectedPage == "Properties" ? "checked" : "")>
         <ul class="admin-edit-api-resources-page-tabs__list">
             <li class="admin-edit-api-resources-page-tabs__list-item" title="@ViewData["Title"]">
