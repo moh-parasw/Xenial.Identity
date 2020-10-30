@@ -1,0 +1,5 @@
+@import "grid-style";
+
+.admin-clients-page {
+    @include grid-style;
+}
