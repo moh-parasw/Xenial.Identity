@@ -15,10 +15,10 @@
         columns.Add(model => model.ClientId).Titled("Id");
         columns.Add(model => model.ClientName).Titled("Name");
 
-        columns.Add(model => $"<div class=\"actions-container\"><a href=\"/Admin/Roles/Delete/{model.Id}\" class=\"button\"><i class=\"fas fa-times\"></i></a><a class=\"button\" href=\"/Admin/Roles/Edit/{model.Id}\"><i class=\"fas fa-pen\"></i></a></div>")
+        columns.Add(model => $"<div class=\"actions-container\"><a href=\"/Admin/Clients/Delete/{model.Id}\" class=\"button\"><i class=\"fas fa-times\"></i></a><a class=\"button\" href=\"/Admin/Clients/Edit/{model.Id}\"><i class=\"fas fa-pen\"></i></a></div>")
         .Encoded(false)
         .Css("actions")
-        .Titled("<div class=\"actions-container\"><a class=\"button\" href=\"/Admin/Roles/Add\"><i class=\"fas fa-plus\"></i></button></div>");
+        .Titled("<div class=\"actions-container\"><a class=\"button\" href=\"/Admin/Clients/Add\"><i class=\"fas fa-plus\"></i></button></div>");
     })
     .Using(GridFilterMode.Header)
     .Empty("No data found")
