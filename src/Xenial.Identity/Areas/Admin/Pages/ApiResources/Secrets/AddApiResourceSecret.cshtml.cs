@@ -34,7 +34,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources.Secrets
             [Required]
             public string Type { get; set; }
             [Required]
-            public string Value { get; set; }
+            public string Value { get; set; } = IdentityModel.CryptoRandom.CreateUniqueId();
             public string Description { get; set; }
             public DateTime? Expiration { get; set; }
             public HashTypes HashType { get; set; }

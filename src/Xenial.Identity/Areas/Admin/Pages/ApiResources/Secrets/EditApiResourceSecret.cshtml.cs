@@ -26,11 +26,12 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources.Secrets
 
         public class ApiResourceSecretInputModel
         {
-            [Required]
-            public string Key { get; set; }
-            [Required]
-            public string Value { get; set; }
+            public string Description { get; set; }
+            public DateTime? Expiration { get; set; }
         }
+
+        public string Type { get; set; }
+        public string Value { get; set; }
 
         internal class ApiResourceMappingConfiguration : Profile
         {
@@ -66,6 +67,8 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources.Secrets
             }
 
             Input = Mapper.Map<ApiResourceSecretInputModel>(apiResourceSecret);
+            Type = apiResourceSecret.Type;
+            Value = apiResourceSecret.Value;
 
             return Page();
         }
@@ -91,7 +94,8 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources.Secrets
                         return Page();
                     }
 
-                    Mapper.Map(Input, apiResourceSecret);
+                    apiResourceSecret.Expiration = Input.Expiration;
+                    apiResourceSecret.Description = Input.Description;
 
                     await unitOfWork.SaveAsync(apiResource);
                     await unitOfWork.CommitChangesAsync();
