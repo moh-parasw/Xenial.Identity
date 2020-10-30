@@ -2,8 +2,8 @@
 @import "tabs";
 @import "view-style";
 
-.admin-edit-identity-resources-page {
+.admin-edit-identity-resources-properties-page {
   @include view-style();
-  @include tab-pages(2);
+  @include tab-pages(3);
   @include xenial-form(1000rem);
 }

@@ -1,24 +1,24 @@
-﻿@page "/Admin/ApiResources/{resourceId:int}/Properties/{id:int}/Edit"
+﻿@page "/Admin/identityResources/{resourceId:int}/Properties/Add"
 
-@model Xenial.Identity.Areas.Admin.Pages.ApiResources.Properties.EditApiResourcePropertyModel
+@model Xenial.Identity.Areas.Admin.Pages.IdentityResources.Properties.AddIdentityResourcePropertyModel
 @{
     Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
-    ViewData["Title"] = "Edit Api Resource Property";
+    ViewData["Title"] = "Add Identity Resource Property";
 }
 
 <partial name="_StatusMessage" model="Model.StatusMessage" />
-<div class="admin-add-api-resources-properties-page">
-    <div class="admin-add-api-resources-properties-page-tabs">
+<div class="admin-add-identity-resources-properties-page">
+    <div class="admin-add-identity-resources-properties-page-tabs">
         <input type="radio" id="tab1" name="tab-control" checked>
-        <ul class="admin-add-api-resources-properties-page-tabs__list">
-            <li class="admin-add-api-resources-properties-page-tabs__list-item" title="@ViewData["Title"]">
-                <label class="admin-add-api-resources-properties-page-tabs__list-item-label" for="tab1" role="button">
+        <ul class="admin-add-identity-resources-properties-page-tabs__list">
+            <li class="admin-add-identity-resources-properties-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="admin-add-identity-resources-properties-page-tabs__list-item-label" for="tab1" role="button">
                     <i class="fas fa-cogs"></i> <span>@ViewData["Title"]</span>
                 </label>
             </li>
         </ul>
-        <div class="admin-add-api-resources-properties-page-tabs__slider"><div class="indicator"></div></div>
-        <div class="admin-add-api-resources-properties-page-tabs__content">
+        <div class="admin-add-identity-resources-properties-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="admin-add-identity-resources-properties-page-tabs__content">
             <section>
                 <form class="xenial-form" method="post">
                     <div asp-validation-summary="All" class="text-danger"></div>

@@ -33,11 +33,11 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
             public string DisplayName { get; set; }
             public string Description { get; set; }
             public bool Enabled { get; set; } = true;
-            public bool ShowInDiscoveryDocument { get; set; } = true;
-            public bool NonEditable { get; set; }
             public bool Required { get; set; }
             public bool Emphasize { get; set; }
-            public string UserClaims { get; set; } = "profile";
+            public bool ShowInDiscoveryDocument { get; set; } = true;
+            public bool NonEditable { get; set; }
+            public string UserClaims { get; set; }
         }
 
         internal class IdentityResourceMappingConfiguration : Profile
@@ -56,8 +56,6 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
         public IdentityResourceInputModel Input { get; set; } = new IdentityResourceInputModel();
 
         public string StatusMessage { get; set; }
-
-        public string IdentityScopes { get; set; }
 
         public async Task<IActionResult> OnPost()
         {
