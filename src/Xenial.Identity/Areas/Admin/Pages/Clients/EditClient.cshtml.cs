@@ -37,6 +37,30 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
             public string Description { get; set; }
             public bool Enabled { get; set; }
 
+            #region Configuration
+
+            public string ProtocolType { get; set; }
+            public bool RequireClientSecret { get; set; }
+            public bool RequirePkce { get; set; }
+            public bool AllowPlainTextPkce { get; set; }
+            public bool AllowOfflineAccess { get; set; }
+            public bool AllowAccessTokensViaBrowser { get; set; }
+
+            #endregion
+
+            #region Token
+
+            public int IdentityTokenLifetime { get; set; }
+            public int AccessTokenLifetime { get; set; }
+            public AccessTokenType AccessTokenType { get; set; }
+            public int AuthorizationCodeLifetime { get; set; }
+            public int AbsoluteRefreshTokenLifetime { get; set; }
+            public int SlidingRefreshTokenLifetime { get; set; }
+            public TokenUsage RefreshTokenUsage { get; set; }
+            public TokenExpiration RefreshTokenExpiration { get; set; }
+
+            #endregion
+
             #region Consent
 
             public bool RequireConsent { get; set; }

@@ -12,21 +12,45 @@
         <div class="admin-edit-clients-page-tabs">
             <input type="radio" id="tab1" name="tab-control" checked>
             <input type="radio" id="tab2" name="tab-control">
+            <input type="radio" id="tab3" name="tab-control">
+            <input type="radio" id="tab4" name="tab-control">
+            <input type="radio" id="tab5" name="tab-control">
+            <input type="radio" id="tab6" name="tab-control">
             <ul class="admin-edit-clients-page-tabs__list">
                 <li class="admin-edit-clients-page-tabs__list-item" title="General">
                     <label class="admin-edit-clients-page-tabs__list-item-label" for="tab1" role="button">
                         <i class="fas fa-desktop"></i> <span>General</span>
                     </label>
                 </li>
-                <li class="admin-edit-clients-page-tabs__list-item" title="Consent">
+                <li class="admin-edit-clients-page-tabs__list-item" title="Configuration">
                     <label class="admin-edit-clients-page-tabs__list-item-label" for="tab2" role="button">
+                        <i class="fas fa-cog"></i> <span>Configuration</span>
+                    </label>
+                </li>
+                <li class="admin-edit-clients-page-tabs__list-item" title="Secrets">
+                    <label class="admin-edit-clients-page-tabs__list-item-label" for="tab3" role="button">
+                        <i class="fas fa-key"></i> <span>Secrets</span>
+                    </label>
+                </li>
+                <li class="admin-edit-clients-page-tabs__list-item" title="Token">
+                    <label class="admin-edit-clients-page-tabs__list-item-label" for="tab4" role="button">
+                        <i class="fas fa-user-tag"></i> <span>Token</span>
+                    </label>
+                </li>
+                <li class="admin-edit-clients-page-tabs__list-item" title="Consent">
+                    <label class="admin-edit-clients-page-tabs__list-item-label" for="tab5" role="button">
                         <i class="fas fa-question"></i> <span>Consent</span>
+                    </label>
+                </li>
+                <li class="admin-edit-clients-page-tabs__list-item" title="Properties">
+                    <label class="admin-edit-clients-page-tabs__list-item-label" for="tab6" role="button">
+                        <i class="fas fa-cogs"></i> <span>Properties</span>
                     </label>
                 </li>
             </ul>
             <div class="admin-edit-clients-page-tabs__slider"><div class="indicator"></div></div>
             <div class="admin-edit-clients-page-tabs__content">
-                <section>
+                <section> <!-- General -->
                     <div asp-validation-summary="All" class="text-danger"></div>
                     <ul class="xenial-form__list">
                         <li class="xenial-form__list-item">
@@ -49,6 +73,96 @@
                             <label asp-for="Input.Enabled"></label>
                             <input asp-for="Input.Enabled" class="toggle" />
                             <span asp-validation-for="Input.Enabled" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>
+                        </li>
+                    </ul>
+                </section>
+                <section> <!-- Configuration -->
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <ul class="xenial-form__list">
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.ProtocolType"></label>
+                            <input asp-for="Input.ProtocolType" class="form-control" />
+                            <span asp-validation-for="Input.ProtocolType" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.RequireClientSecret"></label>
+                            <input asp-for="Input.RequireClientSecret" class="toggle" />
+                            <span asp-validation-for="Input.RequireClientSecret" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.RequirePkce"></label>
+                            <input asp-for="Input.RequirePkce" class="toggle" />
+                            <span asp-validation-for="Input.RequirePkce" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.AllowPlainTextPkce"></label>
+                            <input asp-for="Input.AllowPlainTextPkce" class="toggle" />
+                            <span asp-validation-for="Input.AllowPlainTextPkce" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.AllowOfflineAccess"></label>
+                            <input asp-for="Input.AllowOfflineAccess" class="toggle" />
+                            <span asp-validation-for="Input.AllowOfflineAccess" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.AllowAccessTokensViaBrowser"></label>
+                            <input asp-for="Input.AllowAccessTokensViaBrowser" class="toggle" />
+                            <span asp-validation-for="Input.AllowAccessTokensViaBrowser" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>
+                        </li>
+                    </ul>
+                </section>
+                <section> <!-- Secrets -->
+
+                </section>
+                <section>
+                    <!-- Tokens -->
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <ul class="xenial-form__list">
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.IdentityTokenLifetime"></label>
+                            <input asp-for="Input.IdentityTokenLifetime" class="form-control" />
+                            <span asp-validation-for="Input.IdentityTokenLifetime" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.AccessTokenLifetime"></label>
+                            <input asp-for="Input.AccessTokenLifetime" class="form-control" />
+                            <span asp-validation-for="Input.AccessTokenLifetime" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.AccessTokenType"></label>
+                            <input asp-for="Input.AccessTokenType" class="form-control" />
+                            <span asp-validation-for="Input.AccessTokenType" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.AuthorizationCodeLifetime"></label>
+                            <input asp-for="Input.AuthorizationCodeLifetime" class="form-control" />
+                            <span asp-validation-for="Input.AuthorizationCodeLifetime" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.AbsoluteRefreshTokenLifetime"></label>
+                            <input asp-for="Input.AbsoluteRefreshTokenLifetime" class="form-control" />
+                            <span asp-validation-for="Input.AbsoluteRefreshTokenLifetime" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.SlidingRefreshTokenLifetime"></label>
+                            <input asp-for="Input.SlidingRefreshTokenLifetime" class="form-control" />
+                            <span asp-validation-for="Input.SlidingRefreshTokenLifetime" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.RefreshTokenUsage"></label>
+                            <input asp-for="Input.RefreshTokenUsage" class="form-control" />
+                            <span asp-validation-for="Input.RefreshTokenUsage" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.RefreshTokenExpiration"></label>
+                            <select asp-for="Input.RefreshTokenExpiration" class="form-control"></select>
+                            <span asp-validation-for="Input.RefreshTokenExpiration" class="text-danger"></span>
                         </li>
                         <li class="xenial-form__list-item">
                             <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>
@@ -84,6 +198,7 @@
                         </li>
                     </ul>
                 </section>
+                <section></section>
             </div>
         </div>
     </div>

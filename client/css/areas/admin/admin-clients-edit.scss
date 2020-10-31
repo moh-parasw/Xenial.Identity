@@ -1,9 +1,9 @@
 @import "forms";
 @import "tabs";
+@import "grid-style";
 
 .admin-edit-clients-page {
-  max-width: 500px;
-  margin: auto;
-  @include tab-pages(2);
+  @include grid-style();
+  @include tab-pages(6);
   @include xenial-form(1000rem);
 }
