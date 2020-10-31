@@ -1,0 +1,50 @@
+﻿@page "/Admin/Clients/Edit/{id:int}"
+
+@model Xenial.Identity.Areas.Admin.Pages.Clients.EditClientModel
+@{
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
+    ViewData["Title"] = "Edit Client";
+}
+
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="admin-edit-clients-page">
+    <div class="admin-edit-clients-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <ul class="admin-edit-clients-page-tabs__list">
+            <li class="admin-edit-clients-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="admin-edit-clients-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-desktop"></i> <span>@ViewData["Title"]</span>
+                </label>
+            </li>
+        </ul>
+        <div class="admin-edit-clients-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="admin-edit-clients-page-tabs__content">
+            <section>
+                <form class="xenial-form" method="post">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <ul class="xenial-form__list">
+                        <li class="xenial-form__list-item">
+                            @Model.ClientType
+                            <label asp-for="Input.ClientId"></label>
+                            <input asp-for="Input.ClientId" class="form-control" />
+                            <span asp-validation-for="Input.ClientId" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.ClientName"></label>
+                            <input asp-for="Input.ClientName" class="form-control" />
+                            <span asp-validation-for="Input.ClientName" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.Description"></label>
+                            <input asp-for="Input.Description" class="form-control" />
+                            <span asp-validation-for="Input.Description" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>
+                        </li>
+                    </ul>
+                </form>
+            </section>
+        </div>
+    </div>
+</div>

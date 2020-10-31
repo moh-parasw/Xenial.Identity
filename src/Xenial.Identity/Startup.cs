@@ -8,6 +8,7 @@ using DevExpress.Xpo;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,7 +19,9 @@ using Westwind.AspNetCore.LiveReload;
 using Xenial.AspNetIdentity.Xpo.Mappers;
 using Xenial.AspNetIdentity.Xpo.Models;
 using Xenial.AspNetIdentity.Xpo.Stores;
+using Xenial.Identity.Areas.Admin.Pages.Clients;
 using Xenial.Identity.Data;
+using Xenial.Identity.Infrastructure;
 using Xenial.Identity.Models;
 using Xenial.Identity.Xpo.Storage;
 
@@ -214,6 +217,11 @@ namespace Xenial.Identity
             //});
 
             services.AddServerSideBlazor();
+
+            services.Configure<RouteOptions>(options =>
+            {
+                options.ConstraintMap.Add(nameof(ClientTypes), typeof(EnumRouteConstraint<ClientTypes>));
+            });
         }
 
         public void Configure(IApplicationBuilder app)

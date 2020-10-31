@@ -20,39 +20,6 @@ using IdentityServer4.Models;
 
 namespace Xenial.Identity.Areas.Admin.Pages.Clients
 {
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
-    public sealed class IconAttribute : Attribute
-    {
-        public string Icon { get; }
-        public IconAttribute(string icon)
-            => Icon = icon;
-    }
-
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
-    public sealed class HeaderAttribute : Attribute
-    {
-        public string Header { get; }
-        public HeaderAttribute(string header)
-            => Header = header;
-    }
-
-    public static class EnumHelper
-    {
-        /// <summary>
-        /// Gets an attribute on an enum field value
-        /// </summary>
-        /// <typeparam name="T">The type of the attribute you want to retrieve</typeparam>
-        /// <param name="enumVal">The enum value</param>
-        /// <returns>The attribute of type T that exists on the enum value</returns>
-        /// <example><![CDATA[string desc = myEnumVariable.GetAttributeOfType<DescriptionAttribute>().Description;]]></example>
-        public static T GetAttributeOfType<T>(this Enum enumVal) where T : System.Attribute
-        {
-            var type = enumVal.GetType();
-            var memInfo = type.GetMember(enumVal.ToString());
-            var attributes = memInfo[0].GetCustomAttributes(typeof(T), false);
-            return (attributes.Length > 0) ? (T)attributes[0] : null;
-        }
-    }
 
     public class AddClientModel : PageModel
     {
@@ -69,41 +36,13 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
             public string ClientName { get; set; }
             public string DisplayName { get; set; }
             public string Description { get; set; }
-
-            public ClientTypes ClientType { get; set; }
-
-            public enum ClientTypes
-            {
-                [Icon("fas fa-file")]
-                [Header("Empty")]
-                [Description("Manual configuration")]
-                Empty = 0,
-                [Icon("fas fa-file-code")]
-                [Header("WebApplication")]
-                [Description("ServerSide (Auth Code Flow with PKCE)")]
-                Web = 1,
-                [Icon("fas fa-laptop")]
-                [Header("SPA")]
-                [Description("Javascript (Auth Code Flow with PKCE)")]
-                Spa = 2,
-                [Icon("fas fa-mobile")]
-                [Header("Native Application")]
-                [Description("Mobile/Desktop (Auth Code Flow with PKCE)")]
-                Native = 3,
-                [Icon("fas fa-server")]
-                [Header("Machine/Robot")]
-                [Description("Client Credentials flow")]
-                Machine = 4,
-                [Icon("fas fa-tv")]
-                [Header("Device flow")]
-                [Description("TV and Limited-Input Device Application")]
-                Device = 5
-            }
+            [Required]
+            public ClientTypes? ClientType { get; set; }
         }
 
-        public IEnumerable<(ClientInputModel.ClientTypes, string header, string description, string icon)> GetClientTypes()
+        public IEnumerable<(ClientTypes, string header, string description, string icon)> GetClientTypes()
         {
-            foreach (ClientInputModel.ClientTypes value in Enum.GetValues(typeof(ClientInputModel.ClientTypes)))
+            foreach (ClientTypes value in Enum.GetValues(typeof(ClientTypes)))
             {
                 var header = value.GetAttributeOfType<HeaderAttribute>().Header;
                 var description = value.GetAttributeOfType<DescriptionAttribute>().Description;
@@ -140,7 +79,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
 
                     await unitOfWork.SaveAsync(client);
                     await unitOfWork.CommitChangesAsync();
-                    return Redirect("/Admin/Clients");
+                    return Redirect($"/Admin/Clients/Edit/{client.Id}?clientType={Input.ClientType}");
                 }
                 catch (ConstraintViolationException ex)
                 {
@@ -164,30 +103,36 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
         {
             switch (Input.ClientType)
             {
-                case ClientInputModel.ClientTypes.Empty:
+                case ClientTypes.Empty:
                     break;
-                case ClientInputModel.ClientTypes.Web:
-                    client.AllowedGrantTypes.AddRange(CreateGrantTypes(GrantTypes.Code, client));
+                case ClientTypes.Web:
+                    client.AllowedGrantTypes.AddRange(CreateGrantTypes(GrantTypes.Hybrid, client));
                     client.RequirePkce = true;
                     client.RequireClientSecret = true;
+                    client.AllowOfflineAccess = true;
                     break;
-                case ClientInputModel.ClientTypes.Spa:
+                case ClientTypes.Native:
+                    client.AllowedGrantTypes.AddRange(CreateGrantTypes(GrantTypes.Hybrid, client));
+                    client.RequirePkce = true;
+                    client.RequireClientSecret = false;
+                    client.AllowOfflineAccess = true;
+                    break;
+                case ClientTypes.Spa:
                     client.AllowedGrantTypes.AddRange(CreateGrantTypes(GrantTypes.Code, client));
                     client.RequirePkce = true;
                     client.RequireClientSecret = false;
                     break;
-                case ClientInputModel.ClientTypes.Native:
-                    client.AllowedGrantTypes.AddRange(CreateGrantTypes(GrantTypes.Code, client));
-                    client.RequirePkce = true;
-                    client.RequireClientSecret = false;
-                    break;
-                case ClientInputModel.ClientTypes.Machine:
+                case ClientTypes.Machine:
                     client.AllowedGrantTypes.AddRange(CreateGrantTypes(GrantTypes.ClientCredentials, client));
                     break;
-                case ClientInputModel.ClientTypes.Device:
+                case ClientTypes.Device:
                     client.AllowedGrantTypes.AddRange(CreateGrantTypes(GrantTypes.DeviceFlow, client));
                     client.RequireClientSecret = false;
                     client.AllowOfflineAccess = true;
+                    break;
+                case ClientTypes.ResourceOwnerPassword:
+                    client.AllowedGrantTypes.AddRange(CreateGrantTypes(GrantTypes.ResourceOwnerPassword, client));
+                    client.RequireClientSecret = false;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
