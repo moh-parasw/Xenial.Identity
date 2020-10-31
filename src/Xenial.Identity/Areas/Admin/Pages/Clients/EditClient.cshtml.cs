@@ -35,6 +35,16 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
             public string ClientName { get; set; }
             public string DisplayName { get; set; }
             public string Description { get; set; }
+            public bool Enabled { get; set; }
+
+            #region Consent
+
+            public bool RequireConsent { get; set; }
+            public bool AllowRememberConsent { get; set; }
+            public string ClientUri { get; set; }
+            public string LogoUri { get; set; }
+
+            #endregion
 
         }
 

@@ -7,20 +7,26 @@
 }
 
 <partial name="_StatusMessage" model="Model.StatusMessage" />
-<div class="admin-edit-clients-page">
-    <div class="admin-edit-clients-page-tabs">
-        <input type="radio" id="tab1" name="tab-control" checked>
-        <ul class="admin-edit-clients-page-tabs__list">
-            <li class="admin-edit-clients-page-tabs__list-item" title="@ViewData["Title"]">
-                <label class="admin-edit-clients-page-tabs__list-item-label" for="tab1" role="button">
-                    <i class="fas fa-desktop"></i> <span>@ViewData["Title"]</span>
-                </label>
-            </li>
-        </ul>
-        <div class="admin-edit-clients-page-tabs__slider"><div class="indicator"></div></div>
-        <div class="admin-edit-clients-page-tabs__content">
-            <section>
-                <form class="xenial-form" method="post">
+<form class="xenial-form" method="post">
+    <div class="admin-edit-clients-page">
+        <div class="admin-edit-clients-page-tabs">
+            <input type="radio" id="tab1" name="tab-control" checked>
+            <input type="radio" id="tab2" name="tab-control">
+            <ul class="admin-edit-clients-page-tabs__list">
+                <li class="admin-edit-clients-page-tabs__list-item" title="General">
+                    <label class="admin-edit-clients-page-tabs__list-item-label" for="tab1" role="button">
+                        <i class="fas fa-desktop"></i> <span>General</span>
+                    </label>
+                </li>
+                <li class="admin-edit-clients-page-tabs__list-item" title="Consent">
+                    <label class="admin-edit-clients-page-tabs__list-item-label" for="tab2" role="button">
+                        <i class="fas fa-question"></i> <span>Consent</span>
+                    </label>
+                </li>
+            </ul>
+            <div class="admin-edit-clients-page-tabs__slider"><div class="indicator"></div></div>
+            <div class="admin-edit-clients-page-tabs__content">
+                <section>
                     <div asp-validation-summary="All" class="text-danger"></div>
                     <ul class="xenial-form__list">
                         <li class="xenial-form__list-item">
@@ -40,11 +46,45 @@
                             <span asp-validation-for="Input.Description" class="text-danger"></span>
                         </li>
                         <li class="xenial-form__list-item">
+                            <label asp-for="Input.Enabled"></label>
+                            <input asp-for="Input.Enabled" class="toggle" />
+                            <span asp-validation-for="Input.Enabled" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
                             <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>
                         </li>
                     </ul>
-                </form>
-            </section>
+                </section>
+                <section>
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <ul class="xenial-form__list">
+                        <li class="xenial-form__list-item">
+                            @Model.ClientType
+                            <label asp-for="Input.RequireConsent"></label>
+                            <input asp-for="Input.RequireConsent" class="toggle" />
+                            <span asp-validation-for="Input.RequireConsent" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.AllowRememberConsent"></label>
+                            <input asp-for="Input.AllowRememberConsent" class="toggle" />
+                            <span asp-validation-for="Input.AllowRememberConsent" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.ClientUri"></label>
+                            <input asp-for="Input.ClientUri" class="form-control" />
+                            <span asp-validation-for="Input.ClientUri" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.LogoUri"></label>
+                            <input asp-for="Input.LogoUri" class="form-control" />
+                            <span asp-validation-for="Input.LogoUri" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>
+                        </li>
+                    </ul>
+                </section>
+            </div>
         </div>
     </div>
-</div>
+</form>
