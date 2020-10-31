@@ -30,7 +30,7 @@
                             @if (Model.IsPhoneConfirmed)
                             {
                                 <div class="input-group">
-                                    <input asp-for="Phone" class="form-control" disabled />
+                                    <input asp-for="Phone" disabled />
                                     <div class="input-group-append">
                                         <span class="input-group-text text-success font-weight-bold">✓</span>
                                     </div>
@@ -38,14 +38,14 @@
                             }
                             else
                             {
-                                <input asp-for="Phone" class="form-control" disabled />
+                                <input asp-for="Phone" disabled />
                                 <button id="email-verification" type="submit" asp-page-handler="SendVerificationPhone" class="btn btn-link">Send verification message</button>
                             }
                         </li>
                     }*@
                     <li class="xenial-form__list-item">
                         <label asp-for="Input.NewPhone"></label>
-                        <input asp-for="Input.NewPhone" class="form-control" />
+                        <input asp-for="Input.NewPhone" />
                         <span asp-validation-for="Input.NewPhone" class="text-danger"></span>
                     </li>
                     <li class="xenial-form__list-item">

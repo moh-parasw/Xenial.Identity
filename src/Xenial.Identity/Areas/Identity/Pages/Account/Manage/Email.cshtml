@@ -28,7 +28,7 @@
                         @if (Model.IsEmailConfirmed)
                         {
                             <div class="input-group">
-                                <input asp-for="Email" class="form-control" disabled />
+                                <input asp-for="Email" disabled />
                                 <div class="input-group-append">
                                     <span class="input-group-text text-success font-weight-bold">✓</span>
                                 </div>
@@ -36,13 +36,13 @@
                         }
                         else
                         {
-                            <input asp-for="Email" class="form-control" disabled />
+                            <input asp-for="Email" disabled />
                             <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="btn btn-link">Send verification email</button>
                         }
                     </li>
                     <li class="xenial-form__list-item">
                         <label asp-for="Input.NewEmail"></label>
-                        <input asp-for="Input.NewEmail" class="form-control" />
+                        <input asp-for="Input.NewEmail" />
                         <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
                     </li>
                     <li class="xenial-form__list-item">
