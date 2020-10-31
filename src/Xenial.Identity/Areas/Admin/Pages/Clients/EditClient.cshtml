@@ -50,7 +50,8 @@
             </ul>
             <div class="admin-edit-clients-page-tabs__slider"><div class="indicator"></div></div>
             <div class="admin-edit-clients-page-tabs__content">
-                <section> <!-- General -->
+                <section>
+                    <!-- General -->
                     <div asp-validation-summary="All" class="text-danger"></div>
                     <ul class="xenial-form__list">
                         <li class="xenial-form__list-item">
@@ -79,7 +80,8 @@
                         </li>
                     </ul>
                 </section>
-                <section> <!-- Configuration -->
+                <section>
+                    <!-- Configuration -->
                     <div asp-validation-summary="All" class="text-danger"></div>
                     <ul class="xenial-form__list">
                         <li class="xenial-form__list-item">
@@ -117,7 +119,8 @@
                         </li>
                     </ul>
                 </section>
-                <section> <!-- Secrets -->
+                <section>
+                    <!-- Secrets -->
 
                 </section>
                 <section>
@@ -136,7 +139,7 @@
                         </li>
                         <li class="xenial-form__list-item">
                             <label asp-for="Input.AccessTokenType"></label>
-                            <input asp-for="Input.AccessTokenType" class="form-control" />
+                            <select asp-for="Input.AccessTokenType" asp-items="Model.AccessTokenTypes"></select>
                             <span asp-validation-for="Input.AccessTokenType" class="text-danger"></span>
                         </li>
                         <li class="xenial-form__list-item">
@@ -156,12 +159,12 @@
                         </li>
                         <li class="xenial-form__list-item">
                             <label asp-for="Input.RefreshTokenUsage"></label>
-                            <input asp-for="Input.RefreshTokenUsage" class="form-control" />
+                            <select asp-for="Input.RefreshTokenUsage" asp-items="Model.RefreshTokenUsages"></select>
                             <span asp-validation-for="Input.RefreshTokenUsage" class="text-danger"></span>
                         </li>
                         <li class="xenial-form__list-item">
                             <label asp-for="Input.RefreshTokenExpiration"></label>
-                            <select asp-for="Input.RefreshTokenExpiration" class="form-control"></select>
+                            <select asp-for="Input.RefreshTokenExpiration" asp-items="Model.RefreshTokenExpirations"></select>
                             <span asp-validation-for="Input.RefreshTokenExpiration" class="text-danger"></span>
                         </li>
                         <li class="xenial-form__list-item">

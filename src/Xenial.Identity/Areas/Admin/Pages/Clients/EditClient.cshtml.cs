@@ -17,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using Xenial.Identity.Xpo.Storage.Models;
 
 using IdentityServer4.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Xenial.Identity.Areas.Admin.Pages.Clients
 {
@@ -71,6 +72,10 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
             #endregion
 
         }
+
+        public SelectList AccessTokenTypes { get; } = new SelectList(Enum.GetValues(typeof(AccessTokenType)));
+        public SelectList RefreshTokenUsages { get; } = new SelectList(Enum.GetValues(typeof(TokenUsage)));
+        public SelectList RefreshTokenExpirations { get; } = new SelectList(Enum.GetValues(typeof(TokenExpiration)));
 
         public IEnumerable<(ClientTypes, string header, string description, string icon)> GetClientTypes()
         {
