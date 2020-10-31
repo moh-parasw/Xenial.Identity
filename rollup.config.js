@@ -8,7 +8,6 @@ import scss from "rollup-plugin-scss";
 import copy from "rollup-plugin-copy";
 import { terser } from "rollup-plugin-terser";
 import gzipPlugin from "rollup-plugin-gzip";
-import filesize from "rollup-plugin-filesize";
 
 const extensions = [".js", ".ts"];
 
@@ -96,8 +95,7 @@ export default (commandLineArgs) => {
             customCompression: (content) =>
               brotliCompressSync(Buffer.from(content)),
             fileName: ".br",
-          }),
-        debug ? undefined : filesize(),
+          })
       ],
     },
   ];
