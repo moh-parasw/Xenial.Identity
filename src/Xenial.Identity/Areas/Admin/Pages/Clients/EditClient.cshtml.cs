@@ -79,6 +79,12 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
 
             #endregion
 
+            #region Device Flow
+
+            public string UserCodeType { get; set; }
+            public int DeviceCodeLifetime { get; set; }
+
+            #endregion
         }
 
         public SelectList AccessTokenTypes { get; } = new SelectList(Enum.GetValues(typeof(AccessTokenType)));

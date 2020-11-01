@@ -19,6 +19,7 @@
             <input type="radio" id="tab4" name="tab-control">
             <input type="radio" id="tab5" name="tab-control">
             <input type="radio" id="tab6" name="tab-control">
+            <input type="radio" id="tab7" name="tab-control">
             <ul class="admin-edit-clients-page-tabs__list">
                 <li class="admin-edit-clients-page-tabs__list-item" title="General">
                     <label class="admin-edit-clients-page-tabs__list-item-label" for="tab1" role="button">
@@ -45,8 +46,13 @@
                         <i class="fas fa-question"></i> <span>Consent</span>
                     </label>
                 </li>
-                <li class="admin-edit-clients-page-tabs__list-item" title="Properties">
+                <li class="admin-edit-clients-page-tabs__list-item" title="Device">
                     <label class="admin-edit-clients-page-tabs__list-item-label" for="tab6" role="button">
+                        <i class="fas fa-tv"></i> <span>Device</span>
+                    </label>
+                </li>
+                <li class="admin-edit-clients-page-tabs__list-item" title="Properties">
+                    <label class="admin-edit-clients-page-tabs__list-item-label" for="tab7" role="button">
                         <i class="fas fa-cogs"></i> <span>Properties</span>
                     </label>
                 </li>
@@ -54,7 +60,7 @@
             <div class="admin-edit-clients-page-tabs__slider"><div class="indicator"></div></div>
             <div class="admin-edit-clients-page-tabs__content">
                 <section>
-                    <!-- General -->
+                    <h2>General</h2>
                     <ul class="xenial-form__list">
                         <li class="xenial-form__list-item">
                             <label asp-for="Input.ClientId"></label>
@@ -82,7 +88,7 @@
                     </ul>
                 </section>
                 <section>
-                    <!-- Configuration -->
+                    <h2>Configuration</h2>
                     <ul class="xenial-form__list">
                         <li class="xenial-form__list-item">
                             <label asp-for="Input.ProtocolType"></label>
@@ -127,11 +133,10 @@
                     </ul>
                 </section>
                 <section>
-                    <!-- Secrets -->
-
+                    <h2>Secrets</h2>
                 </section>
                 <section>
-                    <!-- Tokens -->
+                    <h2>Tokens</h2>
                     <ul class="xenial-form__list">
                         <li class="xenial-form__list-item inline">
                             <div class="inline">
@@ -223,6 +228,7 @@
                     </ul>
                 </section>
                 <section>
+                    <h2>Consent</h2>
                     <ul class="xenial-form__list">
                         <li class="xenial-form__list-item inline">
                             <div class="inline">
@@ -251,7 +257,27 @@
                         </li>
                     </ul>
                 </section>
-                <section></section>
+                <section>
+                    <h2>Device</h2>
+                    <ul class="xenial-form__list">
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.UserCodeType"></label>
+                            <input asp-for="Input.UserCodeType" />
+                            <span asp-validation-for="Input.UserCodeType" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.DeviceCodeLifetime"></label>
+                            <input asp-for="Input.DeviceCodeLifetime" />
+                            <span asp-validation-for="Input.DeviceCodeLifetime" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Properties</h2>
+                </section>
             </div>
         </div>
     </div>
