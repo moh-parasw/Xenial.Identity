@@ -130,9 +130,27 @@
                                 <input asp-for="Input.AllowAccessTokensViaBrowser" class="toggle" />
                                 <span asp-validation-for="Input.AllowAccessTokensViaBrowser" class="text-danger"></span>
                             </div>
-                            <div class="inline">
-
-                            </div>
+                            <div class="inline"></div>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.AllowedGrantTypes"></label>
+                            <input asp-for="Input.AllowedGrantTypes" data-tags="@Model.AllowedGrantTypes" />
+                            <span asp-validation-for="Input.AllowedGrantTypes" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.AllowedScopes"></label>
+                            <input asp-for="Input.AllowedScopes" data-tags="" />
+                            <span asp-validation-for="Input.AllowedScopes" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.RedirectUris"></label>
+                            <input asp-for="Input.RedirectUris" data-tags="" />
+                            <span asp-validation-for="Input.RedirectUris" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Input.AllowedCorsOrigins"></label>
+                            <input asp-for="Input.AllowedCorsOrigins" data-tags="" />
+                            <span asp-validation-for="Input.AllowedCorsOrigins" class="text-danger"></span>
                         </li>
                         <li class="xenial-form__list-item">
                             <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>

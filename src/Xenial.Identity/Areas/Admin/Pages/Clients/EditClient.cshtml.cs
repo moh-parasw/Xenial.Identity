@@ -18,6 +18,7 @@ using Xenial.Identity.Xpo.Storage.Models;
 
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json.Schema;
 
 namespace Xenial.Identity.Areas.Admin.Pages.Clients
 {
@@ -48,6 +49,11 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
             public bool AllowOfflineAccess { get; set; }
             public bool AllowAccessTokensViaBrowser { get; set; }
 
+            public string AllowedScopes { get; set; }
+            public string RedirectUris { get; set; }
+            public string AllowedGrantTypes { get; set; }
+            public string AllowedCorsOrigins { get; set; }
+
             #endregion
 
             #region Token
@@ -61,7 +67,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
             public TokenUsage RefreshTokenUsage { get; set; }
             public TokenExpiration RefreshTokenExpiration { get; set; }
 
-            public bool UpdateAccessTokenClaimsOnRefresh  { get; set; }
+            public bool UpdateAccessTokenClaimsOnRefresh { get; set; }
             public bool IncludeJwtId { get; set; }
             public bool AlwaysSendClientClaims { get; set; }
             public bool AlwaysIncludeUserClaimsInIdToken { get; set; }
@@ -88,6 +94,20 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
             #endregion
         }
 
+        public string AllowedGrantTypes { get; } = string.Join(",",
+            GrantTypes.ClientCredentials
+                .Concat(GrantTypes.Code)
+                .Concat(GrantTypes.CodeAndClientCredentials)
+                .Concat(GrantTypes.DeviceFlow)
+                .Concat(GrantTypes.Hybrid)
+                .Concat(GrantTypes.HybridAndClientCredentials)
+                .Concat(GrantTypes.Implicit)
+                .Concat(GrantTypes.ImplicitAndClientCredentials)
+                .Concat(GrantTypes.ResourceOwnerPassword)
+                .Concat(GrantTypes.ResourceOwnerPasswordAndClientCredentials)
+                .Distinct()
+            );
+
         public SelectList AccessTokenTypes { get; } = new SelectList(Enum.GetValues(typeof(AccessTokenType)));
         public SelectList RefreshTokenUsages { get; } = new SelectList(Enum.GetValues(typeof(TokenUsage)));
         public SelectList RefreshTokenExpirations { get; } = new SelectList(Enum.GetValues(typeof(TokenExpiration)));
@@ -106,8 +126,16 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
         internal class ClientMappingConfiguration : Profile
         {
             public ClientMappingConfiguration()
-                => CreateMap<ClientInputModel, XpoClient>()
+                => CreateMap<XpoClient, ClientInputModel>()
+                    .ForMember(m => m.AllowedScopes, o => o.Ignore())
+                    .ForMember(m => m.RedirectUris, o => o.Ignore())
+                    .ForMember(m => m.AllowedGrantTypes, o => o.Ignore())
+                    .ForMember(m => m.AllowedCorsOrigins, o => o.Ignore())
                     .ReverseMap()
+                    .ForMember(m => m.AllowedScopes, o => o.Ignore())
+                    .ForMember(m => m.RedirectUris, o => o.Ignore())
+                    .ForMember(m => m.AllowedGrantTypes, o => o.Ignore())
+                    .ForMember(m => m.AllowedCorsOrigins, o => o.Ignore())
                 ;
         }
 
@@ -135,10 +163,17 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
 
             ClientType = clientType.HasValue ? clientType.Value : GuessClientType(client);
             Input = Mapper.Map(client, Input);
+            Input.AllowedGrantTypes = string.Join(",", client.AllowedGrantTypes.Select(s => s.GrantType));
+            Input.AllowedScopes = string.Join(",", client.AllowedScopes.Select(s => s.Scope));
+            Input.RedirectUris = string.Join(",", client.RedirectUris.Select(s => s.RedirectUri));
+            Input.AllowedCorsOrigins = string.Join(",", client.AllowedCorsOrigins.Select(s => s.Origin));
 
             return Page();
         }
-
+        internal class Tag
+        {
+            public string Value { get; set; }
+        }
         public async Task<IActionResult> OnPost([FromRoute] int id, [FromQuery] ClientTypes? clientType = null)
         {
             Id = id;
@@ -155,6 +190,11 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
 
                     ClientType = clientType.HasValue ? clientType.Value : GuessClientType(client);
                     client = Mapper.Map(Input, client);
+
+                    await MapAllowedGrantTypes(client);
+                    await MapAllowedScopes(client);
+                    await MapRedirectUris(client);
+                    await MapAllowedCorsOrigins(client);
 
                     await unitOfWork.SaveAsync(client);
                     await unitOfWork.CommitChangesAsync();
@@ -176,6 +216,114 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
             StatusMessage = "Error: Check Validation";
 
             return Page();
+
+        }
+
+        private async Task MapAllowedCorsOrigins(XpoClient client)
+        {
+            if (!string.IsNullOrEmpty(Input.AllowedCorsOrigins))
+            {
+                var jsonArray = Newtonsoft.Json.Linq.JArray.Parse(Input.AllowedCorsOrigins);
+                var values = jsonArray.Select(j => j.ToObject<Tag>()).ToList();
+
+                await ClearAllowedCorsOrigins(client);
+
+                client.AllowedCorsOrigins.AddRange(values.Select(allowedCorsOrigin => new XpoClientCorsOrigin(unitOfWork)
+                {
+                    Origin = allowedCorsOrigin.Value
+                }));
+            }
+            else
+            {
+                await ClearAllowedCorsOrigins(client);
+            }
+            async Task ClearAllowedCorsOrigins(XpoClient client)
+            {
+                foreach (var allowedCorsOrigin in client.AllowedCorsOrigins.ToList())
+                {
+                    await unitOfWork.DeleteAsync(allowedCorsOrigin);
+                }
+            }
+        }
+
+        private async Task MapRedirectUris(XpoClient client)
+        {
+            if (!string.IsNullOrEmpty(Input.RedirectUris))
+            {
+                var jsonArray = Newtonsoft.Json.Linq.JArray.Parse(Input.RedirectUris);
+                var values = jsonArray.Select(j => j.ToObject<Tag>()).ToList();
+
+                await ClearRedirectUris(client);
+
+                client.RedirectUris.AddRange(values.Select(redirectUri => new XpoClientRedirectUri(unitOfWork)
+                {
+                    RedirectUri = redirectUri.Value
+                }));
+            }
+            else
+            {
+                await ClearRedirectUris(client);
+            }
+            async Task ClearRedirectUris(XpoClient client)
+            {
+                foreach (var redirectUri in client.RedirectUris.ToList())
+                {
+                    await unitOfWork.DeleteAsync(redirectUri);
+                }
+            }
+        }
+
+        private async Task MapAllowedScopes(XpoClient client)
+        {
+            if (!string.IsNullOrEmpty(Input.AllowedScopes))
+            {
+                var jsonArray = Newtonsoft.Json.Linq.JArray.Parse(Input.AllowedScopes);
+                var values = jsonArray.Select(j => j.ToObject<Tag>()).ToList();
+                await ClearAllowedScopes(client);
+
+                client.AllowedScopes.AddRange(values.Select(scope => new XpoClientScope(unitOfWork)
+                {
+                    Scope = scope.Value
+                }));
+            }
+            else
+            {
+                await ClearAllowedScopes(client);
+            }
+            async Task ClearAllowedScopes(XpoClient client)
+            {
+                foreach (var allowedScope in client.AllowedScopes.ToList())
+                {
+                    await unitOfWork.DeleteAsync(allowedScope);
+                }
+            }
+        }
+
+        private async Task MapAllowedGrantTypes(XpoClient client)
+        {
+            if (!string.IsNullOrEmpty(Input.AllowedGrantTypes))
+            {
+                var jsonArray = Newtonsoft.Json.Linq.JArray.Parse(Input.AllowedGrantTypes);
+                var values = jsonArray.Select(j => j.ToObject<Tag>()).ToList();
+
+                await ClearAllowedGrantTypes(client);
+
+                client.AllowedGrantTypes.AddRange(values.Select(grant => new XpoClientGrantType(unitOfWork)
+                {
+                    GrantType = grant.Value
+                }));
+            }
+            else
+            {
+                await ClearAllowedGrantTypes(client);
+            }
+            async Task ClearAllowedGrantTypes(XpoClient client)
+            {
+                foreach (var allowedGrantType in client.AllowedGrantTypes.ToList())
+                {
+                    await unitOfWork.DeleteAsync(allowedGrantType);
+                }
+            }
         }
 
         private static ClientTypes? GuessClientType(XpoClient client)
@@ -223,35 +371,5 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
 
                 _ => null
             };
-
-        //case ClientTypes.Empty:
-        //    break;
-        //case ClientTypes.Web:
-        //    client.AllowedGrantTypes.AddRange(CreateGrantTypes(GrantTypes.Code, client));
-        //    client.RequirePkce = true;
-        //    client.RequireClientSecret = true;
-        //    break;
-        //case ClientTypes.Spa:
-        //    client.AllowedGrantTypes.AddRange(CreateGrantTypes(GrantTypes.Code, client));
-        //    client.RequirePkce = true;
-        //    client.RequireClientSecret = false;
-        //    break;
-        //case ClientTypes.Native:
-        //    client.AllowedGrantTypes.AddRange(CreateGrantTypes(GrantTypes.Code, client));
-        //    client.RequirePkce = true;
-        //    client.RequireClientSecret = false;
-        //    break;
-        //case ClientTypes.Machine:
-        //    client.AllowedGrantTypes.AddRange(CreateGrantTypes(GrantTypes.ClientCredentials, client));
-        //    break;
-        //case ClientTypes.Device:
-        //    client.AllowedGrantTypes.AddRange(CreateGrantTypes(GrantTypes.DeviceFlow, client));
-        //    client.RequireClientSecret = false;
-        //    client.AllowOfflineAccess = true;
-        //    break;
-        //default:
-        //    throw new ArgumentOutOfRangeException();
-
-
     }
 }
