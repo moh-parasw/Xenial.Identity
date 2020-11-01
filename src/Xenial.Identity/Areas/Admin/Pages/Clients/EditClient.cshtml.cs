@@ -37,6 +37,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
             public string DisplayName { get; set; }
             public string Description { get; set; }
             public bool Enabled { get; set; }
+            public bool EnableLocalLogin { get; set; }
 
             #region Configuration
 

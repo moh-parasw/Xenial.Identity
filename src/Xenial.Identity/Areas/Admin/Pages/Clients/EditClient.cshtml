@@ -77,10 +77,17 @@
                             <input asp-for="Input.Description" />
                             <span asp-validation-for="Input.Description" class="text-danger"></span>
                         </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.Enabled"></label>
-                            <input asp-for="Input.Enabled" class="toggle" />
-                            <span asp-validation-for="Input.Enabled" class="text-danger"></span>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.Enabled"></label>
+                                <input asp-for="Input.Enabled" class="toggle" />
+                                <span asp-validation-for="Input.Enabled" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.EnableLocalLogin"></label>
+                                <input asp-for="Input.EnableLocalLogin" class="toggle" />
+                                <span asp-validation-for="Input.EnableLocalLogin" class="text-danger"></span>
+                            </div>
                         </li>
                         <li class="xenial-form__list-item">
                             <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>
