@@ -302,6 +302,24 @@
                 </section>
                 <section>
                     <h2>Properties</h2>
+                    @(Html.Grid(Model.Properties).Build(columns =>
+                    {
+                        columns.Add(model => $"<i class=\"fa fa-fingerprint\" data-copy=\"{model.Id}\" title=\"{model.Id}\"></i>")
+                            .Named(nameof(UsersModel.UserOutputModel.Id))
+                            .Encoded(false)
+                            .Titled("Id")
+                            .Css("user-image");
+
+                        columns.Add(model => model.Key).Titled("Key");
+                        columns.Add(model => model.Value).Titled("Value");
+
+                        columns.Add(model => $"<div class=\"actions-container\"><a href=\"/Admin/Clients/{Model.Id}/Properties/{model.Id}/Delete\" class=\"button\"><i class=\"fas fa-times\"></i></a><a class=\"button\" href=\"/Admin/Clients/{Model.Id}/Properties/{model.Id}/Edit\"><i class=\"fas fa-pen\"></i></a></div>")
+                            .Encoded(false)
+                            .Css("actions")
+                            .Titled($"<div class=\"actions-container\"><a class=\"button\" href=\"/Admin/Clients/{Model.Id}/Properties/Add\"><i class=\"fas fa-plus\"></i></button></div>");
+                    })
+                    .Empty("No data found")
+                    )
                 </section>
             </div>
         </div>

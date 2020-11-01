@@ -116,6 +116,26 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
         public SelectList RefreshTokenUsages { get; } = new SelectList(Enum.GetValues(typeof(TokenUsage)));
         public SelectList RefreshTokenExpirations { get; } = new SelectList(Enum.GetValues(typeof(TokenExpiration)));
 
+        public IList<SecretsOutputModel> Secrets { get; set; } = new List<SecretsOutputModel>();
+        public IList<PropertiesOutputModel> Properties { get; set; } = new List<PropertiesOutputModel>();
+
+        public class SecretsOutputModel
+        {
+            public int Id { get; set; }
+            public string Description { get; set; }
+            public string Value { get; set; }
+            public string Type { get; set; }
+            public DateTime Created { get; set; }
+            public DateTime? Expiration { get; set; }
+        }
+
+        public class PropertiesOutputModel
+        {
+            public int Id { get; set; }
+            public string Key { get; set; }
+            public string Value { get; set; }
+        }
+
         public IEnumerable<(ClientTypes, string header, string description, string icon)> GetClientTypes()
         {
             foreach (ClientTypes value in Enum.GetValues(typeof(ClientTypes)))
@@ -130,7 +150,8 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
         internal class ClientMappingConfiguration : Profile
         {
             public ClientMappingConfiguration()
-                => CreateMap<XpoClient, ClientInputModel>()
+            {
+                CreateMap<ClientInputModel, XpoClient>()
                     .ForMember(m => m.AllowedScopes, o => o.Ignore())
                     .ForMember(m => m.RedirectUris, o => o.Ignore())
                     .ForMember(m => m.AllowedGrantTypes, o => o.Ignore())
@@ -141,6 +162,13 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
                     .ForMember(m => m.AllowedGrantTypes, o => o.Ignore())
                     .ForMember(m => m.AllowedCorsOrigins, o => o.Ignore())
                 ;
+
+                CreateMap<SecretsOutputModel, XpoClientSecret>()
+                    .ReverseMap();
+
+                CreateMap<PropertiesOutputModel, XpoClientProperty>()
+                    .ReverseMap();
+            }
         }
 
         internal static IMapper Mapper { get; }
@@ -167,6 +195,8 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
 
             await FetchAllowedScopes();
 
+            FetchSubLists(client);
+
             ClientType = clientType.HasValue ? clientType.Value : GuessClientType(client);
             Input = Mapper.Map(client, Input);
             Input.AllowedGrantTypes = string.Join(",", client.AllowedGrantTypes.Select(s => s.GrantType));
@@ -182,6 +212,11 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
             var resources = await resourceStore.GetAllResourcesAsync();
             AllowedScopes = string.Join(",", resources.ToScopeNames().Distinct());
         }
+        private void FetchSubLists(XpoClient client)
+        {
+            Secrets = client.ClientSecrets.Select(secret => Mapper.Map<SecretsOutputModel>(secret)).ToList();
+            Properties = client.Properties.Select(propertey => Mapper.Map<PropertiesOutputModel>(propertey)).ToList();
+        }
 
         internal class Tag
         {
@@ -191,17 +226,20 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
         {
             Id = id;
             await FetchAllowedScopes();
+
+            var client = await unitOfWork.GetObjectByKeyAsync<XpoClient>(id);
+            if (client == null)
+            {
+                StatusMessage = "Error: can not find client";
+                return Page();
+            }
+
+            FetchSubLists(client);
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var client = await unitOfWork.GetObjectByKeyAsync<XpoClient>(id);
-                    if (client == null)
-                    {
-                        StatusMessage = "Error: can not find client";
-                        return Page();
-                    }
-
                     ClientType = clientType.HasValue ? clientType.Value : GuessClientType(client);
                     client = Mapper.Map(Input, client);
 

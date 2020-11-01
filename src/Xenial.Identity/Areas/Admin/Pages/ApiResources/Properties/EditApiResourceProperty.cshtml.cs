@@ -61,7 +61,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources.Properties
             var apiResourceProperty = apiResource.Properties.FirstOrDefault(property => property.Id == id);
             if (apiResourceProperty == null)
             {
-                StatusMessage = "Error: cannot find api resource propterty";
+                StatusMessage = "Error: cannot find api resource property";
                 return Page();
             }
 
@@ -87,7 +87,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources.Properties
 
                     if (apiResourceProperty == null)
                     {
-                        StatusMessage = "Error: cannot find api resource propterty";
+                        StatusMessage = "Error: cannot find api resource property";
                         return Page();
                     }
 

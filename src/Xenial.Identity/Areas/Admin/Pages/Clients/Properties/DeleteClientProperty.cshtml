@@ -1,24 +1,24 @@
-﻿@page "/Admin/ApiResources/{resourceId:int}/Properties/{id:int}/Delete"
+﻿@page "/Admin/Clients/{clientId:int}/Properties/{id:int}/Delete"
 
-@model Xenial.Identity.Areas.Admin.Pages.ApiResources.Properties.DeleteApiResourcePropertyModel
+@model Xenial.Identity.Areas.Admin.Pages.Clients.Properties.DeleteClientPropertyModel
 @{
     Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
-    ViewData["Title"] = "Delete Api Resource Property";
+    ViewData["Title"] = "Delete Client Property";
 }
 
 <partial name="_StatusMessage" model="Model.StatusMessage" />
-<div class="admin-delete-api-resources-properties-page">
-    <div class="admin-delete-api-resources-properties-page-tabs">
+<div class="admin-delete-clients-properties-page">
+    <div class="admin-delete-clients-properties-page-tabs">
         <input type="radio" id="tab1" name="tab-control" checked>
-        <ul class="admin-delete-api-resources-properties-page-tabs__list">
-            <li class="admin-delete-api-resources-properties-page-tabs__list-item" title="@ViewData["Title"]">
-                <label class="admin-delete-api-resources-properties-page-tabs__list-item-label" for="tab1" role="button">
+        <ul class="admin-delete-clients-properties-page-tabs__list">
+            <li class="admin-delete-clients-properties-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="admin-delete-clients-properties-page-tabs__list-item-label" for="tab1" role="button">
                     <i class="fas fa-cogs"></i> <span>@ViewData["Title"]</span>
                 </label>
             </li>
         </ul>
-        <div class="admin-delete-api-resources-properties-page-tabs__slider"><div class="indicator"></div></div>
-        <div class="admin-delete-api-resources-properties-page-tabs__content">
+        <div class="admin-delete-clients-properties-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="admin-delete-clients-properties-page-tabs__content">
             <ul class="xenial-form__list">
                 <li class="xenial-form__list-item">
                     <label asp-for="Output.Key"></label>

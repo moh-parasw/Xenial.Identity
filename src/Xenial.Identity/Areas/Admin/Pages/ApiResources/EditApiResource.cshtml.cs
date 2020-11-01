@@ -114,27 +114,35 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
             Input.UserClaims = string.Join(",", apiResource.UserClaims.Select(userClaim => userClaim.Type));
             Input.ApiScopes = string.Join(",", apiResource.Scopes.Select(scope => scope.Scope));
 
-            Secrets = apiResource.Secrets.Select(secret => Mapper.Map<SecretsOutputModel>(secret)).ToList();
-            Properties = apiResource.Properties.Select(propertey => Mapper.Map<PropertiesOutputModel>(propertey)).ToList();
+            FetchSubLists(apiResource);
 
             return Page();
+        }
+
+        private void FetchSubLists(XpoApiResource apiResource)
+        {
+            Secrets = apiResource.Secrets.Select(secret => Mapper.Map<SecretsOutputModel>(secret)).ToList();
+            Properties = apiResource.Properties.Select(propertey => Mapper.Map<PropertiesOutputModel>(propertey)).ToList();
         }
 
         public async Task<IActionResult> OnPost([FromRoute] int id)
         {
             Id = id;
             await FetchScopes();
+
+            var apiResource = await unitOfWork.GetObjectByKeyAsync<XpoApiResource>(id);
+            if (apiResource == null)
+            {
+                StatusMessage = "Error: Cannot find api resource";
+                return Page();
+            }
+
+            FetchSubLists(apiResource);
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var apiResource = await unitOfWork.GetObjectByKeyAsync<XpoApiResource>(id);
-                    if (apiResource == null)
-                    {
-                        StatusMessage = "Error: Cannot find api resource";
-                        return Page();
-                    }
-
                     foreach (var userClaim in apiResource.UserClaims.ToList())
                     {
                         apiResource.UserClaims.Remove(userClaim);

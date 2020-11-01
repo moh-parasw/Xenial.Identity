@@ -17,17 +17,17 @@ using Microsoft.Extensions.Logging;
 using Xenial.Identity.Data;
 using Xenial.Identity.Xpo.Storage.Models;
 
-namespace Xenial.Identity.Areas.Admin.Pages.ApiResources.Properties
+namespace Xenial.Identity.Areas.Admin.Pages.Clients.Properties
 {
-    public class DeleteApiResourcePropertyModel : PageModel
+    public class DeleteClientPropertyModel : PageModel
     {
         private readonly UnitOfWork unitOfWork;
-        private readonly ILogger<DeleteApiResourcePropertyModel> logger;
-        public DeleteApiResourcePropertyModel(UnitOfWork unitOfWork, ILogger<DeleteApiResourcePropertyModel> logger)
+        private readonly ILogger<DeleteClientPropertyModel> logger;
+        public DeleteClientPropertyModel(UnitOfWork unitOfWork, ILogger<DeleteClientPropertyModel> logger)
             => (this.unitOfWork, this.logger) = (unitOfWork, logger);
 
 
-        public class ApiResourcePropertyOutputModel
+        public class ClientPropertyOutputModel
         {
             [Required]
             public string Key { get; set; }
@@ -35,52 +35,52 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources.Properties
             public string Value { get; set; }
         }
 
-        internal class ApiResourceMappingConfiguration : Profile
+        internal class ClientMappingConfiguration : Profile
         {
-            public ApiResourceMappingConfiguration()
-                => CreateMap<ApiResourcePropertyOutputModel, XpoApiResourceProperty>()
+            public ClientMappingConfiguration()
+                => CreateMap<ClientPropertyOutputModel, XpoClientProperty>()
                     .ReverseMap()
                 ;
         }
 
         internal static IMapper Mapper { get; }
-            = new MapperConfiguration(cfg => cfg.AddProfile<ApiResourceMappingConfiguration>())
+            = new MapperConfiguration(cfg => cfg.AddProfile<ClientMappingConfiguration>())
                 .CreateMapper();
 
         [Required, BindProperty]
-        public ApiResourcePropertyOutputModel Output { get; set; } = new ApiResourcePropertyOutputModel();
+        public ClientPropertyOutputModel Output { get; set; } = new ClientPropertyOutputModel();
 
         public string StatusMessage { get; set; }
 
-        public async Task<IActionResult> OnGet([FromRoute] int resourceId, [FromRoute] int id)
+        public async Task<IActionResult> OnGet([FromRoute] int clientId, [FromRoute] int id)
         {
-            var apiResource = await unitOfWork.GetObjectByKeyAsync<XpoApiResource>(resourceId);
+            var apiResource = await unitOfWork.GetObjectByKeyAsync<XpoClient>(clientId);
             if (apiResource == null)
             {
-                StatusMessage = "Error: cannot find api resource";
+                StatusMessage = "Error: cannot find client";
                 return Page();
             }
 
             var apiResourceProperty = apiResource.Properties.FirstOrDefault(property => property.Id == id);
             if (apiResourceProperty == null)
             {
-                StatusMessage = "Error: cannot find api resource property";
+                StatusMessage = "Error: cannot find client property";
                 return Page();
             }
 
-            Output = Mapper.Map<ApiResourcePropertyOutputModel>(apiResourceProperty);
+            Output = Mapper.Map<ClientPropertyOutputModel>(apiResourceProperty);
 
             return Page();
         }
 
-        public async Task<IActionResult> OnPost([FromRoute] int resourceId, [FromRoute] int id)
+        public async Task<IActionResult> OnPost([FromRoute] int clientId, [FromRoute] int id)
         {
             try
             {
-                var apiResource = await unitOfWork.GetObjectByKeyAsync<XpoApiResource>(resourceId);
+                var apiResource = await unitOfWork.GetObjectByKeyAsync<XpoClient>(clientId);
                 if (apiResource == null)
                 {
-                    StatusMessage = "Error: cannot find api resource";
+                    StatusMessage = "Error: cannot find client";
                     return Page();
                 }
 
@@ -88,23 +88,23 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources.Properties
 
                 if (apiResourceProperty == null)
                 {
-                    StatusMessage = "Error: cannot find api resource property";
+                    StatusMessage = "Error: cannot find client property";
                     return Page();
                 }
 
                 await unitOfWork.DeleteAsync(apiResourceProperty);
                 await unitOfWork.SaveAsync(apiResource);
                 await unitOfWork.CommitChangesAsync();
-                return Redirect($"/Admin/ApiResources/Edit/{resourceId}?SelectedPage=Properties");
+                return Redirect($"/Admin/Clients/Edit/{clientId}?SelectedPage=Properties");
             }
             catch (ConstraintViolationException ex)
             {
-                logger.LogWarning(ex, "Error saving ApiResourceProperty with {resourceId} and {id}", resourceId, id);
+                logger.LogWarning(ex, "Error saving ClientProperty with {clientId} and {id}", clientId, id);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error deleting ApiResourceProperty with {resourceId} and {id}", resourceId, id);
-                StatusMessage = $"Error deleting api resource property: {ex.Message}";
+                logger.LogError(ex, "Error deleting ClientProperty with {clientId} and {id}", clientId, id);
+                StatusMessage = $"Error deleting client property: {ex.Message}";
                 return Page();
             }
 
