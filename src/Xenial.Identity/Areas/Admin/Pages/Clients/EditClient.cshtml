@@ -159,6 +159,32 @@
                 </section>
                 <section>
                     <h2>Secrets</h2>
+                    @(Html.Grid(Model.Secrets).Build(columns =>
+                    {
+                        columns.Add(model => $"<i class=\"fa fa-fingerprint\" data-copy=\"{model.Id}\" title=\"{model.Id}\"></i>")
+                            .Encoded(false)
+                            .Titled("Id")
+                            .Css("user-image");
+
+                        columns.Add(model => model.Description).Titled("Description");
+                        columns.Add(model => model.Type).Titled("Type");
+
+                        columns.Add(model => $"<i class=\"fa fa-fingerprint\" data-copy=\"{model.Value}\" title=\"{model.Value}\"></i>")
+                            .Encoded(false)
+                            .Titled("Value")
+                            .Css("user-image");
+
+
+                        columns.Add(model => model.Created).Titled("Created");
+                        columns.Add(model => model.Expiration).Titled("Expiration");
+
+                        columns.Add(model => $"<div class=\"actions-container\"><a href=\"/Admin/Clients/{Model.Id}/Secrets/{model.Id}/Delete\" class=\"button\"><i class=\"fas fa-times\"></i></a><a class=\"button\" href=\"/Admin/Clients/{Model.Id}/Secrets/{model.Id}/Edit\"><i class=\"fas fa-pen\"></i></a></div>")
+                            .Encoded(false)
+                            .Css("actions")
+                            .Titled($"<div class=\"actions-container\"><a class=\"button\" href=\"/Admin/Clients/{Model.Id}/Secrets/Add\"><i class=\"fas fa-plus\"></i></button></div>");
+                    })
+                    .Empty("No data found")
+                    )
                 </section>
                 <section>
                     <h2>Tokens</h2>
