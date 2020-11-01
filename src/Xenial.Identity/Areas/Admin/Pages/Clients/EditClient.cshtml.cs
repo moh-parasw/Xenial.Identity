@@ -19,6 +19,7 @@ using Xenial.Identity.Xpo.Storage.Models;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json.Schema;
+using IdentityServer4.Stores;
 
 namespace Xenial.Identity.Areas.Admin.Pages.Clients
 {
@@ -26,8 +27,9 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
     {
         private readonly UnitOfWork unitOfWork;
         private readonly ILogger<AddClientModel> logger;
-        public EditClientModel(UnitOfWork unitOfWork, ILogger<AddClientModel> logger)
-            => (this.unitOfWork, this.logger) = (unitOfWork, logger);
+        private readonly IResourceStore resourceStore;
+        public EditClientModel(UnitOfWork unitOfWork, ILogger<AddClientModel> logger, IResourceStore resourceStore)
+            => (this.unitOfWork, this.logger, this.resourceStore) = (unitOfWork, logger, resourceStore);
 
         public class ClientInputModel
         {
@@ -108,6 +110,8 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
                 .Distinct()
             );
 
+        public string AllowedScopes { get; set; }
+
         public SelectList AccessTokenTypes { get; } = new SelectList(Enum.GetValues(typeof(AccessTokenType)));
         public SelectList RefreshTokenUsages { get; } = new SelectList(Enum.GetValues(typeof(TokenUsage)));
         public SelectList RefreshTokenExpirations { get; } = new SelectList(Enum.GetValues(typeof(TokenExpiration)));
@@ -161,6 +165,8 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
                 return Page();
             }
 
+            await FetchAllowedScopes();
+
             ClientType = clientType.HasValue ? clientType.Value : GuessClientType(client);
             Input = Mapper.Map(client, Input);
             Input.AllowedGrantTypes = string.Join(",", client.AllowedGrantTypes.Select(s => s.GrantType));
@@ -170,6 +176,13 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
 
             return Page();
         }
+
+        private async Task FetchAllowedScopes()
+        {
+            var resources = await resourceStore.GetAllResourcesAsync();
+            AllowedScopes = string.Join(",", resources.ToScopeNames().Distinct());
+        }
+
         internal class Tag
         {
             public string Value { get; set; }
@@ -177,6 +190,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
         public async Task<IActionResult> OnPost([FromRoute] int id, [FromQuery] ClientTypes? clientType = null)
         {
             Id = id;
+            await FetchAllowedScopes();
             if (ModelState.IsValid)
             {
                 try

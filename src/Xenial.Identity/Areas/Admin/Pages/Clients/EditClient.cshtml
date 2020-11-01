@@ -139,7 +139,7 @@
                         </li>
                         <li class="xenial-form__list-item">
                             <label asp-for="Input.AllowedScopes"></label>
-                            <input asp-for="Input.AllowedScopes" data-tags="" />
+                            <input asp-for="Input.AllowedScopes" data-tags="@Model.AllowedScopes" />
                             <span asp-validation-for="Input.AllowedScopes" class="text-danger"></span>
                         </li>
                         <li class="xenial-form__list-item">
