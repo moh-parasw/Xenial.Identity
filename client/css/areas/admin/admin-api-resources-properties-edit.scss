@@ -4,6 +4,6 @@
 
 .admin-edit-api-resources-properties-page {
   @include view-style();
-  @include tab-pages(3);
+  @include tab-pages(1);
   @include xenial-form(1000rem);
 }
