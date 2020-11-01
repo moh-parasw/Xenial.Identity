@@ -7,13 +7,16 @@
 }
 
 <partial name="_StatusMessage" model="Model.StatusMessage" />
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
 <form class="xenial-form" method="post">
     <div class="admin-edit-clients-page">
         <div class="admin-edit-clients-page-tabs">
             <input type="radio" id="tab1" name="tab-control">
-            <input type="radio" id="tab2" name="tab-control">
+            <input type="radio" id="tab2" name="tab-control" checked>
             <input type="radio" id="tab3" name="tab-control">
-            <input type="radio" id="tab4" name="tab-control" checked>
+            <input type="radio" id="tab4" name="tab-control">
             <input type="radio" id="tab5" name="tab-control">
             <input type="radio" id="tab6" name="tab-control">
             <ul class="admin-edit-clients-page-tabs__list">
@@ -52,10 +55,8 @@
             <div class="admin-edit-clients-page-tabs__content">
                 <section>
                     <!-- General -->
-                    <div asp-validation-summary="All" class="text-danger"></div>
                     <ul class="xenial-form__list">
                         <li class="xenial-form__list-item">
-                            @Model.ClientType
                             <label asp-for="Input.ClientId"></label>
                             <input asp-for="Input.ClientId" />
                             <span asp-validation-for="Input.ClientId" class="text-danger"></span>
@@ -82,37 +83,43 @@
                 </section>
                 <section>
                     <!-- Configuration -->
-                    <div asp-validation-summary="All" class="text-danger"></div>
                     <ul class="xenial-form__list">
                         <li class="xenial-form__list-item">
                             <label asp-for="Input.ProtocolType"></label>
                             <input asp-for="Input.ProtocolType" />
                             <span asp-validation-for="Input.ProtocolType" class="text-danger"></span>
                         </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.RequireClientSecret"></label>
-                            <input asp-for="Input.RequireClientSecret" class="toggle" />
-                            <span asp-validation-for="Input.RequireClientSecret" class="text-danger"></span>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.RequireClientSecret"></label>
+                                <input asp-for="Input.RequireClientSecret" class="toggle" />
+                                <span asp-validation-for="Input.RequireClientSecret" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.RequirePkce"></label>
+                                <input asp-for="Input.RequirePkce" class="toggle" />
+                                <span asp-validation-for="Input.RequirePkce" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.AllowPlainTextPkce"></label>
+                                <input asp-for="Input.AllowPlainTextPkce" class="toggle" />
+                                <span asp-validation-for="Input.AllowPlainTextPkce" class="text-danger"></span>
+                            </div>
                         </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.RequirePkce"></label>
-                            <input asp-for="Input.RequirePkce" class="toggle" />
-                            <span asp-validation-for="Input.RequirePkce" class="text-danger"></span>
-                        </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.AllowPlainTextPkce"></label>
-                            <input asp-for="Input.AllowPlainTextPkce" class="toggle" />
-                            <span asp-validation-for="Input.AllowPlainTextPkce" class="text-danger"></span>
-                        </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.AllowOfflineAccess"></label>
-                            <input asp-for="Input.AllowOfflineAccess" class="toggle" />
-                            <span asp-validation-for="Input.AllowOfflineAccess" class="text-danger"></span>
-                        </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.AllowAccessTokensViaBrowser"></label>
-                            <input asp-for="Input.AllowAccessTokensViaBrowser" class="toggle" />
-                            <span asp-validation-for="Input.AllowAccessTokensViaBrowser" class="text-danger"></span>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.AllowOfflineAccess"></label>
+                                <input asp-for="Input.AllowOfflineAccess" class="toggle" />
+                                <span asp-validation-for="Input.AllowOfflineAccess" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.AllowAccessTokensViaBrowser"></label>
+                                <input asp-for="Input.AllowAccessTokensViaBrowser" class="toggle" />
+                                <span asp-validation-for="Input.AllowAccessTokensViaBrowser" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+
+                            </div>
                         </li>
                         <li class="xenial-form__list-item">
                             <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>
@@ -125,7 +132,6 @@
                 </section>
                 <section>
                     <!-- Tokens -->
-                    <div asp-validation-summary="All" class="text-danger"></div>
                     <ul class="xenial-form__list">
                         <li class="xenial-form__list-item inline">
                             <div class="inline">
@@ -217,18 +223,18 @@
                     </ul>
                 </section>
                 <section>
-                    <div asp-validation-summary="All" class="text-danger"></div>
                     <ul class="xenial-form__list">
-                        <li class="xenial-form__list-item">
-                            @Model.ClientType
-                            <label asp-for="Input.RequireConsent"></label>
-                            <input asp-for="Input.RequireConsent" class="toggle" />
-                            <span asp-validation-for="Input.RequireConsent" class="text-danger"></span>
-                        </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.AllowRememberConsent"></label>
-                            <input asp-for="Input.AllowRememberConsent" class="toggle" />
-                            <span asp-validation-for="Input.AllowRememberConsent" class="text-danger"></span>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.RequireConsent"></label>
+                                <input asp-for="Input.RequireConsent" class="toggle" />
+                                <span asp-validation-for="Input.RequireConsent" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.AllowRememberConsent"></label>
+                                <input asp-for="Input.AllowRememberConsent" class="toggle" />
+                                <span asp-validation-for="Input.AllowRememberConsent" class="text-danger"></span>
+                            </div>
                         </li>
                         <li class="xenial-form__list-item">
                             <label asp-for="Input.ClientUri"></label>
