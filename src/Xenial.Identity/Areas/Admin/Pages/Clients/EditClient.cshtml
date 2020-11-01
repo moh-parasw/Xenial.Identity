@@ -10,10 +10,10 @@
 <form class="xenial-form" method="post">
     <div class="admin-edit-clients-page">
         <div class="admin-edit-clients-page-tabs">
-            <input type="radio" id="tab1" name="tab-control" checked>
+            <input type="radio" id="tab1" name="tab-control">
             <input type="radio" id="tab2" name="tab-control">
             <input type="radio" id="tab3" name="tab-control">
-            <input type="radio" id="tab4" name="tab-control">
+            <input type="radio" id="tab4" name="tab-control" checked>
             <input type="radio" id="tab5" name="tab-control">
             <input type="radio" id="tab6" name="tab-control">
             <ul class="admin-edit-clients-page-tabs__list">
@@ -127,45 +127,89 @@
                     <!-- Tokens -->
                     <div asp-validation-summary="All" class="text-danger"></div>
                     <ul class="xenial-form__list">
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.IdentityTokenLifetime"></label>
-                            <input asp-for="Input.IdentityTokenLifetime" />
-                            <span asp-validation-for="Input.IdentityTokenLifetime" class="text-danger"></span>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.IdentityTokenLifetime"></label>
+                                <input asp-for="Input.IdentityTokenLifetime" />
+                                <span asp-validation-for="Input.IdentityTokenLifetime" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.AccessTokenLifetime"></label>
+                                <input asp-for="Input.AccessTokenLifetime" />
+                                <span asp-validation-for="Input.AccessTokenLifetime" class="text-danger"></span>
+                            </div>
                         </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.AccessTokenLifetime"></label>
-                            <input asp-for="Input.AccessTokenLifetime" />
-                            <span asp-validation-for="Input.AccessTokenLifetime" class="text-danger"></span>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.AccessTokenType"></label>
+                                <select asp-for="Input.AccessTokenType" asp-items="Model.AccessTokenTypes"></select>
+                                <span asp-validation-for="Input.AccessTokenType" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.AuthorizationCodeLifetime"></label>
+                                <input asp-for="Input.AuthorizationCodeLifetime" />
+                                <span asp-validation-for="Input.AuthorizationCodeLifetime" class="text-danger"></span>
+                            </div>
                         </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.AccessTokenType"></label>
-                            <select asp-for="Input.AccessTokenType" asp-items="Model.AccessTokenTypes"></select>
-                            <span asp-validation-for="Input.AccessTokenType" class="text-danger"></span>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.AbsoluteRefreshTokenLifetime"></label>
+                                <input asp-for="Input.AbsoluteRefreshTokenLifetime" />
+                                <span asp-validation-for="Input.AbsoluteRefreshTokenLifetime" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.SlidingRefreshTokenLifetime"></label>
+                                <input asp-for="Input.SlidingRefreshTokenLifetime" />
+                                <span asp-validation-for="Input.SlidingRefreshTokenLifetime" class="text-danger"></span>
+                            </div>
                         </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.AuthorizationCodeLifetime"></label>
-                            <input asp-for="Input.AuthorizationCodeLifetime" />
-                            <span asp-validation-for="Input.AuthorizationCodeLifetime" class="text-danger"></span>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.RefreshTokenUsage"></label>
+                                <select asp-for="Input.RefreshTokenUsage" asp-items="Model.RefreshTokenUsages"></select>
+                                <span asp-validation-for="Input.RefreshTokenUsage" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.RefreshTokenExpiration"></label>
+                                <select asp-for="Input.RefreshTokenExpiration" asp-items="Model.RefreshTokenExpirations"></select>
+                                <span asp-validation-for="Input.RefreshTokenExpiration" class="text-danger"></span>
+                            </div>
                         </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.AbsoluteRefreshTokenLifetime"></label>
-                            <input asp-for="Input.AbsoluteRefreshTokenLifetime" />
-                            <span asp-validation-for="Input.AbsoluteRefreshTokenLifetime" class="text-danger"></span>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.UpdateAccessTokenClaimsOnRefresh"></label>
+                                <input asp-for="Input.UpdateAccessTokenClaimsOnRefresh" class="toggle" />
+                                <span asp-validation-for="Input.UpdateAccessTokenClaimsOnRefresh" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.IncludeJwtId"></label>
+                                <input asp-for="Input.IncludeJwtId" class="toggle" />
+                                <span asp-validation-for="Input.IncludeJwtId" class="text-danger"></span>
+                            </div>
                         </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.SlidingRefreshTokenLifetime"></label>
-                            <input asp-for="Input.SlidingRefreshTokenLifetime" />
-                            <span asp-validation-for="Input.SlidingRefreshTokenLifetime" class="text-danger"></span>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.AlwaysSendClientClaims"></label>
+                                <input asp-for="Input.AlwaysSendClientClaims" class="toggle" />
+                                <span asp-validation-for="Input.AlwaysSendClientClaims" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.AlwaysIncludeUserClaimsInIdToken"></label>
+                                <input asp-for="Input.AlwaysIncludeUserClaimsInIdToken" class="toggle" />
+                                <span asp-validation-for="Input.AlwaysIncludeUserClaimsInIdToken" class="text-danger"></span>
+                            </div>
                         </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.RefreshTokenUsage"></label>
-                            <select asp-for="Input.RefreshTokenUsage" asp-items="Model.RefreshTokenUsages"></select>
-                            <span asp-validation-for="Input.RefreshTokenUsage" class="text-danger"></span>
-                        </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.RefreshTokenExpiration"></label>
-                            <select asp-for="Input.RefreshTokenExpiration" asp-items="Model.RefreshTokenExpirations"></select>
-                            <span asp-validation-for="Input.RefreshTokenExpiration" class="text-danger"></span>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.ClientClaimsPrefix"></label>
+                                <input asp-for="Input.ClientClaimsPrefix" />
+                                <span asp-validation-for="Input.ClientClaimsPrefix" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.PairWiseSubjectSalt"></label>
+                                <input asp-for="Input.PairWiseSubjectSalt" />
+                                <span asp-validation-for="Input.PairWiseSubjectSalt" class="text-danger"></span>
+                            </div>
                         </li>
                         <li class="xenial-form__list-item">
                             <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>

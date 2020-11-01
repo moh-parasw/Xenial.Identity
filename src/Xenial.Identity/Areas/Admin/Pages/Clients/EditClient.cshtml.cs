@@ -60,6 +60,14 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
             public TokenUsage RefreshTokenUsage { get; set; }
             public TokenExpiration RefreshTokenExpiration { get; set; }
 
+            public bool UpdateAccessTokenClaimsOnRefresh  { get; set; }
+            public bool IncludeJwtId { get; set; }
+            public bool AlwaysSendClientClaims { get; set; }
+            public bool AlwaysIncludeUserClaimsInIdToken { get; set; }
+
+            public string ClientClaimsPrefix { get; set; }
+            public string PairWiseSubjectSalt { get; set; }
+
             #endregion
 
             #region Consent
