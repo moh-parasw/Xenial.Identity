@@ -56,6 +56,15 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
             public string AllowedGrantTypes { get; set; }
             public string AllowedCorsOrigins { get; set; }
 
+            public string FrontChannelLogoutUri { get; set; }
+            public bool FrontChannelLogoutSessionRequired { get; set; }
+            public string BackChannelLogoutUri { get; set; }
+            public bool BackChannelLogoutSessionRequired { get; set; }
+
+            public string PostLogoutRedirectUris { get; set; }
+            public string IdentityProviderRestrictions { get; set; }
+            public int? UserSsoLifetime { get; set; }
+
             #endregion
 
             #region Token
@@ -156,11 +165,15 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
                     .ForMember(m => m.RedirectUris, o => o.Ignore())
                     .ForMember(m => m.AllowedGrantTypes, o => o.Ignore())
                     .ForMember(m => m.AllowedCorsOrigins, o => o.Ignore())
+                    .ForMember(m => m.PostLogoutRedirectUris, o => o.Ignore())
+                    .ForMember(m => m.IdentityProviderRestrictions, o => o.Ignore())
                     .ReverseMap()
                     .ForMember(m => m.AllowedScopes, o => o.Ignore())
                     .ForMember(m => m.RedirectUris, o => o.Ignore())
                     .ForMember(m => m.AllowedGrantTypes, o => o.Ignore())
                     .ForMember(m => m.AllowedCorsOrigins, o => o.Ignore())
+                    .ForMember(m => m.PostLogoutRedirectUris, o => o.Ignore())
+                    .ForMember(m => m.IdentityProviderRestrictions, o => o.Ignore())
                 ;
 
                 CreateMap<SecretsOutputModel, XpoClientSecret>()
@@ -181,10 +194,12 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
         public string StatusMessage { get; set; }
 
         public ClientTypes? ClientType { get; set; }
+        public string SelectedPage { get; set; }
         public int Id { get; set; }
 
-        public async Task<IActionResult> OnGet([FromRoute] int id, [FromQuery] ClientTypes? clientType = null)
+        public async Task<IActionResult> OnGet([FromRoute] int id, [FromQuery] ClientTypes? clientType = null, [FromQuery] string selectedPage = null)
         {
+            SelectedPage = selectedPage;
             Id = id;
             var client = await unitOfWork.GetObjectByKeyAsync<XpoClient>(id);
             if (client == null)
@@ -203,6 +218,8 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
             Input.AllowedScopes = string.Join(",", client.AllowedScopes.Select(s => s.Scope));
             Input.RedirectUris = string.Join(",", client.RedirectUris.Select(s => s.RedirectUri));
             Input.AllowedCorsOrigins = string.Join(",", client.AllowedCorsOrigins.Select(s => s.Origin));
+            Input.PostLogoutRedirectUris = string.Join(",", client.PostLogoutRedirectUris.Select(s => s.PostLogoutRedirectUri));
+            Input.IdentityProviderRestrictions = string.Join(",", client.IdentityProviderRestrictions.Select(s => s.Provider));
 
             return Page();
         }
@@ -222,8 +239,9 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
         {
             public string Value { get; set; }
         }
-        public async Task<IActionResult> OnPost([FromRoute] int id, [FromQuery] ClientTypes? clientType = null)
+        public async Task<IActionResult> OnPost([FromRoute] int id, [FromQuery] ClientTypes? clientType = null, [FromQuery] string selectedPage = null)
         {
+            SelectedPage = selectedPage;
             Id = id;
             await FetchAllowedScopes();
 
@@ -247,6 +265,8 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
                     await MapAllowedScopes(client);
                     await MapRedirectUris(client);
                     await MapAllowedCorsOrigins(client);
+                    await MapPostLogoutRedirectUris(client);
+                    await MapIdentityProviderRestrictions(client);
 
                     await unitOfWork.SaveAsync(client);
                     await unitOfWork.CommitChangesAsync();
@@ -269,6 +289,60 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
 
             return Page();
 
+        }
+
+        private async Task MapIdentityProviderRestrictions(XpoClient client)
+        {
+            if (!string.IsNullOrEmpty(Input.IdentityProviderRestrictions))
+            {
+                var jsonArray = Newtonsoft.Json.Linq.JArray.Parse(Input.IdentityProviderRestrictions);
+                var values = jsonArray.Select(j => j.ToObject<Tag>()).ToList();
+
+                await ClearIdentityProviderRestrictions(client);
+
+                client.IdentityProviderRestrictions.AddRange(values.Select(identityProviderRestriction => new XpoClientIdPRestriction(unitOfWork)
+                {
+                    Provider = identityProviderRestriction.Value
+                }));
+            }
+            else
+            {
+                await ClearIdentityProviderRestrictions(client);
+            }
+            async Task ClearIdentityProviderRestrictions(XpoClient client)
+            {
+                foreach (var identityProviderRestriction in client.IdentityProviderRestrictions.ToList())
+                {
+                    await unitOfWork.DeleteAsync(identityProviderRestriction);
+                }
+            }
+        }
+
+        private async Task MapPostLogoutRedirectUris(XpoClient client)
+        {
+            if (!string.IsNullOrEmpty(Input.PostLogoutRedirectUris))
+            {
+                var jsonArray = Newtonsoft.Json.Linq.JArray.Parse(Input.PostLogoutRedirectUris);
+                var values = jsonArray.Select(j => j.ToObject<Tag>()).ToList();
+
+                await ClearPostLogoutRedirectUris(client);
+
+                client.PostLogoutRedirectUris.AddRange(values.Select(postLogoutRedirectUri => new XpoClientPostLogoutRedirectUri(unitOfWork)
+                {
+                    PostLogoutRedirectUri = postLogoutRedirectUri.Value
+                }));
+            }
+            else
+            {
+                await ClearPostLogoutRedirectUris(client);
+            }
+            async Task ClearPostLogoutRedirectUris(XpoClient client)
+            {
+                foreach (var postLogoutRedirectUri in client.PostLogoutRedirectUris.ToList())
+                {
+                    await unitOfWork.DeleteAsync(postLogoutRedirectUri);
+                }
+            }
         }
 
         private async Task MapAllowedCorsOrigins(XpoClient client)

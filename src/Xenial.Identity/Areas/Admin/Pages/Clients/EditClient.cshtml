@@ -13,13 +13,13 @@
 <form class="xenial-form" method="post">
     <div class="admin-edit-clients-page">
         <div class="admin-edit-clients-page-tabs">
-            <input type="radio" id="tab1" name="tab-control">
-            <input type="radio" id="tab2" name="tab-control" checked>
-            <input type="radio" id="tab3" name="tab-control">
-            <input type="radio" id="tab4" name="tab-control">
-            <input type="radio" id="tab5" name="tab-control">
-            <input type="radio" id="tab6" name="tab-control">
-            <input type="radio" id="tab7" name="tab-control">
+            <input type="radio" id="tab1" name="tab-control" @(Model.SelectedPage == null || Model.SelectedPage == "Client" ? "checked" : "")>
+            <input type="radio" id="tab2" name="tab-control" @(Model.SelectedPage == "Configuration" ? "checked" : "")>
+            <input type="radio" id="tab3" name="tab-control" @(Model.SelectedPage == "Secrets" ? "checked" : "")>
+            <input type="radio" id="tab4" name="tab-control" @(Model.SelectedPage == "Token" ? "checked" : "")>
+            <input type="radio" id="tab5" name="tab-control" @(Model.SelectedPage == "Consent" ? "checked" : "")>
+            <input type="radio" id="tab6" name="tab-control" @(Model.SelectedPage == "Device" ? "checked" : "")>
+            <input type="radio" id="tab7" name="tab-control" @(Model.SelectedPage == "Properties" ? "checked" : "")>
             <ul class="admin-edit-clients-page-tabs__list">
                 <li class="admin-edit-clients-page-tabs__list-item" title="General">
                     <label class="admin-edit-clients-page-tabs__list-item-label" for="tab1" role="button">
@@ -132,25 +132,74 @@
                             </div>
                             <div class="inline"></div>
                         </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.AllowedGrantTypes"></label>
-                            <input asp-for="Input.AllowedGrantTypes" data-tags="@Model.AllowedGrantTypes" />
-                            <span asp-validation-for="Input.AllowedGrantTypes" class="text-danger"></span>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.AllowedGrantTypes"></label>
+                                <input asp-for="Input.AllowedGrantTypes" data-tags="@Model.AllowedGrantTypes" />
+                                <span asp-validation-for="Input.AllowedGrantTypes" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.AllowedScopes"></label>
+                                <input asp-for="Input.AllowedScopes" data-tags="@Model.AllowedScopes" />
+                                <span asp-validation-for="Input.AllowedScopes" class="text-danger"></span>
+                            </div>
                         </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.AllowedScopes"></label>
-                            <input asp-for="Input.AllowedScopes" data-tags="@Model.AllowedScopes" />
-                            <span asp-validation-for="Input.AllowedScopes" class="text-danger"></span>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.RedirectUris"></label>
+                                <input asp-for="Input.RedirectUris" data-tags="" />
+                                <span asp-validation-for="Input.RedirectUris" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.AllowedCorsOrigins"></label>
+                                <input asp-for="Input.AllowedCorsOrigins" data-tags="" />
+                                <span asp-validation-for="Input.AllowedCorsOrigins" class="text-danger"></span>
+                            </div>
                         </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.RedirectUris"></label>
-                            <input asp-for="Input.RedirectUris" data-tags="" />
-                            <span asp-validation-for="Input.RedirectUris" class="text-danger"></span>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.FrontChannelLogoutUri"></label>
+                                <input asp-for="Input.FrontChannelLogoutUri" />
+                                <span asp-validation-for="Input.FrontChannelLogoutUri" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.FrontChannelLogoutSessionRequired"></label>
+                                <input asp-for="Input.FrontChannelLogoutSessionRequired" class="toggle" />
+                                <span asp-validation-for="Input.FrontChannelLogoutSessionRequired" class="text-danger"></span>
+                            </div>
                         </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="Input.AllowedCorsOrigins"></label>
-                            <input asp-for="Input.AllowedCorsOrigins" data-tags="" />
-                            <span asp-validation-for="Input.AllowedCorsOrigins" class="text-danger"></span>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.BackChannelLogoutUri"></label>
+                                <input asp-for="Input.BackChannelLogoutUri" />
+                                <span asp-validation-for="Input.BackChannelLogoutUri" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.BackChannelLogoutSessionRequired"></label>
+                                <input asp-for="Input.BackChannelLogoutSessionRequired" class="toggle" />
+                                <span asp-validation-for="Input.BackChannelLogoutSessionRequired" class="text-danger"></span>
+                            </div>
+                        </li>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.PostLogoutRedirectUris"></label>
+                                <input asp-for="Input.PostLogoutRedirectUris" data-tags="" />
+                                <span asp-validation-for="Input.PostLogoutRedirectUris" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                                <label asp-for="Input.IdentityProviderRestrictions"></label>
+                                <input asp-for="Input.IdentityProviderRestrictions" data-tags="" />
+                                <span asp-validation-for="Input.IdentityProviderRestrictions" class="text-danger"></span>
+                            </div>
+                        </li>
+                        <li class="xenial-form__list-item inline">
+                            <div class="inline">
+                                <label asp-for="Input.UserSsoLifetime"></label>
+                                <input asp-for="Input.UserSsoLifetime" class="toggle" />
+                                <span asp-validation-for="Input.UserSsoLifetime" class="text-danger"></span>
+                            </div>
+                            <div class="inline">
+                            </div>
                         </li>
                         <li class="xenial-form__list-item">
                             <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>
