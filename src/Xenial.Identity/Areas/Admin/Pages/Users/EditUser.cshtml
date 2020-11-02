@@ -36,6 +36,11 @@
                             <span asp-validation-for="Input.UserName" class="text-danger"></span>
                         </li>
                         <li class="xenial-form__list-item">
+                            <label asp-for="Input.Roles"></label>
+                            <input asp-for="Input.Roles" data-tags="@Model.Roles" data-tags-simple="data-tags-simple" />
+                            <span asp-validation-for="Input.Roles" class="text-danger"></span>
+                        </li>
+                        <li class="xenial-form__list-item">
                             <button type="submit" class="xenial-form__list-item-submit">@ViewData["Title"]</button>
                         </li>
                     </ul>

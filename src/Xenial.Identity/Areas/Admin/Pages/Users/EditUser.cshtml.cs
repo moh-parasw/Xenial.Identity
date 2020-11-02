@@ -18,18 +18,22 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
     public class EditUserModel : PageModel
     {
         private readonly UserManager<XenialIdentityUser> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
         private readonly UnitOfWork unitOfWork;
 
-        public EditUserModel(UserManager<XenialIdentityUser> userManager, UnitOfWork unitOfWork)
-            => (this.userManager, this.unitOfWork) = (userManager, unitOfWork);
+        public EditUserModel(UserManager<XenialIdentityUser> userManager, RoleManager<IdentityRole> roleManager, UnitOfWork unitOfWork)
+            => (this.userManager, this.roleManager, this.unitOfWork) = (userManager, roleManager, unitOfWork);
 
         public class UserInputModel
         {
             [Required]
             public string UserName { get; set; }
 
-
+            public string Roles { get; set; }
         }
+
+        public string Roles { get; set; }
+
         public class ClaimModel
         {
             public string Id { get; set; }
@@ -51,7 +55,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
         {
             Id = id;
             SelectedPage = selectedPage;
-
+            Roles = string.Join(",", await roleManager.Roles.Select(r => r.Name).ToListAsync());
             if (Input == null)
             {
                 var user = await userManager.FindByIdAsync(id);
@@ -69,9 +73,12 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
                     Value = c.Value,
                 }).ToList();
 
+                var roles = await userManager.GetRolesAsync(user);
+
                 Input = new UserInputModel
                 {
                     UserName = user.UserName,
+                    Roles = string.Join(",", roles)
                 };
             }
             return Page();
@@ -80,6 +87,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
         public async Task<IActionResult> OnPost([FromRoute] string id)
         {
             Id = id;
+            Roles = string.Join(",", await roleManager.Roles.Select(r => r.Name).ToListAsync());
             if (ModelState.IsValid)
             {
                 var user = await userManager.FindByIdAsync(id);
@@ -89,8 +97,68 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
                     return Page();
                 }
                 var result = await userManager.SetUserNameAsync(user, Input.UserName);
+
                 if (result.Succeeded)
                 {
+                    async Task<bool> RemoveFromRoles(IEnumerable<string> roleNames)
+                    {
+                        foreach (var roleName in roleNames)
+                        {
+                            var r = await RemoveFromRole(roleName);
+                            if (!r)
+                            {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+
+                    async Task<bool> RemoveFromRole(string roleName)
+                    {
+                        if (await userManager.IsInRoleAsync(user, roleName))
+                        {
+                            var r = await userManager.RemoveFromRoleAsync(user, roleName);
+                            return r.Succeeded;
+                        }
+                        return true;
+                    }
+
+                    if (string.IsNullOrEmpty(Input.Roles))
+                    {
+                        var removeRolesResult = await RemoveFromRoles(roleManager.Roles.Select(r => r.NormalizedName));
+                        if (!removeRolesResult)
+                        {
+                            StatusMessage = "Error updating roles";
+                            return Page();
+                        }
+                    }
+                    else
+                    {
+                        var removeRolesResult = await RemoveFromRoles(roleManager.Roles.Select(r => r.NormalizedName));
+                        if (!removeRolesResult)
+                        {
+                            StatusMessage = "Error updating roles";
+                            return Page();
+                        }
+                        var roleNames = Input.Roles.Split(",").Select(r => roleManager.NormalizeKey(r));
+                        try
+                        {
+                            var rolesResult = await userManager.AddToRolesAsync(user, roleNames);
+                            if (!rolesResult.Succeeded)
+                            {
+                                StatusMessage = "Error updating roles";
+                                return Page();
+                            }
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.Roles)}", "Role does not exist");
+                            StatusMessage = "Error: Check Validation";
+                            return Page();
+                        }
+
+                    }
+
                     var updateResult = await userManager.UpdateAsync(user);
 
                     if (updateResult.Succeeded)
