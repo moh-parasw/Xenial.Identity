@@ -127,6 +127,14 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
 
         public IList<SecretsOutputModel> Secrets { get; set; } = new List<SecretsOutputModel>();
         public IList<PropertiesOutputModel> Properties { get; set; } = new List<PropertiesOutputModel>();
+        public IList<ClaimsOutputModel> Claims { get; set; } = new List<ClaimsOutputModel>();
+
+        public class ClaimsOutputModel
+        {
+            public int Id { get; set; }
+            public string Value { get; set; }
+            public string Type { get; set; }
+        }
 
         public class SecretsOutputModel
         {
@@ -181,6 +189,9 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
 
                 CreateMap<PropertiesOutputModel, XpoClientProperty>()
                     .ReverseMap();
+
+                CreateMap<ClaimsOutputModel, XpoClientClaim>()
+                    .ReverseMap();
             }
         }
 
@@ -229,10 +240,12 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
             var resources = await resourceStore.GetAllResourcesAsync();
             AllowedScopes = string.Join(",", resources.ToScopeNames().Distinct());
         }
+
         private void FetchSubLists(XpoClient client)
         {
             Secrets = client.ClientSecrets.Select(secret => Mapper.Map<SecretsOutputModel>(secret)).ToList();
-            Properties = client.Properties.Select(propertey => Mapper.Map<PropertiesOutputModel>(propertey)).ToList();
+            Properties = client.Properties.Select(property => Mapper.Map<PropertiesOutputModel>(property)).ToList();
+            Claims = client.Claims.Select(claim => Mapper.Map<ClaimsOutputModel>(claim)).ToList();
         }
 
         internal class Tag

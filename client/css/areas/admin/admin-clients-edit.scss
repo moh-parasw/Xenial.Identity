@@ -4,6 +4,6 @@
 
 .admin-edit-clients-page {
   @include grid-style();
-  @include tab-pages(7);
+  @include tab-pages(8);
   @include xenial-form(1000rem);
 }
