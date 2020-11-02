@@ -35,7 +35,6 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
             public string Id { get; set; }
             public string Type { get; set; }
             public string Value { get; set; }
-            public string Issuer { get; set; }
         }
 
         public List<ClaimModel> Claims { get; set; } = new List<ClaimModel>();
@@ -48,9 +47,11 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
         public string SelectedPage { get; set; }
         public string Id { get; set; }
 
-        public async Task<IActionResult> OnGet([FromRoute] string id)
+        public async Task<IActionResult> OnGet([FromRoute] string id, [FromQuery] string selectedPage = null)
         {
             Id = id;
+            SelectedPage = selectedPage;
+
             if (Input == null)
             {
                 var user = await userManager.FindByIdAsync(id);

@@ -4,18 +4,23 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
+using DevExpress.Xpo;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+
+using Xenial.AspNetIdentity.Xpo.Models;
 
 namespace Xenial.Identity.Areas.Admin.Pages.Roles
 {
     public class EditRoleModel : PageModel
     {
         private readonly RoleManager<IdentityRole> roleManager;
+        private readonly UnitOfWork unitOfWork;
 
-        public EditRoleModel(RoleManager<IdentityRole> roleManager)
-            => this.roleManager = roleManager;
+        public EditRoleModel(RoleManager<IdentityRole> roleManager, UnitOfWork unitOfWork)
+            => (this.roleManager, this.unitOfWork) = (roleManager, unitOfWork);
 
         public class RoleInputModel
         {
@@ -23,29 +28,48 @@ namespace Xenial.Identity.Areas.Admin.Pages.Roles
             public string Name { get; set; }
         }
 
+        public class ClaimModel
+        {
+            public string Id { get; set; }
+            public string Type { get; set; }
+            public string Value { get; set; }
+        }
+
+        public List<ClaimModel> Claims { get; set; } = new List<ClaimModel>();
 
         [Required, BindProperty]
         public RoleInputModel Input { get; set; }
 
         public string StatusMessage { get; set; }
+        public string SelectedPage { get; set; }
+        public string Id { get; set; }
 
-        public async Task<IActionResult> OnGet([FromRoute] string id)
+        public async Task<IActionResult> OnGet([FromRoute] string id, [FromQuery] string selectedPage = null)
         {
+            Id = id;
+            SelectedPage = selectedPage;
+
             if (Input == null)
             {
                 var role = await roleManager.FindByIdAsync(id);
-                if (role == null)
+                var xpoRole = await unitOfWork.GetObjectByKeyAsync<XpoIdentityRole>(id);
+                if (role == null || xpoRole == null)
                 {
                     StatusMessage = "Error: Cannot find role";
                     return Page();
                 }
-                if (role != null)
+
+                Input = new RoleInputModel
                 {
-                    Input = new RoleInputModel
-                    {
-                        Name = role.Name
-                    };
-                }
+                    Name = role.Name
+                };
+
+                Claims = xpoRole.Claims.Select(c => new ClaimModel
+                {
+                    Id = c.Id,
+                    Type = c.Type,
+                    Value = c.Value,
+                }).ToList();
             }
             return Page();
         }
