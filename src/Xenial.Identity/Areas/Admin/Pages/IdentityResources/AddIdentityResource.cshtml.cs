@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
+using Xenial.Identity.Configuration;
 using Xenial.Identity.Data;
 using Xenial.Identity.Xpo.Storage.Models;
 
@@ -56,9 +57,23 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
         public IdentityResourceInputModel Input { get; set; } = new IdentityResourceInputModel();
 
         public string StatusMessage { get; set; }
+        public string UserClaims { get; set; }
+
+        public async Task<IActionResult> OnGet()
+        {
+            await FetchUserClaims();
+            return Page();
+        }
+
+        private async Task FetchUserClaims()
+        {
+            var userClaims = await unitOfWork.Query<Xenial.AspNetIdentity.Xpo.Models.XpoIdentityUserClaim>().Select(claim => claim.Type).Distinct().ToListAsync();
+            UserClaims = string.Join(",", ClientConstants.StandardClaims.Concat(userClaims).Distinct());
+        }
 
         public async Task<IActionResult> OnPost()
         {
+            await FetchUserClaims();
             if (ModelState.IsValid)
             {
                 try

@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 
+using Xenial.Identity.Components;
 using Xenial.Identity.Data;
 
 namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
@@ -121,9 +122,9 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                 //await SetOrUpdateClaimAsync(user, new Claim("zoneinfo", user.Zoneinfo ?? string.Empty));
                 //await SetOrUpdateClaimAsync(user, new Claim("locale", user.Locale ?? string.Empty));
                 await SetOrUpdateClaimAsync(user, new Claim("updated_at", ConvertToUnixTimestamp(user.UpdatedAt)?.ToString() ?? string.Empty));
-
-                await SetOrUpdateClaimAsync(user, new Claim("backcolor", user.Color ?? string.Empty));
-                await SetOrUpdateClaimAsync(user, new Claim("forecolor", (Xenial.Identity.Components.MaterialColorPicker.ColorIsDark(user.Color) ? "#FFFFFF" : "#000000") ?? string.Empty));
+                await SetOrUpdateClaimAsync(user, new Claim("xenial_backcolor", user.Color ?? string.Empty));
+                await SetOrUpdateClaimAsync(user, new Claim("xenial_forecolor", (MaterialColorPicker.ColorIsDark(user.Color) ? "#FFFFFF" : "#000000") ?? string.Empty));
+                await SetOrUpdateClaimAsync(user, new Claim("xenial_initials", user.Initials ?? string.Empty));
 
                 var streetAddress = string.Join(" ", new[] { user.AddressStreetAddress1, user.AddressStreetAddress2 }.Where(s => !string.IsNullOrWhiteSpace(s)));
                 var postalAddress = string.Join(" ", new[] { user.AddressPostalCode, user.AddressLocality }.Where(s => !string.IsNullOrWhiteSpace(s)));

@@ -77,7 +77,7 @@ document.querySelectorAll("[data-tags]").forEach(element => {
             new Tagify(element, {
                 whitelist: dataTags,
                 dropdown: {
-                    maxItems: 20,           // <- mixumum allowed rendered suggestions
+                    maxItems: 99,           // <- mixumum allowed rendered suggestions
                     enabled: 0,             // <- show suggestions on focus
                     closeOnSelect: true    // <- do not hide the suggestions dropdown once an item has been selected
                 },

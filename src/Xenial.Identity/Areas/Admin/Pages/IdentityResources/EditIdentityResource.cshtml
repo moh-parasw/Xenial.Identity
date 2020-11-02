@@ -71,7 +71,7 @@
                         </li>
                         <li class="xenial-form__list-item">
                             <label asp-for="Input.UserClaims"></label>
-                            <input asp-for="Input.UserClaims" data-tags="@string.Join(",", ClientConstants.StandardClaims)" data-tags-simple="true" />
+                            <input asp-for="Input.UserClaims" data-tags="@Model.UserClaims" data-tags-simple="true" />
                             <span asp-validation-for="Input.UserClaims" class="text-danger"></span>
                         </li>
                         <li class="xenial-form__list-item">

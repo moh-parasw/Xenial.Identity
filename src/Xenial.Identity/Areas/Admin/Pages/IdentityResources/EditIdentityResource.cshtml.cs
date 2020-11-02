@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
+using Xenial.Identity.Configuration;
 using Xenial.Identity.Xpo.Storage.Models;
 
 namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
@@ -72,11 +73,19 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
         public string StatusMessage { get; set; }
         public int Id { get; set; }
         public string SelectedPage { get; set; }
+        public string UserClaims { get; set; }
+
+        private async Task FetchUserClaims()
+        {
+            var userClaims = await unitOfWork.Query<Xenial.AspNetIdentity.Xpo.Models.XpoIdentityUserClaim>().Select(claim => claim.Type).Distinct().ToListAsync();
+            UserClaims = string.Join(",", ClientConstants.StandardClaims.Concat(userClaims).Distinct());
+        }
 
         public async Task<IActionResult> OnGet([FromRoute] int id, [FromQuery] string selectedPage)
         {
             Id = id;
             SelectedPage = selectedPage;
+            await FetchUserClaims();
 
             var apiResource = await unitOfWork.GetObjectByKeyAsync<XpoIdentityResource>(id);
             if (apiResource == null)
@@ -96,6 +105,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
         public async Task<IActionResult> OnPost([FromRoute] int id)
         {
             Id = id;
+            await FetchUserClaims();
             if (ModelState.IsValid)
             {
                 try
