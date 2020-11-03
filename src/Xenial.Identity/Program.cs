@@ -14,6 +14,7 @@ namespace Xenial.Identity
         public static int Main(string[] args)
         {
             SQLiteConnectionProvider.Register();
+            MySqlConnectionProvider.Register();
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()

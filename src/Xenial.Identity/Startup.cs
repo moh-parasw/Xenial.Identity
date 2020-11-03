@@ -4,7 +4,6 @@ using AutoMapper;
 
 using DevExpress.Xpo;
 
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -65,13 +64,18 @@ namespace Xenial.Identity
             services.AddXpoDefaultDataLayer(ServiceLifetime.Singleton, dl => dl
                 .UseConnectionString(Configuration.GetConnectionString("DefaultConnection"))
                 .UseThreadSafeDataLayer(true)
+#if DEBUG
                 .UseConnectionPool(false) // Remove this line if you use a database server like SQL Server, Oracle, PostgreSql, etc.
                 .UseAutoCreationOption(DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema)
+#else
+                .UseConnectionPool(true)
+                .UseAutoCreationOption(DevExpress.Xpo.DB.AutoCreateOption.None)
+#endif
                 .UseEntityTypes(
                     IdentityXpoTypes.PersistentTypes
                         .Concat(IdentityModelTypeList.ModelTypes)
                         .Concat(XenialIdentityModelTypeList.ModelTypes)
-                        .ToArray()
+                    .ToArray()
                 )
             );
 
@@ -111,19 +115,10 @@ namespace Xenial.Identity
 
                 // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
                 options.EmitStaticAudienceClaim = true;
-            })
-                .AddAspNetIdentity<XenialIdentityUser>()
-                .AddXpoIdentityStore();
+            }).AddAspNetIdentity<XenialIdentityUser>()
+              .AddXpoIdentityStore();
 
-            // in-memory, code config
-            //builder.AddInMemoryIdentityResources(Config.IdentityResources);
-            //builder.AddInMemoryApiResources(Config.IdentityResources);
-            //builder.AddInMemoryApiScopes(Config.ApiScopes);
-            //builder.AddInMemoryClients(Config.Clients);
-            //builder.AddInMemory(Config.Clients);
-
-            // not recommended for production - you need to store your key material somewhere secure
-            builder.AddDeveloperSigningCredential();
+            builder.AddCertificate(Environment, Configuration, null);
 
             services.AddAuthentication()
                 .AddGitHub(options =>
