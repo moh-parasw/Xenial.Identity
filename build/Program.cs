@@ -11,7 +11,7 @@ var iisPackageName = "identity.xenial.io";
 var artifactsLocation = Path.GetFullPath($"./artifacts");
 var artifact = Path.GetFullPath($"{artifactsLocation}/{projectName}.zip");
 var configuration = "Release";
-var selfContained = false;
+var selfContained = true;
 var packageAsSingleFile = false;
 
 
