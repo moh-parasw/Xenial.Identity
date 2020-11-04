@@ -61,24 +61,7 @@ namespace Xenial.Identity
                 razorPagesBuilder.AddRazorRuntimeCompilation();
             }
 
-            services.AddXpoDefaultDataLayer(ServiceLifetime.Singleton, dl => dl
-                .UseConnectionString(Configuration.GetConnectionString("DefaultConnection"))
-                .UseThreadSafeDataLayer(true)
-#if DEBUG
-                .UseConnectionPool(false) // Remove this line if you use a database server like SQL Server, Oracle, PostgreSql, etc.
-                .UseAutoCreationOption(DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema)
-#else
-                .UseConnectionPool(true)
-                .UseAutoCreationOption(DevExpress.Xpo.DB.AutoCreateOption.None)
-#endif
-                .UseEntityTypes(
-                    IdentityXpoTypes.PersistentTypes
-                        .Concat(IdentityModelTypeList.ModelTypes)
-                        .Concat(XenialIdentityModelTypeList.ModelTypes)
-                    .ToArray()
-                )
-            );
-
+            services.AddXpo(Configuration);
             services.AddXpoDefaultUnitOfWork();
 
             services.AddDefaultIdentity<XenialIdentityUser>(options =>

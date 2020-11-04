@@ -1,6 +1,9 @@
-﻿using DevExpress.Xpo.DB;
+﻿using DevExpress.Xpo;
+using DevExpress.Xpo.DB;
 
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Serilog;
@@ -8,6 +11,8 @@ using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 
 using System;
+
+using Xenial.Identity.Infrastructure;
 
 namespace Xenial.Identity
 {
@@ -38,7 +43,25 @@ namespace Xenial.Identity
             try
             {
                 Log.Information("Starting host...");
-                CreateHostBuilder(args).Build().Run();
+
+                var host = CreateHostBuilder(args).Build();
+
+                Log.Information("Update Database");
+
+                var serviceCollection = new ServiceCollection();
+                serviceCollection
+                    .AddXpo(host.Services.GetRequiredService<IConfiguration>(), AutoCreateOption.DatabaseAndSchema)
+                    .AddXpoDefaultUnitOfWork();
+
+                using (var provider = serviceCollection.BuildServiceProvider())
+                using (var unitOfWork = provider.GetRequiredService<UnitOfWork>())
+                {
+                    unitOfWork.UpdateSchema();
+                }
+
+                Log.Information("Update Done");
+
+                host.Run();
                 return 0;
             }
             catch (Exception ex)
