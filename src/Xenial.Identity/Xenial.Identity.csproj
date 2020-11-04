@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>9941a3cb-8710-45b7-bd66-b7dc8363cc0a</UserSecretsId>
     <LangVersion>latest</LangVersion>
+    <DefaultConnectionString>PLEASE SET BEFORE USE</DefaultConnectionString>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,4 +26,10 @@
     <ProjectReference Include="..\Xenial.Identity.Xpo\Xenial.Identity.Xpo.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <DestinationConnectionStrings Include="DefaultConnection">
+      <Value>$(DefaultConnectionString)</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+  
 </Project>
