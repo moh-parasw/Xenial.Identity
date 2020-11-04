@@ -24,9 +24,7 @@ Target("build:dotnet", DependsOn("restore:dotnet"), () => RunAsync("dotnet", $"b
 Target("build", DependsOn("restore", "build:npm", "build:dotnet"));
 
 
-var connectionString = Environment.GetEnvironmentVariable("XENIAL_DEFAULTCONNECTIONSTRING")
-    ?.Replace(";", "%3B") //Replace with encoded chars https://stackoverflow.com/questions/11987384/how-do-i-pass-a-property-value-containing-a-semicolon-on-the-msbuild-command-lin
-;
+var connectionString = Environment.GetEnvironmentVariable("XENIAL_DEFAULTCONNECTIONSTRING");
 Target("publish", DependsOn("build"), () => RunAsync("dotnet", $"msbuild {web} /t:Restore;Build /p:Configuration={configuration} /p:RuntimeIdentifier=win-x64 /p:SelfContained={selfContained} /p:PackageAsSingleFile={packageAsSingleFile} /p:DeployOnBuild=true /p:WebPublishMethod=package /p:PublishProfile=Package /v:minimal /p:DesktopBuildPackageLocation={artifact} /p:DeployIisAppPath={iisPackageName} /p:DefaultConnectionString=\"{connectionString}\""));
 Target("deploy", DependsOn("publish"), () => RunAsync("cmd.exe", $"/C {projectName}.deploy.cmd /T /M:{Environment.GetEnvironmentVariable("WEBDEPLOY_IP")} /U:{Environment.GetEnvironmentVariable("WEBDEPLOY_USER")} /P:{Environment.GetEnvironmentVariable("WEBDEPLOY_PASS")} -allowUntrusted", workingDirectory: artifactsLocation));
 Target("default", DependsOn("publish"));
