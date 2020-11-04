@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
+
+using DevExpress.Xpo.DB;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,11 +13,15 @@ namespace Xenial.Identity.Infrastructure
 {
     public static class XpoExtentions
     {
-        public static IServiceCollection AddXpo(this IServiceCollection services, IConfiguration configuration, DevExpress.Xpo.DB.AutoCreateOption autoCreateOption = DevExpress.Xpo.DB.AutoCreateOption.None)
+        public static IServiceCollection AddXpo(
+            this IServiceCollection services,
+            IConfiguration configuration,
+            AutoCreateOption autoCreateOption = AutoCreateOption.None
+        )
             => services.AddXpoDefaultDataLayer(ServiceLifetime.Singleton, dl => dl
                 .UseConnectionString(configuration.GetConnectionString("DefaultConnection"))
-                .UseThreadSafeDataLayer(true)
-                .UseConnectionPool(autoCreateOption == DevExpress.Xpo.DB.AutoCreateOption.None)
+                .UseThreadSafeDataLayer(autoCreateOption == AutoCreateOption.None)
+                .UseConnectionPool(autoCreateOption == AutoCreateOption.None)
                 .UseAutoCreationOption(autoCreateOption)
                 .UseEntityTypes(
                     IdentityXpoTypes.PersistentTypes
