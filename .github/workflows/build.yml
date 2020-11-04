@@ -20,5 +20,7 @@ jobs:
       uses: actions/setup-node@v2.1.2
     - name: Build
       run: dotnet run --project ".\build\build.csproj" "build"
+      env:
+        DEVEXPRESS_NUGET_FEED: ${{secrets.DEVEXPRESS_NUGET_FEED}}
     - name: Deploy
       run: dotnet run --project ".\build\build.csproj" "deploy" -s
