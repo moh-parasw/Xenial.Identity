@@ -28,5 +28,7 @@ jobs:
         DEVEXPRESS_NUGET_FEED: ${{secrets.DEVEXPRESS_NUGET_FEED}}
     - name: Publish
       run: dotnet run --project ".\build\build.csproj" "publish" -s
+      env:
+        DEVEXPRESS_NUGET_FEED: ${{secrets.DEVEXPRESS_NUGET_FEED}}
     - name: Deploy
       run: dotnet run --project ".\build\build.csproj" "deploy" -s
