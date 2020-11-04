@@ -38,14 +38,6 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
 
             if (context.SyntaxReceiver is SyntaxReceiver syntaxReceiver)
             {
-#if DEBUG
-
-                //if (!System.Diagnostics.Debugger.IsAttached)
-                //{
-                //    System.Diagnostics.Debugger.Launch();
-                //}
-#endif
-
                 foreach (var canidate in syntaxReceiver.Canidates)
                 {
                     var targetType = canidate;
@@ -150,9 +142,6 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                         var source = textWriter.ToString();
                         var sourceFileName = $"{targetType.Identifier}.{Name}.generated.cs";
                         context.AddSource(sourceFileName, SourceText.From(source, Encoding.UTF8));
-#if DEBUG
-                        File.WriteAllText($@"C:\F\tmp\{sourceFileName}", source);
-#endif
                     }
                 }
             }
