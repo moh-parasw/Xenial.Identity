@@ -150,7 +150,9 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                         var source = textWriter.ToString();
                         var sourceFileName = $"{targetType.Identifier}.{Name}.generated.cs";
                         context.AddSource(sourceFileName, SourceText.From(source, Encoding.UTF8));
+#if DEBUG
                         File.WriteAllText($@"C:\F\tmp\{sourceFileName}", source);
+#endif
                     }
                 }
             }
