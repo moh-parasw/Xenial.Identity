@@ -14,6 +14,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
     {
         private int id;
         private bool enabled = true;
+        private bool required = true;
         private string name;
         private string displayName;
         private string description;
@@ -32,6 +33,9 @@ namespace Xenial.Identity.Xpo.Storage.Models
 
         [Persistent("Enabled")]
         public bool Enabled { get => enabled; set => SetPropertyValue(ref enabled, value); }
+
+        [Persistent("Required")]
+        public bool Required { get => required; set => SetPropertyValue(ref required, value); }
 
         [Persistent("Name")]
         [Size(200)]

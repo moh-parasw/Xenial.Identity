@@ -30,6 +30,8 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiScopes
             public string DisplayName { get; set; }
             public string Description { get; set; }
             public bool Enabled { get; set; } = true;
+            public bool Required { get; set; } = true;
+            public bool Emphasize { get; set; }
             public bool ShowInDiscoveryDocument { get; set; } = true;
             public bool NonEditable { get; set; }
             public string UserClaims { get; set; } = "profile";

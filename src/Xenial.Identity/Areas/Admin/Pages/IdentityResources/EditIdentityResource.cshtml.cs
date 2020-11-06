@@ -110,26 +110,26 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
             {
                 try
                 {
-                    var apiResource = await unitOfWork.GetObjectByKeyAsync<XpoIdentityResource>(id);
-                    if (apiResource == null)
+                    var identityResource = await unitOfWork.GetObjectByKeyAsync<XpoIdentityResource>(id);
+                    if (identityResource == null)
                     {
                         StatusMessage = "Error: Cannot find api resource";
                         return Page();
                     }
-
-                    foreach (var userClaim in apiResource.UserClaims.ToList())
+                    identityResource = Mapper.Map(Input, identityResource);
+                    foreach (var userClaim in identityResource.UserClaims.ToList())
                     {
-                        apiResource.UserClaims.Remove(userClaim);
+                        identityResource.UserClaims.Remove(userClaim);
                     }
 
                     var userClaimsString = string.IsNullOrEmpty(Input.UserClaims) ? string.Empty : Input.UserClaims;
                     var userClaims = userClaimsString.Split(",").Select(s => s.Trim()).ToList();
-                    apiResource.UserClaims.AddRange(userClaims.Select(userClaim => new XpoIdentityResourceClaim(unitOfWork)
+                    identityResource.UserClaims.AddRange(userClaims.Select(userClaim => new XpoIdentityResourceClaim(unitOfWork)
                     {
                         Type = userClaim
                     }));
 
-                    await unitOfWork.SaveAsync(apiResource);
+                    await unitOfWork.SaveAsync(identityResource);
                     await unitOfWork.CommitChangesAsync();
                     return Redirect("/Admin/IdentityResources");
                 }

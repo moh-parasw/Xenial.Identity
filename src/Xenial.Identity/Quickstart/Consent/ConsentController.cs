@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using IdentityServer4.Validation;
 using System.Collections.Generic;
 using System;
-using Xenial.Identity.Quickstart;
+using IdentityServer4.Stores;
 
 namespace Xenial.Identity.Quickstart.Consent
 {
@@ -25,18 +25,21 @@ namespace Xenial.Identity.Quickstart.Consent
     [Authorize]
     public class ConsentController : Controller
     {
-        private readonly IIdentityServerInteractionService _interaction;
-        private readonly IEventService _events;
-        private readonly ILogger<ConsentController> _logger;
+        private readonly IIdentityServerInteractionService interaction;
+        private readonly IEventService events;
+        private readonly ILogger<ConsentController> logger;
+        private readonly IClientStore clientStore;
 
         public ConsentController(
             IIdentityServerInteractionService interaction,
             IEventService events,
-            ILogger<ConsentController> logger)
+            ILogger<ConsentController> logger,
+            IClientStore clientStore)
         {
-            _interaction = interaction;
-            _events = events;
-            _logger = logger;
+            this.interaction = interaction;
+            this.events = events;
+            this.logger = logger;
+            this.clientStore = clientStore;
         }
 
         /// <summary>
@@ -67,7 +70,7 @@ namespace Xenial.Identity.Quickstart.Consent
 
             if (result.IsRedirect)
             {
-                var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
+                var context = await interaction.GetAuthorizationContextAsync(model.ReturnUrl);
                 if (context?.IsNativeClient() == true)
                 {
                     // The client is native, so this change in how to
@@ -99,8 +102,11 @@ namespace Xenial.Identity.Quickstart.Consent
             var result = new ProcessConsentResult();
 
             // validate return url is still valid
-            var request = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
-            if (request == null) return result;
+            var request = await interaction.GetAuthorizationContextAsync(model.ReturnUrl);
+            if (request == null)
+            {
+                return result;
+            }
 
             ConsentResponse grantedConsent = null;
 
@@ -110,7 +116,7 @@ namespace Xenial.Identity.Quickstart.Consent
                 grantedConsent = new ConsentResponse { Error = AuthorizationError.AccessDenied };
 
                 // emit event
-                await _events.RaiseAsync(new ConsentDeniedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues));
+                await events.RaiseAsync(new ConsentDeniedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues));
             }
             // user clicked 'yes' - validate the data
             else if (model?.Button == "yes")
@@ -132,7 +138,7 @@ namespace Xenial.Identity.Quickstart.Consent
                     };
 
                     // emit event
-                    await _events.RaiseAsync(new ConsentGrantedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues, grantedConsent.ScopesValuesConsented, grantedConsent.RememberConsent));
+                    await events.RaiseAsync(new ConsentGrantedEvent(User.GetSubjectId(), request.Client.ClientId, request.ValidatedResources.RawScopeValues, grantedConsent.ScopesValuesConsented, grantedConsent.RememberConsent));
                 }
                 else
                 {
@@ -147,7 +153,7 @@ namespace Xenial.Identity.Quickstart.Consent
             if (grantedConsent != null)
             {
                 // communicate outcome of consent back to identityserver
-                await _interaction.GrantConsentAsync(request, grantedConsent);
+                await interaction.GrantConsentAsync(request, grantedConsent);
 
                 // indicate that's it ok to redirect back to authorization endpoint
                 result.RedirectUri = model.ReturnUrl;
@@ -164,20 +170,20 @@ namespace Xenial.Identity.Quickstart.Consent
 
         private async Task<ConsentViewModel> BuildViewModelAsync(string returnUrl, ConsentInputModel model = null)
         {
-            var request = await _interaction.GetAuthorizationContextAsync(returnUrl);
+            var request = await interaction.GetAuthorizationContextAsync(returnUrl);
             if (request != null)
             {
-                return CreateConsentViewModel(model, returnUrl, request);
+                return await CreateConsentViewModel(model, returnUrl, request);
             }
             else
             {
-                _logger.LogError("No consent request matching request: {0}", returnUrl);
+                logger.LogError("No consent request matching request: {0}", returnUrl);
             }
 
             return null;
         }
 
-        private ConsentViewModel CreateConsentViewModel(
+        private async Task<ConsentViewModel> CreateConsentViewModel(
             ConsentInputModel model, string returnUrl,
             AuthorizationRequest request)
         {
@@ -185,11 +191,12 @@ namespace Xenial.Identity.Quickstart.Consent
             {
                 RememberConsent = model?.RememberConsent ?? true,
                 ScopesConsented = model?.ScopesConsented ?? Enumerable.Empty<string>(),
-                Description = model?.Description,
+                Description = model?.Description ?? HttpContext?.Request?.Headers["User-Agent"],
 
                 ReturnUrl = returnUrl,
 
                 ClientName = request.Client.ClientName ?? request.Client.ClientId,
+                ClientDescription = (await clientStore.FindClientByIdAsync(request.Client.ClientId))?.Description,
                 ClientUrl = request.Client.ClientUri,
                 ClientLogoUrl = request.Client.LogoUri,
                 AllowRememberConsent = request.Client.AllowRememberConsent
@@ -217,8 +224,7 @@ namespace Xenial.Identity.Quickstart.Consent
         }
 
         private ScopeViewModel CreateScopeViewModel(IdentityResource identity, bool check)
-        {
-            return new ScopeViewModel
+            => new ScopeViewModel
             {
                 Value = identity.Name,
                 DisplayName = identity.DisplayName ?? identity.Name,
@@ -227,7 +233,6 @@ namespace Xenial.Identity.Quickstart.Consent
                 Required = identity.Required,
                 Checked = check || identity.Required
             };
-        }
 
         public ScopeViewModel CreateScopeViewModel(ParsedScopeValue parsedScopeValue, ApiScope apiScope, bool check)
         {
@@ -249,8 +254,7 @@ namespace Xenial.Identity.Quickstart.Consent
         }
 
         private ScopeViewModel GetOfflineAccessScope(bool check)
-        {
-            return new ScopeViewModel
+            => new ScopeViewModel
             {
                 Value = IdentityServer4.IdentityServerConstants.StandardScopes.OfflineAccess,
                 DisplayName = ConsentOptions.OfflineAccessDisplayName,
@@ -258,6 +262,5 @@ namespace Xenial.Identity.Quickstart.Consent
                 Emphasize = true,
                 Checked = check
             };
-        }
     }
 }

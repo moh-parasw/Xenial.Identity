@@ -1,104 +1,145 @@
-@model ConsentViewModel
+﻿@model ConsentViewModel
 
-<div class="page-consent">
-    <div class="lead">
-        @if (Model.ClientLogoUrl != null)
-        {
-            <div class="client-logo"><img src="@Model.ClientLogoUrl"></div>
-        }
-        <h1>
-            @Model.ClientName
-            <small class="text-muted">is requesting your permission</small>
-        </h1>
-        <p>Uncheck the permissions you do not wish to grant.</p>
-    </div>
+@{
+    ViewData["Title"] = Model.ClientName;
+    Layout = "_LayoutWithoutSide";
+}
 
-    <div class="row">
-        <div class="col-sm-8">
-            <partial name="_ValidationSummary" />
-        </div>
-    </div>
+<div class="consent-page">
+    <div class="consent-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <ul class="consent-page-tabs__list">
+            <li class="consent-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="consent-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-key"></i> <span>@ViewData["Title"]</span>
+                </label>
+            </li>
+        </ul>
+        <div class="consent-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="consent-page-tabs__content">
+            <section>
+                <ul class="xenial-form__list">
 
-    <form asp-action="Index">
-        <input type="hidden" asp-for="ReturnUrl" />
-        <div class="row">
-            <div class="col-sm-8">
-                @if (Model.IdentityScopes.Any())
-                {
-                    <div class="form-group">
-                        <div class="card">
-                            <div class="card-header">
-                                <span class="glyphicon glyphicon-user"></span>
-                                Personal Information
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                @foreach (var scope in Model.IdentityScopes)
+                    <li class="xenial-form__list-item">
+                        @if (!string.IsNullOrEmpty(Model.ClientUrl))
+                        {
+                            <div class="consent-page__client">
+                                <a href="@Model.ClientUrl" target="_blank">
+                                    @if (Model.ClientLogoUrl != null)
+                                    {
+                                        <div class="consent-page__client-logo"><img src="@Model.ClientLogoUrl"></div>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa fa-info-circle"></i>
+                                    }
+                                    <strong>@Model.ClientName</strong>
+                                </a>
+                                @if (!string.IsNullOrEmpty(Model.ClientDescription))
                                 {
-                                    <partial name="_ScopeListItem" model="@scope" />
+                                    <p class="consent-page__client-description">@Model.ClientDescription</p>
                                 }
-                            </ul>
-                        </div>
-                    </div>
-                }
-
-                @if (Model.ApiScopes.Any())
-                {
-                    <div class="form-group">
-                        <div class="card">
-                            <div class="card-header">
-                                <span class="glyphicon glyphicon-tasks"></span>
-                                Application Access
                             </div>
-                            <ul class="list-group list-group-flush">
-                                @foreach (var scope in Model.ApiScopes)
+                        }
+                        else
+                        {
+                            <div class="consent-page__client">
+                                @if (Model.ClientLogoUrl != null)
                                 {
-                                    <partial name="_ScopeListItem" model="scope" />
+                                    <div class="consent-page__client-logo"><img src="@Model.ClientLogoUrl"></div>
                                 }
-                            </ul>
-                        </div>
-                    </div>
-                }
+                                else
+                                {
+                                    <i class="fa fa-info-circle"></i>
+                                }
+                                <strong>@Model.ClientName</strong>
+                                @if (!string.IsNullOrEmpty(Model.ClientDescription))
+                                {
+                                    <p class="consent-page__client-description">@Model.ClientDescription</p>
+                                }
+                            </div>
+                        }
+                    </li>
+                </ul>
 
-                <div class="form-group">
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="glyphicon glyphicon-tasks"></span>
-                            Description
-                        </div>
-                        <div class="card-body">
-                            <input placeholder="Description or name of device" asp-for="Description" autofocus>
-                        </div>
-                    </div>
-                </div>
+                <p class="text-center">is requesting your permission</p>
+                <p class="text-center">Uncheck the permissions you do not wish to grant.</p>
 
-                @if (Model.AllowRememberConsent)
-                {
-                    <div class="form-group">
-                        <div class="form-check">
-                            <input class="form-check-input" asp-for="RememberConsent">
-                            <label class="form-check-label" asp-for="RememberConsent">
-                                <strong>Remember My Decision</strong>
+                <partial name="_ValidationSummary" />
+
+                <form asp-action="Index" class="xenial-form">
+                    <input type="hidden" asp-for="ReturnUrl" />
+                    <ul class="xenial-form__list">
+                        @if (Model.IdentityScopes.Any())
+                        {
+                            <li class="xenial-form__list-item">
+                                <label class="xenial-form__list-item__consent-header">
+                                    <i class="fas fa-user"></i>
+                                    Personal Information
+                                </label>
+                            </li>
+                        }
+                        @foreach (var scope in Model.IdentityScopes)
+                        {
+                            <partial name="_ScopeListItem" model="@scope" />
+                        }
+                        @if (Model.IdentityScopes.Any())
+                        {
+                            <li class="xenial-form__list-item">
+                                <hr />
+                            </li>
+                        }
+
+                        @if (Model.ApiScopes.Any())
+                        {
+                            <li class="xenial-form__list-item">
+                                <label class="xenial-form__list-item__consent-header">
+                                    <i class="fas fa-puzzle-piece"></i>
+                                    Application Access
+                                </label>
+                            </li>
+                        }
+                        @foreach (var scope in Model.ApiScopes)
+                        {
+                            <partial name="_ScopeListItem" model="scope" />
+                        }
+                        @if (Model.ApiScopes.Any())
+                        {
+                            <li class="xenial-form__list-item">
+                                <hr />
+                            </li>
+                        }
+                        <li class="xenial-form__list-item">
+                            <label class="xenial-form__list-item__consent-header">
+                                <i class="fas fa-desktop"></i>
+                                Your Device
                             </label>
-                        </div>
-                    </div>
-                }
-            </div>
-        </div>
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <label asp-for="Description">
+                                <i class="fas fa-laptop-code"></i>
+                                Description
+                            </label>
+                            <input placeholder="Description or name of device" asp-for="Description" autofocus>
+                        </li>
 
-        <div class="row">
-            <div class="col-sm-4">
-                <button name="button" value="yes" class="btn btn-primary" autofocus>Yes, Allow</button>
-                <button name="button" value="no" class="btn btn-secondary">No, Do Not Allow</button>
-            </div>
-            <div class="col-sm-4 col-lg-auto">
-                @if (Model.ClientUrl != null)
-                {
-                    <a class="btn btn-outline-info" href="@Model.ClientUrl">
-                        <span class="glyphicon glyphicon-info-sign"></span>
-                        <strong>@Model.ClientName</strong>
-                    </a>
-                }
-            </div>
+                        @if (Model.AllowRememberConsent)
+                        {
+                            <li class="xenial-form__list-item">
+                                <label class="form-check-label" asp-for="RememberConsent">
+                                    Remember My Decision
+                                </label>
+                                <input class="toggle" asp-for="RememberConsent">
+                            </li>
+                        }
+
+                        <li class="xenial-form__list-item">
+                            <button name="button" value="no" class="button xenial-form__list-item-danger">No, Do Not Allow</button>
+                            <button name="button" value="yes" class="button xenial-form__list-item-submit" autofocus>Yes, Allow</button>
+                        </li>
+                    </ul>
+                </form>
+            </section>
         </div>
-    </form>
+    </div>
 </div>

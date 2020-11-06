@@ -78,16 +78,16 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
             {
                 try
                 {
-                    var apiResource = Mapper.Map(Input, new XpoIdentityResource(unitOfWork));
+                    var identityResource = Mapper.Map(Input, new XpoIdentityResource(unitOfWork));
 
                     var userClaimsString = string.IsNullOrEmpty(Input.UserClaims) ? string.Empty : Input.UserClaims;
                     var userClaims = userClaimsString.Split(",").Select(s => s.Trim()).ToList();
-                    apiResource.UserClaims.AddRange(userClaims.Select(userClaim => new XpoIdentityResourceClaim(unitOfWork)
+                    identityResource.UserClaims.AddRange(userClaims.Select(userClaim => new XpoIdentityResourceClaim(unitOfWork)
                     {
                         Type = userClaim
                     }));
 
-                    await unitOfWork.SaveAsync(apiResource);
+                    await unitOfWork.SaveAsync(identityResource);
                     await unitOfWork.CommitChangesAsync();
                     return Redirect("/Admin/IdentityResources");
                 }

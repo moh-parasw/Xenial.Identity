@@ -31,6 +31,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
             public string DisplayName { get; set; }
             public string Description { get; set; }
             public bool Enabled { get; set; } = true;
+            public bool Required { get; set; } = true;
             public bool ShowInDiscoveryDocument { get; set; } = true;
             public bool NonEditable { get; set; }
             public string UserClaims { get; set; }
@@ -143,6 +144,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
             {
                 try
                 {
+                    apiResource = Mapper.Map(Input, apiResource);
                     foreach (var userClaim in apiResource.UserClaims.ToList())
                     {
                         apiResource.UserClaims.Remove(userClaim);

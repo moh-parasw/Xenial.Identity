@@ -10,15 +10,13 @@
     @(Html.Grid(Model.PersistedGrants).Build(columns =>
     {
         columns.Add(model => $"<i class=\"fa fa-fingerprint\" data-copy=\"{model.Key}\" title=\"{model.Key}\"></i>").Encoded(false).Titled("Key").Css("user-image");
-        //columns.Add(model => $"<a href=\"Admin/Roles/View/{model.Id}\">{model.Name}</a>").Encoded(false).Titled("Name");
-
-        columns.Add(model => model.Type).Titled("Type");
         columns.Add(model => model.ClientId).Titled("Client");
+        columns.Add(model => model.Type).Titled("Type");
 
-        columns.Add(model => $"<div class=\"actions-container\"><a href=\"/Admin/Roles/Delete/{model.Key}\" class=\"button\"><i class=\"fas fa-times\"></i></a><a class=\"button\" href=\"/Admin/Roles/Edit/{model.Key}\"><i class=\"fas fa-pen\"></i></a></div>")
+        columns.Add(model => $"<div class=\"actions-container\"><a href=\"/Admin/PersistedGrants/Delete/{model.Key}\" class=\"button\"><i class=\"fas fa-times\"></i></a><a class=\"button\" href=\"/Admin/PersistedGrants/Edit/{model.Key}\"><i class=\"fas fa-pen\"></i></a></div>")
         .Encoded(false)
         .Css("actions")
-        .Titled("<div class=\"actions-container\"><a class=\"button\" href=\"/Admin/Roles/Add\"><i class=\"fas fa-plus\"></i></button></div>");
+        .Titled("<div class=\"actions-container\"><a class=\"button\" href=\"/Admin/PersistedGrants/Add\"><i class=\"fas fa-plus\"></i></button></div>");
     })
     .Using(GridFilterMode.Header)
     .Empty("No data found")
