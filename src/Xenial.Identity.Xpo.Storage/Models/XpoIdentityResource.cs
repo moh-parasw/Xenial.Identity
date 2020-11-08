@@ -45,7 +45,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         public string Description { get => description; set => SetPropertyValue(ref description, value); }
 
         [Persistent("Required")]
-        public bool Required { get => required; set => required = SetPropertyValue(ref required, value); }
+        public bool Required { get => required; set => SetPropertyValue(ref required, value); }
 
         [Persistent("Emphasize")]
         public bool Emphasize { get => emphasize; set => SetPropertyValue(ref emphasize, value); }

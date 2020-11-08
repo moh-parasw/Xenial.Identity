@@ -53,10 +53,10 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
             public IdentityResourceMappingConfiguration()
             {
                 CreateMap<IdentityResourceInputModel, XpoIdentityResource>()
-                                   .ForMember(api => api.UserClaims, o => o.Ignore())
-                                   .ForMember(api => api.Properties, o => o.Ignore())
-                                   .ReverseMap()
-                               ;
+                    .ForMember(api => api.UserClaims, o => o.Ignore())
+                    .ForMember(api => api.Properties, o => o.Ignore())
+                    .ReverseMap()
+                ;
 
                 CreateMap<PropertiesOutputModel, XpoIdentityResourceProperty>()
                     .ReverseMap();
@@ -116,7 +116,9 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
                         StatusMessage = "Error: Cannot find api resource";
                         return Page();
                     }
+
                     identityResource = Mapper.Map(Input, identityResource);
+
                     foreach (var userClaim in identityResource.UserClaims.ToList())
                     {
                         identityResource.UserClaims.Remove(userClaim);
