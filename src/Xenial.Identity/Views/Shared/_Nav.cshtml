@@ -5,21 +5,26 @@
 
 @{
     string name = null;
+    var isLoggedOut = false;
     if (!true.Equals(ViewData["signed-out"]))
     {
         name = Context.User?.GetDisplayName();
+    }
+    if (true.Equals(ViewData["signed-out"]))
+    {
+        isLoggedOut = true;
     }
 }
 
 <header class="xenial-header">
     <input class="xenial-header__togglenavbar-checkbox"
-    id="xenial-toggle-navbar"
-    type="checkbox"
-    aria-hidden="true" />
+           id="xenial-toggle-navbar"
+           type="checkbox"
+           aria-hidden="true" />
     <input class="xenial-header__togglenavbar-checkbox"
-    id="xenial-toggle-navbar"
-    type="checkbox"
-    aria-hidden="true" />
+           id="xenial-toggle-navbar"
+           type="checkbox"
+           aria-hidden="true" />
     <div class="xenial-header__logo__teaser" aria-hidden="true">
         <a href="/">
             <img src="./img/logo.svg" />
@@ -47,7 +52,7 @@
         </a>
     </div>
     <label class="xenial-header__togglenavbar-label"
-    for="xenial-toggle-navbar">
+           for="xenial-toggle-navbar">
         <span class="middle">
             <span class="before"></span>
             <span class="after"></span>
@@ -61,7 +66,7 @@
                     Home
                 </a>
             </li>
-            @if (SignInManager.IsSignedIn(User))
+            @if (SignInManager.IsSignedIn(User) && !isLoggedOut)
             {
                 @if ((await Authorization.AuthorizeAsync(User, "Administrator")).Succeeded)
                 {
@@ -73,32 +78,38 @@
                     </li>
                 }
             }
-            <li>
-                <a asp-area="Identity" asp-page="/Account/Manage/Index">
-                    <i class="fas fa-user"></i>
-                    @if (!string.IsNullOrWhiteSpace(name))
-                    {
-                    <span>@name</span>
-                    }
-                    else
-                    {
-                    <span>Profile</span>
-                    }
-                </a>
-            </li>
-            @if (!string.IsNullOrEmpty(name))
+            @if (!string.IsNullOrWhiteSpace(name) && !isLoggedOut)
             {
-            <li>
-                <a class="dropdown-item" asp-action="Logout" asp-controller="Account">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Logout
-                </a>
-            </li>
+                <li>
+                    <a asp-area="Identity" asp-page="/Account/Manage/Index">
+                        <i class="fas fa-user"></i>
+                        <span>@name</span>
+
+                    </a>
+                </li>
+            }
+            @if (!string.IsNullOrEmpty(name) && !isLoggedOut)
+            {
+                <li>
+                    <a class="dropdown-item" href="~/Identity/Account/Logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </li>
+            }
+            @if (isLoggedOut)
+            {
+                <li>
+                    <a class="dropdown-item" href="~/Identity/Account/Login">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login
+                    </a>
+                </li>
             }
             <li>
                 <label for="xenial-toggle-theme"
-                title="Turn the lights on/off"
-                aria-label="Theme">
+                       title="Turn the lights on/off"
+                       aria-label="Theme">
                     <i class="xenial-theme-indicator"></i>
                     <span class="xenial-theme-text" aria-hidden="true">Theme</span>
                 </label>
@@ -107,25 +118,25 @@
     </nav>
 </header>
 @* <div class="nav-page">
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 
-<a href="~/" class="navbar-brand">
-<img src="~/icon.png" class="icon-banner">
-IdentityServer4
-</a>
+    <a href="~/" class="navbar-brand">
+    <img src="~/icon.png" class="icon-banner">
+    IdentityServer4
+    </a>
 
-@if (!string.IsNullOrWhiteSpace(name))
-{
-<ul class="navbar-nav mr-auto">
-<li class="nav-item dropdown">
-<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">@name <b class="caret"></b></a>
+    @if (!string.IsNullOrWhiteSpace(name))
+    {
+    <ul class="navbar-nav mr-auto">
+    <li class="nav-item dropdown">
+    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">@name <b class="caret"></b></a>
 
-<div class="dropdown-menu">
-<a class="dropdown-item" asp-action="Logout" asp-controller="Account">Logout</a>
-</div>
-</li>
-</ul>
-}
+    <div class="dropdown-menu">
+    <a class="dropdown-item" asp-action="Logout" asp-controller="Account">Logout</a>
+    </div>
+    </li>
+    </ul>
+    }
 
-</nav>
-</div> *@
+    </nav>
+    </div> *@

@@ -208,10 +208,7 @@ namespace Xenial.Identity.Quickstart.Account
         }
 
         [HttpGet]
-        public IActionResult AccessDenied()
-        {
-            return View();
-        }
+        public IActionResult AccessDenied() => View();
 
 
         /*****************************************/

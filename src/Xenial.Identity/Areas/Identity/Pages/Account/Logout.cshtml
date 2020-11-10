@@ -1,10 +1,110 @@
 ﻿@page
 @model LogoutModel
 @{
-    ViewData["Title"] = "Log out";
+    ViewData["Title"] = "Logout";
+    // set this so the layout rendering sees an anonymous user
+    ViewData["signed-out"] = Model.LoggedOutModel != null;
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
 }
 
-<header>
-    <h1>@ViewData["Title"]</h1>
-    <p>You have successfully logged out of the application.</p>
-</header>
+@if (Model.LoggedOutModel != null)
+{
+    <div class="logged-out-page">
+        <div class="logged-out-page-tabs">
+            <input type="radio" id="tab2" name="tab-control" checked>
+            <ul class="logged-out-page-tabs__list">
+                <li class="logged-out-page-tabs__list-item" title="Logout">
+                    <label class="logged-out-page-tabs__list-item-label" for="tab2" role="button">
+                        <i class="fas fa-key"></i> <span>Logout</span>
+                    </label>
+                </li>
+            </ul>
+            <div class="logged-out-page-tabs__slider"><div class="indicator"></div></div>
+            <div class="logged-out-page-tabs__content">
+                <section>
+                    <h2>Logout</h2>
+                    <p class="text-center">You are now logged out</p>
+
+                    @if (!string.IsNullOrEmpty(Model.LoggedOutModel.PostLogoutRedirectUri))
+                    {
+                        <div class="text-center">
+                            Click <a class="PostLogoutRedirectUri" @(Model.LoggedOutModel.AutomaticRedirectAfterSignOut ? "data-redirect" : string.Empty) href="@Model.LoggedOutModel.PostLogoutRedirectUri">here</a> to return to the
+                            <span>@Model.LoggedOutModel.ClientName</span> application.
+                        </div>
+
+                        <form class="xenial-form give-me-space">
+                            <ul class="xenial-form__list">
+                                <li class="xenial-form__list-item">
+                                    <a href="@Model.LoggedOutModel.PostLogoutRedirectUri" class="button xenial-form__list-item-submit">Go to @Model.LoggedOutModel.ClientName</a>
+                                </li>
+                            </ul>
+                        </form>
+                    }
+                    else
+                    {
+                        <form class="xenial-form give-me-space">
+                            <ul class="xenial-form__list">
+                                <li class="xenial-form__list-item">
+                                    <a href="/" class="button xenial-form__list-item-submit">Login</a>
+                                </li>
+                            </ul>
+                        </form>
+                    }
+                </section>
+            </div>
+        </div>
+
+        @if (Model.LoggedOutModel.SignOutIframeUrl != null)
+        {
+            <iframe width="0" height="0" class="signout" src="@Model.LoggedOutModel.SignOutIframeUrl"></iframe>
+        }
+    </div>
+
+    @section scripts
+    {
+        @*@if (Model.LoggedOutModel.AutomaticRedirectAfterSignOut)
+            {
+                <script src="~/js/signout-redirect.js"></script>
+            }*@
+    }
+}
+else if (Model.LogOutModel != null)
+{
+    <div class="logout-page">
+        <div class="logout-page-tabs">
+            <input type="radio" id="tab1" name="tab-control" checked>
+            <ul class="logout-page-tabs__list">
+                <li class="logout-page-tabs__list-item" title="@ViewData["Title"]">
+                    <label class="logout-page-tabs__list-item-label" for="tab1" role="button">
+                        <i class="fas fa-key"></i> <span>@ViewData["Title"]</span>
+                    </label>
+                </li>
+            </ul>
+            <div class="logout-page-tabs__slider"><div class="indicator"></div></div>
+            <div class="logout-page-tabs__content">
+                <section>
+                    <h2>Logout</h2>
+                    <p class="text-center">Would you like to logout?</p>
+
+                    <form class="xenial-form" method="post">
+                        <ul class="xenial-form__list">
+                            <li class="xenial-form__list-item">
+                                <input type="hidden" name="logoutId" id="logoutId" asp-for="LogoutId" />
+                                <button class="xenial-form__list-item-submit">Yes</button>
+                            </li>
+                        </ul>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="logout-page">
+        <header>
+            <h1>@ViewData["Title"]</h1>
+            <p>You have successfully logged out of the application.</p>
+        </header>
+    </div>
+}

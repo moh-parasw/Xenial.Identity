@@ -89,3 +89,9 @@ document.querySelectorAll("[data-tags]").forEach(element => {
         }
     }
 });
+
+document.querySelectorAll("[data-redirect]").forEach(element => {
+    if (element instanceof HTMLLinkElement) {
+        window.location.href = element.href;
+    }
+});

@@ -1,13 +1,15 @@
 @import "forms";
 @import "tabs";
 
-.logout-page {
+.logged-out-page {
   @include tab-pages(1);
   margin-left: auto;
   margin-right: auto;
   max-width: 370px;
   @include xenial-form(1000rem);
-
+  iframe {
+    visibility: hidden;
+  }
   .text-center {
     text-align: center;
   }
