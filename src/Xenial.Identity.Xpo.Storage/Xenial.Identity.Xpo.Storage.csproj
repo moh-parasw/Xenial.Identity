@@ -5,11 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DevExpress.Xpo" Version="20.2.2-*" />
-    <PackageReference Include="DevExpress.Persistent.Base" Version="20.2.2-*" />
+    <PackageReference Include="DevExpress.Xpo" Version="20.2.3" />
+    <PackageReference Include="DevExpress.Data" Version="20.2.3" />
+    <PackageReference Include="DevExpress.Persistent.Base" Version="20.2.3" />
 
     <PackageReference Include="IdentityServer4.Storage" Version="[4.1.1, 5.0)" />
-    <PackageReference Include="AutoMapper" Version="[10.0.0,11.0)" />
+    <PackageReference Include="AutoMapper" Version="[10.1.1,11.0)" />
 
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
 

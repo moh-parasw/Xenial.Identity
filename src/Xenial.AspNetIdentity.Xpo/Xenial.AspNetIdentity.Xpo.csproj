@@ -9,8 +9,8 @@
     <PackageReference Include="DevExpress.Data" Version="20.2.3" />
     <PackageReference Include="DevExpress.Persistent.Base" Version="20.2.3" />
 
-    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.1.9" />
-    <PackageReference Include="AutoMapper" Version="[10.0.0,11.0)" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.0" />
+    <PackageReference Include="AutoMapper" Version="[10.1.1,11.0)" />
   </ItemGroup>
 
   <ItemGroup>
