@@ -1,23 +1,39 @@
-@model string
+﻿@model string
+@{
+    ViewData["Title"] = "User Code";
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
+}
 
-<div class="page-device-code">
-    <div class="lead">
-        <h1>User Code</h1>
-        <p>Please enter the code displayed on your device.</p>
-    </div>
+<div class="device-page">
+    <div class="device-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <ul class="device-page-tabs__list">
+            <li class="device-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="device-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-key"></i> <span>@ViewData["Title"]</span>
+                </label>
+            </li>
+        </ul>
+        <div class="device-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="device-page-tabs__content">
+            <section>
+                <h2>@ViewData["Title"]</h2>
+                <p class="text-center">Please enter the code displayed on your device.</p>
 
-    <partial name="_ValidationSummary" />
+                <partial name="_ValidationSummary" />
 
-    <div class="row">
-        <div class="col-sm-6">
-            <form asp-action="UserCodeCapture">
-                <div class="form-group">
-                    <label for="userCode">User Code:</label>
-                    <input for="userCode" name="userCode" autofocus />
-                </div>
-
-                <button class="btn btn-primary" name="button">Submit</button>
-            </form>
+                <form asp-action="UserCodeCapture" class="xenial-form">
+                    <ul class="xenial-form__list">
+                        <li class="xenial-form__list-item">
+                            <label for="userCode">User Code:</label>
+                            <input for="userCode" name="userCode" autofocus />
+                        </li>
+                        <li class="xenial-form__list-item">
+                            <button class="xenial-form__list-item-submit" name="button">Submit</button>
+                        </li>
+                    </ul>
+                </form>
+            </section>
         </div>
     </div>
 </div>
