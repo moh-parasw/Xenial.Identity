@@ -1,7 +1,26 @@
+﻿@{
+    ViewData["Title"] = "User Code";
+    Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
+}
 
-<div class="page-device-success">
-    <div class="lead">
-        <h1>Success</h1>
-        <p>You have successfully authorized the device</p>
+<div class="device-success-page">
+    <div class="device-success-page-tabs">
+        <input type="radio" id="tab1" name="tab-control" checked>
+        <ul class="device-success-page-tabs__list">
+            <li class="device-success-page-tabs__list-item" title="@ViewData["Title"]">
+                <label class="device-success-page-tabs__list-item-label" for="tab1" role="button">
+                    <i class="fas fa-key"></i> <span>@ViewData["Title"]</span>
+                </label>
+            </li>
+        </ul>
+        <div class="device-success-page-tabs__slider"><div class="indicator"></div></div>
+        <div class="device-success-page-tabs__content">
+            <section>
+                <h2>@ViewData["Title"]</h2>
+                <h3 class="text-center">Success</h3>
+                <p class="text-center">You have successfully authorized the device</p>
+                <p class="text-center">You may now close this browser window</p>
+            </section>
+        </div>
     </div>
 </div>
