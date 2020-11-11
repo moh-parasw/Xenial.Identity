@@ -14,13 +14,13 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
     [AllowAnonymous]
     public class ConfirmEmailChangeModel : PageModel
     {
-        private readonly UserManager<XenialIdentityUser> _userManager;
-        private readonly SignInManager<XenialIdentityUser> _signInManager;
+        private readonly UserManager<XenialIdentityUser> userManager;
+        private readonly SignInManager<XenialIdentityUser> signInManager;
 
         public ConfirmEmailChangeModel(UserManager<XenialIdentityUser> userManager, SignInManager<XenialIdentityUser> signInManager)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+            this.userManager = userManager;
+            this.signInManager = signInManager;
         }
 
         [TempData]
@@ -33,14 +33,14 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
                 return RedirectToPage("/Index");
             }
 
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{userId}'.");
             }
 
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
-            var result = await _userManager.ChangeEmailAsync(user, email, code);
+            var result = await userManager.ChangeEmailAsync(user, email, code);
             if (!result.Succeeded)
             {
                 StatusMessage = "Error changing email.";
@@ -49,14 +49,14 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
 
             // In our UI email and user name are one and the same, so when we update the email
             // we need to update the user name.
-            var setUserNameResult = await _userManager.SetUserNameAsync(user, email);
+            var setUserNameResult = await userManager.SetUserNameAsync(user, email);
             if (!setUserNameResult.Succeeded)
             {
                 StatusMessage = "Error changing user name.";
                 return Page();
             }
 
-            await _signInManager.RefreshSignInAsync(user);
+            await signInManager.RefreshSignInAsync(user);
             StatusMessage = "Thank you for confirming your email change.";
             return Page();
         }
