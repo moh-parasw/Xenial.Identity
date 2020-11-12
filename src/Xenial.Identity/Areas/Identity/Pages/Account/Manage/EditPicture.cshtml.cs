@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 
 using DevExpress.XtraReports.Design;
 
+using IdentityModel;
+
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -20,7 +22,9 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 
+using Xenial.Identity.Areas.Identity.Controllers;
 using Xenial.Identity.Data;
+using Xenial.Identity.Infrastructure;
 
 namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
 {
@@ -28,12 +32,11 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<XenialIdentityUser> userManager;
         private readonly ILogger<EditPictureModel> logger;
+
         public EditPictureModel(
             UserManager<XenialIdentityUser> userManager,
             ILogger<EditPictureModel> logger
-
-        )
-            => (this.userManager, this.logger) = (userManager, logger);
+        ) => (this.userManager, this.logger) = (userManager, logger);
 
         public ProfilePictureModel ProfilePicture { get; set; }
 
@@ -87,6 +90,17 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                     stream.Position = 0;
                     user.Picture = stream.ToArray();
                     user.PictureMimeType = GeMimeTypeFromImageByteArray(user.Picture);
+
+                    if (string.IsNullOrEmpty(user.PictureId)) //We only set a new one if there wasn't one before
+                    {
+                        user.PictureId = CryptoRandom.CreateUniqueId();
+                    }
+
+                    string AbsolutePictureUri(string pictureId)
+                        => $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/api/profile/picture/{pictureId}";
+
+                    var picture = AbsolutePictureUri(user.PictureId);
+                    await userManager.SetOrUpdateClaimAsync(user, new System.Security.Claims.Claim("picture", picture));
                 }
                 var result = await userManager.UpdateAsync(user);
                 if (result.Succeeded)
@@ -144,8 +158,12 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                 logger.LogWarning("No user found {User}", User);
                 return Page();
             }
+
             user.Picture = new byte[0];
             user.PictureMimeType = null;
+            user.PictureId = null;
+            await userManager.RemoveClaimAsync(user, "picture");
+
             var result = await userManager.UpdateAsync(user);
             if (result.Succeeded)
             {

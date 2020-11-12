@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 
 using Xenial.Identity.Components;
 using Xenial.Identity.Data;
+using Xenial.Identity.Infrastructure;
 
 namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
 {
@@ -108,9 +109,9 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                 user = mapper.Map(Input, user);
                 user.UpdatedAt = DateTime.Now;
 
-                await SetOrUpdateClaimAsync(user, new Claim("name", user.FullName ?? string.Empty));
-                await SetOrUpdateClaimAsync(user, new Claim("family_name", user.LastName ?? string.Empty));
-                await SetOrUpdateClaimAsync(user, new Claim("given_name", user.FirstName ?? string.Empty));
+                await userManager.SetOrUpdateClaimAsync(user, new Claim("name", user.FullName ?? string.Empty));
+                await userManager.SetOrUpdateClaimAsync(user, new Claim("family_name", user.LastName ?? string.Empty));
+                await userManager.SetOrUpdateClaimAsync(user, new Claim("given_name", user.FirstName ?? string.Empty));
                 //TODO: Picture and Public Profile
                 //await SetOrUpdateClaimAsync(user, new Claim("picture", absProfilePictureUrl));
                 //await SetOrUpdateClaimAsync(user, new Claim("website", user.Website ?? string.Empty));
@@ -121,15 +122,15 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                 //await SetOrUpdateClaimAsync(user, new Claim("birthdate", user.Birthdate?.ToString("YYYY-MM-DD") ?? string.Empty));
                 //await SetOrUpdateClaimAsync(user, new Claim("zoneinfo", user.Zoneinfo ?? string.Empty));
                 //await SetOrUpdateClaimAsync(user, new Claim("locale", user.Locale ?? string.Empty));
-                await SetOrUpdateClaimAsync(user, new Claim("updated_at", ConvertToUnixTimestamp(user.UpdatedAt)?.ToString() ?? string.Empty));
-                await SetOrUpdateClaimAsync(user, new Claim("xenial_backcolor", user.Color ?? string.Empty));
-                await SetOrUpdateClaimAsync(user, new Claim("xenial_forecolor", (MaterialColorPicker.ColorIsDark(user.Color) ? "#FFFFFF" : "#000000") ?? string.Empty));
-                await SetOrUpdateClaimAsync(user, new Claim("xenial_initials", user.Initials ?? string.Empty));
+                await userManager.SetOrUpdateClaimAsync(user, new Claim("updated_at", ConvertToUnixTimestamp(user.UpdatedAt)?.ToString() ?? string.Empty));
+                await userManager.SetOrUpdateClaimAsync(user, new Claim("xenial_backcolor", user.Color ?? string.Empty));
+                await userManager.SetOrUpdateClaimAsync(user, new Claim("xenial_forecolor", (MaterialColorPicker.ColorIsDark(user.Color) ? "#FFFFFF" : "#000000") ?? string.Empty));
+                await userManager.SetOrUpdateClaimAsync(user, new Claim("xenial_initials", user.Initials ?? string.Empty));
 
                 var streetAddress = string.Join(" ", new[] { user.AddressStreetAddress1, user.AddressStreetAddress2 }.Where(s => !string.IsNullOrWhiteSpace(s)));
                 var postalAddress = string.Join(" ", new[] { user.AddressPostalCode, user.AddressLocality }.Where(s => !string.IsNullOrWhiteSpace(s)));
 
-                await SetOrUpdateClaimAsync(user, new Claim("address", JsonConvert.SerializeObject(new
+                await userManager.SetOrUpdateClaimAsync(user, new Claim("address", JsonConvert.SerializeObject(new
                 {
                     formatted = string.Join(Environment.NewLine, new[] { streetAddress, postalAddress, user.AddressRegion, user.AddressCountry }.Where(s => !string.IsNullOrWhiteSpace(s))) ?? string.Empty,
                     street_address = streetAddress ?? string.Empty,
@@ -157,19 +158,6 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
             }
         }
 
-        private async Task SetOrUpdateClaimAsync(XenialIdentityUser user, Claim newClaim)
-        {
-            var claims = await userManager.GetClaimsAsync(user);
-            if (claims.Any(c => c.Type == newClaim.Type))
-            {
-                var claim = claims.First(c => c.Type == newClaim.Type);
-                await userManager.ReplaceClaimAsync(user, claim, newClaim);
-            }
-            else
-            {
-                await userManager.AddClaimAsync(user, newClaim);
-            }
-        }
         private static double? ConvertToUnixTimestamp(DateTime? date)
         {
             if (date.HasValue)

@@ -219,6 +219,7 @@ namespace Xenial.Identity
             {
                 endpoints.MapBlazorHub();
                 endpoints.MapRazorPages();
+                endpoints.MapControllers();
                 endpoints.MapDefaultControllerRoute();
             });
         }

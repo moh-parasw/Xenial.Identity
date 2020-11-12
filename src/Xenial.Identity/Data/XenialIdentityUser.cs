@@ -23,6 +23,7 @@ namespace Xenial.Identity.Data
 
         public byte[] Picture { get; set; }
         public string PictureMimeType { get; set; }
+        public string PictureId { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
     }
