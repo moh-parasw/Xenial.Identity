@@ -161,7 +161,8 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
 
             user.Picture = new byte[0];
             user.PictureMimeType = null;
-            user.PictureId = null;
+            //Don't reset PictureId. Should stay static as long user lives cause tokens are cached
+            //user.PictureId = null;
             await userManager.RemoveClaimAsync(user, "picture");
 
             var result = await userManager.UpdateAsync(user);

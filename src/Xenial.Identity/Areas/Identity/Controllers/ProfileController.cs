@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-using DevExpress.Data.Filtering;
 using DevExpress.Xpo;
 
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
+using SkiaSharp;
+
+using Xenial.Identity.Components;
 using Xenial.Identity.Models;
 
 namespace Xenial.Identity.Areas.Identity.Controllers
@@ -36,7 +35,9 @@ namespace Xenial.Identity.Areas.Identity.Controllers
             var user = await unitOfWork.Query<XpoXeniaIIdentityUser>().Where(u => u.PictureId == pictureId).Select(u => new
             {
                 PictureMimeType = u.PictureMimeType,
-                Picture = u.Picture
+                Picture = u.Picture,
+                Initials = u.Initials,
+                BackColor = u.Color
             }).FirstOrDefaultAsync();
 
             if (user == null)
@@ -46,6 +47,33 @@ namespace Xenial.Identity.Areas.Identity.Controllers
 
             if (user.Picture == default || user.Picture.Length <= 0)
             {
+                if (!string.IsNullOrEmpty(user.Initials) && !string.IsNullOrEmpty(user.BackColor))
+                {
+                    using var bitmap = new SKBitmap(128, 128, false);
+                    using var skCanvas = new SKCanvas(bitmap);
+                    using var skPaintBack = new SKPaint();
+                    using var skPaintFore = new SKPaint();
+
+                    skPaintBack.Style = SKPaintStyle.Fill;
+                    skPaintBack.IsAntialias = true;
+                    skPaintBack.Color = SKColor.Parse(user.BackColor);
+                    skPaintBack.StrokeWidth = 10;
+
+                    skPaintFore.TextSize = 64.0f;
+                    skPaintFore.IsAntialias = true;
+                    skPaintFore.Color = SKColor.Parse(MaterialColorPicker.ColorIsDark(user.BackColor) ? "#FFFFFF" : "#000000");
+                    skPaintFore.StrokeWidth = 3;
+                    skPaintFore.TextAlign = SKTextAlign.Center;
+
+                    skCanvas.DrawCircle(64, 64, 64, skPaintBack);
+                    var offset = 85.5f;
+                    skCanvas.DrawText(user.Initials, bitmap.Info.Width / 2f, offset, skPaintFore);
+
+                    using var skImage = SKImage.FromBitmap(bitmap);
+                    using var skData = skImage.Encode(SKEncodedImageFormat.Png, 100);
+                    return File(skData.AsStream(), "image/png");
+                }
+
                 return NotFound();
             }
 
