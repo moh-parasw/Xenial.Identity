@@ -165,23 +165,23 @@ namespace Xenial.Identity.Quickstart.Device
             return result;
         }
 
-        private async Task<DeviceAuthorizationViewModel> BuildViewModelAsync(string userCode, DeviceAuthorizationInputModel model = null, string deviceId = null)
+        private async Task<DeviceAuthorizationViewModel> BuildViewModelAsync(string userCode, DeviceAuthorizationInputModel model = null)
         {
             var request = await interaction.GetAuthorizationContextAsync(userCode);
             if (request != null)
             {
-                return CreateConsentViewModel(userCode, model, request, deviceId);
+                return CreateConsentViewModel(userCode, model, request);
             }
 
             return null;
         }
 
-        private DeviceAuthorizationViewModel CreateConsentViewModel(string userCode, DeviceAuthorizationInputModel model, DeviceFlowAuthorizationRequest request, string deviceId = null)
+        private DeviceAuthorizationViewModel CreateConsentViewModel(string userCode, DeviceAuthorizationInputModel model, DeviceFlowAuthorizationRequest request)
         {
             var vm = new DeviceAuthorizationViewModel
             {
                 UserCode = userCode,
-                Description = model?.Description ?? deviceId,
+                Description = model?.Description,
 
                 RememberConsent = model?.RememberConsent ?? true,
                 ScopesConsented = model?.ScopesConsented ?? Enumerable.Empty<string>(),

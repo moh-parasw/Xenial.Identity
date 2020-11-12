@@ -112,8 +112,6 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                 await userManager.SetOrUpdateClaimAsync(user, new Claim("name", user.FullName ?? string.Empty));
                 await userManager.SetOrUpdateClaimAsync(user, new Claim("family_name", user.LastName ?? string.Empty));
                 await userManager.SetOrUpdateClaimAsync(user, new Claim("given_name", user.FirstName ?? string.Empty));
-                //TODO: Picture and Public Profile
-                //await SetOrUpdateClaimAsync(user, new Claim("picture", absProfilePictureUrl));
                 //await SetOrUpdateClaimAsync(user, new Claim("website", user.Website ?? string.Empty));
                 //await SetOrUpdateClaimAsync(user, new Claim("profile", absProfileUrl));
 
