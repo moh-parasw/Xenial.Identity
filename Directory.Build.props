@@ -25,6 +25,9 @@
     <NoWarn>$(NoWarn);NU5105</NoWarn>
     <Nullable>disable</Nullable>
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
+    <LastUpdate></LastUpdate>
+    <GitBranch></GitBranch>
+    <GitHash></GitHash>
   </PropertyGroup>
   
   <ItemGroup>
@@ -37,4 +40,28 @@
     <ProjectCapability Include="DynamicFileNesting" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MinVer" Version="2.3.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  
+  <Target Name="AddMetadaAssemblyAttributes" BeforeTargets="CoreGenerateAssemblyInfo">
+    <ItemGroup>
+      <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" Condition="'$(LastUpdate)' != ''" >
+        <_Parameter1>LastUpdate</_Parameter1>
+        <_Parameter2>$(LastUpdate)</_Parameter2>
+      </AssemblyAttribute>
+      <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" Condition="'$(GitBranch)' != ''" >
+        <_Parameter1>GitBranch</_Parameter1>
+        <_Parameter2>$(GitBranch)</_Parameter2>
+      </AssemblyAttribute>
+      <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" Condition="'$(GitHash)' != ''" >
+        <_Parameter1>GitHash</_Parameter1>
+        <_Parameter2>$(GitHash)</_Parameter2>
+      </AssemblyAttribute>
+    </ItemGroup>
+  </Target>
+  
 </Project>
