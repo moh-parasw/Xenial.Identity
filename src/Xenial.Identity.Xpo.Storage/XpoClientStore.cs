@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-using IdentityServer4.Models;
-using IdentityServer4.Stores;
+using Duende.IdentityServer.Models;
+using Duende.IdentityServer.Stores;
 
 namespace Xenial.Identity.Xpo.Storage
 {

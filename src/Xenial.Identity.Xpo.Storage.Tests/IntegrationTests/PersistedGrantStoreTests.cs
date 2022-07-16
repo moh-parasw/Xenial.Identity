@@ -8,8 +8,8 @@ using DevExpress.Xpo;
 
 using FluentAssertions;
 
-using IdentityServer4.Models;
-using IdentityServer4.Stores;
+using Duende.IdentityServer.Models;
+using Duende.IdentityServer.Stores;
 
 using Xenial.Identity.Xpo.Storage.Mappers;
 using Xenial.Identity.Xpo.Storage.Models;

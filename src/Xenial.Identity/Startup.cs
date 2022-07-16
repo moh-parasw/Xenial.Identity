@@ -96,7 +96,7 @@ namespace Xenial.Identity
                 options.Events.RaiseFailureEvents = true;
                 options.Events.RaiseSuccessEvents = true;
 
-                // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
+                // see https://Duende.IdentityServer.readthedocs.io/en/latest/topics/resources.html
                 options.EmitStaticAudienceClaim = true;
             }).AddAspNetIdentity<XenialIdentityUser>()
               .AddXpoIdentityStore();

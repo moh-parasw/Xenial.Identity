@@ -9,7 +9,7 @@ using AutoMapper;
 using DevExpress.Xpo;
 using DevExpress.Xpo.DB.Exceptions;
 
-using IdentityServer4.Models;
+using Duende.IdentityServer.Models;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

@@ -16,10 +16,10 @@ using Microsoft.Extensions.Logging;
 
 using Xenial.Identity.Xpo.Storage.Models;
 
-using IdentityServer4.Models;
+using Duende.IdentityServer.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json.Schema;
-using IdentityServer4.Stores;
+using Duende.IdentityServer.Stores;
 
 namespace Xenial.Identity.Areas.Admin.Pages.Clients
 {

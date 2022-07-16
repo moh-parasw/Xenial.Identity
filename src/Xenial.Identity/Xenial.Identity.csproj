@@ -6,15 +6,16 @@
     <LangVersion>latest</LangVersion>
     <DefaultConnectionString>PLEASE SET BEFORE USE</DefaultConnectionString>
     <EnableMSDeployAppOffline>true</EnableMSDeployAppOffline>
-    <NoWarn>$(NoWarn);ASP0000</NoWarn>
+    <NoWarn>$(NoWarn);ASP0000;CS0618</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.6" />
-    <PackageReference Include="IdentityServer4" Version="4.1.2" />
-    <PackageReference Include="IdentityServer4.AspNetIdentity" Version="4.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.7" />
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.6" />    
+    <PackageReference Include="Duende.IdentityServer" Version="6.1.2" />
+    <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.1.2" />
     <PackageReference Include="MySql.Data" Version="8.0.29" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NonFactors.Grid.Mvc6" Version="7.0.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="6.0.0" />
     <PackageReference Include="SkiaSharp" Version="2.88.0" />

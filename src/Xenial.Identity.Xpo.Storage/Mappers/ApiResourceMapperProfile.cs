@@ -2,7 +2,7 @@
 
 using AutoMapper;
 
-using IdentityServer4.Models;
+using Duende.IdentityServer.Models;
 
 namespace Xenial.Identity.Xpo.Storage.Mappers
 {

@@ -4,7 +4,7 @@ using System.Text;
 
 using DevExpress.Xpo;
 
-using IdentityServer4.Models;
+using Duende.IdentityServer.Models;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;

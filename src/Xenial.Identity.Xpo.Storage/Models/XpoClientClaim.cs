@@ -5,7 +5,7 @@ using System.Text;
 using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
 
-using IdentityServer4.Models;
+using Duende.IdentityServer.Models;
 
 namespace Xenial.Identity.Xpo.Storage.Models
 {

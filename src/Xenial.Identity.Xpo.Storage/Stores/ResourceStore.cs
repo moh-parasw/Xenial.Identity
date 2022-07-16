@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 using DevExpress.Xpo;
 
-using IdentityServer4.Models;
-using IdentityServer4.Stores;
+using Duende.IdentityServer.Models;
+using Duende.IdentityServer.Stores;
 
 using Microsoft.Extensions.Logging;
 
@@ -18,7 +18,7 @@ namespace Xenial.Identity.Xpo.Storage.Stores
     /// <summary>
     /// Implementation of IResourceStore thats uses Xpo.
     /// </summary>
-    /// <seealso cref="IdentityServer4.Stores.IResourceStore" />
+    /// <seealso cref="Duende.IdentityServer.Stores.IResourceStore" />
     public class ResourceStore : IResourceStore
     {
         /// <summary>

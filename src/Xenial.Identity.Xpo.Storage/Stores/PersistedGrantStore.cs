@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using DevExpress.Xpo;
 using DevExpress.Xpo.DB.Exceptions;
 
-using IdentityServer4.Extensions;
-using IdentityServer4.Models;
-using IdentityServer4.Stores;
+using Duende.IdentityServer.Extensions;
+using Duende.IdentityServer.Models;
+using Duende.IdentityServer.Stores;
 
 using Microsoft.Extensions.Logging;
 
@@ -21,7 +21,7 @@ namespace Xenial.Identity.Xpo.Storage.Stores
     /// <summary>
     /// Implementation of IPersistedGrantStore thats uses Xpo.
     /// </summary>
-    /// <seealso cref="IdentityServer4.Stores.IPersistedGrantStore" />
+    /// <seealso cref="Duende.IdentityServer.Stores.IPersistedGrantStore" />
     public class PersistedGrantStore : IPersistedGrantStore
     {
         /// <summary>

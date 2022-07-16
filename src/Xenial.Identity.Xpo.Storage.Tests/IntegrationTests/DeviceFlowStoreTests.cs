@@ -12,8 +12,8 @@ using FluentAssertions;
 
 using IdentityModel;
 
-using IdentityServer4.Models;
-using IdentityServer4.Stores.Serialization;
+using Duende.IdentityServer.Models;
+using Duende.IdentityServer.Stores.Serialization;
 
 using Xenial.Identity.Xpo.Storage.Models;
 using Xenial.Identity.Xpo.Storage.Stores;

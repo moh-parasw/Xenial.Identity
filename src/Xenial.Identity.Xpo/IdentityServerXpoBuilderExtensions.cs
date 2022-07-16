@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Xenial.Identity.Xpo.Storage.TokenCleanup;
 using Xenial.Identity.Xpo.Storage.Configuration;
 using Microsoft.Extensions.Hosting;
-using IdentityServer4.Stores;
+using Duende.IdentityServer.Stores;
 using Xenial.Identity.Xpo.Storage.Stores;
 using Xenial.Identity.Xpo.Storage.Options;
 using Xenial.Identity.Xpo.Services;

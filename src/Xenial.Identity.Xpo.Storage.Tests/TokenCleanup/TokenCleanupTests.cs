@@ -5,9 +5,9 @@ using DevExpress.Xpo;
 
 using FluentAssertions;
 
-using IdentityServer4.Models;
-using IdentityServer4.Stores;
-using IdentityServer4.Test;
+using Duende.IdentityServer.Models;
+using Duende.IdentityServer.Stores;
+using Duende.IdentityServer.Test;
 
 using Microsoft.Extensions.DependencyInjection;
 

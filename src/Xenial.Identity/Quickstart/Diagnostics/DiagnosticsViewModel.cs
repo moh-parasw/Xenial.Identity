@@ -1,15 +1,10 @@
-﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
-
-using IdentityModel;
+﻿using IdentityModel;
 
 using Microsoft.AspNetCore.Authentication;
 
-using Newtonsoft.Json;
-
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 
 namespace Xenial.Identity.Quickstart.Diagnostics
 {
@@ -25,7 +20,7 @@ namespace Xenial.Identity.Quickstart.Diagnostics
                 var bytes = Base64Url.Decode(encoded);
                 var value = Encoding.UTF8.GetString(bytes);
 
-                Clients = JsonConvert.DeserializeObject<string[]>(value);
+                Clients = JsonSerializer.Deserialize<string[]>(value);
             }
         }
 

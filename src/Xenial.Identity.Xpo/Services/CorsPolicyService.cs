@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using DevExpress.Xpo;
 
-using IdentityServer4.Services;
+using Duende.IdentityServer.Services;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +19,7 @@ namespace Xenial.Identity.Xpo.Services
     /// <summary>
     /// Implementation of ICorsPolicyService that consults the client configuration in the database for allowed CORS origins.
     /// </summary>
-    /// <seealso cref="IdentityServer4.Services.ICorsPolicyService" />
+    /// <seealso cref="Duende.IdentityServer.Services.ICorsPolicyService" />
     public class CorsPolicyService : ICorsPolicyService
     {
         private readonly IHttpContextAccessor context;

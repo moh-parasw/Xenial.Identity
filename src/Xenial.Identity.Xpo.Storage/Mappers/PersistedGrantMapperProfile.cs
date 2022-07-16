@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-using IdentityServer4.Models;
+using Duende.IdentityServer.Models;
 
 using Xenial.Identity.Xpo.Storage.Models;
 

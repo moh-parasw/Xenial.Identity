@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 using Xenial.Identity.Xpo.Storage.Models;
 
-using IdentityServer4.Models;
+using Duende.IdentityServer.Models;
 
 namespace Xenial.Identity.Areas.Admin.Pages.Clients
 {

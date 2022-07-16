@@ -6,7 +6,7 @@ using System.Text;
 using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
 
-using IdentityServer4.Models;
+using Duende.IdentityServer.Models;
 
 using Xenial.Identity.Xpo.Storage.ValueConverters;
 
