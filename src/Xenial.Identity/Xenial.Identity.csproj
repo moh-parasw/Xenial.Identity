@@ -1,27 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net5</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <UserSecretsId>9941a3cb-8710-45b7-bd66-b7dc8363cc0a</UserSecretsId>
     <LangVersion>latest</LangVersion>
     <DefaultConnectionString>PLEASE SET BEFORE USE</DefaultConnectionString>
     <EnableMSDeployAppOffline>true</EnableMSDeployAppOffline>
+    <NoWarn>$(NoWarn);ASP0000</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.0" />
-    <PackageReference Include="IdentityServer4" Version="4.1.1" />
-    <PackageReference Include="IdentityServer4.AspNetIdentity" Version="4.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.0" />
-    <PackageReference Include="MySql.Data" Version="8.0.22" />
-    <PackageReference Include="NonFactors.Grid.Mvc6" Version="6.2.1" />
-    <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
-    <PackageReference Include="SkiaSharp" Version="2.80.2" />
-    <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.6" />
+    <PackageReference Include="IdentityServer4" Version="4.1.2" />
+    <PackageReference Include="IdentityServer4.AspNetIdentity" Version="4.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.7" />
+    <PackageReference Include="MySql.Data" Version="8.0.29" />
+    <PackageReference Include="NonFactors.Grid.Mvc6" Version="7.0.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="6.0.0" />
+    <PackageReference Include="SkiaSharp" Version="2.88.0" />
+    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
     <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
-    <PackageReference Include="WestWind.AspnetCore.LiveReload" Version="0.2.14" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.0" />
+    <PackageReference Include="WestWind.AspnetCore.LiveReload" Version="0.3.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.7" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.7" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,6 +34,13 @@
     <DestinationConnectionStrings Include="DefaultConnection">
       <Value>$(DefaultConnectionString)</Value>
     </DestinationConnectionStrings>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="MinVer" Version="4.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   
 </Project>

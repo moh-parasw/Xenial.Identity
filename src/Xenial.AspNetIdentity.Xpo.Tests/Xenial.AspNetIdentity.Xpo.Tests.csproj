@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5</TargetFramework>
+    <TargetFrameworks>net6.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,9 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="5.10.3" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.0" />
-    <PackageReference Include="Xenial.Tasty" Version="0.1.24" />
+    <PackageReference Include="FluentAssertions" Version="6.7.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.7" />
+    <PackageReference Include="Xenial.Tasty" Version="0.2.0" />
   </ItemGroup>
 
 </Project>
