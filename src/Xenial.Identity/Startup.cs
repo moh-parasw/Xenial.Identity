@@ -88,7 +88,6 @@ namespace Xenial.Identity
                 .AddScoped<IUserClaimsPrincipalFactory<XenialIdentityUser>, UserClaimsPrincipalFactory<XenialIdentityUser, IdentityRole>>()
             ;
 
-
             var builder = services.AddIdentityServer(options =>
             {
                 options.Events.RaiseErrorEvents = true;
@@ -98,7 +97,9 @@ namespace Xenial.Identity
 
                 // see https://Duende.IdentityServer.readthedocs.io/en/latest/topics/resources.html
                 options.EmitStaticAudienceClaim = true;
-            }).AddAspNetIdentity<XenialIdentityUser>()
+            })
+              .AddRedirectUriValidator<RedirectValidator>()
+              .AddAspNetIdentity<XenialIdentityUser>()
               .AddXpoIdentityStore();
 
             builder.AddCertificate(Environment, Configuration, null);
