@@ -15,6 +15,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using DevExpress.Xpo;
+using Microsoft.Extensions.Configuration;
 
 namespace Xenial.Identity.Areas.Identity.Pages.Account
 {
@@ -26,19 +27,25 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
         private readonly SignInManager<XenialIdentityUser> signInManager;
         private readonly ILogger<LoginModel> logger;
         private readonly IEmailSender emailSender;
+        private readonly IConfiguration configuration;
 
         public LoginModel(SignInManager<XenialIdentityUser> signInManager,
             ILogger<LoginModel> logger,
             UserManager<XenialIdentityUser> userManager,
             RoleManager<IdentityRole> roleManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IConfiguration configuration)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
             this.signInManager = signInManager;
             this.logger = logger;
             this.emailSender = emailSender;
+            this.configuration = configuration;
+            AllowRegister = this.configuration.GetValue<bool>("Identity:AllowNew");
         }
+
+        public readonly bool AllowRegister = true;
 
         [BindProperty]
         public LoginInputModel LoginInput { get; set; }
@@ -87,6 +94,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
             [Compare(nameof(Password), ErrorMessage = "The password and confirmation password do not match.")]
             public string RegisterConfirmPassword { get; set; }
         }
+
         public async Task OnGetAsync(string returnUrl = null)
         {
             SelectedPage = "login";
@@ -141,6 +149,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
             // If we got this far, something failed, redisplay form
             return Page();
         }
+
         public void MarkAllFieldsAsSkipped(string name)
         {
             foreach (var state in ModelState.Where(k => !k.Key.StartsWith($"{name}.")).Select(x => x.Value))
@@ -152,6 +161,11 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostRegisterAsync(string returnUrl = null)
         {
+            if (!AllowRegister)
+            {
+                return BadRequest();
+            }
+
             SelectedPage = "register";
             returnUrl = returnUrl ?? Url.Content("~/");
             ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
