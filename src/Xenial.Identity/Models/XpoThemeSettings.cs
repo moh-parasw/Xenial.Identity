@@ -22,4 +22,7 @@ public class XpoThemeSettings : XpoIdentityBaseObjectString
 
     private byte[] customLogo = Array.Empty<byte>();
     public byte[] CustomLogo { get => customLogo; set => SetPropertyValue(nameof(CustomLogo), ref customLogo, value); }
+
+    private string customLogoMimeType = "";
+    public string CustomLogoMimeType { get => customLogoMimeType; set => SetPropertyValue(nameof(CustomLogoMimeType), ref customLogoMimeType, value); }
 }

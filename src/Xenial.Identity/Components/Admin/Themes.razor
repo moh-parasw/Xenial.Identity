@@ -1,7 +1,106 @@
-﻿@page "/Admin2/Theme"
+﻿@inject UnitOfWork UOW
+@page "/Admin2/Theme"
 
-<h3>Themes</h3>
+<MudText Typo="Typo.h3" GutterBottom>Themes</MudText>
+
+<MudStack Row="false">
+
+    <MudText Typo="Typo.caption" GutterBottom>Logo</MudText>
+
+    <div style="max-height: 100px; display: grid;">
+        <MudImage Fluid="true" Src="@customImage" />
+    </div>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <MudText Color="Color.Error" Typo="Typo.caption">ERROR: @errorMessage</MudText>
+    }
+    <InputFile id="logoInput" OnChange="UploadFiles" hidden accept=".jpg, .jpeg, .png, .svg" />
+
+    <MudButton HtmlTag="label"
+               Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Filled.CloudUpload"
+               for="logoInput">
+        Upload Logo
+    </MudButton>
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Error"
+               StartIcon="@Icons.Filled.Delete"
+               OnClick="DeleteLogo">Delete Logo</MudButton>
+
+    <MudDivider />
+
+    <MudTextField @bind-Value="@customStyleSheet"
+                  Lines="30"
+                  Label="Custom-CSS"
+                  Variant="Variant.Outlined" />
+
+    <MudButton OnClick="SaveChanges">Save</MudButton>
+</MudStack>
 
 @code {
+    private string customImage = "";
+    private string errorMessage = "";
+    private string customStyleSheet;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var theme = UOW.FindObject<XpoThemeSettings>(null);
+        customStyleSheet = theme.CustomCss;
+        SetImage(theme);
+    }
+
+    private async Task UploadFiles(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            errorMessage = "";
+            var theme = UOW.FindObject<XpoThemeSettings>(null);
+            theme.CustomLogoMimeType = e.File.ContentType;
+            using var reader = e.File.OpenReadStream();
+            using var ms = new MemoryStream();
+            await reader.CopyToAsync(ms);
+            theme.CustomLogo = ms.ToArray();
+            await UOW.CommitChangesAsync();
+            SetImage(theme);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private async Task DeleteLogo()
+    {
+        errorMessage = "";
+        var theme = UOW.FindObject<XpoThemeSettings>(null);
+        theme.CustomLogoMimeType = "";
+        theme.CustomLogo = Array.Empty<byte>();
+        await UOW.CommitChangesAsync();
+        SetImage(theme);
+        StateHasChanged();
+    }
+
+    private void SetImage(XpoThemeSettings theme)
+    {
+        if (theme.CustomLogo.Length > 0)
+        {
+            customImage = $"data:{theme.CustomLogoMimeType};base64, {Convert.ToBase64String(theme.CustomLogo)}";
+        }
+        else
+        {
+            customImage = "./img/logo.svg";
+        }
+    }
+
+    private void SaveChanges()
+    {
+        var theme = UOW.FindObject<XpoThemeSettings>(null);
+        theme.CustomCss = customStyleSheet;
+        UOW.CommitChanges();
+    }
 }

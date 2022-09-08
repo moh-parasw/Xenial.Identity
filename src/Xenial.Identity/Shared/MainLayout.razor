@@ -33,7 +33,12 @@
         </MudNavMenu>
     </MudDrawer>
     <MudMainContent>
-        @Body
+        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="my-8">
+            @Body
+        </MudContainer>
+        <MudScrollToTop>
+            <MudFab Color="Color.Tertiary" Icon="@Icons.Filled.ArrowCircleUp" IconSize="Size.Large" />
+        </MudScrollToTop>
     </MudMainContent>
 </MudLayout>
 

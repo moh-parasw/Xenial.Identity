@@ -14,7 +14,7 @@ using System;
 
 using Xenial.Identity;
 using Xenial.Identity.Infrastructure;
-
+using Xenial.Identity.Models;
 
 SQLiteConnectionProvider.Register();
 MySqlConnectionProvider.Register();
@@ -54,6 +54,11 @@ try
     using (var unitOfWork = provider.GetRequiredService<UnitOfWork>())
     {
         unitOfWork.UpdateSchema();
+        if (unitOfWork.FindObject<XpoThemeSettings>(null) is null)
+        {
+            unitOfWork.Save(new XpoThemeSettings(unitOfWork));
+            unitOfWork.CommitChanges();
+        }
     }
 
     Log.Information("Update Done");
