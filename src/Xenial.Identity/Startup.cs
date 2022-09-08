@@ -120,7 +120,7 @@ public class Startup
             o.AddPolicy("Administrator", policy =>
             {
                 policy.RequireAuthenticatedUser();
-                policy.RequireRole("Administrator");
+                //policy.RequireRole("Administrator");
             });
         });
 
