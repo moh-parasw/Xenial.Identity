@@ -1,0 +1,78 @@
+﻿@inherits LayoutComponentBase
+@inject IBreakpointService BreakpointService
+@implements IAsyncDisposable
+<PageTitle>Blazor Identity Server App</PageTitle>
+
+<MudThemeProvider @ref="_mudThemeProvider" IsDarkMode="@isDarkMode" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1" Dense>
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+    </MudAppBar>
+    <MudDrawer @ref="drawer"
+               @bind-Open="drawerOpen"
+               Elevation="2"
+               Variant="@drawerVariant"
+               ClipMode="DrawerClipMode.Docked">
+        <MudDrawerHeader>
+            <MudIcon Icon="@Icons.Filled.RocketLaunch" Size="Size.Large" />
+        </MudDrawerHeader>
+        <MudNavMenu Style="height: 100%">
+            <NavMenu />
+        </MudNavMenu>
+    </MudDrawer>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private MudDrawer drawer;
+    private MudThemeProvider _mudThemeProvider;
+    private bool isDarkMode;
+    bool drawerOpen = true;
+    Breakpoint breakpoint;
+    void DrawerToggle()
+        => drawerOpen = !drawerOpen;
+    Guid subscriptionId;
+
+    DrawerVariant drawerVariant => breakpoint == Breakpoint.Xs
+        ? DrawerVariant.Responsive
+        : DrawerVariant.Mini;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && _mudThemeProvider is not null)
+        {
+            var result = await BreakpointService.Subscribe(BreakPointChanged);
+            if (result is not null)
+            {
+                breakpoint = result.Breakpoint;
+                subscriptionId = result.SubscriptionId;
+            }
+            isDarkMode = await _mudThemeProvider.GetSystemPreference();
+            StateHasChanged();
+        }
+    }
+
+    void BreakPointChanged(Breakpoint bp)
+    {
+        breakpoint = bp;
+
+        if (drawer is not null)
+        {
+            drawer.Variant = drawerVariant;
+        }
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _ = await BreakpointService.Unsubscribe(subscriptionId);
+    }
+
+}
