@@ -18,6 +18,7 @@ public class XpoThemeSettings : XpoIdentityBaseObjectString
     }
 
     private string customCss = "";
+    [Size(SizeAttribute.Unlimited)]
     public string CustomCss { get => customCss; set => SetPropertyValue(nameof(CustomCss), ref customCss, value); }
 
     private byte[] customLogo = Array.Empty<byte>();

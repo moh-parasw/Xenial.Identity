@@ -1,4 +1,5 @@
 ﻿@inject UnitOfWork UOW
+@inject ISnackbar Snackbar
 @page "/Admin2/Theme"
 
 <MudText Typo="Typo.h3" GutterBottom>Themes</MudText>
@@ -8,7 +9,7 @@
     <MudText Typo="Typo.caption" GutterBottom>Logo</MudText>
 
     <div style="max-height: 100px; display: grid;">
-        <MudImage Fluid="true" Src="@customImage" />
+        <MudImage Fluid="true" Src="@imgUrl" />
     </div>
 
     @if (!string.IsNullOrEmpty(errorMessage))
@@ -36,11 +37,15 @@
                   Label="Custom-CSS"
                   Variant="Variant.Outlined" />
 
-    <MudButton OnClick="SaveChanges">Save</MudButton>
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Success"
+               OnClick="SaveChanges">Save</MudButton>
 </MudStack>
 
 @code {
-    private string customImage = "";
+    private Random rng = new Random();
+    private int imageRand = 0;
+    private string imgUrl => $"./themes/logo?{imageRand}";
     private string errorMessage = "";
     private string customStyleSheet;
 
@@ -50,7 +55,6 @@
 
         var theme = UOW.FindObject<XpoThemeSettings>(null);
         customStyleSheet = theme.CustomCss;
-        SetImage(theme);
     }
 
     private async Task UploadFiles(InputFileChangeEventArgs e)
@@ -65,14 +69,18 @@
             await reader.CopyToAsync(ms);
             theme.CustomLogo = ms.ToArray();
             await UOW.CommitChangesAsync();
-            SetImage(theme);
             StateHasChanged();
+            Snackbar.Add("Changes saved successfully", Severity.Success);
+            UpdateImage();
         }
         catch (Exception ex)
         {
             errorMessage = ex.Message;
         }
     }
+
+    private void UpdateImage()
+        => imageRand = rng.Next();
 
     private async Task DeleteLogo()
     {
@@ -81,20 +89,9 @@
         theme.CustomLogoMimeType = "";
         theme.CustomLogo = Array.Empty<byte>();
         await UOW.CommitChangesAsync();
-        SetImage(theme);
         StateHasChanged();
-    }
-
-    private void SetImage(XpoThemeSettings theme)
-    {
-        if (theme.CustomLogo.Length > 0)
-        {
-            customImage = $"data:{theme.CustomLogoMimeType};base64, {Convert.ToBase64String(theme.CustomLogo)}";
-        }
-        else
-        {
-            customImage = "./img/logo.svg";
-        }
+        Snackbar.Add("Changes saved successfully", Severity.Success);
+        UpdateImage();
     }
 
     private void SaveChanges()
@@ -102,5 +99,6 @@
         var theme = UOW.FindObject<XpoThemeSettings>(null);
         theme.CustomCss = customStyleSheet;
         UOW.CommitChanges();
+        Snackbar.Add("Changes saved successfully", Severity.Success);
     }
 }
