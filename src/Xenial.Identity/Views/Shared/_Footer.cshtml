@@ -19,11 +19,11 @@
             <ul class="xenial-footer__fineprint-imprint">
                 @if (settings.ShowLicenses)
                 {
-                    <li><a href="/license">Licenses</a></li>
+                    @Html.Raw(settings.LicenceHtml)
                 }
                 @if (settings.ShowImprint)
                 {
-                    <li><a href="/imprint">Imprint</a></li>
+                    @Html.Raw(settings.ImprintHtml)
                 }
             </ul>
             @if (settings.ShowTermsOfUse || settings.ShowCopyright)
@@ -31,22 +31,11 @@
                 <p class="xenial-footer__fineprint-terms">
                     @if (settings.ShowTermsOfUse)
                     {
-                        <text>
-                            Use of this site constitutes acceptance of our
-                            <a href="#"> Website Terms of Use </a>
-                            and
-                            <a href="#"> Privacy Policy </a>
-
-                            <br />
-                        </text>
+                        @Html.Raw(settings.TermsOfUseHtml)
                     }
                     @if (settings.ShowCopyright)
                     {
-                        <text>
-                            Copyright © 2012-@DateTime.Today.Year Manuel Grundner. All
-                            trademarks or registered trademarks are property of their respective
-                            owners
-                        </text>
+                        @Html.Raw(settings.CopyrightHtml.Replace("{{ year }}", DateTime.Today.Year.ToString()))
                     }
                 </p>
             }

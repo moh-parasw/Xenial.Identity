@@ -17,13 +17,28 @@ public class XpoThemeSettings : XpoIdentityBaseObjectString
         ShowFooter = true;
         ShowHearts = true;
         ShowImprint = true;
-        ShowLicenses = true;
         ShowCopyright = true;
         ShowTermsOfUse = true;
         ShowRuntimeInformation = true;
+        ShowLicenses = true;
+        LicenceHtml = @"<li><a href=""/license"">Licenses</a></li>";
+        ImprintHtml = @"<li><a href=""/imprint"">Imprint</a></li>";
+        TermsOfUseHtml = @"Use of this site constitutes acceptance of our
+<a href=""/termsofuse""> Website Terms of Use </a>
+and
+<a href=""/privacy""> Privacy Policy </a>
+
+<br />";
+        CopyrightHtml = @"Copyright © 2012-{{ year }} Manuel Grundner. All
+trademarks or registered trademarks are property of their respective
+owners.";
         base.AfterConstruction();
     }
 
+    private string copyrightHtml = "";
+    private string termsOfUseHtml = "";
+    private string imprintHtml = "";
+    private string licenceHtml = "";
     private string customCss = "";
     [Size(SizeAttribute.Unlimited)]
     public string CustomCss { get => customCss; set => SetPropertyValue(nameof(CustomCss), ref customCss, value); }
@@ -50,14 +65,44 @@ public class XpoThemeSettings : XpoIdentityBaseObjectString
     private bool showLicenses = true;
     public bool ShowLicenses { get => showLicenses; set => SetPropertyValue(nameof(ShowLicenses), ref showLicenses, value); }
 
+
+    [Size(SizeAttribute.Unlimited)]
+    public string LicenceHtml
+    {
+        get => licenceHtml;
+        set => SetPropertyValue(nameof(LicenceHtml), ref licenceHtml, value);
+    }
+
     private bool showImprint = true;
     public bool ShowImprint { get => showImprint; set => SetPropertyValue(nameof(ShowImprint), ref showImprint, value); }
+
+
+    [Size(SizeAttribute.Unlimited)]
+    public string ImprintHtml
+    {
+        get => imprintHtml;
+        set => SetPropertyValue(nameof(ImprintHtml), ref imprintHtml, value);
+    }
 
     private bool showTermsOfUse = true;
     public bool ShowTermsOfUse { get => showTermsOfUse; set => SetPropertyValue(nameof(ShowTermsOfUse), ref showTermsOfUse, value); }
 
+    [Size(SizeAttribute.Unlimited)]
+    public string TermsOfUseHtml
+    {
+        get => termsOfUseHtml;
+        set => SetPropertyValue(nameof(TermsOfUseHtml), ref termsOfUseHtml, value);
+    }
+
     private bool showCopyright = true;
     public bool ShowCopyright { get => showCopyright; set => SetPropertyValue(nameof(ShowCopyright), ref showCopyright, value); }
+
+    [Size(SizeAttribute.Unlimited)]
+    public string CopyrightHtml
+    {
+        get => copyrightHtml;
+        set => SetPropertyValue(nameof(CopyrightHtml), ref copyrightHtml, value);
+    }
 
     private bool showRuntimeInformation = true;
     public bool ShowRuntimeInformation { get => showRuntimeInformation; set => SetPropertyValue(nameof(ShowRuntimeInformation), ref showRuntimeInformation, value); }

@@ -17,17 +17,45 @@
                Label="Show Licenses"
                Color="Color.Secondary" />
 
+    @if (theme.ShowLicenses)
+    {
+        <MonacoEdit @bind-Value="@theme.LicenceHtml"
+                Height="200px"
+                Language="CodeLanguage.Html" />
+    }
+
     <MudSwitch @bind-Checked="@theme.ShowImprint"
                Label="Show Imprint"
                Color="Color.Secondary" />
+
+    @if (theme.ShowImprint)
+    {
+        <MonacoEdit @bind-Value="@theme.ImprintHtml"
+                Height="200px"
+                Language="CodeLanguage.Html" />
+    }
 
     <MudSwitch @bind-Checked="@theme.ShowTermsOfUse"
                Label="Show Terms of Use"
                Color="Color.Secondary" />
 
+    @if (theme.ShowTermsOfUse)
+    {
+        <MonacoEdit @bind-Value="@theme.TermsOfUseHtml"
+                Height="200px"
+                Language="CodeLanguage.Html" />
+    }
+
     <MudSwitch @bind-Checked="@theme.ShowCopyright"
                Label="Show Copyright"
                Color="Color.Secondary" />
+
+    @if (theme.ShowCopyright)
+    {
+        <MonacoEdit @bind-Value="@theme.CopyrightHtml"
+                Height="200px"
+                Language="CodeLanguage.Html" />
+    }
 
     <MudSwitch @bind-Checked="@theme.ShowRuntimeInformation"
                Label="Show Runtime Information"
