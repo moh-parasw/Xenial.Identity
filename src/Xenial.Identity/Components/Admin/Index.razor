@@ -4,6 +4,8 @@
 
 <MonacoEdit @bind-Value="@Code" Language="CodeLanguage.Html" />
 
+@((MarkupString)Code)
+
 @code {
     public string Code { get; set; } = "<h1>Hello From Monaco</h1>";
 }

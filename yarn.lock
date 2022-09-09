@@ -552,6 +552,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/blazor__javascript-interop@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "@types/blazor__javascript-interop@npm:3.1.2"
+  checksum: e9e78f11ba6d7b81a03609db2120bbdbbece0545e0c28ffd327b83ea5874cd7500ef35cfb300e4b2a2d272bf794a8127009fdbf60c27e8c3e9cfffd6bca8bf94
+  languageName: node
+  linkType: hard
+
 "@types/debug@npm:^4.1.5":
   version: 4.1.7
   resolution: "@types/debug@npm:4.1.7"
@@ -693,6 +700,7 @@ __metadata:
     "@rollup/plugin-babel": ^5.2.1
     "@rollup/plugin-commonjs": ^15.1.0
     "@rollup/plugin-node-resolve": ^14.0.1
+    "@types/blazor__javascript-interop": ^3.1.2
     "@types/qrcode": ^1.3.5
     "@xenial-io/xenial-template": 0.0.8
     "@yaireo/tagify": ^3.20.3
