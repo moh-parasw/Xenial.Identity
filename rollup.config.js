@@ -24,6 +24,30 @@ export default (commandLineArgs) => {
 
   return [
     {
+      input: "./client/js/admin.ts",
+      output: [
+        {
+          file: `src/Xenial.Identity/wwwroot/js/admin.min.js`,
+          format: "iife",
+          plugins: debug ? [] : [terser()],
+        },
+      ],
+      external: [],
+      plugins: [
+        resolve({ extensions }),
+        commonjs(),
+        babel({
+          extensions,
+          exclude: "node_modules/**",
+          babelHelpers: 'bundled'
+        }),
+        scss({
+          output: `src/Xenial.Identity/wwwroot/css/admin-bundle.css`,
+          outputStyle: debug ? undefined : "compressed",
+        }),
+      ]
+    },
+    {
       input: "./client/js/index.ts",
       output: [
         {
