@@ -7,7 +7,7 @@
   "scripts": {
     "build": "rollup -c",
     "debug": "rollup -c --configDebug",
-    "watch": "yarn run debug && chokidar client/**/* rollup.config.js -d 150 -c \"yarn run debug\"",
+    "watch": "yarn run debug && chokidar client/**/* rollup.config.js -d 150 -c \"yarn run debug\""
   },
   "repository": {
     "type": "git",
