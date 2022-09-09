@@ -42,11 +42,10 @@ public class ThemeController : Controller
         return File(ms, "text/css", false);
     }
 
-
     private static Stream GenerateStreamFromString(string s)
     {
         var stream = new MemoryStream();
-        using var writer = new StreamWriter(stream);
+        var writer = new StreamWriter(stream);
         writer.Write(s);
         writer.Flush();
         stream.Position = 0;
