@@ -1,5 +1,6 @@
 import fg from "fast-glob";
 
+// import nodePolyfills from 'rollup-plugin-polyfill-node';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { brotliCompressSync } from "zlib";
 import commonjs from "@rollup/plugin-commonjs";
@@ -37,8 +38,27 @@ export default (commandLineArgs) => {
       ],
       external: [],
       plugins: [
+        // nodePolyfills({
+        //   include: ["util", "stream", "zlib", "assert", "buffer"]
+        // }),
         resolve({ extensions }),
-        postcss(),
+        scss({
+          output: `src/Xenial.Identity/wwwroot/css/admin-bundle.css`,
+          outputStyle: debug ? undefined : "compressed",
+        }),
+        postcss({
+          url: (asset) => {
+            if (!/\.ttf$/.test(asset.url)) return asset.url;
+            const distPath = path.join(process.cwd(), 'dist');
+            const distFontsPath = path.join(distPath, 'fonts');
+            fs.ensureDirSync(distFontsPath);
+            const targetFontPath = path.join(distFontsPath, asset.pathname);
+            fs.copySync(asset.absolutePath, targetFontPath);
+            const relativePath = path.relative(process.cwd(), targetFontPath);
+            const publicPath = '/';
+            return `${publicPath}${relativePath}`;
+          },
+        }),
         monaco({
           languages: ['json', 'html', 'css'],
         }),
@@ -48,12 +68,7 @@ export default (commandLineArgs) => {
           extensions,
           exclude: "node_modules/**",
           babelHelpers: 'bundled'
-        }),
-        scss({
-          output: `src/Xenial.Identity/wwwroot/css/admin-bundle.css`,
-          outputStyle: debug ? undefined : "compressed",
-        }),
-
+        })
       ]
     },
     {

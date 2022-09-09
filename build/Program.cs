@@ -22,13 +22,13 @@ var hash = new Lazy<Task<string>>(async () => (await ReadAsync("git", "rev-parse
 
 Func<Task<string>> assemblyProperties = async () => $"/property:LastUpdate={await lastUpdate.Value} /property:GitBranch={await branch.Value} /property:GitHash={await hash.Value}";
 
-Target("restore:npm", () => RunAsync("cmd.exe", $"/C npm ci"));
+Target("restore:yarn", () => RunAsync("cmd.exe", $"/C yarn install"));
 Target("restore:dotnet", () => RunAsync("dotnet", $"restore {sln}"));
-Target("restore", DependsOn("restore:npm", "restore:dotnet"));
+Target("restore", DependsOn("restore:yarn", "restore:dotnet"));
 
-Target("build:npm", () => RunAsync("cmd.exe", $"/C npm run build"));
+Target("build:yarn", () => RunAsync("cmd.exe", $"/C yarn build"));
 Target("build:dotnet", DependsOn("restore:dotnet"), async () => await RunAsync("dotnet", $"build {sln} --no-restore {await assemblyProperties()}"));
-Target("build", DependsOn("restore", "build:npm", "build:dotnet"));
+Target("build", DependsOn("restore", "build:yarn", "build:dotnet"));
 
 
 var connectionString = Environment.GetEnvironmentVariable("XENIAL_DEFAULTCONNECTIONSTRING");
