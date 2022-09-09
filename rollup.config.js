@@ -1,6 +1,5 @@
 import fg from "fast-glob";
 
-// import nodePolyfills from 'rollup-plugin-polyfill-node';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { brotliCompressSync } from "zlib";
 import commonjs from "@rollup/plugin-commonjs";
@@ -42,8 +41,11 @@ export default (commandLineArgs) => {
           output: `src/Xenial.Identity.Components/wwwroot/css/MonacoEdit-bundle.css`,
           outputStyle: debug ? undefined : "compressed",
         }),
-        nodeResolve(),
-        commonjs(),
+        nodeResolve({
+          sourceMap: debug
+        }),
+        commonjs({
+        }),
         babel({
           extensions,
           exclude: "node_modules/**",
