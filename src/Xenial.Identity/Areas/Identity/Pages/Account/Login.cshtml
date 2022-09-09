@@ -10,7 +10,10 @@
     <div class="login-page-tabs">
 
         <input type="radio" id="tab1" name="tab-control" @(Model.SelectedPage == "login" ? "checked" : "")>
-        <input type="radio" id="tab2" name="tab-control" @(Model.SelectedPage == "register" ? "checked" : "")>
+        @if (Model.AllowRegister)
+        {
+            <input type="radio" id="tab2" name="tab-control" @(Model.SelectedPage == "register" ? "checked" : "")>
+        }
         <ul class="login-page-tabs__list">
             <li class="login-page-tabs__list-item" title="@ViewData["Title"]">
                 <label class="login-page-tabs__list-item-label" for="tab1" role="button">

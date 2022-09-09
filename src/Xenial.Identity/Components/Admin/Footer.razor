@@ -1,0 +1,55 @@
+﻿@inject UnitOfWork UOW
+@inject ISnackbar Snackbar
+@page "/Admin2/Footer"
+
+<MudText Typo="Typo.h3" GutterBottom>Footer</MudText>
+
+<MudStack Row="false">
+    <MudSwitch @bind-Checked="@theme.ShowFooter"
+               Label="Show Footer"
+               Color="Color.Secondary" />
+
+    <MudSwitch @bind-Checked="@theme.ShowHearts"
+               Label="Show Hearts"
+               Color="Color.Secondary" />
+
+    <MudSwitch @bind-Checked="@theme.ShowLicenses"
+               Label="Show Licenses"
+               Color="Color.Secondary" />
+
+    <MudSwitch @bind-Checked="@theme.ShowImprint"
+               Label="Show Imprint"
+               Color="Color.Secondary" />
+
+    <MudSwitch @bind-Checked="@theme.ShowTermsOfUse"
+               Label="Show Terms of Use"
+               Color="Color.Secondary" />
+
+    <MudSwitch @bind-Checked="@theme.ShowCopyright"
+               Label="Show Copyright"
+               Color="Color.Secondary" />
+
+    <MudSwitch @bind-Checked="@theme.ShowRuntimeInformation"
+               Label="Show Runtime Information"
+               Color="Color.Secondary" />
+
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Success"
+               OnClick="SaveChanges">Save</MudButton>
+</MudStack>
+
+@code {
+    private XpoThemeSettings theme;
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        theme = UOW.FindObject<XpoThemeSettings>(null);
+    }
+
+    private void SaveChanges()
+    {
+        UOW.CommitChanges();
+        Snackbar.Add("Changes saved successfully", Severity.Success);
+    }
+}

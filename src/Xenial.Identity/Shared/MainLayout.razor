@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @inject IBreakpointService BreakpointService
+@inject NavigationManager NavigationManager
 @implements IAsyncDisposable
 <PageTitle>Blazor Identity Server App</PageTitle>
 
@@ -16,7 +17,9 @@
             <MudIcon Icon="@Icons.Filled.RocketLaunch" Size="Size.Small" />
         }
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+        <MudTooltip Text="Preview Site">
+            <MudIconButton Icon="@Icons.Filled.RemoveRedEye" Href="@NavigationManager.BaseUri" Target="_blank" Color="Color.Inherit" Edge="Edge.End" />
+        </MudTooltip>
     </MudAppBar>
     <MudDrawer @ref="drawer"
                @bind-Open="drawerOpen"

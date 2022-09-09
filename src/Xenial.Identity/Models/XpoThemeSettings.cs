@@ -14,6 +14,13 @@ public class XpoThemeSettings : XpoIdentityBaseObjectString
     public override void AfterConstruction()
     {
         Id = Guid.NewGuid().ToString();
+        ShowFooter = true;
+        ShowHearts = true;
+        ShowImprint = true;
+        ShowLicenses = true;
+        ShowCopyright = true;
+        ShowTermsOfUse = true;
+        ShowRuntimeInformation = true;
         base.AfterConstruction();
     }
 
@@ -32,4 +39,26 @@ public class XpoThemeSettings : XpoIdentityBaseObjectString
 
     private string logoTeaserSecondRow = "";
     public string LogoTeaserSecondRow { get => logoTeaserSecondRow; set => SetPropertyValue(nameof(LogoTeaserSecondRow), ref logoTeaserSecondRow, value); }
+
+
+    private bool showFooter = true;
+    public bool ShowFooter { get => showFooter; set => SetPropertyValue(nameof(ShowFooter), ref showFooter, value); }
+
+    private bool showHearts = true;
+    public bool ShowHearts { get => showHearts; set => SetPropertyValue(nameof(ShowHearts), ref showHearts, value); }
+
+    private bool showLicenses = true;
+    public bool ShowLicenses { get => showLicenses; set => SetPropertyValue(nameof(ShowLicenses), ref showLicenses, value); }
+
+    private bool showImprint = true;
+    public bool ShowImprint { get => showImprint; set => SetPropertyValue(nameof(ShowImprint), ref showImprint, value); }
+
+    private bool showTermsOfUse = true;
+    public bool ShowTermsOfUse { get => showTermsOfUse; set => SetPropertyValue(nameof(ShowTermsOfUse), ref showTermsOfUse, value); }
+
+    private bool showCopyright = true;
+    public bool ShowCopyright { get => showCopyright; set => SetPropertyValue(nameof(ShowCopyright), ref showCopyright, value); }
+
+    private bool showRuntimeInformation = true;
+    public bool ShowRuntimeInformation { get => showRuntimeInformation; set => SetPropertyValue(nameof(ShowRuntimeInformation), ref showRuntimeInformation, value); }
 }
