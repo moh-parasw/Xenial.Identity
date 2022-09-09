@@ -1,5 +1,6 @@
 import fg from "fast-glob";
 
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { brotliCompressSync } from "zlib";
 import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
@@ -9,6 +10,7 @@ import copy from "rollup-plugin-copy";
 import { terser } from "rollup-plugin-terser";
 import gzipPlugin from "rollup-plugin-gzip";
 import monaco from 'rollup-plugin-monaco-editor';
+import postcss from 'rollup-plugin-postcss';
 
 const extensions = [".js", ".ts"];
 
@@ -28,8 +30,8 @@ export default (commandLineArgs) => {
       input: "./client/js/admin.ts",
       output: [
         {
-          file: `src/Xenial.Identity/wwwroot/js/admin.min.js`,
-          format: "iife",
+          dir: `src/Xenial.Identity/wwwroot/js/admin`,
+          format: 'esm',
           plugins: debug ? [] : [terser()],
         },
       ],

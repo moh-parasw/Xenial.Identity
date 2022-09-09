@@ -2,7 +2,7 @@
 import 'notyf/notyf.min.css';
 
 import { xenial } from "@xenial-io/xenial-template";
-import QRCode from "qrcode/build/qrcode";
+import QRCode from "qrcode";
 import { notyf } from "./notify";
 import { MvcGrid } from "./components/mvc-grid-6-2-1/mvc-grid";
 import "./file-upload";
