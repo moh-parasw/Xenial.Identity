@@ -1,5 +1,6 @@
 import fg from "fast-glob";
 
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { brotliCompressSync } from "zlib";
 import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
@@ -23,6 +24,35 @@ export default (commandLineArgs) => {
   const debug = commandLineArgs.configDebug;
 
   return [
+    {
+      input: "./client/js/MonacoEdit.ts",
+      output: [
+        {
+          dir: `src/Xenial.Identity.Components/wwwroot/js/MonacoEdit`,
+          format: 'esm',
+          sourcemap: debug,
+          plugins: debug ? [] : [terser()],
+        },
+      ],
+      external: [],
+      plugins: [
+        resolve({ extensions }),
+        scss({
+          output: `src/Xenial.Identity.Components/wwwroot/css/MonacoEdit-bundle.css`,
+          outputStyle: debug ? undefined : "compressed",
+        }),
+        nodeResolve({
+          sourceMap: debug
+        }),
+        commonjs({
+        }),
+        babel({
+          extensions,
+          exclude: "node_modules/**",
+          babelHelpers: 'bundled'
+        })
+      ]
+    },
     {
       input: "./client/js/index.ts",
       output: [

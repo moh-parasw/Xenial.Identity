@@ -93,7 +93,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                 => CreateMap<InputModel, XenialIdentityUser>().ReverseMap();
         }
 
-        private static readonly IConfigurationProvider mapperConfiguration = new MapperConfiguration(o => o.AddProfile<ModelMapperProfile>());
+        private static readonly AutoMapper.IConfigurationProvider mapperConfiguration = new MapperConfiguration(o => o.AddProfile<ModelMapperProfile>());
 
         public async Task OnPost()
         {

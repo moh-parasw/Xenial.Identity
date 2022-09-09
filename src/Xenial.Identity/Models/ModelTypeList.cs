@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Xenial.Identity.Models
 {
@@ -9,7 +6,8 @@ namespace Xenial.Identity.Models
     {
         public static readonly Type[] ModelTypes = new[]
         {
-            typeof(XpoXeniaIIdentityUser)
+            typeof(XpoXeniaIIdentityUser),
+            typeof(XpoThemeSettings)
         };
     }
 }

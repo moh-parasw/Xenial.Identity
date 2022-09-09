@@ -1,35 +1,61 @@
-﻿<footer class="xenial-footer">
-    <div class="xenial-footer__fineprint">
-        <p class="xenial-footer__fineprint-love">
-            <span>Made with <i class="fas fa-heart green"></i><i class="fas fa-heart red"></i><i class="fas fa-heart egg"></i><i class="fas fa-heart red"></i><i class="fas fa-heart green"></i> in <a href="https://www.google.at/maps/place/Steiermark/@@47.219506,14.3067507,9z/data=!3m1!4b1!4m5!3m4!1s0x476e3578b82d0251:0xd005e47efb227d34!8m2!3d47.3593442!4d14.4699827" target="_blank">Austria</a></span>
-        </p>
-        <ul class="xenial-footer__fineprint-imprint">
-            <li><a href="/license">Licenses</a></li>
-            <li><a href="#">Imprint</a></li>
-        </ul>
-        <p class="xenial-footer__fineprint-terms">
-            Use of this site constitutes acceptance of our
-            <a href="#">Website Terms of Use</a>
-            and
-            <a href="#">Privacy Policy</a>
-            <br />
-            Copyright © 2012-@DateTime.Today.Year Manuel Grundner. All
-            trademarks or registered trademarks are property of their respective
-            owners
-        </p>
-        @{
-            var assembly = typeof(Xenial.Identity.Startup).Assembly;
-            var attributes = assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyMetadataAttribute), false).OfType<System.Reflection.AssemblyMetadataAttribute>().ToList();
-            var siteVersion = GetType().Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false).OfType<System.Reflection.AssemblyInformationalVersionAttribute>().FirstOrDefault()?.InformationalVersion;
-            var siteRepo = attributes.FirstOrDefault(m => m.Key == "RepositoryUrl")?.Value;
-            var gitHash = attributes.FirstOrDefault(m => m.Key == "GitHash")?.Value;
-            var lastUpdate = attributes.FirstOrDefault(m => m.Key == "LastUpdate")?.Value;
-        }
-        <p class="xenial-footer__fineprint-githash" aria-hidden="true">
-            <a href="@siteRepo/commit/@gitHash"
+﻿@using DevExpress.Xpo
+@using Xenial.Identity.Models
+@inject UnitOfWork UOW
+@{
+
+    var settings = UOW.FindObject<XpoThemeSettings>(null);
+
+}
+@if (settings.ShowFooter)
+{
+    <footer class="xenial-footer">
+        <div class="xenial-footer__fineprint">
+            @if (settings.ShowHearts)
+            {
+                <p class="xenial-footer__fineprint-love">
+                    <span>Made with <i class="fas fa-heart green"></i><i class="fas fa-heart red"></i><i class="fas fa-heart egg"></i><i class="fas fa-heart red"></i><i class="fas fa-heart green"></i> in <a href="https://www.google.at/maps/place/Steiermark/@@47.219506,14.3067507,9z/data=!3m1!4b1!4m5!3m4!1s0x476e3578b82d0251:0xd005e47efb227d34!8m2!3d47.3593442!4d14.4699827" target="_blank">Austria</a></span>
+                </p>
+            }
+            <ul class="xenial-footer__fineprint-imprint">
+                @if (settings.ShowLicenses)
+                {
+                    @Html.Raw(settings.LicenceHtml)
+                }
+                @if (settings.ShowImprint)
+                {
+                    @Html.Raw(settings.ImprintHtml)
+                }
+            </ul>
+            @if (settings.ShowTermsOfUse || settings.ShowCopyright)
+            {
+                <p class="xenial-footer__fineprint-terms">
+                    @if (settings.ShowTermsOfUse)
+                    {
+                        @Html.Raw(settings.TermsOfUseHtml)
+                    }
+                    @if (settings.ShowCopyright)
+                    {
+                        @Html.Raw(settings.CopyrightHtml.Replace("{{ year }}", DateTime.Today.Year.ToString()))
+                    }
+                </p>
+            }
+            @{
+                var assembly = typeof(Xenial.Identity.Startup).Assembly;
+                var attributes = assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyMetadataAttribute), false).OfType<System.Reflection.AssemblyMetadataAttribute>().ToList();
+                var siteVersion = GetType().Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false).OfType<System.Reflection.AssemblyInformationalVersionAttribute>().FirstOrDefault()?.InformationalVersion;
+                var siteRepo = attributes.FirstOrDefault(m => m.Key == "RepositoryUrl")?.Value;
+                var gitHash = attributes.FirstOrDefault(m => m.Key == "GitHash")?.Value;
+                var lastUpdate = attributes.FirstOrDefault(m => m.Key == "LastUpdate")?.Value;
+            }
+            @if (settings.ShowRuntimeInformation)
+            {
+                <p class="xenial-footer__fineprint-githash" aria-hidden="true">
+                    <a href="@siteRepo/commit/@gitHash"
                title="Version: '@siteVersion' Last update: '@lastUpdate' Sha: '@gitHash'">
-                @siteVersion - @lastUpdate - @System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription
-            </a>
-        </p>
-    </div>
-</footer>
+                        @siteVersion - @lastUpdate - @System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription
+                    </a>
+                </p>
+            }
+        </div>
+    </footer>
+}

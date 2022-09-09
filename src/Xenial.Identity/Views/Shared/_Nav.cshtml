@@ -1,7 +1,10 @@
-﻿@using Duende.IdentityServer.Extensions
+﻿@using DevExpress.Xpo
+@using Duende.IdentityServer.Extensions
+@using Xenial.Identity.Models
 @inject IAuthorizationService Authorization
 @inject UserManager<XenialIdentityUser> UserManager
 @inject SignInManager<XenialIdentityUser> SignInManager
+@inject UnitOfWork UOW
 
 @{
     string name = null;
@@ -14,6 +17,13 @@
     {
         isLoggedOut = true;
     }
+    var settings = UOW.FindObject<XpoThemeSettings>(null);
+    var logoTeaserFirstRow = string.IsNullOrEmpty(settings.LogoTeaserFirstRow)
+        ? "Manuel Grundner"
+        : settings.LogoTeaserFirstRow;
+    var logoTeaserSecondRow = string.IsNullOrEmpty(settings.LogoTeaserSecondRow)
+        ? "code & consult"
+        : settings.LogoTeaserSecondRow;
 }
 
 <header class="xenial-header">
@@ -27,26 +37,26 @@
            aria-hidden="true" />
     <div class="xenial-header__logo__teaser" aria-hidden="true">
         <a href="/">
-            <img src="./img/logo.svg" />
+            <img src="themes/logo" />
             <span class="xenial-header__logo__teaser__brand-rows">
                 <span class="xenial-header__logo__teaser__brand-first-row">
-                    Manuel Grundner
+                    @logoTeaserFirstRow
                 </span>
                 <span class="xenial-header__logo__teaser__brand-second-row">
-                    code & consult
+                    @logoTeaserSecondRow
                 </span>
             </span>
         </a>
     </div>
     <div class="xenial-header__logo">
         <a href="/">
-            <img src="./img/logo.svg" />
+            <img src="themes/logo" />
             <span class="xenial-header__logo__brand-rows">
                 <span class="xenial-header__logo__brand-first-row">
-                    Manuel Grundner
+                    @logoTeaserFirstRow
                 </span>
                 <span class="xenial-header__logo__brand-second-row">
-                    code & consult
+                    @logoTeaserSecondRow
                 </span>
             </span>
         </a>
@@ -70,6 +80,12 @@
             {
                 @if ((await Authorization.AuthorizeAsync(User, "Administrator")).Succeeded)
                 {
+                    <li>
+                        <a href="~/Admin2">
+                            <i class="fas fa-tools"></i>
+                            Admin Dashboard
+                        </a>
+                    </li>
                     <li>
                         <a asp-area="Admin" asp-page="/Index">
                             <i class="fas fa-tools"></i>
@@ -117,26 +133,3 @@
         </ul>
     </nav>
 </header>
-@* <div class="nav-page">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-
-    <a href="~/" class="navbar-brand">
-    <img src="~/icon.png" class="icon-banner">
-    IdentityServer4
-    </a>
-
-    @if (!string.IsNullOrWhiteSpace(name))
-    {
-    <ul class="navbar-nav mr-auto">
-    <li class="nav-item dropdown">
-    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">@name <b class="caret"></b></a>
-
-    <div class="dropdown-menu">
-    <a class="dropdown-item" asp-action="Logout" asp-controller="Account">Logout</a>
-    </div>
-    </li>
-    </ul>
-    }
-
-    </nav>
-    </div> *@
