@@ -10,8 +10,6 @@ import scss from "rollup-plugin-scss";
 import copy from "rollup-plugin-copy";
 import { terser } from "rollup-plugin-terser";
 import gzipPlugin from "rollup-plugin-gzip";
-import monaco from 'rollup-plugin-monaco-editor';
-import postcss from 'rollup-plugin-postcss';
 
 const extensions = [".js", ".ts"];
 
@@ -39,29 +37,10 @@ export default (commandLineArgs) => {
       ],
       external: [],
       plugins: [
-        // nodePolyfills({
-        //   include: ["util", "stream", "zlib", "assert", "buffer"]
-        // }),
         resolve({ extensions }),
         scss({
           output: `src/Xenial.Identity.Components/wwwroot/css/MonacoEdit-bundle.css`,
           outputStyle: debug ? undefined : "compressed",
-        }),
-        postcss({
-          url: (asset) => {
-            if (!/\.ttf$/.test(asset.url)) return asset.url;
-            const distPath = path.join(process.cwd(), 'dist');
-            const distFontsPath = path.join(distPath, 'fonts');
-            fs.ensureDirSync(distFontsPath);
-            const targetFontPath = path.join(distFontsPath, asset.pathname);
-            fs.copySync(asset.absolutePath, targetFontPath);
-            const relativePath = path.relative(process.cwd(), targetFontPath);
-            const publicPath = '/';
-            return `${publicPath}${relativePath}`;
-          },
-        }),
-        monaco({
-          languages: ['json', 'html', 'css'],
         }),
         nodeResolve(),
         commonjs(),
