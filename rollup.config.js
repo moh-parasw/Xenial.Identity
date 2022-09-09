@@ -8,6 +8,7 @@ import scss from "rollup-plugin-scss";
 import copy from "rollup-plugin-copy";
 import { terser } from "rollup-plugin-terser";
 import gzipPlugin from "rollup-plugin-gzip";
+import monaco from 'rollup-plugin-monaco-editor';
 
 const extensions = [".js", ".ts"];
 
@@ -35,6 +36,11 @@ export default (commandLineArgs) => {
       external: [],
       plugins: [
         resolve({ extensions }),
+        postcss(),
+        monaco({
+          languages: ['json', 'html', 'css'],
+        }),
+        nodeResolve(),
         commonjs(),
         babel({
           extensions,
@@ -45,6 +51,7 @@ export default (commandLineArgs) => {
           output: `src/Xenial.Identity/wwwroot/css/admin-bundle.css`,
           outputStyle: debug ? undefined : "compressed",
         }),
+
       ]
     },
     {

@@ -11,6 +11,7 @@
 *.sln.docstates
 
 .tye/process_store
+.yarn/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
