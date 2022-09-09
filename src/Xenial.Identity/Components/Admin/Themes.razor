@@ -42,10 +42,10 @@
                   Placeholder="code & consult"
                   Variant="Variant.Outlined" />
 
-    <MudTextField @bind-Value="@customStyleSheet"
-                  Lines="30"
-                  Label="Custom-CSS"
-                  Variant="Variant.Outlined" />
+
+    <MudText Typo="Typo.caption" GutterBottom>Custom-CSS</MudText>
+    <MonacoEdit @bind-Value="@customStyleSheet"
+                Language="CodeLanguage.Css" />
 
     <MudButton Variant="Variant.Filled"
                Color="Color.Success"
