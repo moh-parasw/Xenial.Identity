@@ -42,6 +42,19 @@ public class ThemeController : Controller
         return File(ms, "text/css", false);
     }
 
+    [Route("/themes/favicon")]
+    public async Task<IActionResult> GetFacivon()
+    {
+        var settings = await unitOfWork.FindObjectAsync<XpoThemeSettings>(null);
+        if (settings.CustomFacivon.Length > 0)
+        {
+            return File(settings.CustomFacivon, "image/x-icon", false);
+        }
+        var logo = environment.WebRootFileProvider.GetFileInfo("img/favicon.ico");
+        var fs = logo.CreateReadStream();
+        return File(fs, "image/x-icon", false);
+    }
+
     private static Stream GenerateStreamFromString(string s)
     {
         var stream = new MemoryStream();

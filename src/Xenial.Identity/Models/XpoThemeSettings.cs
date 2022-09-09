@@ -35,10 +35,6 @@ owners.";
         base.AfterConstruction();
     }
 
-    private string copyrightHtml = "";
-    private string termsOfUseHtml = "";
-    private string imprintHtml = "";
-    private string licenceHtml = "";
     private string customCss = "";
     [Size(SizeAttribute.Unlimited)]
     public string CustomCss { get => customCss; set => SetPropertyValue(nameof(CustomCss), ref customCss, value); }
@@ -48,6 +44,14 @@ owners.";
 
     private string customLogoMimeType = "";
     public string CustomLogoMimeType { get => customLogoMimeType; set => SetPropertyValue(nameof(CustomLogoMimeType), ref customLogoMimeType, value); }
+
+
+    private byte[] customFacivon = Array.Empty<byte>();
+    public byte[] CustomFacivon
+    {
+        get => customFacivon;
+        set => SetPropertyValue(nameof(CustomFacivon), ref customFacivon, value);
+    }
 
     private string logoTeaserFirstRow = "";
     public string LogoTeaserFirstRow { get => logoTeaserFirstRow; set => SetPropertyValue(nameof(LogoTeaserFirstRow), ref logoTeaserFirstRow, value); }
@@ -65,7 +69,7 @@ owners.";
     private bool showLicenses = true;
     public bool ShowLicenses { get => showLicenses; set => SetPropertyValue(nameof(ShowLicenses), ref showLicenses, value); }
 
-
+    private string licenceHtml = "";
     [Size(SizeAttribute.Unlimited)]
     public string LicenceHtml
     {
@@ -76,7 +80,7 @@ owners.";
     private bool showImprint = true;
     public bool ShowImprint { get => showImprint; set => SetPropertyValue(nameof(ShowImprint), ref showImprint, value); }
 
-
+    private string imprintHtml = "";
     [Size(SizeAttribute.Unlimited)]
     public string ImprintHtml
     {
@@ -87,6 +91,7 @@ owners.";
     private bool showTermsOfUse = true;
     public bool ShowTermsOfUse { get => showTermsOfUse; set => SetPropertyValue(nameof(ShowTermsOfUse), ref showTermsOfUse, value); }
 
+    private string termsOfUseHtml = "";
     [Size(SizeAttribute.Unlimited)]
     public string TermsOfUseHtml
     {
@@ -97,6 +102,7 @@ owners.";
     private bool showCopyright = true;
     public bool ShowCopyright { get => showCopyright; set => SetPropertyValue(nameof(ShowCopyright), ref showCopyright, value); }
 
+    private string copyrightHtml = "";
     [Size(SizeAttribute.Unlimited)]
     public string CopyrightHtml
     {

@@ -12,10 +12,6 @@
         <MudImage Fluid="true" Src="@imgUrl" />
     </div>
 
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <MudText Color="Color.Error" Typo="Typo.caption">ERROR: @errorMessage</MudText>
-    }
     <InputFile id="logoInput" OnChange="UploadFiles" hidden accept=".jpg, .jpeg, .png, .svg" />
 
     <MudButton HtmlTag="label"
@@ -29,6 +25,31 @@
                Color="Color.Error"
                StartIcon="@Icons.Filled.Delete"
                OnClick="DeleteLogo">Delete Logo</MudButton>
+
+    <MudDivider />
+
+    
+    <MudText Typo="Typo.caption" GutterBottom>Favicon</MudText>
+
+    <div style="display: grid;">
+        <MudImage Src="@faviconUrl" Width="16" />
+        <MudImage Src="@faviconUrl" Width="32" />
+        <MudImage Src="@faviconUrl" Width="64" />
+    </div>
+
+    <InputFile id="faviconInput" OnChange="UploadFavicon" hidden accept=".ico" />
+
+    <MudButton HtmlTag="label"
+               Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Filled.CloudUpload"
+               for="faviconInput">
+        Upload Favicon
+    </MudButton>
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Error"
+               StartIcon="@Icons.Filled.Delete"
+               OnClick="DeleteFavicon">Delete Favicon</MudButton>
 
     <MudDivider />
 
@@ -56,7 +77,7 @@
     private Random rng = new Random();
     private int imageRand = 0;
     private string imgUrl => $"./themes/logo?{imageRand}";
-    private string errorMessage = "";
+    private string faviconUrl => $"./themes/favicon?{imageRand}";
     private string customStyleSheet;
     private string logoTeaserFirstRow;
     private string logoTeaserSecondRow;
@@ -75,7 +96,6 @@
     {
         try
         {
-            errorMessage = "";
             var theme = UOW.FindObject<XpoThemeSettings>(null);
             theme.CustomLogoMimeType = e.File.ContentType;
             using var reader = e.File.OpenReadStream();
@@ -89,7 +109,27 @@
         }
         catch (Exception ex)
         {
-            errorMessage = ex.Message;
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+    private async Task UploadFavicon(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var theme = UOW.FindObject<XpoThemeSettings>(null);
+            using var reader = e.File.OpenReadStream();
+            using var ms = new MemoryStream();
+            await reader.CopyToAsync(ms);
+            theme.CustomFacivon = ms.ToArray();
+            await UOW.CommitChangesAsync();
+            StateHasChanged();
+            Snackbar.Add("Changes saved successfully", Severity.Success);
+            UpdateImage();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
         }
     }
 
@@ -98,10 +138,19 @@
 
     private async Task DeleteLogo()
     {
-        errorMessage = "";
         var theme = UOW.FindObject<XpoThemeSettings>(null);
         theme.CustomLogoMimeType = "";
         theme.CustomLogo = Array.Empty<byte>();
+        await UOW.CommitChangesAsync();
+        StateHasChanged();
+        Snackbar.Add("Changes saved successfully", Severity.Success);
+        UpdateImage();
+    }
+
+    private async Task DeleteFavicon()
+    {
+        var theme = UOW.FindObject<XpoThemeSettings>(null);
+        theme.CustomFacivon = Array.Empty<byte>();
         await UOW.CommitChangesAsync();
         StateHasChanged();
         Snackbar.Add("Changes saved successfully", Severity.Success);
