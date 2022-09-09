@@ -32,6 +32,16 @@
 
     <MudDivider />
 
+    <MudTextField @bind-Value="@logoTeaserFirstRow"
+                  Label="Logo Teaser Row 1"
+                  Placeholder="Manuel Grundner"
+                  Variant="Variant.Outlined" />
+
+    <MudTextField @bind-Value="@logoTeaserSecondRow"
+                  Label="Logo Teaser Row 2"
+                  Placeholder="code & consult"
+                  Variant="Variant.Outlined" />
+
     <MudTextField @bind-Value="@customStyleSheet"
                   Lines="30"
                   Label="Custom-CSS"
@@ -48,6 +58,8 @@
     private string imgUrl => $"./themes/logo?{imageRand}";
     private string errorMessage = "";
     private string customStyleSheet;
+    private string logoTeaserFirstRow;
+    private string logoTeaserSecondRow;
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,6 +67,8 @@
 
         var theme = UOW.FindObject<XpoThemeSettings>(null);
         customStyleSheet = theme.CustomCss;
+        logoTeaserFirstRow = theme.LogoTeaserFirstRow;
+        logoTeaserSecondRow = theme.LogoTeaserSecondRow;
     }
 
     private async Task UploadFiles(InputFileChangeEventArgs e)
@@ -98,6 +112,8 @@
     {
         var theme = UOW.FindObject<XpoThemeSettings>(null);
         theme.CustomCss = customStyleSheet;
+        theme.LogoTeaserFirstRow = logoTeaserFirstRow;
+        theme.LogoTeaserSecondRow = logoTeaserSecondRow;
         UOW.CommitChanges();
         Snackbar.Add("Changes saved successfully", Severity.Success);
     }

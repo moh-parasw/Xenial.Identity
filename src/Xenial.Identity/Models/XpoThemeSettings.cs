@@ -26,4 +26,10 @@ public class XpoThemeSettings : XpoIdentityBaseObjectString
 
     private string customLogoMimeType = "";
     public string CustomLogoMimeType { get => customLogoMimeType; set => SetPropertyValue(nameof(CustomLogoMimeType), ref customLogoMimeType, value); }
+
+    private string logoTeaserFirstRow = "";
+    public string LogoTeaserFirstRow { get => logoTeaserFirstRow; set => SetPropertyValue(nameof(LogoTeaserFirstRow), ref logoTeaserFirstRow, value); }
+
+    private string logoTeaserSecondRow = "";
+    public string LogoTeaserSecondRow { get => logoTeaserSecondRow; set => SetPropertyValue(nameof(LogoTeaserSecondRow), ref logoTeaserSecondRow, value); }
 }
