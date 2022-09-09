@@ -2,6 +2,8 @@
 
 <h3>Index</h3>
 
-@code {
+<MonacoEdit @bind-Value="@Code" Language="CodeLanguage.Html" />
 
+@code {
+    public string Code { get; set; } = "<h1>Hello From Monaco</h1>";
 }

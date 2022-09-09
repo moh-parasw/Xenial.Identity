@@ -7,7 +7,7 @@
   "scripts": {
     "build": "rollup -c",
     "debug": "rollup -c --configDebug",
-    "watch": "chokidar client/**/* node_modules/@xenial-io/xenial-template/src/**/* rollup.config.js -d 150 -c \"npm run debug\"",
+    "watch": "chokidar client/**/* rollup.config.js -d 150 -c \"yarn run debug\"",
     "postinstall": "patch-package"
   },
   "repository": {
@@ -46,6 +46,7 @@
     "zlib": "^1.0.5"
   },
   "dependencies": {
+    "@monaco-editor/loader": "^1.3.2",
     "@xenial-io/xenial-template": "0.0.8",
     "@yaireo/tagify": "^3.20.3",
     "copy-to-clipboard": "^3.3.1",

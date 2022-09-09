@@ -1,0 +1,40 @@
+﻿@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+<h3>MonacoEdit</h3>
+
+<div style="min-height: 500px">
+    <div @ref="el" style="height: 500px;"></div>
+</div>
+
+@code {
+    private ElementReference el;
+
+    [Parameter]
+    public string Value { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter]
+    public CodeLanguage Language { get; set; }
+
+    public const string Script = "./_content/Xenial.Identity.Components/js/MonacoEdit/MonacoEdit.js";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            var module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", Script);
+            var lang = Language switch
+            {
+                CodeLanguage.Css => "css",
+                CodeLanguage.Html => "html",
+                CodeLanguage.Json => "json",
+                _ => ""
+            };
+            await module.InvokeVoidAsync("CreateMonacoEditor", el, Value, lang);
+        }
+    }
+}

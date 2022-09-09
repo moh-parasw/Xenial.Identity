@@ -28,11 +28,12 @@ export default (commandLineArgs) => {
 
   return [
     {
-      input: "./client/js/admin.ts",
+      input: "./client/js/MonacoEdit.ts",
       output: [
         {
-          dir: `src/Xenial.Identity/wwwroot/js/admin`,
+          dir: `src/Xenial.Identity.Components/wwwroot/js/MonacoEdit`,
           format: 'esm',
+          sourcemap: debug,
           plugins: debug ? [] : [terser()],
         },
       ],
@@ -43,7 +44,7 @@ export default (commandLineArgs) => {
         // }),
         resolve({ extensions }),
         scss({
-          output: `src/Xenial.Identity/wwwroot/css/admin-bundle.css`,
+          output: `src/Xenial.Identity.Components/wwwroot/css/MonacoEdit-bundle.css`,
           outputStyle: debug ? undefined : "compressed",
         }),
         postcss({
