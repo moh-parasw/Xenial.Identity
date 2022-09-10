@@ -39,11 +39,11 @@
           Class="mb-0"
           Loading="IsLoading">
     <HeaderContent>
-        <MudTh>
+        <MudTh Style="width:0.1%; white-space: nowrap;">
             <MudTableSortLabel T="XenialIdentityUser"
                                SortLabel="@(nameof(XenialIdentityUser.Id))">Id</MudTableSortLabel>
         </MudTh>
-        <MudTh>Icon</MudTh>
+        <MudTh Style="width:0.1%; white-space: nowrap;">Icon</MudTh>
         <MudTh>
             <MudTableSortLabel T="XenialIdentityUser"
                                SortLabel="@(nameof(XenialIdentityUser.UserName))">Username</MudTableSortLabel>
@@ -60,7 +60,8 @@
             <MudTableSortLabel T="XenialIdentityUser"
                                SortLabel="@(nameof(XenialIdentityUser.Email))">Email</MudTableSortLabel>
         </MudTh>
-        <MudTh>
+        <MudTh Style="width:0.1%; white-space: nowrap;">
+
         </MudTh>
         @*<MudTh><MudTableSortLabel SortLabel="sign_field" T="Element">Sign</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortLabel="name_field" T="Element">Name</MudTableSortLabel></MudTh>
@@ -68,13 +69,28 @@
         <MudTh><MudTableSortLabel SortLabel="mass_field" T="Element">Molar mass</MudTableSortLabel></MudTh>*@
     </HeaderContent>
     <RowTemplate>
-        <MudTd Style="width:0.1%; white-space: nowrap;" DataLabel="@(nameof(XenialIdentityUser.Id))"><i class="fa fa-fingerprint cursor-pointer" onclick="@(async () => await CopyToClipboard(context.Id))" title="@context.Id"></i></MudTd>
-        <MudTd Style="width:0.1%; white-space: nowrap;">@((MarkupString)UserImageTag(context))</MudTd>
+        <MudTd DataLabel="@(nameof(XenialIdentityUser.Id))"><i class="fa fa-fingerprint cursor-pointer" onclick="@(async () => await CopyToClipboard(context.Id))" title="@context.Id"></i></MudTd>
+        <MudTd DataLabel="@(nameof(XenialIdentityUser.Picture))">@((MarkupString)UserImageTag(context))</MudTd>
             <MudTd DataLabel="@(nameof(context.UserName))">@context.UserName</MudTd>
             <MudTd DataLabel="@(nameof(context.FirstName))">@context.FirstName</MudTd>
             <MudTd DataLabel="@(nameof(context.LastName))">@context.LastName</MudTd>
             <MudTd DataLabel="@(nameof(context.Email))">@context.Email</MudTd>
-            <MudTd Style="width:0.1%; white-space: nowrap;"></MudTd>
+            <MudTd>
+                <MudStack Row>
+                    <MudTooltip Text="Delete">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Error"
+                                   Size="Size.Small" />
+                    </MudTooltip>
+                    <MudTooltip Text="Edit">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Size="Size.Small" />
+                    </MudTooltip>
+                </MudStack>
+            </MudTd>
         </RowTemplate>
 
     </MudTable>
