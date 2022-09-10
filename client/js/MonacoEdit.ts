@@ -15,6 +15,7 @@ export async function CreateMonacoEditor(component: DotNet.DotNetObject, el: HTM
             minimap: {
                 enabled: false
             },
+            automaticLayout: true
         });
         editors.set(el, edit);
         edit.onKeyUp(async _ => {
