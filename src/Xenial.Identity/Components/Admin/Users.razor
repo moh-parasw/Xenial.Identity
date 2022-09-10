@@ -1,4 +1,5 @@
 ﻿@page "/Admin2/Users"
+@using DevExpress.Data.Filtering
 @using Microsoft.AspNetCore.Identity
 @using Xenial.Identity.Areas.Identity.Pages.Account.Manage
 @using Xenial.Identity.Data
@@ -12,8 +13,23 @@
     <MudToolBar Dense>
         @if (total.HasValue)
         {
-            <MudText Typo="Typo.caption">Total: @total.Value</MudText>
+            <MudText Class="mr-2"
+                 Typo="Typo.caption">Total: @total.Value</MudText>
         }
+        <MudTextField Immediate
+                      Clearable
+                      DebounceInterval="200"
+                      Value="@search"
+                      ValueChanged="@(async (string s) => await SearchChanged(s))"
+                      Label="Search"
+                      Variant="Variant.Outlined"
+                      Adornment="Adornment.End"
+                      Margin="Margin.Dense"
+                      IconSize="Size.Small"
+                      AdornmentIcon="@Icons.Filled.Search"
+                      AdornmentColor="Color.Secondary"
+                      Style="width: 200px" />
+
         <MudSpacer />
         <MudTooltip Text="Add">
             <MudIconButton Icon="@Icons.Filled.Add"
@@ -27,7 +43,6 @@
         </MudTooltip>
     </MudToolBar>
 </MudPaper>
-
 <MudTable @ref="table"
           T="XenialIdentityUser"
           Dense
@@ -63,18 +78,22 @@
         <MudTh Style="width:0.1%; white-space: nowrap;">
 
         </MudTh>
-        @*<MudTh><MudTableSortLabel SortLabel="sign_field" T="Element">Sign</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="name_field" T="Element">Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="position_field" T="Element">Position</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="mass_field" T="Element">Molar mass</MudTableSortLabel></MudTh>*@
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="@(nameof(XenialIdentityUser.Id))"><i class="fa fa-fingerprint cursor-pointer" onclick="@(async () => await CopyToClipboard(context.Id))" title="@context.Id"></i></MudTd>
         <MudTd DataLabel="@(nameof(XenialIdentityUser.Picture))">@((MarkupString)UserImageTag(context))</MudTd>
-            <MudTd DataLabel="@(nameof(context.UserName))">@context.UserName</MudTd>
-            <MudTd DataLabel="@(nameof(context.FirstName))">@context.FirstName</MudTd>
-            <MudTd DataLabel="@(nameof(context.LastName))">@context.LastName</MudTd>
-            <MudTd DataLabel="@(nameof(context.Email))">@context.Email</MudTd>
+            <MudTd DataLabel="@(nameof(context.UserName))">
+                <MudHighlighter Text="@context.UserName" HighlightedText="@search" />
+            </MudTd>
+            <MudTd DataLabel="@(nameof(context.FirstName))">
+                <MudHighlighter Text="@context.FirstName" HighlightedText="@search" />
+            </MudTd>
+            <MudTd DataLabel="@(nameof(context.LastName))">
+                <MudHighlighter Text="@context.LastName" HighlightedText="@search" />
+            </MudTd>
+            <MudTd DataLabel="@(nameof(context.Email))">
+                <MudHighlighter Text="@context.Email" HighlightedText="@search" />
+            </MudTd>
             <MudTd>
                 <MudStack Row>
                     <MudTooltip Text="Delete">
@@ -92,16 +111,18 @@
                 </MudStack>
             </MudTd>
         </RowTemplate>
-
     </MudTable>
 
     @code {
+    private string search;
     private int? total;
     private MudTable<XenialIdentityUser> table;
     private bool IsLoading = true;
-    protected override async Task OnInitializedAsync()
+
+    private async Task SearchChanged(string search)
     {
-        await base.OnInitializedAsync();
+        this.search = search;
+        await table.ReloadServerData();
     }
 
     private async Task CopyToClipboard(string content)
@@ -117,6 +138,17 @@
             total = await userManager.Users.CountAsync();
             var items = userManager.Users;
 
+            if (!string.IsNullOrEmpty(search))
+            {
+                var s = search.ToLowerInvariant();
+                items = items.Where(i =>
+                    i.FirstName.ToLower().Contains(s)
+                    || i.LastName.ToLower().Contains(s)
+                    || i.Email.ToLower().Contains(s)
+                    || i.LastName.ToLower().Contains(s)
+                );
+            }
+            
             if (!string.IsNullOrEmpty(state.SortLabel))
             {
                 items = state.SortLabel switch
