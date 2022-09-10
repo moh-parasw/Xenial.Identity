@@ -52,7 +52,9 @@
           Virtualize="true"
           Height="calc(100vh - 17em)"
           Class="mb-0"
-          Loading="IsLoading">
+          Loading="IsLoading"
+          RowClassFunc="SelectedRowClassFunc"
+          OnRowClick="RowClickEvent">
     <HeaderContent>
         <MudTh Style="width:0.1%; white-space: nowrap;">
             <MudTableSortLabel T="XenialIdentityUser"
@@ -114,6 +116,27 @@
     </MudTable>
 
     @code {
+
+    private XenialIdentityUser HighlightedValue;
+
+    private string SelectedRowClassFunc(XenialIdentityUser element, int rowNumber)
+    {
+        if (table is null)
+        {
+            return "";
+        }
+        if (EqualityComparer<XenialIdentityUser>.Default.Equals(HighlightedValue, element))
+        {
+            return "mud-selected-item mud-primary-hover";
+        }
+        return "";
+    }
+
+    private void RowClickEvent(TableRowClickEventArgs<XenialIdentityUser> e)
+    {
+        HighlightedValue = e.Item;
+    }
+
     private string search;
     private int? total;
     private MudTable<XenialIdentityUser> table;
