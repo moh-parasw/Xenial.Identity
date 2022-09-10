@@ -1,12 +1,17 @@
 ﻿@using Microsoft.JSInterop
+@using MudBlazor.Utilities
 @inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
-<div style="@($"min-height: {Height}; min-width: {Width};")">
+<div class="@classes" style="@($"--editor-height: {Height}; min-width: {Width};")">
     <div @ref="el" style="@($"height: {Height}; width: {Width};")"></div>
 </div>
 
 @code {
+    private string classes => new CssBuilder("code-editor")
+            .AddClass("show-code", Visible)
+            .Build();
+
     private ElementReference el;
     private IJSObjectReference? module;
     private DotNetObjectReference<MonacoEdit>? component;
@@ -25,6 +30,9 @@
 
     [Parameter]
     public string Width { get; set; } = "100%";
+
+    [Parameter]
+    public bool Visible { get; set; } = true;
 
     public const string Script = "./_content/Xenial.Identity.Components/js/MonacoEdit/MonacoEdit.js";
 

@@ -59,6 +59,11 @@ try
             unitOfWork.Save(new XpoThemeSettings(unitOfWork));
             unitOfWork.CommitChanges();
         }
+        if (unitOfWork.FindObject<XpoApplicationSettings>(null) is null)
+        {
+            unitOfWork.Save(new XpoApplicationSettings(unitOfWork));
+            unitOfWork.CommitChanges();
+        }
     }
 
     Log.Information("Update Done");

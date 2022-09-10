@@ -1,0 +1,55 @@
+﻿@inject ISnackbar Snackbar
+@inject UnitOfWork UOW
+@page "/Admin2/AppSettings"
+
+<MudText Typo="Typo.h3" GutterBottom>Application Settings</MudText>
+
+<MudStack Row="false">
+
+    <MudSwitch @bind-Checked="@settings.AllowRegister"
+               Label="Allow Register"
+               Color="Color.Secondary" />
+
+    <MudDivider />
+
+    <MudText Typo="Typo.h6" GutterBottom>External Providers</MudText>
+
+    <MudSwitch @bind-Checked="@settings.AllowExternalProviders"
+               Label="Allow External Providers"
+               Color="Color.Secondary" />
+
+    @if (settings.AllowExternalProviders)
+    {
+        <MudSwitch @bind-Checked="@settings.AllowGithub"
+               Label="Allow Github"
+               Color="Color.Secondary" />
+    }
+
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Success"
+               OnClick="SaveChanges">Save</MudButton>
+
+</MudStack>
+@code {
+    private XpoApplicationSettings settings;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        settings = UOW.FindObject<XpoApplicationSettings>(null);
+    }
+
+    private void SaveChanges()
+    {
+        try
+        {
+            UOW.CommitChanges();
+            Snackbar.Add("Changes saved successfully", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"<ul><li>Could not save changes</li><li>{ex.Message}</li></ul>", Severity.Error);
+        }
+    }
+}

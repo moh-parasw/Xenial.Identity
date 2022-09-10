@@ -16,6 +16,7 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using DevExpress.Xpo;
 using Microsoft.Extensions.Configuration;
+using Xenial.Identity.Models;
 
 namespace Xenial.Identity.Areas.Identity.Pages.Account
 {
@@ -34,7 +35,8 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
             UserManager<XenialIdentityUser> userManager,
             RoleManager<IdentityRole> roleManager,
             IEmailSender emailSender,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            UnitOfWork uow)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
@@ -42,10 +44,15 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
             this.logger = logger;
             this.emailSender = emailSender;
             this.configuration = configuration;
-            AllowRegister = this.configuration.GetValue<bool>("Identity:AllowNew");
+            var settings = uow.FindObject<XpoApplicationSettings>(null);
+            AllowRegister = settings.AllowRegister;
+            AllowExternalProviders = settings.AllowExternalProviders;
+            AllowGithub = settings.AllowGithub;
         }
 
         public readonly bool AllowRegister = true;
+        public readonly bool AllowExternalProviders = true;
+        public readonly bool AllowGithub = true;
 
         [BindProperty]
         public LoginInputModel LoginInput { get; set; }
@@ -109,6 +116,13 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            if(!AllowGithub)
+            {
+                ExternalLogins = ExternalLogins
+                    .Where(x => !"github".Equals(x.Name, StringComparison.InvariantCultureIgnoreCase))
+                    .ToList();
+            }
 
             ReturnUrl = returnUrl;
         }

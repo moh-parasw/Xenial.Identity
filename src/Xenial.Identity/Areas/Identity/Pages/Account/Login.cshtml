@@ -36,19 +36,22 @@
         <div class="login-page-tabs__content">
             <section class="login-form">
                 <h2>Login</h2>
-                @if (Model.ExternalLogins.Any())
+                @if (Model.AllowExternalProviders)
                 {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <ul class="login-page__providers">
-                            @foreach (var provider in Model.ExternalLogins)
-                            {
-                                <li class="login-page__providers-item">
-                                    <button type="submit" class="login-page__providers-item-button @provider.Name.ToLower()" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                </li>
-                            }
-                        </ul>
-                    </form>
-                    <span class="login-page-or">or</span>
+                    @if (Model.ExternalLogins.Any())
+                    {
+                        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                            <ul class="login-page__providers">
+                                @foreach (var provider in Model.ExternalLogins)
+                                {
+                                    <li class="login-page__providers-item">
+                                        <button type="submit" class="login-page__providers-item-button @provider.Name.ToLower()" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                                    </li>
+                                }
+                            </ul>
+                        </form>
+                        <span class="login-page-or">or</span>
+                    }
                 }
 
                 <form method="post" class="xenial-form" asp-page-handler="login">

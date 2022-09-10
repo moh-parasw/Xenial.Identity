@@ -1,0 +1,11 @@
+﻿.code-editor {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.15s ease-out;
+}
+
+  .code-editor.show-code {
+    overflow: auto;
+    max-height: var(--editor-height, 500px);
+    transition: max-height 0.25s ease-in;
+  }

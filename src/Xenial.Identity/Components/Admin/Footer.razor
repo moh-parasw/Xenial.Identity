@@ -8,6 +8,7 @@
     <MudSwitch @bind-Checked="@theme.ShowFooter"
                Label="Show Footer"
                Color="Color.Secondary" />
+
     @if (theme.ShowFooter)
     {
         <MudSwitch @bind-Checked="@theme.ShowHearts"
@@ -18,45 +19,37 @@
                Label="Show Licenses"
                Color="Color.Secondary" />
 
-        @if (theme.ShowLicenses)
-        {
-            <MonacoEdit @bind-Value="@theme.LicenceHtml"
+        <MonacoEdit @bind-Value="@theme.LicenceHtml"
                 Height="200px"
-                Language="CodeLanguage.Html" />
-        }
+                Language="CodeLanguage.Html"
+                Visible="@theme.ShowLicenses" />
 
         <MudSwitch @bind-Checked="@theme.ShowImprint"
                Label="Show Imprint"
                Color="Color.Secondary" />
 
-        @if (theme.ShowImprint)
-        {
-            <MonacoEdit @bind-Value="@theme.ImprintHtml"
+        <MonacoEdit @bind-Value="@theme.ImprintHtml"
                 Height="200px"
-                Language="CodeLanguage.Html" />
-        }
+                Language="CodeLanguage.Html"
+                Visible="@theme.ShowImprint" />
 
         <MudSwitch @bind-Checked="@theme.ShowTermsOfUse"
                Label="Show Terms of Use"
                Color="Color.Secondary" />
 
-        @if (theme.ShowTermsOfUse)
-        {
-            <MonacoEdit @bind-Value="@theme.TermsOfUseHtml"
+        <MonacoEdit @bind-Value="@theme.TermsOfUseHtml"
                 Height="200px"
-                Language="CodeLanguage.Html" />
-        }
+                Language="CodeLanguage.Html"
+                Visible="@theme.ShowTermsOfUse" />
 
         <MudSwitch @bind-Checked="@theme.ShowCopyright"
                Label="Show Copyright"
                Color="Color.Secondary" />
 
-        @if (theme.ShowCopyright)
-        {
-            <MonacoEdit @bind-Value="@theme.CopyrightHtml"
+        <MonacoEdit @bind-Value="@theme.CopyrightHtml"
                 Height="200px"
-                Language="CodeLanguage.Html" />
-        }
+                Language="CodeLanguage.Html"
+                Visible="@theme.ShowCopyright" />
 
         <MudSwitch @bind-Checked="@theme.ShowRuntimeInformation"
                Label="Show Runtime Information"
@@ -70,6 +63,7 @@
 
 @code {
     private XpoThemeSettings theme;
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -79,7 +73,14 @@
 
     private void SaveChanges()
     {
-        UOW.CommitChanges();
-        Snackbar.Add("Changes saved successfully", Severity.Success);
+        try
+        {
+            UOW.CommitChanges();
+            Snackbar.Add("Changes saved successfully", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"<ul><li>Could not save changes</li><li>{ex.Message}</li></ul>", Severity.Error);
+        }
     }
 }

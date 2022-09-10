@@ -7,7 +7,8 @@ namespace Xenial.Identity.Models
         public static readonly Type[] ModelTypes = new[]
         {
             typeof(XpoXeniaIIdentityUser),
-            typeof(XpoThemeSettings)
+            typeof(XpoThemeSettings),
+            typeof(XpoApplicationSettings),
         };
     }
 }
