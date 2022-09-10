@@ -1,0 +1,154 @@
+﻿@page "/Admin2/Users"
+@using Microsoft.AspNetCore.Identity
+@using Xenial.Identity.Areas.Identity.Pages.Account.Manage
+@using Xenial.Identity.Data
+@inject UserManager<XenialIdentityUser> userManager
+@inject IJsApiService JsApiService
+@inject ISnackbar Snackbar
+
+<MudText Typo="Typo.h3" GutterBottom>Users</MudText>
+
+<MudPaper Elevation="10" Class="mb-1" Square>
+    <MudToolBar Dense>
+        @if (total.HasValue)
+        {
+            <MudText Typo="Typo.caption">Total: @total.Value</MudText>
+        }
+        <MudSpacer />
+        <MudTooltip Text="Add">
+            <MudIconButton Icon="@Icons.Filled.Add"
+                           OnClick="@table.ReloadServerData"
+                           Color="Color.Success" />
+        </MudTooltip>
+        <MudTooltip Text="Refresh">
+            <MudIconButton Icon="@Icons.Filled.Refresh"
+                           OnClick="@table.ReloadServerData"
+                           Color="Color.Primary" />
+        </MudTooltip>
+    </MudToolBar>
+</MudPaper>
+
+<MudTable @ref="table"
+          T="XenialIdentityUser"
+          Dense
+          FixedHeader
+          Elevation="10"
+          ServerData="@(new Func<TableState, Task<TableData<XenialIdentityUser>>>(ServerReload))"
+          Virtualize="true"
+          Height="calc(100vh - 17em)"
+          Class="mb-0"
+          Loading="IsLoading">
+    <HeaderContent>
+        <MudTh>
+            <MudTableSortLabel T="XenialIdentityUser"
+                               SortLabel="@(nameof(XenialIdentityUser.Id))">Id</MudTableSortLabel>
+        </MudTh>
+        <MudTh>Icon</MudTh>
+        <MudTh>
+            <MudTableSortLabel T="XenialIdentityUser"
+                               SortLabel="@(nameof(XenialIdentityUser.UserName))">Username</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel T="XenialIdentityUser"
+                               SortLabel="@(nameof(XenialIdentityUser.FirstName))">Firstname</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel T="XenialIdentityUser"
+                               SortLabel="@(nameof(XenialIdentityUser.LastName))">Lastname</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel T="XenialIdentityUser"
+                               SortLabel="@(nameof(XenialIdentityUser.Email))">Email</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+        </MudTh>
+        @*<MudTh><MudTableSortLabel SortLabel="sign_field" T="Element">Sign</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="name_field" T="Element">Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="position_field" T="Element">Position</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="mass_field" T="Element">Molar mass</MudTableSortLabel></MudTh>*@
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd Style="width:0.1%; white-space: nowrap;" DataLabel="@(nameof(XenialIdentityUser.Id))"><i class="fa fa-fingerprint cursor-pointer" onclick="@(async () => await CopyToClipboard(context.Id))" title="@context.Id"></i></MudTd>
+        <MudTd Style="width:0.1%; white-space: nowrap;">@((MarkupString)UserImageTag(context))</MudTd>
+            <MudTd DataLabel="@(nameof(context.UserName))">@context.UserName</MudTd>
+            <MudTd DataLabel="@(nameof(context.FirstName))">@context.FirstName</MudTd>
+            <MudTd DataLabel="@(nameof(context.LastName))">@context.LastName</MudTd>
+            <MudTd DataLabel="@(nameof(context.Email))">@context.Email</MudTd>
+            <MudTd Style="width:0.1%; white-space: nowrap;"></MudTd>
+        </RowTemplate>
+
+    </MudTable>
+
+    @code {
+    private int? total;
+    private MudTable<XenialIdentityUser> table;
+    private bool IsLoading = true;
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    private async Task CopyToClipboard(string content)
+    {
+        await JsApiService.CopyToClipboardAsync(content);
+        Snackbar.Add($"Copied {content} to clipboard!", Severity.Info);
+    }
+
+    private async Task<TableData<XenialIdentityUser>> ServerReload(TableState state)
+    {
+        try
+        {
+            total = await userManager.Users.CountAsync();
+            var items = userManager.Users;
+
+            if (!string.IsNullOrEmpty(state.SortLabel))
+            {
+                items = state.SortLabel switch
+                {
+                    nameof(XenialIdentityUser.Id) => items.OrderByDirection(state.SortDirection, x => x.Id),
+                    nameof(XenialIdentityUser.UserName) => items.OrderByDirection(state.SortDirection, x => x.UserName),
+                    nameof(XenialIdentityUser.FirstName) => items.OrderByDirection(state.SortDirection, x => x.FirstName),
+                    nameof(XenialIdentityUser.LastName) => items.OrderByDirection(state.SortDirection, x => x.LastName),
+                    nameof(XenialIdentityUser.Email) => items.OrderByDirection(state.SortDirection, x => x.Email),
+                    _ => items
+                };
+            }
+
+            var result = await items.Skip(state.Page * state.PageSize)
+                .Take(state.PageSize)
+                .ToArrayAsync();
+
+            return new TableData<XenialIdentityUser>()
+                {
+                    Items = result,
+                    TotalItems = total.Value
+                };
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    public static string UserImageTag(XenialIdentityUser user)
+    {
+        var model = new ProfilePictureModel(user);
+        var userImageTag = @$"<div class=""profile-card__image"" style=""--profile-card-height: 2.5rem;"">";
+
+        if (model != null && string.IsNullOrEmpty(model.ImageUri) && string.IsNullOrEmpty(model.Inititals))
+        {
+            userImageTag += @$"<i class=""fas fa-user profile-card__image-item""></i>";
+        }
+        else if (model != null && !string.IsNullOrEmpty(model.ImageUri))
+        {
+            userImageTag += @$"<img src=""{model.ImageUri}"" class=""profile-card__image-item"" style="" cursor: auto; width: 100%"" />";
+        }
+        else
+        {
+            userImageTag += @$"<span class=""profile-card__image-initials profile-card__image-item"" style=""--data-forecolor: {model.ForeColor}; --data-backcolor: {model.BackColor};"">{model.Inititals}</span>";
+        }
+        userImageTag += @$"</div>";
+        return userImageTag;
+    }
+}

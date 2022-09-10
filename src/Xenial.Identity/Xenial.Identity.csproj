@@ -27,6 +27,10 @@
     <PackageReference Include="WestWind.AspnetCore.LiveReload" Version="0.3.6" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.7" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.7" />
+    <PackageReference Include="Spectre.Console" Version="0.44.0" />
+    <PackageReference Include="Spectre.Console.Analyzer" Version="0.44.0" />
+    <PackageReference Include="TextMateSharp" Version="1.0.41" />
+    <PackageReference Include="TextMateSharp.Grammars" Version="1.0.41" />
   </ItemGroup>
 
   <ItemGroup>

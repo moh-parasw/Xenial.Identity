@@ -19,6 +19,8 @@ using Xenial.Identity.Models;
 SQLiteConnectionProvider.Register();
 MySqlConnectionProvider.Register();
 
+DevExpress.Xpo.Logger.LogManager.SetTransport(new XpoConsoleLogger());
+
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
