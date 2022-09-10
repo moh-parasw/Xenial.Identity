@@ -115,25 +115,36 @@
         </RowTemplate>
     </MudTable>
 
-
+    @if (HighlightedValue is not null)
+{
     <MudDrawer @bind-Open="@openDrawer" Width="400px" Height="100%" Anchor="@Anchor.End" Elevation="1" Variant="@DrawerVariant.Temporary">
         <MudDrawerHeader>
-            <MudStack Row Style="width: 100%">
-                <MudText Typo="Typo.h6">User</MudText>
+            <MudStack Row Style="width: 100%; align-items: center; justify-content: center;">
+                @((MarkupString)UserImageTag(HighlightedValue))
+                <MudText Typo="Typo.h6">@HighlightedValue.DisplayName</MudText>
                 <MudSpacer />
                 <MudIcon Icon="@Icons.Filled.Close"
                      Class="cursor-pointer"
                      onclick="@CloseDrawer" />
             </MudStack>
         </MudDrawerHeader>
-        <MudNavMenu>
-            <MudStack Class="px-2">
-                <MudField Label="Username"
-                      Variant="Variant.Text">@HighlightedValue?.UserName</MudField>
-            </MudStack>
-        </MudNavMenu>
+        <MudStack Class="px-2">
+            <MudField Label="Username"
+                  Variant="Variant.Text">@HighlightedValue.UserName</MudField>
+            <MudField Label="Firstname"
+                  Variant="Variant.Text">@HighlightedValue.FirstName</MudField>
+            <MudField Label="Lastname"
+                  Variant="Variant.Text">@HighlightedValue.LastName</MudField>
+            <MudField Label="Email"
+                  Variant="Variant.Text">@HighlightedValue.Email</MudField>
+            <MudField Label="PhoneNumber"
+                  Variant="Variant.Text">@HighlightedValue.PhoneNumber</MudField>
+            <MudText Typo="Typo.caption">Claims</MudText>
+            <UserClaimsSmall User="@HighlightedValue" />
+        </MudStack>
     </MudDrawer>
-    @code {
+}
+@code {
     bool openDrawer;
     private XenialIdentityUser HighlightedValue;
 

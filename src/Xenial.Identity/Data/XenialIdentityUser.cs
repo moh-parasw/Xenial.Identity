@@ -10,6 +10,11 @@ namespace Xenial.Identity.Data
         public string FullName { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+
+        public string DisplayName => string.IsNullOrWhiteSpace($"{FirstName} {LastName}")
+            ? UserName
+            : $"{FirstName} {LastName}";
+
         public string Color { get; set; }
         public string Initials { get; set; }
 

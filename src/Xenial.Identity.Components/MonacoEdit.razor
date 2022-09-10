@@ -29,10 +29,28 @@
     public string Height { get; set; } = "500px";
 
     [Parameter]
+    public EventCallback<string> HeightChanged { get; set; }
+
+    [Parameter]
     public string Width { get; set; } = "100%";
 
     [Parameter]
     public bool Visible { get; set; } = true;
+
+    [Parameter]
+    public bool Formatted { get; set; }
+
+    [Parameter]
+    public bool NoLineNumbers { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    [Parameter]
+    public bool Folding { get; set; } = false;
+
+    [Parameter]
+    public bool AdjustHeightToContent { get; set; } = false;
 
     public const string Script = "./_content/Xenial.Identity.Components/js/MonacoEdit/MonacoEdit.js";
 
@@ -51,7 +69,24 @@
                 CodeLanguage.Json => "json",
                 _ => ""
             };
-            await module.InvokeVoidAsync("CreateMonacoEditor", component, el, Value, lang);
+
+            var options = new
+            {
+                lineNumbers = !NoLineNumbers,
+                @readonly = ReadOnly,
+                formatted = Formatted,
+                folding = Folding,
+                adjustHeightToContent = AdjustHeightToContent
+            };
+
+            await module.InvokeVoidAsync("CreateMonacoEditor", component, el, Value, lang, options);
+        }
+        else
+        {
+            if (module is not null && component is not null)
+            {
+                await module.InvokeVoidAsync("UpdateOptions", component, el);
+            }
         }
     }
 
@@ -60,6 +95,14 @@
     {
         Value = value;
         await ValueChanged.InvokeAsync(value);
+    }
+
+    [JSInvokable]
+    public async Task SetHeight(string height)
+    {
+        Height = height;
+        await HeightChanged.InvokeAsync(height);
+        StateHasChanged();
     }
 
     public async ValueTask DisposeAsync()

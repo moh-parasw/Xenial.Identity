@@ -1,0 +1,63 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@using Xenial.Identity.Data
+@inject UserManager<XenialIdentityUser> UserManager
+@if (claims.Any())
+{
+    <MudSimpleTable Dense>
+        <thead>
+            <tr>
+                <th>Claim</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var claim in claims)
+            {
+                @if (claim.Value?.StartsWith("{") ?? false)
+                {
+                    <tr>
+                        <td colspan="2">@claim.Type</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="pa-0">
+                            <MonacoEdit Value="@claim.Value"
+                            Formatted
+                            NoLineNumbers
+                            ReadOnly
+                            AdjustHeightToContent
+                            Height="100px"
+                            Width="calc(100% - .1px)"
+                            Language="@CodeLanguage.Json" />
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td>@claim.Type</td>
+                        <td>@claim.Value</td>
+                    </tr>
+                }
+
+            }
+        </tbody>
+    </MudSimpleTable>
+}
+else
+{
+    <MudText Typo="Typo.body2">No Claims</MudText>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public XenialIdentityUser User { get; set; }
+
+    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        claims = await UserManager.GetClaimsAsync(User);
+    }
+}
