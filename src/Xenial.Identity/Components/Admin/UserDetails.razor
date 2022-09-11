@@ -67,7 +67,7 @@
 
                         <MudStack Row>
                             <MudTextField Label="Postalcode"
-                                      Style="100px"
+                                      Style="width: 100px"
                                       Variant="Variant.Filled"
                                       Margin="Margin.Dense"
                                       Class="flex-grow-0"
@@ -98,7 +98,9 @@
                                   Margin="Margin.Dense"
                                   @bind-Value="@User.Initials" />
 
-                        <MudColorPicker DisableToolbar="false"
+                        <MudColorPicker Label="Color"
+                                    Variant="Variant.Filled"
+                                    DisableToolbar="false"
                                     DisableAlpha="true"
                                     DisableColorField="false"
                                     DisablePreview="false"
@@ -108,13 +110,13 @@
                                     ColorPickerMode="ColorPickerMode.RGB"
                                     PickerVariant="PickerVariant.Dialog"
                                     Value="@color"
-                                    ValueChanged="ColorChanged"/>
+                                    ValueChanged="ColorChanged" />
 
                     </MudStack>
                 </MudTabPanel>
-                 <MudTabPanel Text="Claims" Icon="@Icons.Filled.Class">
-                     <UserClaimsSmall User="@User" AllowEdit />
-                 </MudTabPanel>
+                <MudTabPanel Text="Claims" Icon="@Icons.Filled.Class">
+                    <UserClaimsSmall User="@User" AllowEdit />
+                </MudTabPanel>
             </MudTabs>
 
             <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="async () => await SaveUser()">Save</MudButton>
