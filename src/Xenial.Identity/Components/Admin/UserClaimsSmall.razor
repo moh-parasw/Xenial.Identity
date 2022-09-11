@@ -2,6 +2,9 @@
 @using System.Security.Claims
 @using Xenial.Identity.Data
 @inject UserManager<XenialIdentityUser> UserManager
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
 @if (claims.Any())
 {
     <MudSimpleTable Dense>
@@ -38,7 +41,8 @@
                                         <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                        Variant="Variant.Filled"
                                        Color="Color.Error"
-                                       Size="Size.Small" />
+                                       Size="Size.Small"
+                                       OnClick="async () => await DeleteClaim(claim)" />
                                     </MudTooltip>
                                     <MudTooltip Text="Edit">
                                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
@@ -77,7 +81,8 @@
                                         <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                        Variant="Variant.Filled"
                                        Color="Color.Error"
-                                       Size="Size.Small" />
+                                       Size="Size.Small"
+                                       OnClick="async () => await DeleteClaim(claim)" />
                                     </MudTooltip>
                                     <MudTooltip Text="Edit">
                                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
@@ -112,18 +117,40 @@ else
     <MudText Typo="Typo.body2">No Claims</MudText>
 }
 
+
+<MudMessageBox @ref="mbox" Title="Delete Claim" CancelText="Cancel">
+    <MessageContent>
+        <ul>
+            <li>
+                Do your really want to delete the claim?
+            </li>
+            <li style="overflow: hidden">
+                @if (currentClaim is not null)
+                {
+                    <ClaimDisplay Claim="@currentClaim" />
+                }
+            </li>
+            <li>
+                <strong>This operation can <em>not</em> be undone!</strong>
+            </li>
+        </ul>
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Delete Claim</MudButton>
+    </YesButton>
+</MudMessageBox>
+
 @code {
+    private MudMessageBox mbox;
     [Parameter, EditorRequired]
     public XenialIdentityUser User { get; set; }
+
+    private Claim currentClaim;
 
     [Parameter]
     public bool AllowEdit { get; set; }
 
     private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
 
-    protected override async Task OnParametersSetAsync()
-    {
-        await base.OnParametersSetAsync();
-        claims = await UserManager.GetClaimsAsync(User);
-    }
+
 }

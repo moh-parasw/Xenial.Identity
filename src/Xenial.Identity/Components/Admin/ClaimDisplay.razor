@@ -1,0 +1,26 @@
+﻿@using System.Security.Claims
+
+@if (Claim.Value?.StartsWith("{") ?? false)
+{
+    <MonacoEdit Value="@Claim.Value"
+            Formatted
+            NoLineNumbers
+            ReadOnly
+            AdjustHeightToContent
+            Height="100px"
+            Width="calc(100% - .1px)"
+            Language="@CodeLanguage.Json" />
+}
+else if ((Claim.Value?.StartsWith("https://") ?? false) || (Claim.Value?.StartsWith("http://") ?? false))
+{
+    <MudLink Href="@Claim.Value" Target="_blank">@Claim.Value</MudLink>
+}
+else
+{
+    @Claim?.Value
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public Claim Claim { get; set; }
+}
