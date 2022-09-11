@@ -1,0 +1,28 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Xenial.Identity.Data
+@inject UserManager<XenialIdentityUser> userManager;
+@if (Roles.Count > 0)
+{
+    <MudStack Row>
+        @foreach (var role in Roles)
+        {
+            <MudChip Size="Size.Small" Class="flex-grow-0">@role</MudChip>
+        }
+    </MudStack>
+}
+else
+{
+    <MudText Typo="Typo.body2">No Roles</MudText>
+}
+@code {
+    [Parameter, EditorRequired]
+    public XenialIdentityUser User { get; set; }
+
+    private IList<string> Roles { get; set; } = Array.Empty<string>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        Roles = await userManager.GetRolesAsync(User);
+    }
+}

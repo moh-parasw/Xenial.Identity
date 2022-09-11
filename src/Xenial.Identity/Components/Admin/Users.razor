@@ -50,7 +50,7 @@
           Elevation="10"
           ServerData="@(new Func<TableState, Task<TableData<XenialIdentityUser>>>(ServerReload))"
           Virtualize="true"
-          Height="calc(100vh - 17em)"
+          Height="calc(100vh - 19em)"
           Class="mb-0"
           Loading="IsLoading"
           RowClassFunc="SelectedRowClassFunc"
@@ -113,6 +113,9 @@
                 </MudStack>
             </MudTd>
         </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
     </MudTable>
 
     @if (HighlightedValue is not null)
@@ -139,6 +142,8 @@
                   Variant="Variant.Text">@HighlightedValue.Email</MudField>
             <MudField Label="PhoneNumber"
                   Variant="Variant.Text">@HighlightedValue.PhoneNumber</MudField>
+            <MudText Typo="Typo.caption">Roles</MudText>
+            <UserRolesChips User="@HighlightedValue" />
             <MudText Typo="Typo.caption">Claims</MudText>
             <UserClaimsSmall User="@HighlightedValue" />
         </MudStack>
