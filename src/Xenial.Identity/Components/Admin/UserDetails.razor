@@ -112,6 +112,9 @@
 
                     </MudStack>
                 </MudTabPanel>
+                 <MudTabPanel Text="Claims" Icon="@Icons.Filled.Class">
+                     <UserClaimsSmall User="@User" AllowEdit />
+                 </MudTabPanel>
             </MudTabs>
 
             <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="async () => await SaveUser()">Save</MudButton>

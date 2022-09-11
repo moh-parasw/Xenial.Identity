@@ -7,6 +7,18 @@
     <MudSimpleTable Dense>
         <thead>
             <tr>
+                @if (AllowEdit)
+                {
+                    <th Style="width:0.1%; white-space: nowrap;">
+                        <MudTooltip Text="Add">
+                            <MudIconButton Icon="@Icons.Material.Filled.Add"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Success"
+                                   Size="Size.Small"
+                                   Style="margin-left: 0.8rem;" />
+                        </MudTooltip>
+                    </th>
+                }
                 <th>Claim</th>
                 <th>Value</th>
             </tr>
@@ -17,10 +29,30 @@
                 @if (claim.Value?.StartsWith("{") ?? false)
                 {
                     <tr>
+                        @if (AllowEdit)
+                        {
+                            <td>
+                                <MudStack Row>
+                                    <MudSpacer />
+                                    <MudTooltip Text="Delete">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Error"
+                                       Size="Size.Small" />
+                                    </MudTooltip>
+                                    <MudTooltip Text="Edit">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       Size="Size.Small" />
+                                    </MudTooltip>
+                                </MudStack>
+                            </td>
+                        }
                         <td colspan="2">@claim.Type</td>
                     </tr>
                     <tr>
-                        <td colspan="2" class="pa-0">
+                        <td colspan="@(AllowEdit ? 3 : 2)" class="pa-0">
                             <MonacoEdit Value="@claim.Value"
                             Formatted
                             NoLineNumbers
@@ -30,11 +62,32 @@
                             Width="calc(100% - .1px)"
                             Language="@CodeLanguage.Json" />
                         </td>
+
                     </tr>
                 }
                 else
                 {
                     <tr>
+                        @if (AllowEdit)
+                        {
+                            <td>
+                                <MudStack Row>
+                                    <MudSpacer />
+                                    <MudTooltip Text="Delete">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Error"
+                                       Size="Size.Small" />
+                                    </MudTooltip>
+                                    <MudTooltip Text="Edit">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       Size="Size.Small" />
+                                    </MudTooltip>
+                                </MudStack>
+                            </td>
+                        }
                         <td>@claim.Type</td>
                         <td style="word-break: keep-all; white-space: nowrap;">
                             @if ((claim.Value?.StartsWith("https://") ?? false) || (claim.Value?.StartsWith("http://") ?? false))
@@ -46,6 +99,7 @@
                                 @claim.Value
                             }
                         </td>
+
                     </tr>
                 }
 
@@ -61,6 +115,9 @@ else
 @code {
     [Parameter, EditorRequired]
     public XenialIdentityUser User { get; set; }
+
+    [Parameter]
+    public bool AllowEdit { get; set; }
 
     private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
 
