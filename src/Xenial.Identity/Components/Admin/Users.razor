@@ -3,9 +3,10 @@
 @using Microsoft.AspNetCore.Identity
 @using Xenial.Identity.Areas.Identity.Pages.Account.Manage
 @using Xenial.Identity.Data
-@inject UserManager<XenialIdentityUser> userManager
+@inject UserManager<XenialIdentityUser> UserManager
 @inject IJsApiService JsApiService
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
 <MudText Typo="Typo.h3" GutterBottom>Users</MudText>
 
@@ -102,7 +103,8 @@
                         <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                    Variant="Variant.Filled"
                                    Color="Color.Error"
-                                   Size="Size.Small" />
+                                   Size="Size.Small"
+                                   OnClick="async () => await DeleteUser(context)"/>
                     </MudTooltip>
                     <MudTooltip Text="Edit">
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
@@ -150,6 +152,8 @@
     </MudDrawer>
 }
 @code {
+
+
     bool openDrawer;
     private XenialIdentityUser HighlightedValue;
 
@@ -210,8 +214,8 @@
     {
         try
         {
-            total = await userManager.Users.CountAsync();
-            var items = userManager.Users;
+            total = await UserManager.Users.CountAsync();
+            var items = UserManager.Users;
 
             if (!string.IsNullOrEmpty(search))
             {
