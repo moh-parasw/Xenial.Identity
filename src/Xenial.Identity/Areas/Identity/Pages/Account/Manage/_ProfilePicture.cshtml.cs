@@ -19,6 +19,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
             {
                 BackColor = user.Color;
                 ForeColor = MaterialColorPicker.ColorIsLight(user.Color) ? "var(--xenial-darker-color)" : "var(--xenial-lighter-color)";
+                ForeColorMudBlazor = MaterialColorPicker.ColorIsLight(user.Color) ? "var(--mud-palette-text-primary)" : "var(--mud-palette-text-primary)";
             }
             Inititals = user.Initials;
         }
@@ -26,6 +27,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
         public string ImageUri { get; set; }
         public string BackColor { get; set; }
         public string ForeColor { get; set; }
+        public string ForeColorMudBlazor { get; set; }
         public string Inititals { get; set; }
 
         private static string CreateImageUri(XenialIdentityUser user)

@@ -1,0 +1,46 @@
+﻿@using MudBlazor.Utilities
+@using Xenial.Identity.Areas.Identity.Pages.Account.Manage
+@using Xenial.Identity.Data
+@if (Model is not null)
+{
+    if (string.IsNullOrEmpty(Model.ImageUri))
+    {
+        @if (string.IsNullOrEmpty(@Model.Inititals))
+        {
+            <MudAvatar Size="@Size">
+                <MudIcon Icon="@Icons.Filled.PersonOutline" />
+            </MudAvatar>
+        }
+        else
+        {
+            <MudAvatar Size="@Size" Style="@Color">
+                @Model.Inititals
+            </MudAvatar>
+        }
+    }
+    else
+    {
+        <MudAvatar Size="@Size" Image="@Model.ImageUri" />
+    }
+}
+@code {
+    private string Color => new CssBuilder("font-weight: bold;")
+            .AddClass($"color: {Model?.ForeColorMudBlazor};", () => !string.IsNullOrEmpty(Model.ForeColorMudBlazor))
+            .AddClass($"background-color: {Model?.BackColor};", () => !string.IsNullOrEmpty(Model.BackColor))
+            .Build();
+
+    [Parameter, EditorRequired]
+    public XenialIdentityUser User { get; set; }
+
+    [Parameter]
+    public Size Size { get; set; } = Size.Medium;
+
+    private ProfilePictureModel Model;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        Model = new ProfilePictureModel(User);
+    }
+}

@@ -48,21 +48,11 @@ public class Startup
 
         var mvcBuilder = services.AddControllersWithViews();
 
-        if (Environment.IsDevelopment())
-        {
-            mvcBuilder.AddRazorRuntimeCompilation();
-        }
-
         var razorPagesBuilder = services.AddRazorPages(o =>
         {
             o.Conventions.AuthorizeAreaFolder("Admin", "/", "Administrator");
             o.Conventions.AuthorizePage("/_Host", "Administrator");
         });
-
-        if (Environment.IsDevelopment())
-        {
-            razorPagesBuilder.AddRazorRuntimeCompilation();
-        }
 
         services.AddMudServices();
         services.AddXpo(Configuration);
