@@ -46,6 +46,7 @@
     </MudToolBar>
 </MudPaper>
 <MudTable @ref="table"
+          RowsPerPage="100"
           T="XenialIdentityUser"
           Dense
           FixedHeader
@@ -158,7 +159,7 @@
                 <MudSpacer />
                 <MudIcon Icon="@Icons.Filled.Close"
                      Class="cursor-pointer"
-                     onclick="@CloseDrawer" />
+                     onclick="@(() => CloseDrawer())" />
             </MudStack>
         </MudDrawerHeader>
         <MudStack Class="px-2">

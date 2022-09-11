@@ -56,6 +56,6 @@ public partial class Users
             }
         }
 
-        await this.table.ReloadServerData();
+        await table.ReloadServerData();
     }
 }

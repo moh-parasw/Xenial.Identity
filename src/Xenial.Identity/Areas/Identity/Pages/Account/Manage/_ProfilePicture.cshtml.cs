@@ -19,7 +19,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
             {
                 BackColor = user.Color;
                 ForeColor = MaterialColorPicker.ColorIsLight(user.Color) ? "var(--xenial-darker-color)" : "var(--xenial-lighter-color)";
-                ForeColorMudBlazor = MaterialColorPicker.ColorIsLight(user.Color) ? "var(--mud-palette-text-primary)" : "var(--mud-palette-text-primary)";
+                ForeColorMudBlazor = MaterialColorPicker.ColorIsLight(user.Color) ? "var(--mud-palette-black)" : "var(--mud-palette-white)";
             }
             Inititals = user.Initials;
         }
