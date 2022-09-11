@@ -25,7 +25,7 @@ export function CreateMonacoEditor(component: DotNet.DotNetObject, el: HTMLEleme
     loader.init().then(async i => {
         console.log(options);
         if (language === "json" && options.formatted) {
-            value = JSON.stringify(JSON.parse(value), undefined, 2);
+            value = JSON.stringify(JSON.parse(value), undefined, 4);
         }
         if (editors.has(el)) {
             editors.get(el)?.dispose();

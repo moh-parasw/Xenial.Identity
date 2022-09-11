@@ -83,7 +83,17 @@
         </MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="@(nameof(XenialIdentityUser.Id))"><i class="fa fa-fingerprint cursor-pointer" onclick="@(async () => await CopyToClipboard(context.Id))" title="@context.Id"></i></MudTd>
+        <MudTd DataLabel="@(nameof(XenialIdentityUser.Id))">
+            <MudTooltip Text="@context.Id">
+                <MudIconButton Size="Size.Small"
+                               DisableElevation
+                               Color="Color.Transparent"
+                               Variant="Variant.Filled"
+                               Icon="@Icons.Filled.Fingerprint"
+                               Style="background-color: transparent"
+                               OnClick="async () => await CopyToClipboard(context.Id)" />
+            </MudTooltip>
+        </MudTd>
         <MudTd DataLabel="@(nameof(XenialIdentityUser.Picture))">@((MarkupString)UserImageTag(context))</MudTd>
             <MudTd DataLabel="@(nameof(context.UserName))">
                 <MudHighlighter Text="@context.UserName" HighlightedText="@search" />
@@ -104,7 +114,7 @@
                                    Variant="Variant.Filled"
                                    Color="Color.Error"
                                    Size="Size.Small"
-                                   OnClick="async () => await DeleteUser(context)"/>
+                                   OnClick="async () => await DeleteUser(context)" />
                     </MudTooltip>
                     <MudTooltip Text="Edit">
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
@@ -118,9 +128,25 @@
         <PagerContent>
             <MudTablePager />
         </PagerContent>
-    </MudTable>
+        <NoRecordsContent>
+            @if (total > 0)
+            {
+                <ul>
+                    <li>There are no users found matching '@search'</li>
+                    <li><MudButton Size="Size.Small" Color="Color.Primary" OnClick="async () => await SearchChanged(string.Empty)">Clear Filter</MudButton></li>
+                </ul>
+            }
+            else
+            {
+                <ul>
+                    <li>There are no users yet.</li>
+                    <li>Do you want to <MudLink Class="cursor-pointer" onclick="">Add a User</MudLink></li>
+                </ul>
+            }
+    </NoRecordsContent>
+</MudTable>
 
-    @if (HighlightedValue is not null)
+@if (HighlightedValue is not null)
 {
     <MudDrawer @bind-Open="@openDrawer" Width="400px" Height="100%" Anchor="@Anchor.End" Elevation="1" Variant="@DrawerVariant.Temporary">
         <MudDrawerHeader>
@@ -221,7 +247,8 @@
             {
                 var s = search.ToLowerInvariant();
                 items = items.Where(i =>
-                    i.FirstName.ToLower().Contains(s)
+                    i.Id.ToLower() == s
+                    || i.FirstName.ToLower().Contains(s)
                     || i.LastName.ToLower().Contains(s)
                     || i.Email.ToLower().Contains(s)
                     || i.LastName.ToLower().Contains(s)

@@ -805,6 +805,11 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 throw new ArgumentNullException(nameof(user));
             }
             var userInDb = await UnitOfWork.GetObjectByKeyAsync<TXPUser>(user.Id, cancellationToken);
+            if (userInDb is null)
+            {
+                return new string[0];
+            }
+
             var rolesInDb = UnitOfWork.GetClassInfo<TXPUser>().FindMember("Roles")?.GetValue(userInDb);
             if (rolesInDb is IList<TXPRole> roles)
             {

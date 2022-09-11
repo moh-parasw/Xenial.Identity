@@ -36,7 +36,7 @@
                 {
                     <tr>
                         <td>@claim.Type</td>
-                        <td>
+                        <td style="word-break: keep-all; white-space: nowrap;">
                             @if ((claim.Value?.StartsWith("https://") ?? false) || (claim.Value?.StartsWith("http://") ?? false))
                             {
                                 <MudLink Href="@claim.Value" Target="_blank">@claim.Value</MudLink>
