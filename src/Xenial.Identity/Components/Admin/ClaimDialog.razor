@@ -1,0 +1,74 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+@using Xenial.Identity.Data
+@inject UserManager<XenialIdentityUser> UserManager
+
+<MudDialog>
+    <TitleContent>
+        @if (IsNewClaim)
+        {
+            <text>Add Claim</text>
+        }
+        else
+        {
+            <text>Edit Claim</text>
+        }
+    </TitleContent>
+    <DialogContent>
+        <MudStack Spacing="4">
+            <MudStack Row>
+                <MudTextField Value="@Claim.Type"
+                              Variant="Variant.Filled"
+                              Label="Type" />
+                <MudSelect T="ClaimEditMode"
+                           Variant="Variant.Filled"
+                           AnchorOrigin="Origin.BottomCenter"                           
+                           Value="@Mode"
+                           Label="Mode">
+                    @foreach (var v in Enum.GetValues<ClaimEditMode>())
+                    {
+                        <MudSelectItem Value="@v">@v</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudStack>
+            @if (Mode == ClaimEditMode.Text)
+            {
+
+            }
+            else if (Mode == ClaimEditMode.MultiLine)
+            {
+
+            }
+            else
+            {
+
+            }
+        </MudStack>
+
+    </DialogContent>
+    <DialogActions>
+        @*<MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Save">Save</MudButton>*@
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter, EditorRequired]
+    public Claim Claim { get; set; }
+
+    [Parameter, EditorRequired]
+    public XenialIdentityUser User { get; set; }
+
+    [Parameter]
+    public bool IsNewClaim { get; set; }
+
+    private ClaimEditMode Mode { get; set; }
+
+    private enum ClaimEditMode
+    {
+        Text,
+        MultiLine,
+        Json,
+        Xml
+    }
+}

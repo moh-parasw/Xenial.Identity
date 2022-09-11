@@ -10,6 +10,27 @@ namespace Xenial.Identity.Components.Admin;
 
 public partial class UserClaimsSmall
 {
+    private async Task EditClaim(Claim claim = null)
+    {
+        var dialog = DialogService.Show<ClaimDialog>(
+            claim == null ? "Add Claim" : "Edit Claim",
+            new DialogParameters
+            {
+                [nameof(ClaimDialog.Claim)] = claim ?? new Claim("", ""),
+                [nameof(ClaimDialog.IsNewClaim)] = claim == null,
+                [nameof(ClaimDialog.User)] = User,
+            },
+            new DialogOptions
+            {
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true,
+                CloseOnEscapeKey = true,
+                DisableBackdropClick = true,
+            });
+
+        await dialog.GetReturnValueAsync<object>();
+    }
+
     private async Task DeleteClaim(Claim claim)
     {
         currentClaim = claim;

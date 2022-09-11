@@ -18,7 +18,8 @@
                                    Variant="Variant.Filled"
                                    Color="Color.Success"
                                    Size="Size.Small"
-                                   Style="margin-left: 0.8rem;" />
+                                   Style="margin-left: 0.8rem;"
+                                   OnClick="async () => await EditClaim(null)" />
                         </MudTooltip>
                     </th>
                 }
@@ -48,7 +49,8 @@
                                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                        Variant="Variant.Filled"
                                        Color="Color.Primary"
-                                       Size="Size.Small" />
+                                       Size="Size.Small"
+                                       OnClick="async () => await EditClaim(claim)" />
                                     </MudTooltip>
                                 </MudStack>
                             </td>
@@ -88,7 +90,8 @@
                                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                        Variant="Variant.Filled"
                                        Color="Color.Primary"
-                                       Size="Size.Small" />
+                                       Size="Size.Small"
+                                       OnClick="async () => await EditClaim(claim)" />
                                     </MudTooltip>
                                 </MudStack>
                             </td>
@@ -116,7 +119,6 @@ else
 {
     <MudText Typo="Typo.body2">No Claims</MudText>
 }
-
 
 <MudMessageBox @ref="mbox" Title="Delete Claim" CancelText="Cancel">
     <MessageContent>
