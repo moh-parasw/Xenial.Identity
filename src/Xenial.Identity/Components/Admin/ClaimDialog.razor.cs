@@ -87,7 +87,7 @@ public partial class ClaimDialog
 
     private void SetMode(ClaimEditMode mode)
     {
-        this.Mode = mode;
+        Mode = mode;
         if (mode == ClaimEditMode.Json && string.IsNullOrWhiteSpace(value))
         {
             value = """
@@ -114,9 +114,7 @@ public partial class ClaimDialog
     }
 
     private void Cancel()
-    {
-        MudDialog?.Close();
-    }
+        => MudDialog?.Close();
 
     private enum ClaimEditMode
     {

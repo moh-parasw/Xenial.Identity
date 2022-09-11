@@ -74,13 +74,21 @@ export function CreateMonacoEditor(component: DotNet.DotNetObject, el: HTMLEleme
     });
 }
 
-export async function UpdateOptions(component: DotNet.DotNetObject, el: HTMLElement) {
+export async function UpdateOptions(component: DotNet.DotNetObject, el: HTMLElement, value: string | undefined) {
     if(runtimeOptions.has(el)){
         const opt = runtimeOptions.get(el);
         if(opt?.height) {
             await component.invokeMethodAsync('SetHeight', opt.height);
         }
     }
+    const edit = editors.get(el);
+    //TODO: Get Editor And Blazor in sync
+    // if (edit) {
+    //     const currentValue = edit.getValue();
+    //     if(currentValue !== value){
+    //         edit.setValue(value ?? "");
+    //     }
+    // }
 }
 
 export function DisposeMonacoEditor(el: HTMLElement) {

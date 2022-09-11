@@ -2,7 +2,9 @@
 
 @if (Claim.Value?.StartsWith("{") ?? false)
 {
-    <MonacoEdit Value="@Claim.Value"
+    <MonacoEdit
+            @ref="edit"
+            Value="@Claim.Value"
             Formatted
             NoLineNumbers
             ReadOnly
@@ -23,4 +25,12 @@ else
 @code {
     [Parameter, EditorRequired]
     public Claim Claim { get; set; }
+
+    private MonacoEdit edit;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        edit?.Refresh(Claim.Value);
+    }
 }
