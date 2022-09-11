@@ -28,7 +28,11 @@ public partial class UserClaimsSmall
                 DisableBackdropClick = true,
             });
 
-        await dialog.GetReturnValueAsync<object>();
+        var refresh = await dialog.GetReturnValueAsync<bool?>();
+        if (refresh == true)
+        {
+            await Refresh();
+        }
     }
 
     private async Task DeleteClaim(Claim claim)
@@ -83,5 +87,9 @@ public partial class UserClaimsSmall
         await Refresh();
     }
 
-    private async Task Refresh() => claims = await UserManager.GetClaimsAsync(User);
+    private async Task Refresh()
+    {
+        claims = await UserManager.GetClaimsAsync(User);
+        StateHasChanged();
+    }
 }
