@@ -96,54 +96,55 @@
             </MudTooltip>
         </MudTd>
         <MudTd DataLabel="@(nameof(XenialIdentityUser.Picture))"><UserAvatar Size="Size.Small" User="@context" /></MudTd>
-            <MudTd DataLabel="@(nameof(context.UserName))">
-                <MudHighlighter Text="@context.UserName" HighlightedText="@search" />
-            </MudTd>
-            <MudTd DataLabel="@(nameof(context.FirstName))">
-                <MudHighlighter Text="@context.FirstName" HighlightedText="@search" />
-            </MudTd>
-            <MudTd DataLabel="@(nameof(context.LastName))">
-                <MudHighlighter Text="@context.LastName" HighlightedText="@search" />
-            </MudTd>
-            <MudTd DataLabel="@(nameof(context.Email))">
-                <MudHighlighter Text="@context.Email" HighlightedText="@search" />
-            </MudTd>
-            <MudTd>
-                <MudStack Row>
-                    <MudTooltip Text="Delete">
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+        <MudTd DataLabel="@(nameof(context.UserName))">
+            <MudHighlighter Text="@context.UserName" HighlightedText="@search" />
+        </MudTd>
+        <MudTd DataLabel="@(nameof(context.FirstName))">
+            <MudHighlighter Text="@context.FirstName" HighlightedText="@search" />
+        </MudTd>
+        <MudTd DataLabel="@(nameof(context.LastName))">
+            <MudHighlighter Text="@context.LastName" HighlightedText="@search" />
+        </MudTd>
+        <MudTd DataLabel="@(nameof(context.Email))">
+            <MudHighlighter Text="@context.Email" HighlightedText="@search" />
+        </MudTd>
+        <MudTd>
+            <MudStack Row>
+                <MudTooltip Text="Delete">
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                    Variant="Variant.Filled"
                                    Color="Color.Error"
                                    Size="Size.Small"
                                    OnClick="async () => await DeleteUser(context)" />
-                    </MudTooltip>
-                    <MudTooltip Text="Edit">
-                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                </MudTooltip>
+                <MudTooltip Text="Edit">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                    Variant="Variant.Filled"
                                    Color="Color.Primary"
-                                   Size="Size.Small" />
-                    </MudTooltip>
-                </MudStack>
-            </MudTd>
-        </RowTemplate>
-        <PagerContent>
-            <MudTablePager />
-        </PagerContent>
-        <NoRecordsContent>
-            @if (total > 0)
-            {
-                <ul>
-                    <li>There are no users found matching '@search'</li>
-                    <li><MudButton Size="Size.Small" Color="Color.Primary" OnClick="async () => await SearchChanged(string.Empty)">Clear Filter</MudButton></li>
-                </ul>
-            }
-            else
-            {
-                <ul>
-                    <li>There are no users yet.</li>
-                    <li>Do you want to <MudLink Class="cursor-pointer" onclick="">Add a User</MudLink></li>
-                </ul>
-            }
+                                   Size="Size.Small"
+                                   Href="@($"/Admin2/User/{context.Id}")" />
+                </MudTooltip>
+            </MudStack>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+    <NoRecordsContent>
+        @if (total > 0)
+        {
+            <ul>
+                <li>There are no users found matching '@search'</li>
+                <li><MudButton Size="Size.Small" Color="Color.Primary" OnClick="async () => await SearchChanged(string.Empty)">Clear Filter</MudButton></li>
+            </ul>
+        }
+        else
+        {
+            <ul>
+                <li>There are no users yet.</li>
+                <li>Do you want to <MudLink Class="cursor-pointer" onclick="">Add a User</MudLink></li>
+            </ul>
+        }
     </NoRecordsContent>
 </MudTable>
 
@@ -161,6 +162,23 @@
             </MudStack>
         </MudDrawerHeader>
         <MudStack Class="px-2">
+            <MudStack Row>
+                <MudSpacer />
+                <MudTooltip Text="Delete">
+                    <MudButton EndIcon="@Icons.Material.Filled.Delete"
+                           Variant="Variant.Filled"
+                           Color="Color.Error"
+                           Size="Size.Small"
+                           OnClick="async () => await DeleteUser(HighlightedValue)">Delete</MudButton>
+                </MudTooltip>
+                <MudTooltip Text="Edit">
+                    <MudButton EndIcon="@Icons.Material.Filled.Edit"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Small"
+                           Href="@($"/Admin2/User/{HighlightedValue.Id}")">Edit</MudButton>
+                </MudTooltip>
+            </MudStack>
             <MudField Label="Username"
                   Variant="Variant.Text">@HighlightedValue.UserName</MudField>
             <MudField Label="Firstname"

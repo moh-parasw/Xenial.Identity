@@ -1,0 +1,12 @@
+﻿@page "/Admin2/User/{UserId}"
+<h3>UserDetails</h3>
+
+@code {
+    [Parameter]
+    public string UserId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return base.OnParametersSetAsync();
+    }
+}
