@@ -174,7 +174,10 @@
         User = await UserManager.FindByIdAsync(UserId);
         if (User is not null)
         {
-            color = new MudColor(User.Color);
+            if (!string.IsNullOrEmpty(User.Color))
+            {
+                color = new MudColor(User.Color);
+            }
         }
     }
 }
