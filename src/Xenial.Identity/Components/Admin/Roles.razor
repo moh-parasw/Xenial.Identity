@@ -1,15 +1,15 @@
-﻿@page "/Admin2/Users"
+﻿@page "/Admin2/Roles"
 @using DevExpress.Data.Filtering
 @using Microsoft.AspNetCore.Identity
 @using MudBlazor.Utilities
 @using Xenial.Identity.Areas.Identity.Pages.Account.Manage
 @using Xenial.Identity.Data
-@inject UserManager<XenialIdentityUser> UserManager
+@inject RoleManager<IdentityRole> RolesManager
 @inject IJsApiService JsApiService
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
 
-<MudText Typo="Typo.h3" GutterBottom>Users</MudText>
+<MudText Typo="Typo.h3" GutterBottom>Roles</MudText>
 
 <MudPaper Elevation="10" Class="mb-1" Square>
     <MudToolBar Dense>
@@ -35,7 +35,7 @@
         <MudSpacer />
         <MudTooltip Text="Add">
             <MudIconButton Icon="@Icons.Filled.Add"
-                           Href="/Admin/AddUser"
+                           Href="/Admin2/AddRole"
                            Color="Color.Success" />
         </MudTooltip>
         <MudTooltip Text="Refresh">
@@ -47,11 +47,11 @@
 </MudPaper>
 <MudTable @ref="table"
           RowsPerPage="100"
-          T="XenialIdentityUser"
+          T="IdentityRole"
           Dense
           FixedHeader
           Elevation="10"
-          ServerData="@(new Func<TableState, Task<TableData<XenialIdentityUser>>>(ServerReload))"
+          ServerData="@(new Func<TableState, Task<TableData<IdentityRole>>>(ServerReload))"
           Virtualize="true"
           Height="calc(100vh - 21em)"
           Class="mb-0"
@@ -60,32 +60,20 @@
           OnRowClick="RowClickEvent">
     <HeaderContent>
         <MudTh Style="width:0.1%; white-space: nowrap;">
-            <MudTableSortLabel T="XenialIdentityUser"
-                               SortLabel="@(nameof(XenialIdentityUser.Id))">Id</MudTableSortLabel>
-        </MudTh>
-        <MudTh Style="width:0.1%; white-space: nowrap;">Icon</MudTh>
-        <MudTh>
-            <MudTableSortLabel T="XenialIdentityUser"
-                               SortLabel="@(nameof(XenialIdentityUser.UserName))">Username</MudTableSortLabel>
+            <MudTableSortLabel T="IdentityRole"
+                               SortLabel="@(nameof(IdentityRole.Id))">Id</MudTableSortLabel>
         </MudTh>
         <MudTh>
-            <MudTableSortLabel T="XenialIdentityUser"
-                               SortLabel="@(nameof(XenialIdentityUser.FirstName))">Firstname</MudTableSortLabel>
+            <MudTableSortLabel T="IdentityRole"
+                               SortLabel="@(nameof(IdentityRole.Name))">Name</MudTableSortLabel>
         </MudTh>
-        <MudTh>
-            <MudTableSortLabel T="XenialIdentityUser"
-                               SortLabel="@(nameof(XenialIdentityUser.LastName))">Lastname</MudTableSortLabel>
-        </MudTh>
-        <MudTh>
-            <MudTableSortLabel T="XenialIdentityUser"
-                               SortLabel="@(nameof(XenialIdentityUser.Email))">Email</MudTableSortLabel>
-        </MudTh>
+       
         <MudTh Style="width:0.1%; white-space: nowrap;">
 
         </MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="@(nameof(XenialIdentityUser.Id))">
+        <MudTd DataLabel="@(nameof(IdentityRole.Id))">
             <MudTooltip Text="@context.Id">
                 <MudIconButton Size="Size.Small"
                                DisableElevation
@@ -96,18 +84,8 @@
                                OnClick="async () => await CopyToClipboard(context.Id)" />
             </MudTooltip>
         </MudTd>
-        <MudTd DataLabel="@(nameof(XenialIdentityUser.Picture))"><UserAvatar Size="Size.Small" User="@context" /></MudTd>
-        <MudTd DataLabel="@(nameof(context.UserName))">
-            <MudHighlighter Text="@context.UserName" HighlightedText="@search" />
-        </MudTd>
-        <MudTd DataLabel="@(nameof(context.FirstName))">
-            <MudHighlighter Text="@context.FirstName" HighlightedText="@search" />
-        </MudTd>
-        <MudTd DataLabel="@(nameof(context.LastName))">
-            <MudHighlighter Text="@context.LastName" HighlightedText="@search" />
-        </MudTd>
-        <MudTd DataLabel="@(nameof(context.Email))">
-            <MudHighlighter Text="@context.Email" HighlightedText="@search" />
+        <MudTd DataLabel="@(nameof(context.Name))">
+            <MudHighlighter Text="@context.Name" HighlightedText="@search" />
         </MudTd>
         <MudTd>
             <MudStack Row>
@@ -116,14 +94,14 @@
                                    Variant="Variant.Filled"
                                    Color="Color.Error"
                                    Size="Size.Small"
-                                   OnClick="async () => await DeleteUser(context)" />
+                                   OnClick="async () => await DeleteRole(context)" />
                 </MudTooltip>
                 <MudTooltip Text="Edit">
                     <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                    Variant="Variant.Filled"
                                    Color="Color.Primary"
                                    Size="Size.Small"
-                                   Href="@($"/Admin2/User/{context.Id}")" />
+                                   Href="@($"/Admin2/Role/{context.Id}")" />
                 </MudTooltip>
             </MudStack>
         </MudTd>
@@ -135,15 +113,15 @@
         @if (total > 0)
         {
             <ul>
-                <li>There are no users found matching '@search'</li>
+                <li>There are no roles found matching '@search'</li>
                 <li><MudButton Size="Size.Small" Color="Color.Primary" OnClick="async () => await SearchChanged(string.Empty)">Clear Filter</MudButton></li>
             </ul>
         }
         else
         {
             <ul>
-                <li>There are no users yet.</li>
-                <li>Do you want to <MudLink Class="cursor-pointer" Href="/Admin2/AddUser">Add a User</MudLink></li>
+                <li>There are no roles yet.</li>
+                <li>Do you want to <MudLink Class="cursor-pointer" Href="/Admin2/AddRole">Add a Role</MudLink></li>
             </ul>
         }
     </NoRecordsContent>
@@ -154,8 +132,7 @@
     <MudDrawer @bind-Open="@openDrawer" Width="400px" Height="100%" Anchor="@Anchor.End" Elevation="1" Variant="@DrawerVariant.Temporary">
         <MudDrawerHeader>
             <MudStack Row Style="width: 100%; align-items: center; justify-content: center;">
-                <UserAvatar User="@HighlightedValue" />
-                <MudText Typo="Typo.h6">@HighlightedValue.DisplayName</MudText>
+                <MudText Typo="Typo.h6">@HighlightedValue.Name</MudText>
                 <MudSpacer />
                 <MudIcon Icon="@Icons.Filled.Close"
                      Class="cursor-pointer"
@@ -170,40 +147,19 @@
                            Variant="Variant.Filled"
                            Color="Color.Error"
                            Size="Size.Small"
-                           OnClick="async () => await DeleteUser(HighlightedValue)">Delete</MudButton>
+                           OnClick="async () => await DeleteRole(HighlightedValue)">Delete</MudButton>
                 </MudTooltip>
                 <MudTooltip Text="Edit">
                     <MudButton EndIcon="@Icons.Material.Filled.Edit"
                            Variant="Variant.Filled"
                            Color="Color.Primary"
                            Size="Size.Small"
-                           Href="@($"/Admin2/User/{HighlightedValue.Id}")">Edit</MudButton>
+                           Href="@($"/Admin2/Role/{HighlightedValue.Id}")">Edit</MudButton>
                 </MudTooltip>
             </MudStack>
-            <MudField Label="Username"
-                  Variant="Variant.Text">@HighlightedValue.UserName</MudField>
-            <MudField Label="Firstname"
-                  Variant="Variant.Text">@HighlightedValue.FirstName</MudField>
-            <MudField Label="Lastname"
-                  Variant="Variant.Text">@HighlightedValue.LastName</MudField>
-            <MudTooltip Inline="false" RootStyle="width: unset" Text="@(HighlightedValue.EmailConfirmed ? "E-Mail is confirmed" : "E-Mail is NOT confirmed")">
-                <MudField Label="Email"
-                      Variant="Variant.Text"
-                      Adornment="Adornment.End"
-                      AdornmentColor="@(HighlightedValue.EmailConfirmed ? Color.Success : Color.Error)"
-                      AdornmentIcon="@(HighlightedValue.EmailConfirmed ? Icons.Filled.CheckCircle : Icons.Filled.CheckCircleOutline)">@HighlightedValue.Email</MudField>
-            </MudTooltip>
-            <MudTooltip Inline="false" RootStyle="width: unset" Text="@(HighlightedValue.PhoneNumberConfirmed ? "Phonenumber is confirmed" : "Phonenumber is NOT confirmed")">
-                <MudField Label="PhoneNumber"
-                      Variant="Variant.Text"
-                      Adornment="Adornment.End"
-                      AdornmentColor="@(HighlightedValue.PhoneNumberConfirmed ? Color.Success : Color.Error)"
-                      AdornmentIcon="@(HighlightedValue.PhoneNumberConfirmed ? Icons.Filled.CheckCircle : Icons.Filled.CheckCircleOutline)">@HighlightedValue.PhoneNumber</MudField>
-            </MudTooltip>
-            <MudText Typo="Typo.caption">Roles</MudText>
-            <UserRolesChips User="@HighlightedValue" />
+            
             <MudText Typo="Typo.caption">Claims</MudText>
-            <UserClaimsSmall User="@HighlightedValue" />
+            <RoleClaimsSmall Role="@HighlightedValue" />
         </MudStack>
     </MudDrawer>
 }
@@ -211,17 +167,17 @@
 
 
     bool openDrawer;
-    private XenialIdentityUser HighlightedValue;
+    private IdentityRole HighlightedValue;
 
     private void CloseDrawer()
         => openDrawer = false;
 
-    private string SelectedRowClassFunc(XenialIdentityUser element, int rowNumber)
+    private string SelectedRowClassFunc(IdentityRole element, int rowNumber)
         => new CssBuilder("cursor-pointer")
-            .AddClass("mud-selected-item mud-primary-hover", EqualityComparer<XenialIdentityUser>.Default.Equals(HighlightedValue, element))
+            .AddClass("mud-selected-item mud-primary-hover", EqualityComparer<IdentityRole>.Default.Equals(HighlightedValue, element))
             .Build();
 
-    private void RowClickEvent(TableRowClickEventArgs<XenialIdentityUser> e)
+    private void RowClickEvent(TableRowClickEventArgs<IdentityRole> e)
     {
         HighlightedValue = e.Item;
         if (HighlightedValue is null)
@@ -243,7 +199,7 @@
 
     private string search;
     private int? total;
-    private MudTable<XenialIdentityUser> table;
+    private MudTable<IdentityRole> table;
     private bool IsLoading = true;
 
     private async Task SearchChanged(string search)
@@ -258,22 +214,19 @@
         Snackbar.Add($"Copied {content} to clipboard!", Severity.Info);
     }
 
-    private async Task<TableData<XenialIdentityUser>> ServerReload(TableState state)
+    private async Task<TableData<IdentityRole>> ServerReload(TableState state)
     {
         try
         {
-            total = await UserManager.Users.CountAsync();
-            var items = UserManager.Users;
+            total = await RolesManager.Roles.CountAsync();
+            var items = RolesManager.Roles;
 
             if (!string.IsNullOrEmpty(search))
             {
                 var s = search.ToLowerInvariant();
                 items = items.Where(i =>
                     i.Id.ToLower() == s
-                    || i.FirstName.ToLower().Contains(s)
-                    || i.LastName.ToLower().Contains(s)
-                    || i.Email.ToLower().Contains(s)
-                    || i.LastName.ToLower().Contains(s)
+                    || i.Name.ToLower().Contains(s)
                 );
             }
 
@@ -281,11 +234,8 @@
             {
                 items = state.SortLabel switch
                 {
-                    nameof(XenialIdentityUser.Id) => items.OrderByDirection(state.SortDirection, x => x.Id),
-                    nameof(XenialIdentityUser.UserName) => items.OrderByDirection(state.SortDirection, x => x.UserName),
-                    nameof(XenialIdentityUser.FirstName) => items.OrderByDirection(state.SortDirection, x => x.FirstName),
-                    nameof(XenialIdentityUser.LastName) => items.OrderByDirection(state.SortDirection, x => x.LastName),
-                    nameof(XenialIdentityUser.Email) => items.OrderByDirection(state.SortDirection, x => x.Email),
+                    nameof(IdentityRole.Id) => items.OrderByDirection(state.SortDirection, x => x.Id),
+                    nameof(IdentityRole.Name) => items.OrderByDirection(state.SortDirection, x => x.Name),
                     _ => items
                 };
             }
@@ -294,11 +244,11 @@
                 .Take(state.PageSize)
                 .ToArrayAsync();
 
-            return new TableData<XenialIdentityUser>()
-                {
-                    Items = result,
-                    TotalItems = total.Value
-                };
+            return new TableData<IdentityRole>()
+            {
+                Items = result,
+                TotalItems = total.Value
+            };
         }
         finally
         {

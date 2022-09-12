@@ -1,0 +1,144 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@using Xenial.Identity.Data
+@inject RoleManager<IdentityRole> RolesManager
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+@if (claims.Any())
+{
+    <MudSimpleTable Dense>
+        <thead>
+            <tr>
+                @if (AllowEdit)
+                {
+                    <th Style="width:0.1%; white-space: nowrap;">
+                        <MudTooltip Text="Add">
+                            <MudIconButton Icon="@Icons.Material.Filled.Add"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Success"
+                                   Size="Size.Small"
+                                   Style="margin-left: 0.8rem;"
+                                   OnClick="async () => await EditClaim(null)" />
+                        </MudTooltip>
+                    </th>
+                }
+                <th>Claim</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var claim in claims)
+            {
+                @if (claim.Value?.StartsWith("{") ?? false)
+                {
+                    <tr>
+                        @if (AllowEdit)
+                        {
+                            <td>
+                                <MudStack Row>
+                                    <MudSpacer />
+                                    <MudTooltip Text="Delete">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Error"
+                                       Size="Size.Small"
+                                       OnClick="async () => await DeleteClaim(claim)" />
+                                    </MudTooltip>
+                                    <MudTooltip Text="Edit">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       OnClick="async () => await EditClaim(claim)" />
+                                    </MudTooltip>
+                                </MudStack>
+                            </td>
+                        }
+                        <td colspan="2">@claim.Type</td>
+                    </tr>
+                    <tr>
+                        <td colspan="@(AllowEdit ? 3 : 2)" class="pa-0">
+                            <ClaimDisplay Claim="@claim" />
+                        </td>
+
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        @if (AllowEdit)
+                        {
+                            <td>
+                                <MudStack Row>
+                                    <MudSpacer />
+                                    <MudTooltip Text="Delete">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Error"
+                                       Size="Size.Small"
+                                       OnClick="async () => await DeleteClaim(claim)" />
+                                    </MudTooltip>
+                                    <MudTooltip Text="Edit">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       OnClick="async () => await EditClaim(claim)" />
+                                    </MudTooltip>
+                                </MudStack>
+                            </td>
+                        }
+                        <td>@claim.Type</td>
+                        <td style="word-break: keep-all; white-space: nowrap;">
+                            <ClaimDisplay Claim="@claim" />
+                        </td>
+
+                    </tr>
+                }
+
+            }
+        </tbody>
+    </MudSimpleTable>
+}
+else
+{
+    <MudText Typo="Typo.body2">No Claims</MudText>
+}
+
+<MudMessageBox @ref="mbox" Title="Delete Claim" CancelText="Cancel">
+    <MessageContent>
+        <ul>
+            <li>
+                Do your really want to delete the claim <strong>@currentClaim?.Type</strong>?
+            </li>
+            <li style="overflow: hidden" class="my-2">
+                @if (currentClaim is not null)
+                {
+                    <ClaimDisplay Claim="@currentClaim" />
+                }
+            </li>
+            <li>
+                <strong>This operation can <em>not</em> be undone!</strong>
+            </li>
+        </ul>
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Delete Claim</MudButton>
+    </YesButton>
+</MudMessageBox>
+
+@code {
+    private MudMessageBox mbox;
+    [Parameter, EditorRequired]
+    public IdentityRole Role { get; set; }
+
+    private Claim currentClaim;
+
+    [Parameter]
+    public bool AllowEdit { get; set; }
+
+    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+
+
+}
