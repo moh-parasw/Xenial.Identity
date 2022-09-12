@@ -12,13 +12,13 @@ public partial class RoleClaimsSmall
 {
     private async Task EditClaim(Claim claim = null)
     {
-        var dialog = DialogService.Show<ClaimDialog>(
+        var dialog = DialogService.Show<RoleClaimDialog>(
             claim == null ? "Add Claim" : "Edit Claim",
             new DialogParameters
             {
-                [nameof(ClaimDialog.Claim)] = claim ?? new Claim("", ""),
-                [nameof(ClaimDialog.IsNewClaim)] = claim == null,
-                [nameof(ClaimDialog.User)] = Role,
+                [nameof(RoleClaimDialog.Claim)] = claim ?? new Claim("", ""),
+                [nameof(RoleClaimDialog.IsNewClaim)] = claim == null,
+                [nameof(RoleClaimDialog.Role)] = Role,
             },
             new DialogOptions
             {

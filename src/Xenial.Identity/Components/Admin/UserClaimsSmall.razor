@@ -103,7 +103,14 @@
 }
 else
 {
-    <MudText Typo="Typo.body2">No Claims</MudText>
+    @if (AllowEdit)
+    {
+        <MudText style="text-align: center;" Typo="Typo.body2">There are no claims yet. Do you want to <MudLink Class="cursor-pointer" OnClick="@(async () => await EditClaim(null))">Add a Claim</MudLink></MudText>
+    }
+    else
+    {
+        <MudText Typo="Typo.body2">No Claims</MudText>
+    }
 }
 
 <MudMessageBox @ref="mbox" Title="Delete Claim" CancelText="Cancel">

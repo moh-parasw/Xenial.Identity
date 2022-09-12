@@ -1,0 +1,86 @@
+﻿@page "/Admin2/Role/{RoleId}"
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@using MudBlazor.Utilities
+@using Newtonsoft.Json
+@using Xenial.Identity.Data
+@using Xenial.Identity.Infrastructure
+@inject RoleManager<IdentityRole> RolesManager
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+
+<MudStack Row Spacing="2">
+    <MudFab Icon="@Icons.Filled.ArrowBack" Size="@Size.Large" Color="Color.Surface" Href="/Admin2/Roles" />
+    <MudText Typo="Typo.h3" GutterBottom>Role</MudText>
+</MudStack>
+
+@if (Role is not null)
+{
+    <div class="small-tabs">
+        <MudContainer MaxWidth="MaxWidth.Small">
+            <MudStack>
+                <MudPaper Class="pa-4">
+                    <MudStack Row="true">
+                        <MudStack Justify="Justify.Center" Spacing="0">
+                            <MudText Typo="Typo.body1">@Role.Name</MudText>
+                        </MudStack>
+                    </MudStack>
+                </MudPaper>
+
+                <MudTabs ApplyEffectsToContainer="true"
+                     Centered
+                     Elevation="4"
+                     Rounded="true"
+                     PanelClass="pa-6"
+                     ActivePanelIndex="@ActivePanelIndex"
+                     ActivePanelIndexChanged="@(i => SetActivePanelIndex(i))">
+                    <MudTabPanel ToolTip="Name" Icon="@Icons.Filled.Person">
+                        <MudStack Spacing="4">
+                            <MudTextField Label="Name"
+                                      Variant="Variant.Filled"
+                                      FullWidth
+                                      Margin="Margin.Dense"
+                                      @bind-Value="@Role.Name" />
+                        </MudStack>
+                    </MudTabPanel>
+                    <MudTabPanel ToolTip="Claims" Icon="@Icons.Filled.Class">
+                        <RoleClaimsSmall Role="@Role" AllowEdit />
+                    </MudTabPanel>
+                </MudTabs>
+
+                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="async () => await SaveRole()">Save</MudButton>
+
+            </MudStack>
+        </MudContainer>
+    </div>
+
+}
+@code {
+    [Parameter]
+    public string RoleId { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = nameof(ActivePanelIndex))]
+    public int ActivePanelIndex { get; set; } = 0;
+
+    private void SetActivePanelIndex(int activePanelIndex)
+    {
+        ActivePanelIndex = activePanelIndex;
+        NavigationManager.NavigateTo(
+            NavigationManager.GetUriWithQueryParameter(nameof(ActivePanelIndex), activePanelIndex)
+        );
+    }
+
+    public IdentityRole Role { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        await ReloadRole();
+    }
+
+
+    protected async Task ReloadRole()
+        => Role = await RolesManager.FindByIdAsync(RoleId);
+}

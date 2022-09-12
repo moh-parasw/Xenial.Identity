@@ -1,0 +1,66 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+@using Xenial.Identity.Data
+@inject RoleManager<IdentityRole> RolesManager
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        @if (IsNewClaim)
+        {
+            <text>Add Claim</text>
+        }
+        else
+        {
+            <text>Edit Claim</text>
+        }
+    </TitleContent>
+    <DialogContent>
+        <MudFocusTrap DefaultFocus="DefaultFocus.FirstChild">
+            <MudStack Spacing="4">
+                <MudStack Row>
+
+                    <MudTextField T="string"
+                                  Value="@type"
+                                  ValueChanged="v => SetType(v)"
+                                  Variant="Variant.Filled"
+                                  Label="Type" />
+                    <MudSelect T="ClaimEditMode"
+                               Variant="Variant.Filled"
+                               AnchorOrigin="Origin.BottomCenter"
+                               Value="@Mode"
+                               ValueChanged="v => SetMode(v)"
+                               Label="Mode">
+                        @foreach (var v in Enum.GetValues<ClaimEditMode>())
+                        {
+                            <MudSelectItem Value="@v">@v</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudStack>
+                @if (Mode == ClaimEditMode.Text || Mode == ClaimEditMode.MultiLine)
+                {
+                    <MudTextField T="string"
+                              Value="@value"
+                              ValueChanged="v => SetValue(v)"
+                              Lines="@(Mode == ClaimEditMode.MultiLine ? 5 : 1)"
+                              Variant="Variant.Filled"
+                              Label="Value" />
+                }
+                else
+                {
+                    <MonacoEdit Value="@value"
+                            ValueChanged="v => SetValue(v)"
+                            Formatted
+                            Height="250px"
+                            Width="calc(100% - .1px)"
+                            Language="@CodeLanguage.Json" />
+                }
+            </MudStack>
+        </MudFocusTrap>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Save">Save</MudButton>
+    </DialogActions>
+</MudDialog>

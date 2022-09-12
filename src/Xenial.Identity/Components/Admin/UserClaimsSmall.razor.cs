@@ -12,13 +12,13 @@ public partial class UserClaimsSmall
 {
     private async Task EditClaim(Claim claim = null)
     {
-        var dialog = DialogService.Show<ClaimDialog>(
+        var dialog = DialogService.Show<UserClaimDialog>(
             claim == null ? "Add Claim" : "Edit Claim",
             new DialogParameters
             {
-                [nameof(ClaimDialog.Claim)] = claim ?? new Claim("", ""),
-                [nameof(ClaimDialog.IsNewClaim)] = claim == null,
-                [nameof(ClaimDialog.User)] = User,
+                [nameof(UserClaimDialog.Claim)] = claim ?? new Claim("", ""),
+                [nameof(UserClaimDialog.IsNewClaim)] = claim == null,
+                [nameof(UserClaimDialog.User)] = User,
             },
             new DialogOptions
             {

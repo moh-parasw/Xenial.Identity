@@ -9,7 +9,7 @@ using Xenial.Identity.Data;
 
 namespace Xenial.Identity.Components.Admin;
 
-public partial class ClaimDialog
+public partial class UserClaimDialog
 {
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
