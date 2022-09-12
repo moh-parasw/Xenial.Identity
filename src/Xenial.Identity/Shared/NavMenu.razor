@@ -1,14 +1,30 @@
-﻿<MudNavLink Icon="@Icons.Filled.SettingsApplications" Match="NavLinkMatch.All" Href="/Admin2/AppSettings">Application</MudNavLink>
+﻿<MudStack Row="false" Spacing="0">
 
-<MudDivider />
+    <MudTooltip Text="Application" Placement="Placement.Right">
+        <MudNavLink Icon="@Icons.Filled.SettingsApplications" Match="NavLinkMatch.All" Href="/Admin2/AppSettings">Application</MudNavLink>
+    </MudTooltip>
 
-<MudNavLink Icon="@Icons.Filled.Colorize" Match="NavLinkMatch.All" Href="/Admin2/Theme">Theme</MudNavLink>
-<MudNavLink Icon="@Icons.Filled.BorderBottom" Match="NavLinkMatch.All" Href="/Admin2/Footer">Footer</MudNavLink>
+    <MudDivider />
 
-<MudDivider />
+    <MudTooltip Text="Theme" Placement="Placement.Right">
+        <MudNavLink Icon="@Icons.Filled.Colorize" Match="NavLinkMatch.All" Href="/Admin2/Theme">Theme</MudNavLink>
+    </MudTooltip>
+    <MudTooltip Text="Footer" Placement="Placement.Right">
+        <MudNavLink Icon="@Icons.Filled.BorderBottom" Match="NavLinkMatch.All" Href="/Admin2/Footer">Footer</MudNavLink>
+    </MudTooltip>
 
-<MudNavLink Icon="@Icons.Filled.People" Match="NavLinkMatch.All" Href="/Admin2/Users">Users</MudNavLink>
-<MudNavLink Icon="@Icons.Filled.Groups" Match="NavLinkMatch.All" Href="/Admin2/Roles">Roles</MudNavLink>
+    <MudDivider />
 
-<MudDivider />
-<MudNavLink Icon="@Icons.Filled.Api" Match="NavLinkMatch.All" Href="/Admin2/Apis">Apis</MudNavLink>
+    <MudTooltip Text="Users" Placement="Placement.Right">
+        <MudNavLink Icon="@Icons.Filled.People" Match="NavLinkMatch.All" Href="/Admin2/Users">Users</MudNavLink>
+    </MudTooltip>
+    <MudTooltip Text="Groups" Placement="Placement.Right">
+        <MudNavLink Icon="@Icons.Filled.Groups" Match="NavLinkMatch.All" Href="/Admin2/Roles">Roles</MudNavLink>
+    </MudTooltip>
+
+    <MudDivider />
+    <MudTooltip Text="Apis" Placement="Placement.Right">
+        <MudNavLink Icon="@Icons.Filled.Api" Match="NavLinkMatch.All" Href="/Admin2/Apis">Apis</MudNavLink>
+    </MudTooltip>
+
+</MudStack>
