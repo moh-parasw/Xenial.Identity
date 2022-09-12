@@ -1,16 +1,14 @@
-﻿using IdentityModel;
+﻿using System.Security.Claims;
+
+using DevExpress.Xpo;
+
+using IdentityModel;
 
 using Microsoft.AspNetCore.Components.Forms;
+
 using Microsoft.AspNetCore.Identity;
 
-using MudBlazor.Utilities;
-
 using Newtonsoft.Json;
-
-using System.IO;
-using System.Security.Claims;
-
-using TextMateSharp.Themes;
 
 using Xenial.Identity.Infrastructure;
 
@@ -18,6 +16,17 @@ namespace Xenial.Identity.Components.Admin;
 
 public partial class UserDetails
 {
+    private async Task<IEnumerable<string>> SearchRoles(string x)
+    {
+        var roles = (await RolesManager.Roles.Select(x => x.Name).ToListAsync());
+        if (string.IsNullOrEmpty(x))
+        {
+            return roles.Except(Roles);
+        }
+
+        return roles.Except(Roles).Where(v => v.Contains(x, StringComparison.InvariantCultureIgnoreCase));
+    }
+
     protected async Task SaveUser()
     {
         var existingUser = await UserManager.FindByIdAsync(User.Id);
@@ -46,6 +55,12 @@ public partial class UserDetails
                     var token = await UserManager.GenerateEmailConfirmationTokenAsync(User);
                     ShowSnackbarIfError(await UserManager.ConfirmEmailAsync(User, token), "confirming the email address");
                 }
+            }
+            var existingRoles = await UserManager.GetRolesAsync(existingUser);
+            if (!existingRoles.SequenceEqual(Roles))
+            {
+                ShowSnackbarIfError(await UserManager.RemoveFromRolesAsync(User, existingRoles), "removing roles");
+                ShowSnackbarIfError(await UserManager.AddToRolesAsync(User, Roles), "adding roles");
             }
         }
 

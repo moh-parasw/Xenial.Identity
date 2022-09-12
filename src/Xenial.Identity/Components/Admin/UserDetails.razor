@@ -6,6 +6,7 @@
 @using Xenial.Identity.Data
 @using Xenial.Identity.Infrastructure
 @inject UserManager<XenialIdentityUser> UserManager
+@inject RoleManager<IdentityRole> RolesManager
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
 
@@ -63,6 +64,10 @@
                                       @bind-Value="@User.CompanyName" />
 
                         </MudStack>
+                    </MudTabPanel>
+                    <MudTabPanel ToolTip="Roles" Icon="@Icons.Filled.Groups">
+                        <MudText Typo="Typo.caption">Roles</MudText>
+                        <TagStringEdit @bind-Tags="@Roles" SearchFunc="@SearchRoles" />
                     </MudTabPanel>
                     <MudTabPanel ToolTip="Authentification" Icon="@Icons.Filled.Key">
                         <MudStack Spacing="4">
@@ -185,6 +190,9 @@
 
 }
 @code {
+
+    private IList<string> Roles { get; set; } = new List<string>();
+
     [Parameter]
     public string UserId { get; set; }
 
@@ -226,5 +234,6 @@
                 color = new MudColor(User.Color);
             }
         }
+        Roles = await UserManager.GetRolesAsync(User);
     }
 }
