@@ -2,11 +2,11 @@
 
 namespace Xenial.Identity.Components.Admin;
 
-public partial class AddRole
+public partial class AddUser
 {
-    protected async Task SaveRole()
+    protected async Task SaveUser()
     {
-        var result = await RolesManager.CreateAsync(Role);
+        var result = await UserManager.CreateAsync(User);
 
         await ShowSnackback(result);
 
@@ -17,16 +17,16 @@ public partial class AddRole
                 Snackbar.Add($"""
                 <ul>
                     <li>
-                        Role was successfully created!
+                        User was successfully created!
                     </li>
                     <li>
-                        <em>{Role.Name}</em>
+                        <em>{User.UserName}</em>
                     </li>
                 </ul>
                 """, MudBlazor.Severity.Success);
 
-                var roleId = await RolesManager.GetRoleIdAsync(Role);
-                NavigationManager.NavigateTo($"/Admin2/Role/{roleId}");
+                var userId = await UserManager.GetUserIdAsync(User);
+                NavigationManager.NavigateTo($"/Admin2/User/{userId}");
             }
             else
             {
@@ -34,7 +34,7 @@ public partial class AddRole
             }
         }
 
-        void ShowSnackbarIfError(IdentityResult result, string message = "creating the role")
+        void ShowSnackbarIfError(IdentityResult result, string message = "creating the user")
         {
             if (result.Succeeded)
             {
@@ -49,7 +49,7 @@ public partial class AddRole
                         There was an error when {message}!
                     </li>
                     <li>
-                        <em>{Role.Name}</em>
+                        <em>{User.UserName}</em>
                     </li>
                     {errors}
                 </ul>
