@@ -7,128 +7,152 @@
 @using Xenial.Identity.Infrastructure
 @inject UserManager<XenialIdentityUser> UserManager
 @inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
 
-<MudText Typo="Typo.h3" GutterBottom>User</MudText>
+<MudStack Row Spacing="2">
+    <MudFab Icon="@Icons.Filled.ArrowBack" Size="@Size.Large" Color="Color.Surface" Href="/Admin2/Users" />
+    <MudText Typo="Typo.h3" GutterBottom>User</MudText>
+</MudStack>
 
 @if (User is not null)
 {
-    <MudContainer MaxWidth="MaxWidth.Small">
-        <MudStack>
-            <MudPaper Class="pa-4">
-                <MudStack Row="true">
-                    <UserAvatar User="@User" Size="Size.Large" />
-                    <MudStack Justify="Justify.Center" Spacing="0">
-                        <MudText Typo="Typo.body1">@User.DisplayName</MudText>
-                        <MudText Typo="Typo.body2">@User.Email</MudText>
+    <div class="small-tabs">
+        <MudContainer MaxWidth="MaxWidth.Small">
+            <MudStack>
+                <MudPaper Class="pa-4">
+                    <MudStack Row="true">
+                        <UserAvatar User="@User" Size="Size.Large" />
+                        <MudStack Justify="Justify.Center" Spacing="0">
+                            <MudText Typo="Typo.body1">@User.DisplayName</MudText>
+                            <MudText Typo="Typo.body2">@User.Email</MudText>
+                        </MudStack>
                     </MudStack>
-                </MudStack>
-            </MudPaper>
+                </MudPaper>
 
-            <MudTabs Elevation="4" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
-                <MudTabPanel Text="Name" Icon="@Icons.Filled.Person">
-                    <MudStack Spacing="4">
-                        <MudStack Row>
-                            <MudTextField Label="Firstname"
+                <MudTabs ApplyEffectsToContainer="true"
+                     Centered
+                     Elevation="4"
+                     Rounded="true"
+                     PanelClass="pa-6"
+                     ActivePanelIndex="@ActivePanelIndex"
+                     ActivePanelIndexChanged="@(i => SetActivePanelIndex(i))">
+                    <MudTabPanel ToolTip="Name" Icon="@Icons.Filled.Person">
+                        <MudStack Spacing="4">
+                            <MudStack Row>
+                                <MudTextField Label="Firstname"
+                                          Variant="Variant.Filled"
+                                          FullWidth
+                                          Margin="Margin.Dense"
+                                          @bind-Value="@User.FirstName" />
+
+                                <MudTextField Label="LastName"
+                                          Variant="Variant.Filled"
+                                          FullWidth
+                                          Margin="Margin.Dense"
+                                          @bind-Value="@User.LastName" />
+                            </MudStack>
+                            <MudTextField Label="Fullname"
                                       Variant="Variant.Filled"
                                       FullWidth
                                       Margin="Margin.Dense"
-                                      @bind-Value="@User.FirstName" />
+                                      @bind-Value="@User.FullName" />
 
-                            <MudTextField Label="LastName"
-                                      Variant="Variant.Filled"
-                                      FullWidth
-                                      Margin="Margin.Dense"
-                                      @bind-Value="@User.LastName" />
-                        </MudStack>
-                        <MudTextField Label="Fullname"
-                                  Variant="Variant.Filled"
-                                  FullWidth
-                                  Margin="Margin.Dense"
-                                  @bind-Value="@User.FullName" />
-
-                        <MudTextField Label="Company"
-                                  Variant="Variant.Filled"
-                                  Margin="Margin.Dense"
-                                  @bind-Value="@User.CompanyName" />
-
-                    </MudStack>
-                </MudTabPanel>
-                <MudTabPanel Text="Address" Icon="@Icons.Filled.LocationCity">
-                    <MudStack Spacing="4">
-                        <MudTextField Label="Address 1"
-                                  Variant="Variant.Filled"
-                                  Margin="Margin.Dense"
-                                  @bind-Value="@User.AddressStreetAddress1" />
-
-                        <MudTextField Label="Address 2"
-                                  Variant="Variant.Filled"
-                                  Margin="Margin.Dense"
-                                  @bind-Value="@User.AddressStreetAddress2" />
-
-                        <MudStack Row>
-                            <MudTextField Label="Postalcode"
-                                      Style="width: 100px"
+                            <MudTextField Label="Company"
                                       Variant="Variant.Filled"
                                       Margin="Margin.Dense"
-                                      Class="flex-grow-0"
-                                      @bind-Value="@User.AddressPostalCode" />
-
-                            <MudTextField Label="City"
-                                      Variant="Variant.Filled"
-                                      Margin="Margin.Dense"
-                                      @bind-Value="@User.AddressLocality" />
+                                      @bind-Value="@User.CompanyName" />
 
                         </MudStack>
-                        <MudStack Row>
-                            <MudTextField Label="Region"
+                    </MudTabPanel>
+                    <MudTabPanel ToolTip="Address" Icon="@Icons.Filled.LocationCity">
+                        <MudStack Spacing="4">
+                            <MudTextField Label="Address 1"
                                       Variant="Variant.Filled"
                                       Margin="Margin.Dense"
-                                      @bind-Value="@User.AddressRegion" />
-                            <MudTextField Label="Country"
+                                      @bind-Value="@User.AddressStreetAddress1" />
+
+                            <MudTextField Label="Address 2"
                                       Variant="Variant.Filled"
                                       Margin="Margin.Dense"
-                                      @bind-Value="@User.AddressCountry" />
+                                      @bind-Value="@User.AddressStreetAddress2" />
+
+                            <MudStack Row>
+                                <MudTextField Label="Postalcode"
+                                          Style="width: 100px"
+                                          Variant="Variant.Filled"
+                                          Margin="Margin.Dense"
+                                          Class="flex-grow-0"
+                                          @bind-Value="@User.AddressPostalCode" />
+
+                                <MudTextField Label="City"
+                                          Variant="Variant.Filled"
+                                          Margin="Margin.Dense"
+                                          @bind-Value="@User.AddressLocality" />
+
+                            </MudStack>
+                            <MudStack Row>
+                                <MudTextField Label="Region"
+                                          Variant="Variant.Filled"
+                                          Margin="Margin.Dense"
+                                          @bind-Value="@User.AddressRegion" />
+                                <MudTextField Label="Country"
+                                          Variant="Variant.Filled"
+                                          Margin="Margin.Dense"
+                                          @bind-Value="@User.AddressCountry" />
+                            </MudStack>
                         </MudStack>
-                    </MudStack>
-                </MudTabPanel>
-                <MudTabPanel Text="Appearance" Icon="@Icons.Filled.RemoveRedEye">
-                    <MudStack Spacing="4">
-                        <MudTextField Label="Initials"
-                                  Variant="Variant.Filled"
-                                  Margin="Margin.Dense"
-                                  @bind-Value="@User.Initials" />
+                    </MudTabPanel>
+                    <MudTabPanel ToolTip="Appearance" Icon="@Icons.Filled.RemoveRedEye">
+                        <MudStack Spacing="4">
+                            <MudTextField Label="Initials"
+                                      Variant="Variant.Filled"
+                                      Margin="Margin.Dense"
+                                      @bind-Value="@User.Initials" />
 
-                        <MudColorPicker Label="Color"
-                                    Variant="Variant.Filled"
-                                    DisableToolbar="false"
-                                    DisableAlpha="true"
-                                    DisableColorField="false"
-                                    DisablePreview="false"
-                                    DisableSliders="false"
-                                    DisableInputs="true"
-                                    DisableModeSwitch="true"
-                                    ColorPickerMode="ColorPickerMode.RGB"
-                                    PickerVariant="PickerVariant.Dialog"
-                                    Value="@color"
-                                    ValueChanged="ColorChanged" />
+                            <MudColorPicker Label="Color"
+                                        Variant="Variant.Filled"
+                                        DisableToolbar="false"
+                                        DisableAlpha="true"
+                                        DisableColorField="false"
+                                        DisablePreview="false"
+                                        DisableSliders="false"
+                                        DisableInputs="true"
+                                        DisableModeSwitch="true"
+                                        ColorPickerMode="ColorPickerMode.RGB"
+                                        PickerVariant="PickerVariant.Dialog"
+                                        Value="@color"
+                                        ValueChanged="ColorChanged" />
 
-                    </MudStack>
-                </MudTabPanel>
-                <MudTabPanel Text="Claims" Icon="@Icons.Filled.Class">
-                    <UserClaimsSmall User="@User" AllowEdit />
-                </MudTabPanel>
-            </MudTabs>
+                        </MudStack>
+                    </MudTabPanel>
+                    <MudTabPanel ToolTip="Claims" Icon="@Icons.Filled.Class">
+                        <UserClaimsSmall User="@User" AllowEdit />
+                    </MudTabPanel>
+                </MudTabs>
 
-            <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="async () => await SaveUser()">Save</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="async () => await SaveUser()">Save</MudButton>
 
-        </MudStack>
-    </MudContainer>
-
+            </MudStack>
+        </MudContainer>
+    </div>
 
 }
 @code {
     [Parameter]
     public string UserId { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = nameof(ActivePanelIndex))]
+    public int ActivePanelIndex { get; set; } = 0;
+
+    private void SetActivePanelIndex(int activePanelIndex)
+    {
+        ActivePanelIndex = activePanelIndex;
+        NavigationManager.NavigateTo(
+            NavigationManager.GetUriWithQueryParameter(nameof(ActivePanelIndex), activePanelIndex)
+        );
+    }
+
     public XenialIdentityUser User { get; set; }
     public MudColor color;
 

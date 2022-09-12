@@ -110,9 +110,9 @@ else
     <MessageContent>
         <ul>
             <li>
-                Do your really want to delete the claim?
+                Do your really want to delete the claim <strong>@currentClaim?.Type</strong>?
             </li>
-            <li style="overflow: hidden">
+            <li style="overflow: hidden" class="my-2">
                 @if (currentClaim is not null)
                 {
                     <ClaimDisplay Claim="@currentClaim" />
