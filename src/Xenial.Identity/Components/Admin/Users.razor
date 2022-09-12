@@ -186,10 +186,20 @@
                   Variant="Variant.Text">@HighlightedValue.FirstName</MudField>
             <MudField Label="Lastname"
                   Variant="Variant.Text">@HighlightedValue.LastName</MudField>
-            <MudField Label="Email"
-                  Variant="Variant.Text">@HighlightedValue.Email</MudField>
-            <MudField Label="PhoneNumber"
-                  Variant="Variant.Text">@HighlightedValue.PhoneNumber</MudField>
+            <MudTooltip Inline="false" RootStyle="width: unset" Text="@(HighlightedValue.EmailConfirmed ? "E-Mail is confirmed" : "E-Mail is NOT confirmed")">
+                <MudField Label="Email"
+                      Variant="Variant.Text"
+                      Adornment="Adornment.End"
+                      AdornmentColor="@(HighlightedValue.EmailConfirmed ? Color.Success : Color.Error)"
+                      AdornmentIcon="@(HighlightedValue.EmailConfirmed ? Icons.Filled.CheckCircle : Icons.Filled.CheckCircleOutline)">@HighlightedValue.Email</MudField>
+            </MudTooltip>
+            <MudTooltip Inline="false" RootStyle="width: unset" Text="@(HighlightedValue.PhoneNumberConfirmed ? "Phonenumber is confirmed" : "Phonenumber is NOT confirmed")">
+                <MudField Label="PhoneNumber"
+                      Variant="Variant.Text"
+                      Adornment="Adornment.End"
+                      AdornmentColor="@(HighlightedValue.PhoneNumberConfirmed ? Color.Success : Color.Error)"
+                      AdornmentIcon="@(HighlightedValue.PhoneNumberConfirmed ? Icons.Filled.CheckCircle : Icons.Filled.CheckCircleOutline)">@HighlightedValue.PhoneNumber</MudField>
+            </MudTooltip>
             <MudText Typo="Typo.caption">Roles</MudText>
             <UserRolesChips User="@HighlightedValue" />
             <MudText Typo="Typo.caption">Claims</MudText>

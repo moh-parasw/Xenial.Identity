@@ -66,7 +66,7 @@
                     </MudTabPanel>
                     <MudTabPanel ToolTip="Authentification" Icon="@Icons.Filled.Key">
                         <MudStack Spacing="4">
-                            <MudTooltip Inline="false" RootStyle="width: unset" Text="@(User.PhoneNumberConfirmed ? "E-Mail is confirmed" : "E-Mail is NOT confirmed")">
+                            <MudTooltip Inline="false" RootStyle="width: unset" Text="@(User.EmailConfirmed ? "E-Mail is confirmed" : "E-Mail is NOT confirmed")">
                                 <MudTextField Label="E-Mail"
                                           Variant="Variant.Filled"
                                           FullWidth
