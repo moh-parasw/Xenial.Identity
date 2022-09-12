@@ -45,7 +45,7 @@
                                           Margin="Margin.Dense"
                                           @bind-Value="@User.FirstName" />
 
-                                <MudTextField Label="LastName"
+                                <MudTextField Label="Lastname"
                                           Variant="Variant.Filled"
                                           FullWidth
                                           Margin="Margin.Dense"
@@ -62,6 +62,33 @@
                                       Margin="Margin.Dense"
                                       @bind-Value="@User.CompanyName" />
 
+                        </MudStack>
+                    </MudTabPanel>
+                    <MudTabPanel ToolTip="Authentification" Icon="@Icons.Filled.Key">
+                        <MudStack Spacing="4">
+                            <MudTooltip Inline="false" RootStyle="width: unset" Text="@(User.PhoneNumberConfirmed ? "E-Mail is confirmed" : "E-Mail is NOT confirmed")">
+                                <MudTextField Label="E-Mail"
+                                          Variant="Variant.Filled"
+                                          FullWidth
+                                          Margin="Margin.Dense"
+                                          Adornment="Adornment.End"
+                                          AdornmentColor="@(User.EmailConfirmed ? Color.Success : Color.Error)"
+                                          AdornmentIcon="@(User.EmailConfirmed ? Icons.Filled.CheckCircle : Icons.Filled.CheckCircleOutline)"
+                                          OnAdornmentClick="() => User.EmailConfirmed = !User.EmailConfirmed"
+                                          @bind-Value="@User.Email" />
+                            </MudTooltip>
+
+                            <MudTooltip Inline="false" RootStyle="width: unset" Text="@(User.PhoneNumberConfirmed ? "Phonenumber is confirmed" : "Phonenumber is NOT confirmed")">
+                                <MudTextField Label="Phonenumber"
+                                          Variant="Variant.Filled"
+                                          FullWidth
+                                          Margin="Margin.Dense"
+                                          Adornment="Adornment.End"
+                                          AdornmentColor="@(User.PhoneNumberConfirmed ? Color.Success : Color.Error)"
+                                          AdornmentIcon="@(User.PhoneNumberConfirmed ? Icons.Filled.CheckCircle : Icons.Filled.CheckCircleOutline)"
+                                          OnAdornmentClick="() => User.PhoneNumberConfirmed = !User.PhoneNumberConfirmed"
+                                          @bind-Value="@User.PhoneNumber" />
+                            </MudTooltip>
                         </MudStack>
                     </MudTabPanel>
                     <MudTabPanel ToolTip="Address" Icon="@Icons.Filled.LocationCity">

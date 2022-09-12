@@ -20,6 +20,34 @@ public partial class UserDetails
 {
     protected async Task SaveUser()
     {
+        var existingUser = await UserManager.FindByIdAsync(User.Id);
+        if (existingUser is not null)
+        {
+            if (existingUser.PhoneNumber != User.PhoneNumber)
+            {
+                ShowSnackbarIfError(await UserManager.SetPhoneNumberAsync(User, User.PhoneNumber), "updating the phonenumber");
+            }
+            if (existingUser.Email != User.Email)
+            {
+                ShowSnackbarIfError(await UserManager.SetEmailAsync(User, User.Email), "updating the email");
+            }
+            if (existingUser.PhoneNumberConfirmed != User.PhoneNumberConfirmed)
+            {
+                if (User.PhoneNumberConfirmed)
+                {
+                    var token = await UserManager.GenerateChangePhoneNumberTokenAsync(User, User.PhoneNumber);
+                    ShowSnackbarIfError(await UserManager.ChangePhoneNumberAsync(User, User.PhoneNumber, token), "confirming the phone number");
+                }
+            }
+            if (existingUser.EmailConfirmed != User.EmailConfirmed)
+            {
+                if (User.EmailConfirmed)
+                {
+                    var token = await UserManager.GenerateEmailConfirmationTokenAsync(User);
+                    ShowSnackbarIfError(await UserManager.ConfirmEmailAsync(User, token), "confirming the email address");
+                }
+            }
+        }
 
         await UserManager.SetOrUpdateClaimAsync(User, new Claim("name", User.FullName ?? string.Empty));
         await UserManager.SetOrUpdateClaimAsync(User, new Claim("family_name", User.LastName ?? string.Empty));
@@ -53,37 +81,7 @@ public partial class UserDetails
         User.UpdatedAt = DateTime.Now;
         var result = await UserManager.UpdateAsync(User);
 
-        if (result.Succeeded)
-        {
-            await ReloadUser();
-            Snackbar.Add($"""
-                <ul>
-                    <li>
-                        User was successfully updated!
-                    </li>
-                    <li>
-                        <em>{User.UserName}</em>
-                    </li>
-                </ul>
-                """, MudBlazor.Severity.Success);
-        }
-        else
-        {
-            var errors = string.Join("\n", result.Errors.Select(e => $"<li>Code: {e.Code}: {e.Description}</li>"));
-
-            Snackbar.Add($"""
-                <ul>
-                    <li>
-                        There was an error when updating the user!
-                    </li>
-                    <li>
-                        <em>{User.UserName}</em>
-                    </li>
-                    {errors}
-                </ul>
-                """, MudBlazor.Severity.Error);
-        }
-
+        await ShowSnackback(result);
 
         static double? ConvertToUnixTimestamp(DateTime? date)
         {
@@ -96,6 +94,49 @@ public partial class UserDetails
             return null;
         }
 
+        async Task ShowSnackback(IdentityResult result)
+        {
+            if (result.Succeeded)
+            {
+                await ReloadUser();
+                Snackbar.Add($"""
+                <ul>
+                    <li>
+                        User was successfully updated!
+                    </li>
+                    <li>
+                        <em>{User.UserName}</em>
+                    </li>
+                </ul>
+                """, MudBlazor.Severity.Success);
+            }
+            else
+            {
+                ShowSnackbarIfError(result);
+            }
+        }
+
+        void ShowSnackbarIfError(IdentityResult result, string message = "updating the user")
+        {
+            if (result.Succeeded)
+            {
+                return;
+            }
+
+            var errors = string.Join("\n", result.Errors.Select(e => $"<li>Code: {e.Code}: {e.Description}</li>"));
+
+            Snackbar.Add($"""
+                <ul>
+                    <li>
+                        There was an error when {message}!
+                    </li>
+                    <li>
+                        <em>{User.UserName}</em>
+                    </li>
+                    {errors}
+                </ul>
+                """, MudBlazor.Severity.Error);
+        }
     }
 
     private async Task UploadProfilePicture(InputFileChangeEventArgs e)
