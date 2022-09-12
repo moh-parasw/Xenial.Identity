@@ -1,8 +1,16 @@
-﻿using MudBlazor.Utilities;
+﻿using IdentityModel;
+
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Identity;
+
+using MudBlazor.Utilities;
 
 using Newtonsoft.Json;
 
+using System.IO;
 using System.Security.Claims;
+
+using TextMateSharp.Themes;
 
 using Xenial.Identity.Infrastructure;
 
@@ -86,6 +94,101 @@ public partial class UserDetails
                 return Math.Floor(diff.TotalSeconds);
             }
             return null;
+        }
+
+    }
+
+    private async Task UploadProfilePicture(InputFileChangeEventArgs e)
+    {
+        using var reader = e.File.OpenReadStream();
+        using var ms = new MemoryStream();
+        await reader.CopyToAsync(ms);
+        User.PictureMimeType = e.File.ContentType;
+        User.Picture = ms.ToArray();
+
+        if (string.IsNullOrEmpty(User.PictureId)) //We only set a new one if there wasn't one before
+        {
+            User.PictureId = CryptoRandom.CreateUniqueId();
+        }
+
+        string AbsolutePictureUri(string pictureId)
+            => $"{NavigationManager.BaseUri}api/profile/picture/{pictureId}";
+
+        var picture = AbsolutePictureUri(User.PictureId);
+        await UserManager.SetOrUpdateClaimAsync(User, new System.Security.Claims.Claim("picture", picture));
+
+        var result = await UserManager.UpdateAsync(User);
+
+        if (result.Succeeded)
+        {
+            await ReloadUser();
+            Snackbar.Add($"""
+                <ul>
+                    <li>
+                        Profile picture was successfully updated!
+                    </li>
+                    <li>
+                        <em>{User.UserName}</em>
+                    </li>
+                </ul>
+                """, MudBlazor.Severity.Success);
+        }
+        else
+        {
+            var errors = string.Join("\n", result.Errors.Select(e => $"<li>Code: {e.Code}: {e.Description}</li>"));
+
+            Snackbar.Add($"""
+                <ul>
+                    <li>
+                        There was an error when updating the profile picture!
+                    </li>
+                    <li>
+                        <em>{User.UserName}</em>
+                    </li>
+                    {errors}
+                </ul>
+                """, MudBlazor.Severity.Error);
+        }
+    }
+
+    private async Task DeleteProfilePicture()
+    {
+        User.Picture = new byte[0];
+        User.PictureMimeType = null;
+        //Don't reset PictureId. Should stay static as long user lives cause tokens are cached
+        //user.PictureId = null;
+        await UserManager.RemoveClaimAsync(User, "picture");
+
+        var result = await UserManager.UpdateAsync(User);
+        if (result.Succeeded)
+        {
+            await ReloadUser();
+            Snackbar.Add($"""
+                <ul>
+                    <li>
+                        Profile picture was successfully removed!
+                    </li>
+                    <li>
+                        <em>{User.UserName}</em>
+                    </li>
+                </ul>
+                """, MudBlazor.Severity.Success);
+        }
+        else
+        {
+            var errors = string.Join("\n", result.Errors.Select(e => $"<li>Code: {e.Code}: {e.Description}</li>"));
+
+            Snackbar.Add($"""
+                <ul>
+                    <li>
+                        There was an error when removing the profile picture!
+                    </li>
+                    <li>
+                        <em>{User.UserName}</em>
+                    </li>
+                    {errors}
+                </ul>
+                """, MudBlazor.Severity.Error);
         }
     }
 }

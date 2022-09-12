@@ -123,6 +123,26 @@
                                         Value="@color"
                                         ValueChanged="ColorChanged" />
 
+                            <InputFile id="profilePictureInput" OnChange="@UploadProfilePicture" hidden accept=".jpg, .jpeg, .png, .svg" />
+
+                            <MudButton HtmlTag="label"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Filled.CloudUpload"
+                                   for="profilePictureInput">
+                                Upload Profile Picture
+                            </MudButton>
+
+                            @if (User.Picture.Length > 0)
+                            {
+                                <MudButton Variant="Variant.Filled"
+                                   Color="Color.Error"
+                                   StartIcon="@Icons.Filled.Delete"
+                                   OnClick="@DeleteProfilePicture">Remove Profile Picture</MudButton>
+                            }
+
+                            <MudDivider />
+
                         </MudStack>
                     </MudTabPanel>
                     <MudTabPanel ToolTip="Claims" Icon="@Icons.Filled.Class">
