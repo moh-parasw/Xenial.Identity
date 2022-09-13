@@ -37,7 +37,7 @@
                      Centered
                      Elevation="4"
                      Rounded="true"
-                     PanelClass="@(ActivePanelIndex == 0 ? "pa-6" : "")"
+                     PanelClass="@((ActivePanelIndex == 1 || ActivePanelIndex == 2) ? "pa-6" : "")"
                      ActivePanelIndex="@ActivePanelIndex"
                      ActivePanelIndexChanged="@(i => SetActivePanelIndex(i))">
                     <MudTabPanel ToolTip="Name" Icon="@Icons.Filled.Person">
@@ -68,7 +68,8 @@
                         </MudStack>
                     </MudTabPanel>
                     <MudTabPanel ToolTip="Resources" Icon="@Icons.Filled.Interests">
-
+                        <MudText Typo="Typo.caption">Identity-Resources</MudText>
+                        <TagStringEdit @bind-Tags="@IdentityResources" SearchFunc="@SearchUserResources" />
                     </MudTabPanel>
                     <MudTabPanel ToolTip="Secrets" Icon="@Icons.Filled.Key">
                         <ApiSecrets Resource="@Api" />
@@ -110,7 +111,9 @@
         await Reload();
     }
 
-
     protected async Task Reload()
-        => Api = await UnitOfWork.GetObjectByKeyAsync<XpoApiResource>(ApiId);
+    {
+        Api = await UnitOfWork.GetObjectByKeyAsync<XpoApiResource>(ApiId);
+        IdentityResources = Api.UserClaims.Select(m => m.Type).ToList();
+    }
 }

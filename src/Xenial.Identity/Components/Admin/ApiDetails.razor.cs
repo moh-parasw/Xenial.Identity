@@ -1,11 +1,45 @@
-﻿namespace Xenial.Identity.Components.Admin;
+﻿using DevExpress.Xpo;
+
+using Duende.IdentityServer.Models;
+
+using Google.Protobuf.WellKnownTypes;
+
+using Microsoft.AspNetCore.Identity;
+
+using Xenial.Identity.Xpo.Storage.Models;
+
+namespace Xenial.Identity.Components.Admin;
 
 public partial class ApiDetails
 {
+    private IList<string> IdentityResources { get; set; } = new List<string>();
+
+    private async Task<IEnumerable<string>> SearchUserResources(string x)
+    {
+        var resources = await UnitOfWork.Query<XpoIdentityResource>().Select(r => r.Name).ToArrayAsync();
+
+        if (string.IsNullOrEmpty(x))
+        {
+            return resources.Except(IdentityResources);
+        }
+
+        return resources.Except(IdentityResources).Where(v => v.Contains(x, StringComparison.InvariantCultureIgnoreCase));
+    }
+
     protected async Task SaveRole()
     {
         try
         {
+            foreach (var userClaim in Api.UserClaims.ToList())
+            {
+                Api.UserClaims.Remove(userClaim);
+            }
+
+            Api.UserClaims.AddRange(IdentityResources.Select(userClaim => new XpoApiResourceClaim(UnitOfWork)
+            {
+                Type = userClaim
+            }));
+
             await UnitOfWork.SaveAsync(Api);
             await UnitOfWork.CommitChangesAsync();
             await Reload();
