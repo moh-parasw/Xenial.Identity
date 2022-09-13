@@ -4,15 +4,15 @@
     <a asp-page="./EditPicture">
         @if (Model != null && string.IsNullOrEmpty(Model.ImageUri) && string.IsNullOrEmpty(Model.Inititals))
         {
-        <i class="fas fa-user profile-card__image-item"></i>
+            <i class="fas fa-user profile-card__image-item"></i>
         }
         else if (Model != null && !string.IsNullOrEmpty(Model.ImageUri))
         {
-        <img src="@Model.ImageUri" class="profile-card__image-item" />
+            <img src="@Html.Raw(Model.ImageUri)" class="profile-card__image-item" style="width: 100px;" />
         }
         else
         {
-        <span class="profile-card__image-initials profile-card__image-item" style="--data-forecolor: @Model.ForeColor; --data-backcolor: @Model.BackColor;">@Model.Inititals</span>
+            <span class="profile-card__image-initials profile-card__image-item" style="--data-forecolor: @Model.ForeColor; --data-backcolor: @Model.BackColor;">@Model.Inititals</span>
         }
     </a>
 </div>

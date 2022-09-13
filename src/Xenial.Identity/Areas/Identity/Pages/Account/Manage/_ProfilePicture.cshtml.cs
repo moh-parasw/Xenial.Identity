@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 using Xenial.Identity.Components;
 using Xenial.Identity.Data;
