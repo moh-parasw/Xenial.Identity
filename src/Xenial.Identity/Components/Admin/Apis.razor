@@ -68,7 +68,10 @@
             <MudTableSortLabel T="XpoApiResource"
                                SortLabel="@(nameof(XpoApiResource.Name))">Name</MudTableSortLabel>
         </MudTh>
-
+        <MudTh>
+            <MudTableSortLabel T="XpoApiResource"
+                               SortLabel="@(nameof(XpoApiResource.DisplayName))">Displayname</MudTableSortLabel>
+        </MudTh>
         <MudTh Style="width:0.1%; white-space: nowrap;">
 
         </MudTh>
@@ -87,6 +90,9 @@
         </MudTd>
         <MudTd DataLabel="@(nameof(context.Name))">
             <MudHighlighter Text="@context.Name" HighlightedText="@search" />
+        </MudTd>
+        <MudTd DataLabel="@(nameof(context.DisplayName))">
+            <MudHighlighter Text="@context.DisplayName" HighlightedText="@search" />
         </MudTd>
         <MudTd>
             <MudStack Row>
@@ -160,7 +166,7 @@
             </MudStack>
 
             @*<MudText Typo="Typo.caption">Claims</MudText>
-            <RoleClaimsSmall Role="@HighlightedValue" />*@
+        <RoleClaimsSmall Role="@HighlightedValue" />*@
         </MudStack>
     </MudDrawer>
 }
@@ -237,6 +243,7 @@
                 {
                     nameof(XpoApiResource.Id) => items.OrderByDirection(state.SortDirection, x => x.Id),
                     nameof(XpoApiResource.Name) => items.OrderByDirection(state.SortDirection, x => x.Name),
+                    nameof(XpoApiResource.DisplayName) => items.OrderByDirection(state.SortDirection, x => x.DisplayName),
                     _ => items
                 };
             }

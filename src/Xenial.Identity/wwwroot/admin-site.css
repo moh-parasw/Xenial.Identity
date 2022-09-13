@@ -2,6 +2,10 @@
   font-family: 'Roboto', sans-serif;
 }
 
+.mud-nav-link.active .mud-nav-link-icon {
+  color: var(--mud-palette-primary)!important;
+}
+
 /**
  * ==============================================
  * Main Colors with theming

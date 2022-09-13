@@ -10,11 +10,16 @@
 
 <MudLayout>
     <MudAppBar Elevation="1" Dense>
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        @if ((drawerVariant == DrawerVariant.Responsive) || (drawerVariant == DrawerVariant.Mini && drawerOpen))
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        }
         <MudSpacer />
         @if (!drawerOpen)
         {
-            <MudIcon Icon="@Icons.Filled.RocketLaunch" Size="Size.Small" />
+            <MudLink Href="/Admin2">
+                <MudIcon Color="Color.Default" Icon="@Icons.Filled.RocketLaunch" Size="Size.Small" Class="pointer-cursor" />
+            </MudLink>
         }
         <MudSpacer />
         <MudTooltip Text="Preview Site">
@@ -28,7 +33,13 @@
         <MudDrawerHeader>
             @if (drawerOpen)
             {
-                <MudIcon Icon="@Icons.Filled.RocketLaunch" Size="Size.Large" />
+                <MudLink Href="/Admin2">
+                    <MudIcon Color="Color.Default" Icon="@Icons.Filled.RocketLaunch" Size="Size.Large" Class="pointer-cursor" />
+                </MudLink>
+            }
+            else
+            {
+                <MudIconButton Style="margin-left: -1.2rem; margin-top: -1rem;" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" OnClick="@((e) => DrawerToggle())" />
             }
         </MudDrawerHeader>
         <MudNavMenu Style="height: 100%">
