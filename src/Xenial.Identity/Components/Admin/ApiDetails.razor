@@ -37,7 +37,7 @@
                      Centered
                      Elevation="4"
                      Rounded="true"
-                     PanelClass="@((ActivePanelIndex == 1 || ActivePanelIndex == 2) ? "pa-6" : "")"
+                     PanelClass="@((ActivePanelIndex == 0 || ActivePanelIndex == 1) ? "pa-6" : "")"
                      ActivePanelIndex="@ActivePanelIndex"
                      ActivePanelIndexChanged="@(i => SetActivePanelIndex(i))">
                     <MudTabPanel ToolTip="Name" Icon="@Icons.Filled.Person">
@@ -70,6 +70,33 @@
                     <MudTabPanel ToolTip="Resources" Icon="@Icons.Filled.Interests">
                         <MudText Typo="Typo.caption">Identity-Resources</MudText>
                         <TagStringEdit @bind-Tags="@IdentityResources" SearchFunc="@SearchUserResources" />
+
+                        <MudPaper Class="mx-0 mt-6" Elevation="0">
+                            <MudToolBar Row Class="ma-0">
+                                <MudText Typo="Typo.body1">Resources</MudText>
+                                <MudSpacer />
+                                <MudTooltip Text="Add">
+                                    <MudIconButton Icon="@Icons.Filled.Add"
+                                               Href="/Admin2/AddApi"
+                                               Color="Color.Success" />
+                                </MudTooltip>
+                            </MudToolBar>
+                            <MudList Clickable="false">
+                                <MudListItem Text="@Api.Name" InitiallyExpanded="true">
+                                    <NestedList>
+                                        <MudListItem>
+                                            @Api.Name:read
+                                        </MudListItem>
+                                        <MudListItem>
+                                            @Api.Name:write
+                                        </MudListItem>
+                                        <MudListItem>
+                                            @Api.Name:manage
+                                        </MudListItem>
+                                    </NestedList>
+                                </MudListItem>
+                            </MudList>
+                        </MudPaper>
                     </MudTabPanel>
                     <MudTabPanel ToolTip="Secrets" Icon="@Icons.Filled.Key">
                         <ApiSecrets Resource="@Api" />
