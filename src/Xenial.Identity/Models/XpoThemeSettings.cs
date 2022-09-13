@@ -32,6 +32,93 @@ and
         CopyrightHtml = @"Copyright © 2012-{{ year }} Manuel Grundner. All
 trademarks or registered trademarks are property of their respective
 owners.";
+
+        CustomCss = """
+            /* .xenial-header__logo__brand-rows {
+                display: none;
+            }
+
+            .xenial-header__logo img {
+                width: 100%;
+            } */
+
+            /* Dark Theme */
+            /* .xenial__toggletheme-checkbox:not(:checked) ~ * {
+                --xenial-styria-green-color: #007e2d;
+                --xenial-austria-red-color: #c8102e;
+                --xenial-primary-color: #00506a;
+                --xenial-secondary-color: #38bcd8;
+                --xenial-highlight-color: #f3a027;
+                --xenial-lighter-color: #e4e4e4;
+                --xenial-light-color: #8b93a1;
+                --xenial-dark-color: #667a86;
+                --xenial-darker-color: #333333;
+                --xenial-white-color: #fff;
+                --xenial-black-color: #000;
+                --xenial-body-bg-color: #667a86;
+                --xenial-nav-bg-color: #667a86;
+                --xenial-hamburer-bg-color: rgba($xenial-dark-color, 0.85);
+                --xenial-teaser-bg-color: #00506a;
+                --xenial-teaser-fg-color: #e4e4e4;
+                --xenial-teaser-highlight-color: #38bcd8;
+                --xenial-fineprint-bg-color: #38bcd8;
+                --xenial-fineprint-fg-color: #e4e4e4;
+                --xenial-fineprint-highlight-color: #38bcd8;
+                --xenial-tag-color: #f3a027;
+                --highlight-fg: #d4d4d4;
+                --highlight-bg: #1e1e1e;
+                --highlight-selection-bg: #b3d4fc;
+                --highlight-token-comment: #6a9955;
+                --highlight-token-constant: #b5cea8;
+                --highlight-token-string: #ce9178;
+                --highlight-token-keyword: #c586c0;
+                --highlight-token-function: #dcdcaa;
+                --highlight-token-variable: #d16969;
+                --highlight-token-parameter: #9cdcfe;
+                --highlight-token-classname: #4ec9b0;
+                --highlight-token-interpolation: #569cd6;
+                --highlight-token-boolean: #569cd6;
+                --highlight-token-selector: #d7ba7d;
+            } */
+
+            /* Light Theme */
+            /* .xenial__toggletheme-checkbox:checked ~ * {
+                --xenial-styria-green-color: #007e2d;
+                --xenial-austria-red-color: #c8102e;
+                --xenial-lighter-color: #333333;
+                --xenial-light-color: #667a86;
+                --xenial-dark-color: #8b93a1;
+                --xenial-darker-color: #e4e4e4;
+                --xenial-white-color: #000;
+                --xenial-black-color: #fff;
+                --xenial-primary-color: #38bcd8;
+                --xenial-secondary-color: #00506a;
+                --xenial-body-bg-color: #8b93a1;
+                --xenial-nav-bg-color: #8b93a1;
+                --xenial-hamburer-bg-color: rgba(139, 147, 161, 0.85);
+                --xenial-teaser-bg-color: #38bcd8;
+                --xenial-teaser-fg-color: #333333;
+                --xenial-teaser-highlight-color: #f3a027;
+                --xenial-fineprint-bg-color: #38bcd8;
+                --xenial-fineprint-fg-color: #e4e4e4;
+                --xenial-fineprint-highlight-color: #00506a;
+                --xenial-tag-color: #38bcd8;
+                --highlight-fg: #393a34;
+                --highlight-bg: #ffffff;
+                --highlight-selection-bg: #c1def1;
+                --highlight-token-comment: #008000;
+                --highlight-token-constant: #36acaa;
+                --highlight-token-string: #a31515;
+                --highlight-token-keyt: aword: #0000ff;
+                --highlight-token-function: #393a34;
+                --highlight-token-variable: #d16969;
+                --highlight-token-parameter: #2b91af;
+                --highlight-token-classname: #2b91af;
+                --highlight-token-interpolation: #2b91af;
+                --highlight-token-boolean: #0000ff;
+                --highlight-token-selector: #800000;
+            } */
+            """;
         base.AfterConstruction();
     }
 
