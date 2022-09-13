@@ -1,21 +1,24 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using DevExpress.Xpo;
+
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 
 using Xenial.Identity.Data;
+using Xenial.Identity.Xpo.Storage.Models;
 
 namespace Xenial.Identity.Components.Admin;
 
 public partial class Apis
 {
-    private async Task DeleteRole(IdentityRole role)
+    private async Task Delete(XpoApiResource resource)
     {
-        var delete = await DialogService.ShowMessageBox("Delete Role", (MarkupString)$"""
+        var delete = await DialogService.ShowMessageBox("Delete API", (MarkupString)$"""
             <ul>
                 <li>
-                    Do your really want to delete the role?
+                    Do your really want to delete the API?
                 </li>
                 <li>
-                    <em>{role.Name}</em>
+                    <em>{resource.Name}</em>
                 </li>
                 <li>
                     <strong>This operation can <em>not</em> be undone!</strong>
@@ -25,31 +28,32 @@ public partial class Apis
 
         if (delete == true)
         {
-            var result = await RolesManager.DeleteAsync(role);
-            if (result.Succeeded)
+            try
             {
+                await UnitOfWork.DeleteAsync(resource);
+                await UnitOfWork.CommitChangesAsync();
                 Snackbar.Add($"""
                     <ul>
                         <li>
-                            Role was successfully deleted!
+                            API was successfully deleted!
                         </li>
                         <li>
-                            <em>{role.Name}</em>
+                            <em>{resource.Name}</em>
                         </li>
                     </ul>
                     """, MudBlazor.Severity.Success);
             }
-            else
+            catch (Exception ex)
             {
-                var errors = string.Join("\n", result.Errors.Select(e => $"<li>Code: {e.Code}: {e.Description}</li>"));
+                var errors = ex.Message;
 
                 Snackbar.Add($"""
                     <ul>
                         <li>
-                            There was an error when deleting the role!
+                            There was an error when deleting the API!
                         </li>
                         <li>
-                            <em>{role.Name}</em>
+                            <em>{resource.Name}</em>
                         </li>
                         {errors}
                     </ul>

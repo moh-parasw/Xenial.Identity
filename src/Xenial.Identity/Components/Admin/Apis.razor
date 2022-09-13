@@ -4,7 +4,8 @@
 @using MudBlazor.Utilities
 @using Xenial.Identity.Areas.Identity.Pages.Account.Manage
 @using Xenial.Identity.Data
-@inject RoleManager<IdentityRole> RolesManager
+@using Xenial.Identity.Xpo.Storage.Models
+@inject UnitOfWork UnitOfWork
 @inject IJsApiService JsApiService
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
@@ -35,7 +36,7 @@
         <MudSpacer />
         <MudTooltip Text="Add">
             <MudIconButton Icon="@Icons.Filled.Add"
-                           Href="/Admin2/AddRole"
+                           Href="/Admin2/AddApi"
                            Color="Color.Success" />
         </MudTooltip>
         <MudTooltip Text="Refresh">
@@ -47,11 +48,11 @@
 </MudPaper>
 <MudTable @ref="table"
           RowsPerPage="100"
-          T="IdentityRole"
+          T="XpoApiResource"
           Dense
           FixedHeader
           Elevation="10"
-          ServerData="@(new Func<TableState, Task<TableData<IdentityRole>>>(ServerReload))"
+          ServerData="@(new Func<TableState, Task<TableData<XpoApiResource>>>(ServerReload))"
           Virtualize="true"
           Height="calc(100vh - 21em)"
           Class="mb-0"
@@ -60,28 +61,28 @@
           OnRowClick="RowClickEvent">
     <HeaderContent>
         <MudTh Style="width:0.1%; white-space: nowrap;">
-            <MudTableSortLabel T="IdentityRole"
-                               SortLabel="@(nameof(IdentityRole.Id))">Id</MudTableSortLabel>
+            <MudTableSortLabel T="XpoApiResource"
+                               SortLabel="@(nameof(XpoApiResource.Id))">Id</MudTableSortLabel>
         </MudTh>
         <MudTh>
-            <MudTableSortLabel T="IdentityRole"
-                               SortLabel="@(nameof(IdentityRole.Name))">Name</MudTableSortLabel>
+            <MudTableSortLabel T="XpoApiResource"
+                               SortLabel="@(nameof(XpoApiResource.Name))">Name</MudTableSortLabel>
         </MudTh>
-       
+
         <MudTh Style="width:0.1%; white-space: nowrap;">
 
         </MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="@(nameof(IdentityRole.Id))">
-            <MudTooltip Text="@context.Id">
+        <MudTd DataLabel="@(nameof(XpoApiResource.Id))">
+            <MudTooltip Text="@context.Id.ToString()">
                 <MudIconButton Size="Size.Small"
                                DisableElevation
                                Color="Color.Transparent"
                                Variant="Variant.Filled"
                                Icon="@Icons.Filled.Fingerprint"
                                Style="background-color: transparent"
-                               OnClick="async () => await CopyToClipboard(context.Id)" />
+                               OnClick="async () => await CopyToClipboard(context.Id.ToString())" />
             </MudTooltip>
         </MudTd>
         <MudTd DataLabel="@(nameof(context.Name))">
@@ -94,14 +95,14 @@
                                    Variant="Variant.Filled"
                                    Color="Color.Error"
                                    Size="Size.Small"
-                                   OnClick="async () => await DeleteRole(context)" />
+                                   OnClick="async () => await Delete(context)" />
                 </MudTooltip>
                 <MudTooltip Text="Edit">
                     <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                    Variant="Variant.Filled"
                                    Color="Color.Primary"
                                    Size="Size.Small"
-                                   Href="@($"/Admin2/Role/{context.Id}")" />
+                                   Href="@($"/Admin2/Api/{context.Id}")" />
                 </MudTooltip>
             </MudStack>
         </MudTd>
@@ -113,15 +114,15 @@
         @if (total > 0)
         {
             <ul>
-                <li>There are no roles found matching '@search'</li>
+                <li>There are no API's found matching '@search'</li>
                 <li><MudButton Size="Size.Small" Color="Color.Primary" OnClick="async () => await SearchChanged(string.Empty)">Clear Filter</MudButton></li>
             </ul>
         }
         else
         {
             <ul>
-                <li>There are no roles yet.</li>
-                <li>Do you want to <MudLink Class="cursor-pointer" Href="/Admin2/AddRole">Add a Role</MudLink></li>
+                <li>There are no API's yet.</li>
+                <li>Do you want to <MudLink Class="cursor-pointer" Href="/Admin2/AddApi">Add an API</MudLink></li>
             </ul>
         }
     </NoRecordsContent>
@@ -147,19 +148,19 @@
                            Variant="Variant.Filled"
                            Color="Color.Error"
                            Size="Size.Small"
-                           OnClick="async () => await DeleteRole(HighlightedValue)">Delete</MudButton>
+                           OnClick="async () => await Delete(HighlightedValue)">Delete</MudButton>
                 </MudTooltip>
                 <MudTooltip Text="Edit">
                     <MudButton EndIcon="@Icons.Material.Filled.Edit"
                            Variant="Variant.Filled"
                            Color="Color.Primary"
                            Size="Size.Small"
-                           Href="@($"/Admin2/Role/{HighlightedValue.Id}")">Edit</MudButton>
+                           Href="@($"/Admin2/Api/{HighlightedValue.Id}")">Edit</MudButton>
                 </MudTooltip>
             </MudStack>
-            
-            <MudText Typo="Typo.caption">Claims</MudText>
-            <RoleClaimsSmall Role="@HighlightedValue" />
+
+            @*<MudText Typo="Typo.caption">Claims</MudText>
+            <RoleClaimsSmall Role="@HighlightedValue" />*@
         </MudStack>
     </MudDrawer>
 }
@@ -167,17 +168,17 @@
 
 
     bool openDrawer;
-    private IdentityRole HighlightedValue;
+    private XpoApiResource HighlightedValue;
 
     private void CloseDrawer()
         => openDrawer = false;
 
-    private string SelectedRowClassFunc(IdentityRole element, int rowNumber)
+    private string SelectedRowClassFunc(XpoApiResource element, int rowNumber)
         => new CssBuilder("cursor-pointer")
-            .AddClass("mud-selected-item mud-primary-hover", EqualityComparer<IdentityRole>.Default.Equals(HighlightedValue, element))
+            .AddClass("mud-selected-item mud-primary-hover", EqualityComparer<XpoApiResource>.Default.Equals(HighlightedValue, element))
             .Build();
 
-    private void RowClickEvent(TableRowClickEventArgs<IdentityRole> e)
+    private void RowClickEvent(TableRowClickEventArgs<XpoApiResource> e)
     {
         HighlightedValue = e.Item;
         if (HighlightedValue is null)
@@ -199,7 +200,7 @@
 
     private string search;
     private int? total;
-    private MudTable<IdentityRole> table;
+    private MudTable<XpoApiResource> table;
     private bool IsLoading = true;
 
     private async Task SearchChanged(string search)
@@ -214,19 +215,19 @@
         Snackbar.Add($"Copied {content} to clipboard!", Severity.Info);
     }
 
-    private async Task<TableData<IdentityRole>> ServerReload(TableState state)
+    private async Task<TableData<XpoApiResource>> ServerReload(TableState state)
     {
         try
         {
-            total = await RolesManager.Roles.CountAsync();
-            var items = RolesManager.Roles;
+            var query = UnitOfWork.Query<XpoApiResource>().AsQueryable();
+            total = await query.CountAsync();
+            var items = query;
 
             if (!string.IsNullOrEmpty(search))
             {
                 var s = search.ToLowerInvariant();
                 items = items.Where(i =>
-                    i.Id.ToLower() == s
-                    || i.Name.ToLower().Contains(s)
+                    i.Name.ToLower().Contains(s)
                 );
             }
 
@@ -234,8 +235,8 @@
             {
                 items = state.SortLabel switch
                 {
-                    nameof(IdentityRole.Id) => items.OrderByDirection(state.SortDirection, x => x.Id),
-                    nameof(IdentityRole.Name) => items.OrderByDirection(state.SortDirection, x => x.Name),
+                    nameof(XpoApiResource.Id) => items.OrderByDirection(state.SortDirection, x => x.Id),
+                    nameof(XpoApiResource.Name) => items.OrderByDirection(state.SortDirection, x => x.Name),
                     _ => items
                 };
             }
@@ -244,11 +245,11 @@
                 .Take(state.PageSize)
                 .ToArrayAsync();
 
-            return new TableData<IdentityRole>()
-            {
-                Items = result,
-                TotalItems = total.Value
-            };
+            return new TableData<XpoApiResource>()
+                {
+                    Items = result,
+                    TotalItems = total.Value
+                };
         }
         finally
         {
