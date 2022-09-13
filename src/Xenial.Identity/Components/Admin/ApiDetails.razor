@@ -37,7 +37,7 @@
                      Centered
                      Elevation="4"
                      Rounded="true"
-                     PanelClass="pa-6"
+                     PanelClass="@(ActivePanelIndex == 0 ? "pa-6" : "")"
                      ActivePanelIndex="@ActivePanelIndex"
                      ActivePanelIndexChanged="@(i => SetActivePanelIndex(i))">
                     <MudTabPanel ToolTip="Name" Icon="@Icons.Filled.Person">
@@ -66,6 +66,12 @@
                                 <MudSwitch @bind-Checked="@Api.NonEditable" Label="Non Editable" Color="Color.Secondary" />
                             </MudStack>
                         </MudStack>
+                    </MudTabPanel>
+                    <MudTabPanel ToolTip="Resources" Icon="@Icons.Filled.Interests">
+
+                    </MudTabPanel>
+                    <MudTabPanel ToolTip="Secrets" Icon="@Icons.Filled.Key">
+                        <ApiSecrets Resource="@Api" />
                     </MudTabPanel>
                     @*                    <MudTabPanel ToolTip="Claims" Icon="@Icons.Filled.Class">
                 <RoleClaimsSmall Role="@Api" AllowEdit />
