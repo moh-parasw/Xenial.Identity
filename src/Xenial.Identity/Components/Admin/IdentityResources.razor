@@ -1,0 +1,268 @@
+﻿@page "/Admin2/IdentityResources"
+@using DevExpress.Data.Filtering
+@using Microsoft.AspNetCore.Identity
+@using MudBlazor.Utilities
+@using Xenial.Identity.Areas.Identity.Pages.Account.Manage
+@using Xenial.Identity.Data
+@using Xenial.Identity.Xpo.Storage.Models
+@inject UnitOfWork UnitOfWork
+@inject IJsApiService JsApiService
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+<MudText Typo="Typo.h3" GutterBottom>Identity Resources</MudText>
+
+<MudPaper Elevation="10" Class="mb-1" Square>
+    <MudToolBar Dense>
+        @if (total.HasValue)
+        {
+            <MudText Class="mr-2"
+                 Typo="Typo.caption">Total: @total.Value</MudText>
+        }
+        <MudTextField Immediate
+                      Clearable
+                      DebounceInterval="200"
+                      Value="@search"
+                      ValueChanged="@(async (string s) => await SearchChanged(s))"
+                      Label="Search"
+                      Variant="Variant.Outlined"
+                      Adornment="Adornment.End"
+                      Margin="Margin.Dense"
+                      IconSize="Size.Small"
+                      AdornmentIcon="@Icons.Filled.Search"
+                      AdornmentColor="Color.Secondary"
+                      Style="width: 200px" />
+
+        <MudSpacer />
+        <MudTooltip Text="Add">
+            <MudIconButton Icon="@Icons.Filled.Add"
+                           Href="/Admin2/AddIdentityResource"
+                           Color="Color.Success" />
+        </MudTooltip>
+        <MudTooltip Text="Refresh">
+            <MudIconButton Icon="@Icons.Filled.Refresh"
+                           OnClick="@table.ReloadServerData"
+                           Color="Color.Primary" />
+        </MudTooltip>
+    </MudToolBar>
+</MudPaper>
+<MudTable @ref="table"
+          RowsPerPage="100"
+          T="XpoIdentityResource"
+          Dense
+          FixedHeader
+          Elevation="10"
+          ServerData="@(new Func<TableState, Task<TableData<XpoIdentityResource>>>(ServerReload))"
+          Virtualize="true"
+          Height="calc(100vh - 21em)"
+          Class="mb-0"
+          Loading="IsLoading"
+          RowClassFunc="SelectedRowClassFunc"
+          OnRowClick="RowClickEvent">
+    <HeaderContent>
+        <MudTh Style="width:0.1%; white-space: nowrap;">
+            <MudTableSortLabel T="XpoIdentityResource"
+                               SortLabel="@(nameof(XpoIdentityResource.Id))">Id</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel T="XpoIdentityResource"
+                               SortLabel="@(nameof(XpoIdentityResource.Name))">Name</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel T="XpoIdentityResource"
+                               SortLabel="@(nameof(XpoIdentityResource.DisplayName))">Displayname</MudTableSortLabel>
+        </MudTh>
+
+        <MudTh Style="width:0.1%; white-space: nowrap;">
+
+        </MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="@(nameof(XpoIdentityResource.Id))">
+            <MudTooltip Text="@context.Id.ToString()">
+                <MudIconButton Size="Size.Small"
+                               DisableElevation
+                               Color="Color.Transparent"
+                               Variant="Variant.Filled"
+                               Icon="@Icons.Filled.Fingerprint"
+                               Style="background-color: transparent"
+                               OnClick="async () => await CopyToClipboard(context.Id.ToString())" />
+            </MudTooltip>
+        </MudTd>
+        <MudTd DataLabel="@(nameof(context.Name))">
+            <MudHighlighter Text="@context.Name" HighlightedText="@search" />
+        </MudTd>
+        <MudTd DataLabel="@(nameof(context.DisplayName))">
+            <MudHighlighter Text="@context.DisplayName" HighlightedText="@search" />
+        </MudTd>
+        <MudTd>
+            <MudStack Row>
+                <MudTooltip Text="Delete">
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Error"
+                                   Size="Size.Small"
+                                   OnClick="async () => await Delete(context)" />
+                </MudTooltip>
+                <MudTooltip Text="Edit">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Size="Size.Small"
+                                   Href="@($"/Admin2/IdentityResource/{context.Id}")" />
+                </MudTooltip>
+            </MudStack>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+    <NoRecordsContent>
+        @if (total > 0)
+        {
+            <ul>
+                <li>There are no Identity Resources found matching '@search'</li>
+                <li><MudButton Size="Size.Small" Color="Color.Primary" OnClick="async () => await SearchChanged(string.Empty)">Clear Filter</MudButton></li>
+            </ul>
+        }
+        else
+        {
+            <ul>
+                <li>There are no Identity Resources yet.</li>
+                <li>Do you want to <MudLink Class="cursor-pointer" Href="/Admin2/AddIdentityResource">Add an Identity Resource</MudLink></li>
+            </ul>
+        }
+    </NoRecordsContent>
+</MudTable>
+
+@if (HighlightedValue is not null)
+{
+    <MudDrawer @bind-Open="@openDrawer" Width="400px" Height="100%" Anchor="@Anchor.End" Elevation="1" Variant="@DrawerVariant.Temporary">
+        <MudDrawerHeader>
+            <MudStack Row Style="width: 100%; align-items: center; justify-content: center;">
+                <MudText Typo="Typo.h6">@HighlightedValue.Name</MudText>
+                <MudSpacer />
+                <MudIcon Icon="@Icons.Filled.Close"
+                     Class="cursor-pointer"
+                     onclick="@(() => CloseDrawer())" />
+            </MudStack>
+        </MudDrawerHeader>
+        <MudStack Class="px-2">
+            <MudStack Row>
+                <MudSpacer />
+                <MudTooltip Text="Delete">
+                    <MudButton EndIcon="@Icons.Material.Filled.Delete"
+                           Variant="Variant.Filled"
+                           Color="Color.Error"
+                           Size="Size.Small"
+                           OnClick="async () => await Delete(HighlightedValue)">Delete</MudButton>
+                </MudTooltip>
+                <MudTooltip Text="Edit">
+                    <MudButton EndIcon="@Icons.Material.Filled.Edit"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Small"
+                           Href="@($"/Admin2/IdentityResource/{HighlightedValue.Id}")">Edit</MudButton>
+                </MudTooltip>
+            </MudStack>
+
+            @*<MudText Typo="Typo.caption">Claims</MudText>
+            <RoleClaimsSmall Role="@HighlightedValue" />*@
+        </MudStack>
+    </MudDrawer>
+}
+@code {
+
+
+    bool openDrawer;
+    private XpoIdentityResource HighlightedValue;
+
+    private void CloseDrawer()
+        => openDrawer = false;
+
+    private string SelectedRowClassFunc(XpoIdentityResource element, int rowNumber)
+        => new CssBuilder("cursor-pointer")
+            .AddClass("mud-selected-item mud-primary-hover", EqualityComparer<XpoIdentityResource>.Default.Equals(HighlightedValue, element))
+            .Build();
+
+    private void RowClickEvent(TableRowClickEventArgs<XpoIdentityResource> e)
+    {
+        HighlightedValue = e.Item;
+        if (HighlightedValue is null)
+        {
+            openDrawer = false;
+        }
+        else
+        {
+            if (HighlightedValue != e.Item)
+            {
+                openDrawer = true;
+            }
+            else
+            {
+                openDrawer = !openDrawer;
+            }
+        }
+    }
+
+    private string search;
+    private int? total;
+    private MudTable<XpoIdentityResource> table;
+    private bool IsLoading = true;
+
+    private async Task SearchChanged(string search)
+    {
+        this.search = search;
+        await table.ReloadServerData();
+    }
+
+    private async Task CopyToClipboard(string content)
+    {
+        await JsApiService.CopyToClipboardAsync(content);
+        Snackbar.Add($"Copied {content} to clipboard!", Severity.Info);
+    }
+
+    private async Task<TableData<XpoIdentityResource>> ServerReload(TableState state)
+    {
+        try
+        {
+            var query = UnitOfWork.Query<XpoIdentityResource>().AsQueryable();
+            total = await query.CountAsync();
+            var items = query;
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                var s = search.ToLowerInvariant();
+                items = items.Where(i =>
+                    i.Name.ToLower().Contains(s)
+                );
+            }
+
+            if (!string.IsNullOrEmpty(state.SortLabel))
+            {
+                items = state.SortLabel switch
+                {
+                    nameof(XpoIdentityResource.Id) => items.OrderByDirection(state.SortDirection, x => x.Id),
+                    nameof(XpoIdentityResource.Name) => items.OrderByDirection(state.SortDirection, x => x.Name),
+                    nameof(XpoIdentityResource.DisplayName) => items.OrderByDirection(state.SortDirection, x => x.DisplayName),
+                    _ => items
+                };
+            }
+
+            var result = await items.Skip(state.Page * state.PageSize)
+                .Take(state.PageSize)
+                .ToArrayAsync();
+
+            return new TableData<XpoIdentityResource>()
+                {
+                    Items = result,
+                    TotalItems = total.Value
+                };
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+}

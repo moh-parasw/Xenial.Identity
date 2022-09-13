@@ -1,5 +1,8 @@
-﻿using DevExpress.Xpo;
+﻿using DevExpress.Data.Linq.Helpers;
+using DevExpress.Xpo;
 using DevExpress.Xpo.DB;
+
+using Duende.IdentityServer.Models;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +18,7 @@ using System;
 using Xenial.Identity;
 using Xenial.Identity.Infrastructure;
 using Xenial.Identity.Models;
+using Xenial.Identity.Xpo.Storage.Models;
 
 SQLiteConnectionProvider.Register();
 MySqlConnectionProvider.Register();
@@ -56,16 +60,7 @@ try
     using (var unitOfWork = provider.GetRequiredService<UnitOfWork>())
     {
         unitOfWork.UpdateSchema();
-        if (unitOfWork.FindObject<XpoThemeSettings>(null) is null)
-        {
-            unitOfWork.Save(new XpoThemeSettings(unitOfWork));
-            unitOfWork.CommitChanges();
-        }
-        if (unitOfWork.FindObject<XpoApplicationSettings>(null) is null)
-        {
-            unitOfWork.Save(new XpoApplicationSettings(unitOfWork));
-            unitOfWork.CommitChanges();
-        }
+        SeedDatabase(unitOfWork);
     }
 
     Log.Information("Update Done");
@@ -90,3 +85,82 @@ static IHostBuilder CreateHostBuilder(string[] args)
         {
             webBuilder.UseStartup<Startup>();
         });
+
+static void SeedDatabase(UnitOfWork unitOfWork)
+{
+    if (unitOfWork.FindObject<XpoThemeSettings>(null) is null)
+    {
+        unitOfWork.Save(new XpoThemeSettings(unitOfWork));
+        unitOfWork.CommitChanges();
+    }
+    if (unitOfWork.FindObject<XpoApplicationSettings>(null) is null)
+    {
+        unitOfWork.Save(new XpoApplicationSettings(unitOfWork));
+        unitOfWork.CommitChanges();
+    }
+    if (unitOfWork.Query<XpoIdentityResource>().Count() <= 0)
+    {
+        AddResource("profile", "Profile", new[] {
+            "profile",
+            "name",
+            "given_name",
+            "family_name",
+            "middle_name",
+            "nickname",
+            "preferred_username"
+        });
+
+        AddResource("email", "E-mail", new[] {
+            "email",
+            "email_verified",
+        });
+
+        AddResource("openid", "User-Id", new[] {
+            "openid",
+            "sub",
+        });
+
+        AddResource("phone", "Phonenumber", new[] {
+            "phone",
+            "phone_verified",
+        });
+
+        AddResource("role", "Role", new[] {
+            "role",
+        });
+
+        AddResource("xenial", "Avatar", new[] {
+            "xenial",
+            "xenial_backcolor",
+            "xenial_forecolor",
+            "xenial_initials",
+        });
+
+        unitOfWork.CommitChanges();
+    }
+
+    void AddResource(
+        string name,
+        string displayName,
+        string[] resources,
+        bool enabled = true,
+        bool showInDiscoveryDocument = true
+    )
+    {
+        var xpoResources = resources.Select(
+            type => new XpoIdentityResourceClaim(unitOfWork)
+            {
+                Type = type
+            }).ToArray();
+
+        var resource = new XpoIdentityResource(unitOfWork)
+        {
+            Name = name,
+            DisplayName = displayName,
+            Enabled = true,
+            ShowInDiscoveryDocument = true
+        };
+        resource.UserClaims.AddRange(xpoResources);
+        unitOfWork.Save(resource);
+    }
+}
