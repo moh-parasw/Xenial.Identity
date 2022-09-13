@@ -3,6 +3,6 @@
 @inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
-<div class="@Classes" style="@($"--editor-height: {Height}; min-width: {Width};")">
-    <div @ref="el" style="@($"height: {Height}; width: {Width};")"></div>
+<div class="@Classes" style="@($"--editor-height: {CalcHeight}; min-width: {Width};")">
+    <div @ref="el" style="@($"height: {CalcHeight}; width: {Width};")"></div>
 </div>

@@ -70,14 +70,23 @@ export function CreateMonacoEditor(component: DotNet.DotNetObject, el: HTMLEleme
             console.log("onDidChangeModel");
             await reportHeight();
         });
+
+        edit.onDidFocusEditorWidget(async () => {
+            await component.invokeMethodAsync('EditorFocus');
+        });
+
+        edit.onDidBlurEditorWidget(async () => {
+            await component.invokeMethodAsync('EditorBlur');
+        });
+
         await reportHeight();
     });
 }
 
 export async function UpdateOptions(component: DotNet.DotNetObject, el: HTMLElement, value: string | undefined) {
-    if(runtimeOptions.has(el)){
+    if (runtimeOptions.has(el)) {
         const opt = runtimeOptions.get(el);
-        if(opt?.height) {
+        if (opt?.height) {
             await component.invokeMethodAsync('SetHeight', opt.height);
         }
     }

@@ -34,6 +34,17 @@ public partial class MonacoEdit
     public string Height { get; set; } = "500px";
 
     [Parameter]
+    public string? ExpandHeightOnFocus { get; set; }
+
+    private bool editorFocus;
+
+    private string CalcHeight => editorFocus switch
+    {
+        true => string.IsNullOrEmpty(ExpandHeightOnFocus) ? Height : ExpandHeightOnFocus,
+        false => Height
+    };
+
+    [Parameter]
     public EventCallback<string> HeightChanged { get; set; }
 
     [Parameter]
@@ -118,6 +129,20 @@ public partial class MonacoEdit
     {
         Height = height;
         await HeightChanged.InvokeAsync(height);
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void EditorFocus()
+    {
+        editorFocus = true;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void EditorBlur()
+    {
+        editorFocus = false;
         StateHasChanged();
     }
 
