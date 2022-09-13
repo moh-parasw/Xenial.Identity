@@ -1,4 +1,4 @@
-﻿@page "/Admin2/Apis"
+﻿@page "/Admin2/Clients"
 @using DevExpress.Data.Filtering
 @using Microsoft.AspNetCore.Identity
 @using MudBlazor.Utilities
@@ -10,7 +10,7 @@
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
 
-<MudText Typo="Typo.h3" GutterBottom>Apis</MudText>
+<MudText Typo="Typo.h3" GutterBottom>Clients</MudText>
 
 <MudPaper Elevation="10" Class="mb-1" Square>
     <MudToolBar Dense>
@@ -36,7 +36,7 @@
         <MudSpacer />
         <MudTooltip Text="Add">
             <MudIconButton Icon="@Icons.Filled.Add"
-                           Href="/Admin2/AddApi"
+                           Href="/Admin2/AddClient"
                            Color="Color.Success" />
         </MudTooltip>
         <MudTooltip Text="Refresh">
@@ -48,11 +48,11 @@
 </MudPaper>
 <MudTable @ref="table"
           RowsPerPage="100"
-          T="XpoApiResource"
+          T="XpoClient"
           Dense
           FixedHeader
           Elevation="10"
-          ServerData="@(new Func<TableState, Task<TableData<XpoApiResource>>>(ServerReload))"
+          ServerData="@(new Func<TableState, Task<TableData<XpoClient>>>(ServerReload))"
           Virtualize="true"
           Height="calc(100vh - 21em)"
           Class="mb-0"
@@ -61,31 +61,23 @@
           OnRowClick="RowClickEvent">
     <HeaderContent>
         <MudTh Style="width:0.1%; white-space: nowrap;">
-            <MudTableSortLabel T="XpoApiResource"
-                               SortLabel="@(nameof(XpoApiResource.Id))">Id</MudTableSortLabel>
+            <MudTableSortLabel T="XpoClient"
+                               SortLabel="@(nameof(XpoClient.Id))">Id</MudTableSortLabel>
         </MudTh>
         <MudTh>
-            <MudTableSortLabel T="XpoApiResource"
-                               SortLabel="@(nameof(XpoApiResource.Name))">Name</MudTableSortLabel>
+            <MudTableSortLabel T="XpoClient"
+                               SortLabel="@(nameof(XpoClient.ClientId))">Client Id</MudTableSortLabel>
         </MudTh>
         <MudTh>
-            <MudTableSortLabel T="XpoApiResource"
-                               SortLabel="@(nameof(XpoApiResource.DisplayName))">Displayname</MudTableSortLabel>
-        </MudTh>
-        <MudTh>
-            <MudTableSortLabel T="XpoApiResource"
-                               SortLabel="@(nameof(XpoApiResource.Description))">Description</MudTableSortLabel>
-        </MudTh>
-        <MudTh Style="width:0.1%; white-space: nowrap;">
-            <MudTableSortLabel T="XpoApiResource"
-                               SortLabel="@(nameof(XpoApiResource.Enabled))">Enabled</MudTableSortLabel>
+            <MudTableSortLabel T="XpoClient"
+                               SortLabel="@(nameof(XpoClient.ClientName))">Client Name</MudTableSortLabel>
         </MudTh>
         <MudTh Style="width:0.1%; white-space: nowrap;">
 
         </MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="@(nameof(XpoApiResource.Id))">
+        <MudTd DataLabel="@(nameof(XpoClient.Id))">
             <MudTooltip Text="@context.Id.ToString()">
                 <MudIconButton Size="Size.Small"
                                DisableElevation
@@ -96,17 +88,11 @@
                                OnClick="async () => await CopyToClipboard(context.Id.ToString())" />
             </MudTooltip>
         </MudTd>
-        <MudTd DataLabel="@(nameof(context.Name))">
-            <MudHighlighter Text="@context.Name" HighlightedText="@search" />
+        <MudTd DataLabel="@(nameof(context.ClientId))">
+            <MudHighlighter Text="@context.ClientId" HighlightedText="@search" />
         </MudTd>
-        <MudTd DataLabel="@(nameof(context.DisplayName))">
-            <MudHighlighter Text="@context.DisplayName" HighlightedText="@search" />
-        </MudTd>
-        <MudTd DataLabel="@(nameof(context.Description))">
-            <MudHighlighter Text="@context.Description" HighlightedText="@search" />
-        </MudTd>
-        <MudTd DataLabel="@(nameof(context.Enabled))">
-            <MudCheckBox Checked="@context.Enabled" />
+        <MudTd DataLabel="@(nameof(context.ClientName))">
+            <MudHighlighter Text="@context.ClientName" HighlightedText="@search" />
         </MudTd>
         <MudTd>
             <MudStack Row>
@@ -122,7 +108,7 @@
                                    Variant="Variant.Filled"
                                    Color="Color.Primary"
                                    Size="Size.Small"
-                                   Href="@($"/Admin2/Api/{context.Id}")" />
+                                   Href="@($"/Admin2/Client/{context.Id}")" />
                 </MudTooltip>
             </MudStack>
         </MudTd>
@@ -134,15 +120,15 @@
         @if (total > 0)
         {
             <ul>
-                <li>There are no API's found matching '@search'</li>
+                <li>There are no Client found matching '@search'</li>
                 <li><MudButton Size="Size.Small" Color="Color.Primary" OnClick="async () => await SearchChanged(string.Empty)">Clear Filter</MudButton></li>
             </ul>
         }
         else
         {
             <ul>
-                <li>There are no API's yet.</li>
-                <li>Do you want to <MudLink Class="cursor-pointer" Href="/Admin2/AddApi">Add an API</MudLink></li>
+                <li>There are no Clientss yet.</li>
+                <li>Do you want to <MudLink Class="cursor-pointer" Href="/Admin2/AddClient">Add a Client</MudLink></li>
             </ul>
         }
     </NoRecordsContent>
@@ -153,7 +139,7 @@
     <MudDrawer @bind-Open="@openDrawer" Width="400px" Height="100%" Anchor="@Anchor.End" Elevation="1" Variant="@DrawerVariant.Temporary">
         <MudDrawerHeader>
             <MudStack Row Style="width: 100%; align-items: center; justify-content: center;">
-                <MudText Typo="Typo.h6">@HighlightedValue.Name</MudText>
+                <MudText Typo="Typo.h6">@HighlightedValue.ClientId</MudText>
                 <MudSpacer />
                 <MudIcon Icon="@Icons.Filled.Close"
                      Class="cursor-pointer"
@@ -175,7 +161,7 @@
                            Variant="Variant.Filled"
                            Color="Color.Primary"
                            Size="Size.Small"
-                           Href="@($"/Admin2/Api/{HighlightedValue.Id}")">Edit</MudButton>
+                           Href="@($"/Admin2/Client/{HighlightedValue.Id}")">Edit</MudButton>
                 </MudTooltip>
             </MudStack>
 
@@ -188,17 +174,17 @@
 
 
     bool openDrawer;
-    private XpoApiResource HighlightedValue;
+    private XpoClient HighlightedValue;
 
     private void CloseDrawer()
         => openDrawer = false;
 
-    private string SelectedRowClassFunc(XpoApiResource element, int rowNumber)
+    private string SelectedRowClassFunc(XpoClient element, int rowNumber)
         => new CssBuilder("cursor-pointer")
-            .AddClass("mud-selected-item mud-primary-hover", EqualityComparer<XpoApiResource>.Default.Equals(HighlightedValue, element))
+            .AddClass("mud-selected-item mud-primary-hover", EqualityComparer<XpoClient>.Default.Equals(HighlightedValue, element))
             .Build();
 
-    private void RowClickEvent(TableRowClickEventArgs<XpoApiResource> e)
+    private void RowClickEvent(TableRowClickEventArgs<XpoClient> e)
     {
         HighlightedValue = e.Item;
         if (HighlightedValue is null)
@@ -220,7 +206,7 @@
 
     private string search;
     private int? total;
-    private MudTable<XpoApiResource> table;
+    private MudTable<XpoClient> table;
     private bool IsLoading = true;
 
     private async Task SearchChanged(string search)
@@ -235,11 +221,11 @@
         Snackbar.Add($"Copied {content} to clipboard!", Severity.Info);
     }
 
-    private async Task<TableData<XpoApiResource>> ServerReload(TableState state)
+    private async Task<TableData<XpoClient>> ServerReload(TableState state)
     {
         try
         {
-            var query = UnitOfWork.Query<XpoApiResource>().AsQueryable();
+            var query = UnitOfWork.Query<XpoClient>().AsQueryable();
             total = await query.CountAsync();
             var items = query;
 
@@ -247,9 +233,8 @@
             {
                 var s = search.ToLowerInvariant();
                 items = items.Where(i =>
-                    i.Name.ToLower().Contains(s)
-                    || i.DisplayName.ToLower().Contains(s)
-                    || i.Description.ToLower().Contains(s)
+                    i.ClientId.ToLower().Contains(s)
+                    || i.ClientName.ToLower().Contains(s)
                 );
             }
 
@@ -257,11 +242,9 @@
             {
                 items = state.SortLabel switch
                 {
-                    nameof(XpoApiResource.Id) => items.OrderByDirection(state.SortDirection, x => x.Id),
-                    nameof(XpoApiResource.Name) => items.OrderByDirection(state.SortDirection, x => x.Name),
-                    nameof(XpoApiResource.DisplayName) => items.OrderByDirection(state.SortDirection, x => x.DisplayName),
-                    nameof(XpoApiResource.Description) => items.OrderByDirection(state.SortDirection, x => x.Description),
-                    nameof(XpoApiResource.Enabled) => items.OrderByDirection(state.SortDirection, x => x.Enabled),
+                    nameof(XpoClient.Id) => items.OrderByDirection(state.SortDirection, x => x.Id),
+                    nameof(XpoClient.ClientId) => items.OrderByDirection(state.SortDirection, x => x.ClientId),
+                    nameof(XpoClient.ClientName) => items.OrderByDirection(state.SortDirection, x => x.ClientName),
                     _ => items
                 };
             }
@@ -270,7 +253,7 @@
                 .Take(state.PageSize)
                 .ToArrayAsync();
 
-            return new TableData<XpoApiResource>()
+            return new TableData<XpoClient>()
                 {
                     Items = result,
                     TotalItems = total.Value

@@ -1,0 +1,110 @@
+﻿@page "/Admin2/Api/{ApiId:int}"
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@using MudBlazor.Utilities
+@using Newtonsoft.Json
+@using Xenial.Identity.Data
+@using Xenial.Identity.Infrastructure
+@using Xenial.Identity.Xpo.Storage.Models
+@inject UnitOfWork UnitOfWork
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+
+<MudStack Row Spacing="2">
+    <MudFab Icon="@Icons.Filled.ArrowBack" Size="@Size.Large" Color="Color.Surface" Href="/Admin2/Apis" />
+    <MudText Typo="Typo.h3" GutterBottom>Api</MudText>
+</MudStack>
+
+@if (Api is not null)
+{
+    <div class="small-tabs">
+        <MudContainer MaxWidth="MaxWidth.Small">
+            <MudStack>
+                <MudPaper Class="pa-4">
+                    <MudStack Row="true">
+                        <MudAvatar Color="Color.Secondary" Variant="Variant.Outlined" Size="Size.Large">
+                            <MudIcon Icon="@Icons.Filled.Api" />
+                        </MudAvatar>
+                        <MudStack Justify="Justify.Center" Spacing="0">
+                            <MudText Typo="Typo.body1">@Api.Name</MudText>
+                            <MudText Typo="Typo.body2">@Api.DisplayName</MudText>
+                            <MudText Typo="Typo.body2">@Api.Description</MudText>
+                        </MudStack>
+                    </MudStack>
+                </MudPaper>
+
+                <MudTabs ApplyEffectsToContainer="true"
+                     Centered
+                     Elevation="4"
+                     Rounded="true"
+                     PanelClass="pa-6"
+                     ActivePanelIndex="@ActivePanelIndex"
+                     ActivePanelIndexChanged="@(i => SetActivePanelIndex(i))">
+                    <MudTabPanel ToolTip="Name" Icon="@Icons.Filled.Person">
+                        <MudStack Spacing="4">
+                            <MudTextField Label="Name"
+                                      Variant="Variant.Filled"
+                                      FullWidth
+                                      Margin="Margin.Dense"
+                                      @bind-Value="@Api.Name" />
+                            <MudTextField Label="Displayname"
+                                      Variant="Variant.Filled"
+                                      FullWidth
+                                      Margin="Margin.Dense"
+                                      @bind-Value="@Api.DisplayName" />
+                            <MudTextField Label="Description"
+                                      Variant="Variant.Filled"
+                                      FullWidth
+                                      Margin="Margin.Dense"
+                                      @bind-Value="@Api.Description" />
+                            <MudStack Row Class="justify-space-between">
+                                <MudSwitch @bind-Checked="@Api.Enabled" Label="Enabled" Color="Color.Secondary" />
+                                <MudSwitch @bind-Checked="@Api.Required" Label="Required" Color="Color.Secondary" />
+                            </MudStack>
+                            <MudStack Row Class="justify-space-between">
+                                <MudSwitch @bind-Checked="@Api.ShowInDiscoveryDocument" Label="Show in Discovery Document" Color="Color.Secondary" />
+                                <MudSwitch @bind-Checked="@Api.NonEditable" Label="Non Editable" Color="Color.Secondary" />
+                            </MudStack>
+                        </MudStack>
+                    </MudTabPanel>
+                    @*                    <MudTabPanel ToolTip="Claims" Icon="@Icons.Filled.Class">
+                <RoleClaimsSmall Role="@Api" AllowEdit />
+                </MudTabPanel>*@
+                </MudTabs>
+
+                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="async () => await SaveRole()">Save</MudButton>
+
+            </MudStack>
+        </MudContainer>
+    </div>
+
+}
+@code {
+    [Parameter]
+    public int ApiId { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = nameof(ActivePanelIndex))]
+    public int ActivePanelIndex { get; set; } = 0;
+
+    private void SetActivePanelIndex(int activePanelIndex)
+    {
+        ActivePanelIndex = activePanelIndex;
+        NavigationManager.NavigateTo(
+            NavigationManager.GetUriWithQueryParameter(nameof(ActivePanelIndex), activePanelIndex)
+        );
+    }
+
+    public XpoApiResource Api { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        await Reload();
+    }
+
+
+    protected async Task Reload()
+        => Api = await UnitOfWork.GetObjectByKeyAsync<XpoApiResource>(ApiId);
+}
