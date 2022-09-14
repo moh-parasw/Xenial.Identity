@@ -81,8 +81,8 @@
                                                Color="Color.Success" />
                                 </MudTooltip>
                             </MudToolBar>
-                            <MudList Clickable="false">
-                                <MudListItem Text="@Api.Name" InitiallyExpanded="true">
+                            <MudList Clickable="false" >
+                                <MudListItem Text="@Api.Name" InitiallyExpanded="true" ExpandLessIcon="" ExpandMoreIcon="" OnClickHandlerPreventDefault>
                                     <NestedList>
                                         <MudListItem>
                                             @Api.Name:read
@@ -91,7 +91,18 @@
                                             @Api.Name:write
                                         </MudListItem>
                                         <MudListItem>
-                                            @Api.Name:manage
+                                            <MudStack Row AlignItems="AlignItems.Center" Class="mr-6">
+                                                <MudLink Class="cursor-pointer">
+                                                    @Api.Name:manage
+                                                </MudLink>
+                                                <MudSpacer />
+                                                <MudTooltip Text="Delete">
+                                                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                               Variant="Variant.Filled"
+                                                               Color="Color.Error"
+                                                               Size="Size.Small" />
+                                                </MudTooltip>
+                                            </MudStack>
                                         </MudListItem>
                                     </NestedList>
                                 </MudListItem>
