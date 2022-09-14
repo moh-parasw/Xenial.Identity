@@ -145,6 +145,9 @@ public partial class ApiDetails
                 Type = userClaim
             }));
 
+            var scope = Api.Scopes.FirstOrDefault(s => s.Scope == Api.Name) ?? new XpoApiResourceScope(UnitOfWork) { Scope = Api.Name, ApiResource = Api };
+            await UnitOfWork.SaveAsync(scope);
+
             var existingScope = UnitOfWork.Query<XpoApiScope>().Where(s => s.Name == Api.Name).FirstOrDefault() ?? new XpoApiScope(UnitOfWork);
             existingScope.Name = Api.Name;
             existingScope.Description = Api.Description;

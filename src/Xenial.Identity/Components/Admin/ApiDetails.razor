@@ -171,6 +171,6 @@
             Emphasize = existingScope.Emphasize;
         }
         IdentityResources = Api.UserClaims.Select(m => m.Type).ToList();
-        Scopes = Api.Scopes.ToList();
+        Scopes = Api.Scopes.Where(s => s.Scope != Api.Name).ToList();
     }
 }
