@@ -1,0 +1,34 @@
+﻿@if (Value?.StartsWith("{") ?? false)
+{
+    <MonacoEdit
+            @ref="edit"
+            Value="@Value"
+            Formatted
+            NoLineNumbers
+            ReadOnly
+            AdjustHeightToContent
+            Height="100px"
+            Width="calc(100% - .1px)"
+            Language="@CodeLanguage.Json" />
+}
+else if ((Value?.StartsWith("https://") ?? false) || (Value?.StartsWith("http://") ?? false))
+{
+    <MudLink Href="@Value" Target="_blank">@Value</MudLink>
+}
+else
+{
+    @Value
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public string Value { get; set; }
+
+    private MonacoEdit edit;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        edit?.Refresh(Value);
+    }
+}

@@ -123,9 +123,9 @@
                             <ApiSecrets Resource="@Api" />
                         </CascadingValue>
                     </MudTabPanel>
-                    @*                    <MudTabPanel ToolTip="Claims" Icon="@Icons.Filled.Class">
-                <RoleClaimsSmall Role="@Api" AllowEdit />
-                </MudTabPanel>*@
+                    <MudTabPanel ToolTip="Properties" Icon="@Icons.Filled.Class">
+                        <ApiPropertiesSmall Resource="@Api" AllowEdit Height="500px" />
+                    </MudTabPanel>
                 </MudTabs>
 
                 <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="async () => await Save()">Save</MudButton>
