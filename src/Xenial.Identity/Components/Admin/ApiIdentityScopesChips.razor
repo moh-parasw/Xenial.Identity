@@ -1,0 +1,28 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Xenial.Identity.Data
+@using Xenial.Identity.Xpo.Storage.Models
+@if (Scopes.Count > 0)
+{
+    <MudStack Row Class="flex-wrap">
+        @foreach (var scope in Scopes)
+        {
+            <MudChip Size="Size.Small" Class="flex-grow-0">@scope</MudChip>
+        }
+    </MudStack>
+}
+else
+{
+    <MudText Typo="Typo.body2">No Identity Resources</MudText>
+}
+@code {
+    [Parameter, EditorRequired]
+    public XpoApiResource Resource { get; set; }
+
+    private IList<string> Scopes { get; set; } = Array.Empty<string>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        Scopes = Resource.Scopes.Where(m => m.Scope != Resource.Name).Select(u => u.Scope).ToArray();
+    }
+}

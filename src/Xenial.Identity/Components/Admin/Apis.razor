@@ -183,9 +183,44 @@
                            Href="@($"/Admin2/Api/{HighlightedValue.Id}")">Edit</MudButton>
                 </MudTooltip>
             </MudStack>
+            <MudField Label="Name"
+                  Variant="Variant.Text">@HighlightedValue.Name</MudField>
+            <MudField Label="Displayname"
+                  Variant="Variant.Text">@HighlightedValue.DisplayName</MudField>
+            <MudField Label="Description"
+                  Variant="Variant.Text">@HighlightedValue.Description</MudField>
 
-            @*<MudText Typo="Typo.caption">Claims</MudText>
-        <RoleClaimsSmall Role="@HighlightedValue" />*@
+            <MudCheckBox Label="Enabled"
+                     Checked="@HighlightedValue.Enabled"
+                     LabelPosition="LabelPosition.Start"
+                     Class="align-self-start" />
+
+            <MudCheckBox Label="Required"
+                     Checked="@HighlightedValue.Required"
+                     LabelPosition="LabelPosition.Start"
+                     Class="align-self-start" />
+
+            <MudCheckBox Label="Show in Discovery Document"
+                     Checked="@HighlightedValue.ShowInDiscoveryDocument"
+                     LabelPosition="LabelPosition.Start"
+                     Class="align-self-start" />
+
+            <MudCheckBox Label="Non Editable"
+                     Checked="@HighlightedValue.NonEditable"
+                     LabelPosition="LabelPosition.Start"
+                     Class="align-self-start" />
+
+            <MudCheckBox Label="Emphasize"
+                     Checked="@(UnitOfWork.Query<XpoApiScope>().Where(s => s.Name == HighlightedValue.Name).FirstOrDefault()?.Emphasize)"
+                     LabelPosition="LabelPosition.Start"
+                     Class="align-self-start" />
+
+            <MudText Typo="Typo.caption">Scopes</MudText>
+            <ApiIdentityScopesChips Resource="@HighlightedValue" />
+            <MudText Typo="Typo.caption">Roles</MudText>
+            <ApiIdentityResourcesChips Resource="@HighlightedValue" />
+            <MudText Typo="Typo.caption">Properties</MudText>
+            <ApiPropertiesSmall Resource="@HighlightedValue" />
         </MudStack>
     </MudDrawer>
 }

@@ -3,7 +3,7 @@
 @inject UserManager<XenialIdentityUser> userManager;
 @if (Roles.Count > 0)
 {
-    <MudStack Row>
+    <MudStack Row Class="flex-wrap">
         @foreach (var role in Roles)
         {
             <MudChip Size="Size.Small" Class="flex-grow-0">@role</MudChip>
