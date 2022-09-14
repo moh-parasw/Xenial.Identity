@@ -72,7 +72,14 @@
             <MudTableSortLabel T="XpoIdentityResource"
                                SortLabel="@(nameof(XpoIdentityResource.DisplayName))">Displayname</MudTableSortLabel>
         </MudTh>
-
+        <MudTh>
+            <MudTableSortLabel T="XpoIdentityResource"
+                               SortLabel="@(nameof(XpoIdentityResource.Description))">Description</MudTableSortLabel>
+        </MudTh>
+                <MudTh Style="width:0.1%; white-space: nowrap;">
+            <MudTableSortLabel T="XpoApiResource"
+                               SortLabel="@(nameof(XpoApiResource.Enabled))">Enabled</MudTableSortLabel>
+        </MudTh>
         <MudTh Style="width:0.1%; white-space: nowrap;">
 
         </MudTh>
@@ -96,6 +103,12 @@
         </MudTd>
         <MudTd DataLabel="@(nameof(context.DisplayName))">
             <MudHighlighter Text="@context.DisplayName" HighlightedText="@search" />
+        </MudTd>
+        <MudTd DataLabel="@(nameof(context.Description))">
+            <MudHighlighter Text="@context.Description" HighlightedText="@search" />
+        </MudTd>
+        <MudTd DataLabel="@(nameof(context.Enabled))">
+            <MudCheckBox Checked="@context.Enabled" />
         </MudTd>
         <MudTd>
             <MudStack Row>
@@ -252,6 +265,8 @@
                     nameof(XpoIdentityResource.Id) => items.OrderByDirection(state.SortDirection, x => x.Id),
                     nameof(XpoIdentityResource.Name) => items.OrderByDirection(state.SortDirection, x => x.Name),
                     nameof(XpoIdentityResource.DisplayName) => items.OrderByDirection(state.SortDirection, x => x.DisplayName),
+                    nameof(XpoIdentityResource.Description) => items.OrderByDirection(state.SortDirection, x => x.Description),
+                    nameof(XpoIdentityResource.Enabled) => items.OrderByDirection(state.SortDirection, x => x.Enabled),
                     _ => items
                 };
             }
