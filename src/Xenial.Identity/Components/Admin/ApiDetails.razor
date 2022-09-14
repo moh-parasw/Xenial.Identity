@@ -119,7 +119,9 @@
                         </MudPaper>
                     </MudTabPanel>
                     <MudTabPanel ToolTip="Secrets" Icon="@Icons.Filled.Key">
-                        <ApiSecrets Resource="@Api" />
+                        <CascadingValue Value="this" IsFixed>
+                            <ApiSecrets Resource="@Api" />
+                        </CascadingValue>
                     </MudTabPanel>
                     @*                    <MudTabPanel ToolTip="Claims" Icon="@Icons.Filled.Class">
                 <RoleClaimsSmall Role="@Api" AllowEdit />

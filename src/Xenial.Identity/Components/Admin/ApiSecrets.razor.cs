@@ -1,5 +1,7 @@
 ﻿using DevExpress.Xpo;
 
+using Google.Protobuf.WellKnownTypes;
+
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 
@@ -10,6 +12,49 @@ namespace Xenial.Identity.Components.Admin;
 
 public partial class ApiSecrets
 {
+    [CascadingParameter]
+    private ApiDetails ApiDetails { get; set; }
+
+    private async Task AddSecret()
+    {
+        await UnitOfWork.CommitChangesAsync();
+        using (var uow = UnitOfWork.BeginNestedUnitOfWork())
+        {
+            var resource = uow.GetObjectByKey<XpoApiResource>(Resource.Id);
+            var secret = new XpoApiResourceSecret(uow)
+            {
+                ApiResource = resource,
+                Value = IdentityModel.CryptoRandom.CreateUniqueId()
+            };
+            var dialog = DialogService.Show<AddApiSecretDialog>("Add Secret", new MudBlazor.DialogParameters
+            {
+                [nameof(AddApiSecretDialog.UnitOfWork)] = uow,
+                [nameof(AddApiSecretDialog.Secret)] = secret,
+            }, new MudBlazor.DialogOptions
+            {
+                MaxWidth = MudBlazor.MaxWidth.Small,
+                FullWidth = true,
+                Position = MudBlazor.DialogPosition.TopCenter,
+                NoHeader = false,
+                CloseButton = true,
+                CloseOnEscapeKey = true
+            });
+
+            if ((await dialog.GetReturnValueAsync<bool?>()) ?? false)
+            {
+                await uow.SaveAsync(secret);
+                await uow.CommitChangesAsync();
+                await ApiDetails.Save();
+                await Reload();
+            }
+            else
+            {
+                uow.DropChanges();
+            }
+        }
+        StateHasChanged();
+    }
+
     private async Task Delete(XpoApiResourceSecret secret)
     {
         var delete = await DialogService.ShowMessageBox("Delete Secret", (MarkupString)$"""

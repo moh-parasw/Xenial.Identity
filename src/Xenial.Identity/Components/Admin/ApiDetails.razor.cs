@@ -131,7 +131,7 @@ public partial class ApiDetails
         return resources.Except(IdentityResources).Where(v => v.Contains(x, StringComparison.InvariantCultureIgnoreCase));
     }
 
-    protected async Task Save()
+    public async Task Save()
     {
         try
         {
