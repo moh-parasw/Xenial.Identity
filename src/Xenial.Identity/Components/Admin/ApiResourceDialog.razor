@@ -20,7 +20,7 @@
                                   Variant="Variant.Filled"
                                   FullWidth
                                   Margin="Margin.Dense"
-                                  @bind-Value="@Scope.Name" />
+                                  @bind-Value="@Name" />
                 </MudStack>
                 <MudTextField Label="Displayname"
                               Variant="Variant.Filled"
@@ -49,7 +49,24 @@
 </MudDialog>
 
 @code {
-    public bool IsNewScope => UnitOfWork.IsNewObject(Scope);
+    private bool IsNewScope;
+
+    public string Name { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        var prefix = $"{Prefix}:";
+        if(Scope.Name?.StartsWith(prefix) ?? false)
+        {
+            Name = Scope.Name?.Substring(prefix.Length);
+        }
+        else
+        {
+            Name = Scope.Name;
+        }
+        IsNewScope = UnitOfWork.IsNewObject(Scope);
+    }
 
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
@@ -66,6 +83,9 @@
     public void Cancel() =>
         MudDialog.Cancel();
 
-    public void Save() =>
+    public void Save()
+    {
+        Scope.Name = $"{Prefix}:{Name}";
         MudDialog.Close(true);
+    }
 }

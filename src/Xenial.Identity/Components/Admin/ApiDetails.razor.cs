@@ -15,6 +15,7 @@ namespace Xenial.Identity.Components.Admin;
 
 public partial class ApiDetails
 {
+    private IEnumerable<XpoApiResourceScope> Scopes { get; set; } = Enumerable.Empty<XpoApiResourceScope>();
 
     private async Task DeleteScope(XpoApiResourceScope scope)
     {
@@ -31,7 +32,7 @@ public partial class ApiDetails
         await SaveRole();
     }
 
-    private async Task AddResource()
+    private async Task AddScope()
     {
         await UnitOfWork.CommitChangesAsync();
         var newScope = "";
@@ -55,24 +56,63 @@ public partial class ApiDetails
 
             if ((await dialog.GetReturnValueAsync<bool?>()) ?? false)
             {
-                newScope = $"{Api.Name}:{scope.Name}";
-                scope.Name = newScope;
+                newScope = scope.Name;
                 await uow.SaveAsync(scope);
                 await uow.CommitChangesAsync();
+                if (!string.IsNullOrEmpty(newScope))
+                {
+                    Api.Scopes.Add(new XpoApiResourceScope(UnitOfWork)
+                    {
+                        Scope = newScope
+                    });
+                    await SaveRole();
+                }
             }
             else
             {
                 uow.DropChanges();
             }
         }
-        if (!string.IsNullOrEmpty(newScope))
+        StateHasChanged();
+    }
+
+    private async Task EditScope(XpoApiResourceScope scope)
+    {
+        await UnitOfWork.CommitChangesAsync();
+        using (var uow = UnitOfWork.BeginNestedUnitOfWork())
         {
-            Api.Scopes.Add(new XpoApiResourceScope(UnitOfWork)
+            var existingScope = uow.Query<XpoApiScope>().Where(s => s.Name == scope.Scope).First();
+
+            var dialog = DialogService.Show<ApiResourceDialog>("Edit Resource", new MudBlazor.DialogParameters
             {
-                Scope = newScope
+                [nameof(ApiResourceDialog.Prefix)] = Api.Name,
+                [nameof(ApiResourceDialog.UnitOfWork)] = uow,
+                [nameof(ApiResourceDialog.Scope)] = existingScope,
+            }, new MudBlazor.DialogOptions
+            {
+                MaxWidth = MudBlazor.MaxWidth.Small,
+                FullWidth = true,
+                Position = MudBlazor.DialogPosition.TopCenter,
+                NoHeader = false,
+                CloseButton = true,
+                CloseOnEscapeKey = true
             });
-            await SaveRole();
+
+            if ((await dialog.GetReturnValueAsync<bool?>()) ?? false)
+            {
+                await uow.SaveAsync(existingScope);
+                await uow.CommitChangesAsync();
+
+                scope.Scope = existingScope.Name;
+                await UnitOfWork.SaveAsync(scope);
+                await SaveRole();
+            }
+            else
+            {
+                uow.DropChanges();
+            }
         }
+        StateHasChanged();
     }
 
     private IList<string> IdentityResources { get; set; } = new List<string>();

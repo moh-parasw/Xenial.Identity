@@ -79,17 +79,17 @@
                                 <MudTooltip Text="Add">
                                     <MudIconButton Icon="@Icons.Filled.Add"
                                                Color="Color.Success"
-                                               OnClick="@AddResource" />
+                                               OnClick="@AddScope" />
                                 </MudTooltip>
                             </MudToolBar>
                             <MudList Clickable="false">
                                 <MudListItem Text="@Api.Name" InitiallyExpanded="true" ExpandLessIcon="" ExpandMoreIcon="" OnClickHandlerPreventDefault>
                                     <NestedList>
-                                        @foreach (var scope in Api.Scopes.ToList())
+                                        @foreach (var scope in Scopes)
                                         {
                                             <MudListItem>
                                                 <MudStack Row AlignItems="AlignItems.Center" Class="mr-6">
-                                                    <MudLink Class="cursor-pointer">
+                                                    <MudLink Class="cursor-pointer" onclick="@(async () => await EditScope(scope))">
                                                         @scope.Scope
                                                     </MudLink>
                                                     <MudSpacer />
@@ -151,6 +151,10 @@
     protected async Task Reload()
     {
         Api = await UnitOfWork.GetObjectByKeyAsync<XpoApiResource>(ApiId);
+        Api.UserClaims.Reload();
+        Api.Scopes.Reload();
+
         IdentityResources = Api.UserClaims.Select(m => m.Type).ToList();
+        Scopes = Api.Scopes.ToList();
     }
 }
