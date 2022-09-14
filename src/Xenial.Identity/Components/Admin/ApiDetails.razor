@@ -66,6 +66,9 @@
                                 <MudSwitch @bind-Checked="@Api.ShowInDiscoveryDocument" Label="Show in Discovery Document" Color="Color.Secondary" />
                                 <MudSwitch @bind-Checked="@Api.NonEditable" Label="Non Editable" Color="Color.Secondary" />
                             </MudStack>
+                            <MudStack Row Class="justify-space-between">
+                                <MudSwitch @bind-Checked="@Emphasize" Label="Emphasize" Color="Color.Secondary" />
+                            </MudStack>
                         </MudStack>
                     </MudTabPanel>
                     <MudTabPanel ToolTip="Resources" Icon="@Icons.Filled.Interests">
@@ -116,7 +119,7 @@
                 </MudTabPanel>*@
                 </MudTabs>
 
-                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="async () => await SaveRole()">Save</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="async () => await Save()">Save</MudButton>
 
             </MudStack>
         </MudContainer>
@@ -126,6 +129,8 @@
 @code {
     [Parameter]
     public int ApiId { get; set; }
+
+    public bool Emphasize { get; set; }
 
     [Parameter]
     [SupplyParameterFromQuery(Name = nameof(ActivePanelIndex))]
@@ -153,7 +158,11 @@
         Api = await UnitOfWork.GetObjectByKeyAsync<XpoApiResource>(ApiId);
         Api.UserClaims.Reload();
         Api.Scopes.Reload();
-
+        var existingScope = UnitOfWork.Query<XpoApiScope>().Where(s => s.Name == Api.Name).FirstOrDefault();
+        if (existingScope is not null)
+        {
+            Emphasize = existingScope.Emphasize;
+        }
         IdentityResources = Api.UserClaims.Select(m => m.Type).ToList();
         Scopes = Api.Scopes.ToList();
     }

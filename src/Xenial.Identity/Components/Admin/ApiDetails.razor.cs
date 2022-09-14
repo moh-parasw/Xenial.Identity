@@ -29,7 +29,7 @@ public partial class ApiDetails
                 await UnitOfWork.DeleteAsync(item);
             }
         }
-        await SaveRole();
+        await Save();
     }
 
     private async Task AddScope()
@@ -66,7 +66,7 @@ public partial class ApiDetails
                     {
                         Scope = newScope
                     });
-                    await SaveRole();
+                    await Save();
                 }
             }
             else
@@ -107,7 +107,7 @@ public partial class ApiDetails
 
                 scope.Scope = existingScope.Name;
                 await UnitOfWork.SaveAsync(scope);
-                await SaveRole();
+                await Save();
             }
             else
             {
@@ -131,7 +131,7 @@ public partial class ApiDetails
         return resources.Except(IdentityResources).Where(v => v.Contains(x, StringComparison.InvariantCultureIgnoreCase));
     }
 
-    protected async Task SaveRole()
+    protected async Task Save()
     {
         try
         {
@@ -145,6 +145,25 @@ public partial class ApiDetails
                 Type = userClaim
             }));
 
+            var existingScope = UnitOfWork.Query<XpoApiScope>().Where(s => s.Name == Api.Name).FirstOrDefault() ?? new XpoApiScope(UnitOfWork);
+            existingScope.Name = Api.Name;
+            existingScope.Description = Api.Description;
+            existingScope.DisplayName = Api.DisplayName;
+            existingScope.ShowInDiscoveryDocument = Api.ShowInDiscoveryDocument;
+            existingScope.Required = Api.Required;
+            existingScope.Emphasize = Emphasize;
+
+            foreach (var userClaim in existingScope.UserClaims.ToList())
+            {
+                existingScope.UserClaims.Remove(userClaim);
+            }
+
+            existingScope.UserClaims.AddRange(IdentityResources.Select(userClaim => new XpoApiScopeClaim(UnitOfWork)
+            {
+                Type = userClaim
+            }));
+
+            await UnitOfWork.SaveAsync(existingScope);
             await UnitOfWork.SaveAsync(Api);
             await UnitOfWork.CommitChangesAsync();
             await Reload();
