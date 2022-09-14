@@ -8,6 +8,7 @@
 @using Xenial.Identity.Xpo.Storage.Models
 @inject UnitOfWork UnitOfWork
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 @inject NavigationManager NavigationManager
 
 <MudStack Row Spacing="2">
@@ -77,33 +78,31 @@
                                 <MudSpacer />
                                 <MudTooltip Text="Add">
                                     <MudIconButton Icon="@Icons.Filled.Add"
-                                               Href="/Admin2/AddApi"
-                                               Color="Color.Success" />
+                                               Color="Color.Success"
+                                               OnClick="@AddResource" />
                                 </MudTooltip>
                             </MudToolBar>
-                            <MudList Clickable="false" >
+                            <MudList Clickable="false">
                                 <MudListItem Text="@Api.Name" InitiallyExpanded="true" ExpandLessIcon="" ExpandMoreIcon="" OnClickHandlerPreventDefault>
                                     <NestedList>
-                                        <MudListItem>
-                                            @Api.Name:read
-                                        </MudListItem>
-                                        <MudListItem>
-                                            @Api.Name:write
-                                        </MudListItem>
-                                        <MudListItem>
-                                            <MudStack Row AlignItems="AlignItems.Center" Class="mr-6">
-                                                <MudLink Class="cursor-pointer">
-                                                    @Api.Name:manage
-                                                </MudLink>
-                                                <MudSpacer />
-                                                <MudTooltip Text="Delete">
-                                                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                        @foreach (var scope in Api.Scopes.ToList())
+                                        {
+                                            <MudListItem>
+                                                <MudStack Row AlignItems="AlignItems.Center" Class="mr-6">
+                                                    <MudLink Class="cursor-pointer">
+                                                        @scope.Scope
+                                                    </MudLink>
+                                                    <MudSpacer />
+                                                    <MudTooltip Text="Delete">
+                                                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                                                Variant="Variant.Filled"
                                                                Color="Color.Error"
-                                                               Size="Size.Small" />
-                                                </MudTooltip>
-                                            </MudStack>
-                                        </MudListItem>
+                                                               Size="Size.Small"
+                                                               OnClick="async () => await DeleteScope(scope)" />
+                                                    </MudTooltip>
+                                                </MudStack>
+                                            </MudListItem>
+                                        }
                                     </NestedList>
                                 </MudListItem>
                             </MudList>

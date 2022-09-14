@@ -1,0 +1,71 @@
+﻿@using Xenial.Identity.Xpo.Storage.Models
+
+<MudDialog>
+    <TitleContent>
+        @if (IsNewScope)
+        {
+            <text>Add Scope</text>
+        }
+        else
+        {
+            <text>Edit Scope</text>
+        }
+    </TitleContent>
+    <DialogContent>
+        <MudFocusTrap DefaultFocus="DefaultFocus.FirstChild">
+            <MudStack Spacing="4">
+                <MudStack Row>
+                    <MudText Typo="Typo.body1" GutterBottom="false" Class="align-self-end" Style="margin-bottom: .3rem">@Prefix:</MudText>
+                    <MudTextField Label="Name"
+                                  Variant="Variant.Filled"
+                                  FullWidth
+                                  Margin="Margin.Dense"
+                                  @bind-Value="@Scope.Name" />
+                </MudStack>
+                <MudTextField Label="Displayname"
+                              Variant="Variant.Filled"
+                              FullWidth
+                              Margin="Margin.Dense"
+                              @bind-Value="@Scope.DisplayName" />
+                <MudTextField Label="Description"
+                              Variant="Variant.Filled"
+                              FullWidth
+                              Margin="Margin.Dense"
+                              @bind-Value="@Scope.Description" />
+                <MudStack Row Class="justify-space-between">
+                    <MudSwitch @bind-Checked="@Scope.Enabled" Label="Enabled" Color="Color.Secondary" />
+                    <MudSwitch @bind-Checked="@Scope.Required" Label="Required" Color="Color.Secondary" />
+                </MudStack>
+                <MudStack Row Class="justify-space-between">
+                    <MudSwitch @bind-Checked="@Scope.ShowInDiscoveryDocument" Label="Show in Discovery Document" Color="Color.Secondary" />
+                </MudStack>
+            </MudStack>
+        </MudFocusTrap>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@Save">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    public bool IsNewScope => UnitOfWork.IsNewObject(Scope);
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public UnitOfWork UnitOfWork { get; set; }
+
+    [Parameter]
+    public XpoApiScope Scope { get; set; }
+
+    [Parameter]
+    public string Prefix { get; set; }
+
+    public void Cancel() =>
+        MudDialog.Cancel();
+
+    public void Save() =>
+        MudDialog.Close(true);
+}

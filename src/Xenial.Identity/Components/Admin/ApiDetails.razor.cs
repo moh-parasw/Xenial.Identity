@@ -1,4 +1,5 @@
-﻿using DevExpress.Xpo;
+﻿using DevExpress.Data.Filtering;
+using DevExpress.Xpo;
 
 using Duende.IdentityServer.Models;
 
@@ -8,10 +9,72 @@ using Microsoft.AspNetCore.Identity;
 
 using Xenial.Identity.Xpo.Storage.Models;
 
+using static MudBlazor.CategoryTypes;
+
 namespace Xenial.Identity.Components.Admin;
 
 public partial class ApiDetails
 {
+
+    private async Task DeleteScope(XpoApiResourceScope scope)
+    {
+        var scopeName = scope.Scope;
+        await UnitOfWork.DeleteAsync(scope);
+        var scopes = await UnitOfWork.Query<XpoApiScope>().Where(x => x.Name == scopeName).ToListAsync();
+        if (scopes.Count > 0)
+        {
+            foreach (var item in scopes)
+            {
+                await UnitOfWork.DeleteAsync(item);
+            }
+        }
+        await SaveRole();
+    }
+
+    private async Task AddResource()
+    {
+        await UnitOfWork.CommitChangesAsync();
+        var newScope = "";
+        using (var uow = UnitOfWork.BeginNestedUnitOfWork())
+        {
+            var scope = new XpoApiScope(uow);
+            var dialog = DialogService.Show<ApiResourceDialog>("Add Resource", new MudBlazor.DialogParameters
+            {
+                [nameof(ApiResourceDialog.Prefix)] = Api.Name,
+                [nameof(ApiResourceDialog.UnitOfWork)] = uow,
+                [nameof(ApiResourceDialog.Scope)] = scope,
+            }, new MudBlazor.DialogOptions
+            {
+                MaxWidth = MudBlazor.MaxWidth.Small,
+                FullWidth = true,
+                Position = MudBlazor.DialogPosition.TopCenter,
+                NoHeader = false,
+                CloseButton = true,
+                CloseOnEscapeKey = true
+            });
+
+            if ((await dialog.GetReturnValueAsync<bool?>()) ?? false)
+            {
+                newScope = $"{Api.Name}:{scope.Name}";
+                scope.Name = newScope;
+                await uow.SaveAsync(scope);
+                await uow.CommitChangesAsync();
+            }
+            else
+            {
+                uow.DropChanges();
+            }
+        }
+        if (!string.IsNullOrEmpty(newScope))
+        {
+            Api.Scopes.Add(new XpoApiResourceScope(UnitOfWork)
+            {
+                Scope = newScope
+            });
+            await SaveRole();
+        }
+    }
+
     private IList<string> IdentityResources { get; set; } = new List<string>();
 
     private async Task<IEnumerable<string>> SearchUserResources(string x)
