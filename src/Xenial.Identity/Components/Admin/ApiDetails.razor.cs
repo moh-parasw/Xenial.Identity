@@ -44,6 +44,7 @@ public partial class ApiDetails
                 [nameof(ApiResourceDialog.Prefix)] = Api.Name,
                 [nameof(ApiResourceDialog.UnitOfWork)] = uow,
                 [nameof(ApiResourceDialog.Scope)] = scope,
+                [nameof(ApiResourceDialog.ParentIdentityResources)] = IdentityResources,
             }, new MudBlazor.DialogOptions
             {
                 MaxWidth = MudBlazor.MaxWidth.Small,
@@ -88,6 +89,7 @@ public partial class ApiDetails
                 [nameof(ApiResourceDialog.Prefix)] = Api.Name,
                 [nameof(ApiResourceDialog.UnitOfWork)] = uow,
                 [nameof(ApiResourceDialog.Scope)] = existingScope,
+                [nameof(ApiResourceDialog.ParentIdentityResources)] = IdentityResources,
             }, new MudBlazor.DialogOptions
             {
                 MaxWidth = MudBlazor.MaxWidth.Small,

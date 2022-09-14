@@ -38,6 +38,17 @@
                 </MudStack>
                 <MudStack Row Class="justify-space-between">
                     <MudSwitch @bind-Checked="@Scope.ShowInDiscoveryDocument" Label="Show in Discovery Document" Color="Color.Secondary" />
+                    <MudSwitch @bind-Checked="@Scope.Emphasize" Label="Emphasize" Color="Color.Secondary" />
+                </MudStack>
+                <MudStack>
+                    <MudText Typo="Typo.caption">Identity-Resources</MudText>
+                    <MudStack Row>
+                        @foreach (var parentIdentityResource in ParentIdentityResources)
+                        {
+                            <MudChip Size="Size.Small" Class="flex-grow-0">@parentIdentityResource</MudChip>
+                        }
+                    </MudStack>
+                    <TagStringEdit @bind-Tags="@IdentityResources" SearchFunc="@SearchUserResources" />
                 </MudStack>
             </MudStack>
         </MudFocusTrap>
@@ -49,6 +60,8 @@
 </MudDialog>
 
 @code {
+
+    private IList<string> IdentityResources { get; set; } = new List<string>();
     private bool IsNewScope;
 
     public string Name { get; set; }
@@ -57,7 +70,7 @@
     {
         base.OnParametersSet();
         var prefix = $"{Prefix}:";
-        if(Scope.Name?.StartsWith(prefix) ?? false)
+        if (Scope.Name?.StartsWith(prefix) ?? false)
         {
             Name = Scope.Name?.Substring(prefix.Length);
         }
@@ -66,6 +79,7 @@
             Name = Scope.Name;
         }
         IsNewScope = UnitOfWork.IsNewObject(Scope);
+        IdentityResources = Scope.UserClaims.Select(m => m.Type).Except(ParentIdentityResources).ToList();
     }
 
     [CascadingParameter]
@@ -80,12 +94,38 @@
     [Parameter]
     public string Prefix { get; set; }
 
+    [Parameter]
+    public IEnumerable<string> ParentIdentityResources { get; set; } = Enumerable.Empty<string>();
+
     public void Cancel() =>
         MudDialog.Cancel();
 
     public void Save()
     {
         Scope.Name = $"{Prefix}:{Name}";
+        foreach (var claim in Scope.UserClaims.ToList())
+        {
+            UnitOfWork.Delete(claim);
+        }
+        foreach (var claim in IdentityResources.Concat(ParentIdentityResources))
+        {
+            Scope.UserClaims.Add(new XpoApiScopeClaim(UnitOfWork)
+                {
+                    Type = claim
+                });
+        }
         MudDialog.Close(true);
+    }
+
+    private async Task<IEnumerable<string>> SearchUserResources(string x)
+    {
+        var resources = await UnitOfWork.Query<XpoIdentityResource>().Select(r => r.Name).ToArrayAsync();
+
+        if (string.IsNullOrEmpty(x))
+        {
+            return resources.Except(IdentityResources).Except(ParentIdentityResources);
+        }
+
+        return resources.Except(IdentityResources).Except(ParentIdentityResources).Where(v => v.Contains(x, StringComparison.InvariantCultureIgnoreCase));
     }
 }
