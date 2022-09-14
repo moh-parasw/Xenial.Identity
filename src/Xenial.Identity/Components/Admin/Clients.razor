@@ -89,7 +89,9 @@
             </MudTooltip>
         </MudTd>
         <MudTd DataLabel="@(nameof(context.ClientId))">
-            <MudHighlighter Text="@context.ClientId" HighlightedText="@search" />
+            <MudLink Href="@($"/Admin2/Client/{context.Id}")">
+                <MudHighlighter Text="@context.ClientId" HighlightedText="@search" />
+            </MudLink>
         </MudTd>
         <MudTd DataLabel="@(nameof(context.ClientName))">
             <MudHighlighter Text="@context.ClientName" HighlightedText="@search" />
@@ -184,8 +186,10 @@
             .AddClass("mud-selected-item mud-primary-hover", EqualityComparer<XpoClient>.Default.Equals(HighlightedValue, element))
             .Build();
 
-    private void RowClickEvent(TableRowClickEventArgs<XpoClient> e)
+    private async Task RowClickEvent(TableRowClickEventArgs<XpoClient> e)
     {
+        //We delay, so navigating await will not open the drawer
+        await Task.Delay(100);
         HighlightedValue = e.Item;
         if (HighlightedValue is null)
         {

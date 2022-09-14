@@ -103,6 +103,13 @@
                                                                Size="Size.Small"
                                                                OnClick="async () => await DeleteScope(scope)" />
                                                     </MudTooltip>
+                                                    <MudTooltip Text="Edit">
+                                                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                                               Variant="Variant.Filled"
+                                                               Color="Color.Primary"
+                                                               Size="Size.Small"
+                                                               OnClick="async () => await EditScope(scope)" />
+                                                    </MudTooltip>
                                                 </MudStack>
                                             </MudListItem>
                                         }

@@ -97,7 +97,9 @@
             </MudTooltip>
         </MudTd>
         <MudTd DataLabel="@(nameof(context.Name))">
-            <MudHighlighter Text="@context.Name" HighlightedText="@search" />
+            <MudLink Href="@($"/Admin2/Api/{context.Id}")" Class="cursor-pointer">
+                <MudHighlighter Text="@context.Name" HighlightedText="@search" />
+            </MudLink>
         </MudTd>
         <MudTd DataLabel="@(nameof(context.DisplayName))">
             <MudHighlighter Text="@context.DisplayName" HighlightedText="@search" />
@@ -153,6 +155,9 @@
     <MudDrawer @bind-Open="@openDrawer" Width="400px" Height="100%" Anchor="@Anchor.End" Elevation="1" Variant="@DrawerVariant.Temporary">
         <MudDrawerHeader>
             <MudStack Row Style="width: 100%; align-items: center; justify-content: center;">
+                <MudAvatar Color="Color.Secondary" Variant="Variant.Outlined">
+                    <MudIcon Icon="@Icons.Filled.Api" />
+                </MudAvatar>
                 <MudText Typo="Typo.h6">@HighlightedValue.Name</MudText>
                 <MudSpacer />
                 <MudIcon Icon="@Icons.Filled.Close"
@@ -198,8 +203,10 @@
             .AddClass("mud-selected-item mud-primary-hover", EqualityComparer<XpoApiResource>.Default.Equals(HighlightedValue, element))
             .Build();
 
-    private void RowClickEvent(TableRowClickEventArgs<XpoApiResource> e)
+    private async Task RowClickEvent(TableRowClickEventArgs<XpoApiResource> e)
     {
+        //We delay, so navigating await will not open the drawer
+        await Task.Delay(100);
         HighlightedValue = e.Item;
         if (HighlightedValue is null)
         {

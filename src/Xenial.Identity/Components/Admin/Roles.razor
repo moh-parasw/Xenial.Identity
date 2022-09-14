@@ -67,7 +67,7 @@
             <MudTableSortLabel T="IdentityRole"
                                SortLabel="@(nameof(IdentityRole.Name))">Name</MudTableSortLabel>
         </MudTh>
-       
+
         <MudTh Style="width:0.1%; white-space: nowrap;">
 
         </MudTh>
@@ -85,7 +85,9 @@
             </MudTooltip>
         </MudTd>
         <MudTd DataLabel="@(nameof(context.Name))">
-            <MudHighlighter Text="@context.Name" HighlightedText="@search" />
+            <MudLink Href="@($"/Admin2/Role/{context.Id}")">
+                <MudHighlighter Text="@context.Name" HighlightedText="@search" />
+            </MudLink>
         </MudTd>
         <MudTd>
             <MudStack Row>
@@ -132,6 +134,9 @@
     <MudDrawer @bind-Open="@openDrawer" Width="400px" Height="100%" Anchor="@Anchor.End" Elevation="1" Variant="@DrawerVariant.Temporary">
         <MudDrawerHeader>
             <MudStack Row Style="width: 100%; align-items: center; justify-content: center;">
+                <MudAvatar Color="Color.Secondary" Variant="Variant.Outlined">
+                    <MudIcon Icon="@Icons.Filled.Groups" />
+                </MudAvatar>
                 <MudText Typo="Typo.h6">@HighlightedValue.Name</MudText>
                 <MudSpacer />
                 <MudIcon Icon="@Icons.Filled.Close"
@@ -157,7 +162,7 @@
                            Href="@($"/Admin2/Role/{HighlightedValue.Id}")">Edit</MudButton>
                 </MudTooltip>
             </MudStack>
-            
+
             <MudText Typo="Typo.caption">Claims</MudText>
             <RoleClaimsSmall Role="@HighlightedValue" />
         </MudStack>
@@ -177,8 +182,10 @@
             .AddClass("mud-selected-item mud-primary-hover", EqualityComparer<IdentityRole>.Default.Equals(HighlightedValue, element))
             .Build();
 
-    private void RowClickEvent(TableRowClickEventArgs<IdentityRole> e)
+    private async Task RowClickEvent(TableRowClickEventArgs<IdentityRole> e)
     {
+        //We delay, so navigating await will not open the drawer
+        await Task.Delay(100);
         HighlightedValue = e.Item;
         if (HighlightedValue is null)
         {
@@ -245,10 +252,10 @@
                 .ToArrayAsync();
 
             return new TableData<IdentityRole>()
-            {
-                Items = result,
-                TotalItems = total.Value
-            };
+                {
+                    Items = result,
+                    TotalItems = total.Value
+                };
         }
         finally
         {

@@ -98,7 +98,9 @@
         </MudTd>
         <MudTd DataLabel="@(nameof(XenialIdentityUser.Picture))"><UserAvatar Size="Size.Small" User="@context" /></MudTd>
         <MudTd DataLabel="@(nameof(context.UserName))">
-            <MudHighlighter Text="@context.UserName" HighlightedText="@search" />
+            <MudLink Href="@($"/Admin2/User/{context.Id}")">
+                <MudHighlighter Text="@context.UserName" HighlightedText="@search" />
+            </MudLink>
         </MudTd>
         <MudTd DataLabel="@(nameof(context.FirstName))">
             <MudHighlighter Text="@context.FirstName" HighlightedText="@search" />
@@ -221,8 +223,10 @@
             .AddClass("mud-selected-item mud-primary-hover", EqualityComparer<XenialIdentityUser>.Default.Equals(HighlightedValue, element))
             .Build();
 
-    private void RowClickEvent(TableRowClickEventArgs<XenialIdentityUser> e)
+    private async Task RowClickEvent(TableRowClickEventArgs<XenialIdentityUser> e)
     {
+        //We delay, so navigating await will not open the drawer
+        await Task.Delay(100);
         HighlightedValue = e.Item;
         if (HighlightedValue is null)
         {
