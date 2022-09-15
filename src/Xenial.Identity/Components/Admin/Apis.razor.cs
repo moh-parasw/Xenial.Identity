@@ -1,10 +1,15 @@
-﻿using DevExpress.Xpo;
+﻿using System.Security.Cryptography.X509Certificates;
+
+using DevExpress.Xpo;
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 
 using Xenial.Identity.Data;
 using Xenial.Identity.Xpo.Storage.Models;
+
+using static System.Formats.Asn1.AsnWriter;
+using static MudBlazor.CategoryTypes;
 
 namespace Xenial.Identity.Components.Admin;
 
@@ -30,6 +35,24 @@ public partial class Apis
         {
             try
             {
+                foreach (var scopeName in resource.Scopes.Select(m => m.Scope))
+                {
+                    var scopes = await UnitOfWork.Query<XpoApiScope>().Where(x => x.Name == scopeName).ToListAsync();
+                    if (scopes.Count > 0)
+                    {
+                        foreach (var item in scopes)
+                        {
+                            await UnitOfWork.DeleteAsync(item);
+                        }
+                    }
+                }
+
+                var scope = await UnitOfWork.Query<XpoApiScope>().Where(x => x.Name == resource.Name).FirstOrDefaultAsync();
+                if (scope is not null)
+                {
+                    await UnitOfWork.DeleteAsync(scope);
+                }
+
                 await UnitOfWork.DeleteAsync(resource);
                 await UnitOfWork.CommitChangesAsync();
                 Snackbar.Add($"""
@@ -42,6 +65,7 @@ public partial class Apis
                         </li>
                     </ul>
                     """, MudBlazor.Severity.Success);
+                openDrawer = false;
             }
             catch (Exception ex)
             {

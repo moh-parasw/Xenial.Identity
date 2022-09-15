@@ -118,7 +118,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         /// <summary>
         /// Indicates if it's save to do a modification e.g it's not loading, saving or invalidated
         /// </summary>
-        protected virtual bool IsSaveForBusinessLogic
-            => !IsLoading && !IsSaving && !IsInvalidated;
+        public virtual bool IsSaveForBusinessLogic
+            => !IsInvalidated && !IsLoading && !IsSaving;
     }
 }

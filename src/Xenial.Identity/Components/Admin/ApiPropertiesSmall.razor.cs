@@ -113,9 +113,12 @@ public partial class ApiPropertiesSmall
 
     private async Task Refresh()
     {
-        Resource.Properties.Reload();
-        await UnitOfWork.ReloadAsync(Resource, true);
-        properties = Resource.Properties.ToArray();
-        StateHasChanged();
+        if (Resource.IsSaveForBusinessLogic)
+        {
+            Resource.Properties.Reload();
+            await UnitOfWork.ReloadAsync(Resource, true);
+            properties = Resource.Properties.ToArray();
+            StateHasChanged();
+        }
     }
 }
