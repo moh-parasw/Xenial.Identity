@@ -26,7 +26,7 @@ public partial class IdentityResourceDetails
             Snackbar.Add($"""
                 <ul>
                     <li>
-                        Role was successfully updated!
+                        IdentityResource was successfully updated!
                     </li>
                     <li>
                         <em>{IdentityResource.Name}</em>
