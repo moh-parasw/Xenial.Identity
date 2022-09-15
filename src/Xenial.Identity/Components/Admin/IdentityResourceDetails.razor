@@ -3,6 +3,7 @@
 @using System.Security.Claims
 @using MudBlazor.Utilities
 @using Newtonsoft.Json
+@using Xenial.Identity.Configuration
 @using Xenial.Identity.Data
 @using Xenial.Identity.Infrastructure
 @using Xenial.Identity.Xpo.Storage.Models
@@ -47,6 +48,29 @@
                                       FullWidth
                                       Margin="Margin.Dense"
                                       @bind-Value="@IdentityResource.Name" />
+                            <MudTextField Label="Displayname"
+                                      Variant="Variant.Filled"
+                                      FullWidth
+                                      Margin="Margin.Dense"
+                                      @bind-Value="@IdentityResource.DisplayName" />
+                            <MudTextField Label="Description"
+                                      Variant="Variant.Filled"
+                                      FullWidth
+                                      Margin="Margin.Dense"
+                                      @bind-Value="@IdentityResource.Description" />
+                            <MudStack Row Class="justify-space-between">
+                                <MudSwitch @bind-Checked="@IdentityResource.Enabled" Label="Enabled" Color="Color.Secondary" />
+                                <MudSwitch @bind-Checked="@IdentityResource.Required" Label="Required" Color="Color.Secondary" />
+                            </MudStack>
+                            <MudStack Row Class="justify-space-between">
+                                <MudSwitch @bind-Checked="@IdentityResource.ShowInDiscoveryDocument" Label="Show in Discovery Document" Color="Color.Secondary" />
+                                <MudSwitch @bind-Checked="@IdentityResource.NonEditable" Label="Non Editable" Color="Color.Secondary" />
+                            </MudStack>
+                            <MudStack Row Class="justify-space-between">
+                                <MudSwitch @bind-Checked="@IdentityResource.Emphasize" Label="Emphasize" Color="Color.Secondary" />
+                            </MudStack>
+                            <MudText Typo="Typo.caption">Identity-Resources</MudText>
+                            <TagStringEdit @bind-Tags="@UserClaims" SearchFunc="@SearchClaims" />
                         </MudStack>
                     </MudTabPanel>
                     <MudTabPanel ToolTip="Claims" Icon="@Icons.Filled.Class">
@@ -79,6 +103,8 @@
 
     public XpoIdentityResource IdentityResource { get; set; }
 
+    public IList<string> UserClaims { get; set; } = Array.Empty<string>();
+
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
@@ -87,5 +113,32 @@
     }
 
     protected async Task Refresh()
-        => IdentityResource = await UnitOfWork.GetObjectByKeyAsync<XpoIdentityResource>(ResourceId);
+    {
+        IdentityResource = await UnitOfWork.GetObjectByKeyAsync<XpoIdentityResource>(ResourceId);
+        UserClaims = IdentityResource.UserClaims.Select(x => x.Type).ToList();
+    }
+
+    private async Task<IEnumerable<string>> SearchClaims(string x)
+    {
+        var items = await UnitOfWork.Query<XpoIdentityResource>().Select(x => new
+        {
+            Root = x.Name,
+            Nested = x.UserClaims.Select(m => m.Type).ToArray()
+        }).ToListAsync();
+
+        var all = items
+            .Select(m => m.Root)
+            .Concat(items.SelectMany(m => m.Nested))
+            .Concat(ClientConstants.StandardClaims)
+            .Distinct()
+            .ToList();
+
+        if (string.IsNullOrEmpty(x))
+        {
+            return all.Except(UserClaims);
+        }
+
+        return all.Except(UserClaims).Where(v => v.Contains(x, StringComparison.InvariantCultureIgnoreCase));
+
+    }
 }
