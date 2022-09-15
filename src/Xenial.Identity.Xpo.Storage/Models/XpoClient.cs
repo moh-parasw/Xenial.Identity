@@ -12,6 +12,12 @@ using Xenial.Identity.Xpo.Storage.ValueConverters;
 
 namespace Xenial.Identity.Xpo.Storage.Models
 {
+    public enum XpoClientType
+    {
+        Unknown = 0,
+
+    }
+
     /// <summary>
     /// Models an OpenID Connect or OAuth2 client
     /// </summary>
@@ -19,6 +25,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
     [Persistent("Clients")]
     public class XpoClient : XpoStorageBaseObject
     {
+        private XpoClientType clientType;
         private static readonly Client @default = new Client();
         private string DebuggerDisplay => ClientId ?? $"{{{typeof(Client)}}}";
 
@@ -73,6 +80,13 @@ namespace Xenial.Identity.Xpo.Storage.Models
         [Persistent("Id")]
         [Key(AutoGenerate = true)]
         public int Id { get => id; set => SetPropertyValue(ref id, value); }
+
+        [Persistent("ClientType")]
+        public XpoClientType ClientType
+        {
+            get => clientType;
+            set => SetPropertyValue(nameof(ClientType), ref clientType, value);
+        }
 
         /// <summary>
         /// Specifies if client is enabled (defaults to <c>true</c>)
