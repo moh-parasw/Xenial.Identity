@@ -1,0 +1,154 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Xenial.Identity.Data
+@using Xenial.Identity.Xpo.Storage.Models
+@inject ISnackbar Snackbar
+@inject UnitOfWork UnitOfWork
+@inject IDialogService DialogService
+
+@if (properties.Any())
+{
+    <MudSimpleTable Dense Style="@($"height: {Height};")">
+        <thead>
+            <tr>
+                @if (AllowEdit)
+                {
+                    <th Style="width:0.1%; white-space: nowrap;">
+                        <MudTooltip Text="Add">
+                            <MudIconButton Icon="@Icons.Material.Filled.Add"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Success"
+                                   Size="Size.Small"
+                                   Style="margin-left: 0.8rem;"
+                                   OnClick="async () => await Edit(null)" />
+                        </MudTooltip>
+                    </th>
+                }
+                <th>Key</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var property in properties)
+            {
+                @if (property.Value?.StartsWith("{") ?? false)
+                {
+                    <tr>
+                        @if (AllowEdit)
+                        {
+                            <td>
+                                <MudStack Row>
+                                    <MudSpacer />
+                                    <MudTooltip Text="Delete">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Error"
+                                       Size="Size.Small"
+                                       OnClick="async () => await Delete(property)" />
+                                    </MudTooltip>
+                                    <MudTooltip Text="Edit">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       OnClick="async () => await Edit(property)" />
+                                    </MudTooltip>
+                                </MudStack>
+                            </td>
+                        }
+                        <td colspan="2">@property.Key</td>
+                    </tr>
+                    <tr>
+                        <td colspan="@(AllowEdit ? 3 : 2)" class="pa-0">
+                            <PropertyDisplay Value="@property.Value" />
+                        </td>
+
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        @if (AllowEdit)
+                        {
+                            <td>
+                                <MudStack Row>
+                                    <MudSpacer />
+                                    <MudTooltip Text="Delete">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Error"
+                                       Size="Size.Small"
+                                       OnClick="async () => await Delete(property)" />
+                                    </MudTooltip>
+                                    <MudTooltip Text="Edit">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       OnClick="async () => await Edit(property)" />
+                                    </MudTooltip>
+                                </MudStack>
+                            </td>
+                        }
+                        <td>@property.Key</td>
+                        <td style="word-break: keep-all; white-space: nowrap;">
+                            <PropertyDisplay Value="@property.Value" />
+                        </td>
+
+                    </tr>
+                }
+
+            }
+        </tbody>
+    </MudSimpleTable>
+}
+else
+{
+    @if (AllowEdit)
+    {
+        <MudText style="text-align: center;" Typo="Typo.body2">There are no properties yet. Do you want to <MudLink Class="cursor-pointer" onclick="@(async () => await Edit(null))">Add a property</MudLink></MudText>
+    }
+    else
+    {
+        <MudText Typo="Typo.body2">No Properties</MudText>
+    }
+}
+
+<MudMessageBox @ref="mbox" Title="Delete Property" CancelText="Cancel">
+    <MessageContent>
+        <ul>
+            <li>
+                Do your really want to delete the property <strong>@currentProperty?.Key</strong>?
+            </li>
+            <li style="overflow: hidden" class="my-2">
+                @if (currentProperty is not null)
+                {
+                    <PropertyDisplay Value="@currentProperty.Value" />
+                }
+            </li>
+            <li>
+                <strong>This operation can <em>not</em> be undone!</strong>
+            </li>
+        </ul>
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Delete Property</MudButton>
+    </YesButton>
+</MudMessageBox>
+
+@code {
+    private MudMessageBox mbox;
+    [Parameter, EditorRequired]
+    public XpoIdentityResource Resource { get; set; }
+
+    private XpoIdentityResourceProperty currentProperty;
+
+    [Parameter]
+    public bool AllowEdit { get; set; }
+
+    [Parameter]
+    public string Height { get; set; } = "auto";
+
+    private IEnumerable<XpoIdentityResourceProperty> properties = Enumerable.Empty<XpoIdentityResourceProperty>();
+
+
+}

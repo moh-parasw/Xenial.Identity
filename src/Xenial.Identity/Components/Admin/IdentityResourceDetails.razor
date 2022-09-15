@@ -74,8 +74,8 @@
                             <TagStringEdit @bind-Tags="@UserClaims" SearchFunc="@SearchClaims" />
                         </MudStack>
                     </MudTabPanel>
-                    <MudTabPanel ToolTip="Claims" Icon="@Icons.Filled.Class">
-                        @*<IdentityResourceClaimsSmall IdentityResource="@IdentityResource" AllowEdit />*@
+                    <MudTabPanel ToolTip="Properties" Icon="@Icons.Filled.Class">
+                        <IdentityResourcePropertiesSmall Resource="@IdentityResource" AllowEdit />
                     </MudTabPanel>
                 </MudTabs>
 
