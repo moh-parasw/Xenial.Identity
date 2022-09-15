@@ -42,6 +42,7 @@ public partial class IdentityResources
                         </li>
                     </ul>
                     """, MudBlazor.Severity.Success);
+                openDrawer = false;
             }
             catch (Exception ex)
             {

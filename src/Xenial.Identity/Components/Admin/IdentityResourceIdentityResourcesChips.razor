@@ -1,0 +1,28 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Xenial.Identity.Data
+@using Xenial.Identity.Xpo.Storage.Models
+@if (IdentityResources.Count > 0)
+{
+    <MudStack Row Class="flex-wrap">
+        @foreach (var identityResource in IdentityResources)
+        {
+            <MudChip Size="Size.Small" Class="flex-grow-0">@identityResource</MudChip>
+        }
+    </MudStack>
+}
+else
+{
+    <MudText Typo="Typo.body2">No Identity Resources</MudText>
+}
+@code {
+    [Parameter, EditorRequired]
+    public XpoIdentityResource Resource { get; set; }
+
+    private IList<string> IdentityResources { get; set; } = Array.Empty<string>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        IdentityResources = Resource.UserClaims.Select(u => u.Type).ToArray();
+    }
+}

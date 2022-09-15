@@ -1,0 +1,74 @@
+﻿@page "/Admin2/AddIdentityResource"
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@using MudBlazor.Utilities
+@using Newtonsoft.Json
+@using Xenial.AspNetIdentity.Xpo.Models
+@using Xenial.Identity.Configuration
+@using Xenial.Identity.Data
+@using Xenial.Identity.Infrastructure
+@using Xenial.Identity.Xpo.Storage.Models
+@inject UnitOfWork UnitOfWork
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+
+<MudStack Row Spacing="2">
+    <MudFab Icon="@Icons.Filled.ArrowBack" Size="@Size.Large" Color="Color.Surface" Href="/Admin2/IdentityResources" />
+    <MudText Typo="Typo.h3" GutterBottom>Add IdentityResource</MudText>
+</MudStack>
+
+@if (IdentityResource is not null)
+{
+    <div class="small-tabs">
+        <MudContainer MaxWidth="MaxWidth.Small">
+            <MudStack>
+                <MudPaper Class="pa-4">
+                    <MudStack Row="true">
+                        <MudAvatar Color="Color.Secondary" Variant="Variant.Outlined" Size="Size.Large">
+                            <MudIcon Icon="@Icons.Filled.Groups" />
+                        </MudAvatar>
+                        <MudStack Justify="Justify.Center" Spacing="0">
+                            <MudText Typo="Typo.body1">@IdentityResource.Name</MudText>
+                            <MudText Typo="Typo.body2">@IdentityResource.DisplayName</MudText>
+                            <MudText Typo="Typo.body2">@IdentityResource.Description</MudText>
+                        </MudStack>
+                    </MudStack>
+                </MudPaper>
+
+                <MudStack Spacing="4">
+                    <MudTextField Label="Name"
+                              Variant="Variant.Filled"
+                              FullWidth
+                              Margin="Margin.Dense"
+                              @bind-Value="@IdentityResource.Name" />
+                    <MudTextField Label="Displayname"
+                              Variant="Variant.Filled"
+                              FullWidth
+                              Margin="Margin.Dense"
+                              @bind-Value="@IdentityResource.DisplayName" />
+                    <MudTextField Label="Description"
+                              Variant="Variant.Filled"
+                              FullWidth
+                              Margin="Margin.Dense"
+                              @bind-Value="@IdentityResource.Description" />
+
+                </MudStack>
+
+                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="async () => await Save()">Save</MudButton>
+
+            </MudStack>
+        </MudContainer>
+    </div>
+
+}
+@code {
+
+    public XpoIdentityResource IdentityResource { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        IdentityResource = new XpoIdentityResource(UnitOfWork);
+    }
+}

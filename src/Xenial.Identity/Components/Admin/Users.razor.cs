@@ -37,6 +37,7 @@ public partial class Users
                         </li>
                     </ul>
                     """, MudBlazor.Severity.Success);
+                openDrawer = false;
             }
             else
             {

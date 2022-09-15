@@ -183,9 +183,58 @@
                            Href="@($"/Admin2/IdentityResource/{HighlightedValue.Id}")">Edit</MudButton>
                 </MudTooltip>
             </MudStack>
+            <MudStack Row>
+                <MudSpacer />
+                <MudTooltip Text="Delete">
+                    <MudButton EndIcon="@Icons.Material.Filled.Delete"
+                           Variant="Variant.Filled"
+                           Color="Color.Error"
+                           Size="Size.Small"
+                           OnClick="async () => await Delete(HighlightedValue)">Delete</MudButton>
+                </MudTooltip>
+                <MudTooltip Text="Edit">
+                    <MudButton EndIcon="@Icons.Material.Filled.Edit"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Small"
+                           Href="@($"/Admin2/Api/{HighlightedValue.Id}")">Edit</MudButton>
+                </MudTooltip>
+            </MudStack>
+            <MudField Label="Name"
+                  Variant="Variant.Text">@HighlightedValue.Name</MudField>
+            <MudField Label="Displayname"
+                  Variant="Variant.Text">@HighlightedValue.DisplayName</MudField>
+            <MudField Label="Description"
+                  Variant="Variant.Text">@HighlightedValue.Description</MudField>
 
-            @*<MudText Typo="Typo.caption">Claims</MudText>
-        <RoleClaimsSmall Role="@HighlightedValue" />*@
+            <MudCheckBox Label="Enabled"
+                     Disabled
+                     Checked="@HighlightedValue.Enabled"
+                     LabelPosition="LabelPosition.Start"
+                     Class="align-self-start" />
+
+            <MudCheckBox Label="Required"
+                     Disabled
+                     Checked="@HighlightedValue.Required"
+                     LabelPosition="LabelPosition.Start"
+                     Class="align-self-start" />
+
+            <MudCheckBox Label="Show in Discovery Document"
+                     Disabled
+                     Checked="@HighlightedValue.ShowInDiscoveryDocument"
+                     LabelPosition="LabelPosition.Start"
+                     Class="align-self-start" />
+
+            <MudCheckBox Label="Non Editable"
+                     Disabled
+                     Checked="@HighlightedValue.NonEditable"
+                     LabelPosition="LabelPosition.Start"
+                     Class="align-self-start" />
+
+            <MudText Typo="Typo.caption">Identity-Resources</MudText>
+            <IdentityResourceIdentityResourcesChips Resource="@HighlightedValue" />
+            <MudText Typo="Typo.caption">Properties</MudText>
+            <IdentityResourcePropertiesSmall Resource="@HighlightedValue" />
         </MudStack>
     </MudDrawer>
 }

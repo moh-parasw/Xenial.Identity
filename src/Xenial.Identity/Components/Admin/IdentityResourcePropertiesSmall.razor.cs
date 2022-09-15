@@ -1,6 +1,7 @@
 ﻿using DevExpress.Xpo;
 
 using MudBlazor;
+
 using Xenial.Identity.Xpo.Storage.Models;
 
 namespace Xenial.Identity.Components.Admin;
@@ -105,9 +106,12 @@ public partial class IdentityResourcePropertiesSmall
 
     private async Task Refresh()
     {
-        Resource.Properties.Reload();
-        await UnitOfWork.ReloadAsync(Resource, true);
-        properties = Resource.Properties.ToArray();
-        StateHasChanged();
+        if (Resource.IsSaveForBusinessLogic)
+        {
+            Resource.Properties.Reload();
+            await UnitOfWork.ReloadAsync(Resource, true);
+            properties = Resource.Properties.ToArray();
+            StateHasChanged();
+        }
     }
 }

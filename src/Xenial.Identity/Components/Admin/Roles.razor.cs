@@ -38,6 +38,7 @@ public partial class Roles
                         </li>
                     </ul>
                     """, MudBlazor.Severity.Success);
+                openDrawer = false;
             }
             else
             {
