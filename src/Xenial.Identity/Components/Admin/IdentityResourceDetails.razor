@@ -3,6 +3,7 @@
 @using System.Security.Claims
 @using MudBlazor.Utilities
 @using Newtonsoft.Json
+@using Xenial.AspNetIdentity.Xpo.Models
 @using Xenial.Identity.Configuration
 @using Xenial.Identity.Data
 @using Xenial.Identity.Infrastructure
@@ -126,10 +127,22 @@
             Nested = x.UserClaims.Select(m => m.Type).ToArray()
         }).ToListAsync();
 
+        var userClaims = await UnitOfWork.Query<XpoIdentityUserClaim>()
+            .Select(x => x.Type)
+            .Distinct()
+            .ToArrayAsync();
+
+        var roleClaims = await UnitOfWork.Query<XpoIdentityRoleClaim>()
+          .Select(x => x.Type)
+          .Distinct()
+          .ToArrayAsync();
+
         var all = items
             .Select(m => m.Root)
             .Concat(items.SelectMany(m => m.Nested))
             .Concat(ClientConstants.StandardClaims)
+            .Concat(userClaims)
+            .Concat(roleClaims)
             .Distinct()
             .ToList();
 
