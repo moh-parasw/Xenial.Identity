@@ -6,6 +6,19 @@ public partial class IdentityResourceDetails
     {
         try
         {
+            foreach (var claim in IdentityResource.UserClaims.ToList())
+            {
+                await UnitOfWork.DeleteAsync(claim);
+            }
+
+            foreach (var claim in UserClaims)
+            {
+                IdentityResource.UserClaims.Add(new Xpo.Storage.Models.XpoIdentityResourceClaim(UnitOfWork)
+                {
+                    Type = claim
+                });
+            }
+
             await UnitOfWork.SaveAsync(IdentityResource);
             await UnitOfWork.CommitChangesAsync();
 
