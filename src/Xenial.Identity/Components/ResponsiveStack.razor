@@ -1,0 +1,70 @@
+﻿@namespace FairWebBlazor.Components
+
+@using MudBlazor.Utilities
+
+@if (@ChildContent is not null)
+{
+    <div class="@EffectiveClass" style="@Style" @attributes="@UserAttributes">
+        @ChildContent
+    </div>
+}
+@code {
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; } = default!;
+
+    /// <summary>
+    /// User class names, separated by space.
+    /// </summary>
+    [Parameter]
+    [MudBlazor.Category(CategoryTypes.ComponentBase.Common)]
+    public string Class { get; set; } = "";
+
+    /// <summary>
+    /// User styles, applied on top of the component's own classes and styles.
+    /// </summary>
+    [Parameter]
+    [MudBlazor.Category(CategoryTypes.ComponentBase.Common)]
+    public string Style { get; set; } = "";
+
+    /// <summary>
+    /// Use Tag to attach any user data object to the component for your convenience.
+    /// </summary>
+    [Parameter]
+    [MudBlazor.Category(CategoryTypes.ComponentBase.Common)]
+    public object Tag { get; set; } = null!;
+
+    /// <summary>
+    /// UserAttributes carries all attributes you add to the component that don't match any of its parameters.
+    /// They will be splatted onto the underlying HTML tag.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    [MudBlazor.Category(CategoryTypes.ComponentBase.Common)]
+    public Dictionary<string, object> UserAttributes { get; set; } = new Dictionary<string, object>();
+
+
+    /// <summary>
+    /// Sets the breakpoint when the ResponsiveStack should stack items
+    /// Defaults to 250
+    /// </summary>
+    [Parameter]
+    public BreakPoint BreakPoint { get; set; } = BreakPoint.B250;
+
+    private string EffectiveClass => new CssBuilder()
+        .AddClass(Class)
+        .AddClass(BreakPointClass)
+        .Build();
+
+    private string BreakPointClass => BreakPoint switch
+    {
+        BreakPoint.B50 => "responsive-50",
+        BreakPoint.B100 => "responsive-100",
+        BreakPoint.B150 => "responsive-150",
+        BreakPoint.B200 => "responsive-200",
+        BreakPoint.B250 => "responsive-250",
+        BreakPoint.B300 => "responsive-300",
+        BreakPoint.B350 => "responsive-350",
+        BreakPoint.B400 => "responsive-400",
+        BreakPoint.B500 => "responsive-500",
+        _ => "responsive-250"
+    };
+}

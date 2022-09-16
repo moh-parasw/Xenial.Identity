@@ -127,7 +127,7 @@ public partial class TagStringEdit : MudBaseInput<string>
     /// </summary>
     [Parameter]
     [Category(CategoryTypes.FormComponent.ListBehavior)]
-    public Func<string, Task<IEnumerable<string>>> SearchFunc { get; set; }
+    public Func<string, Task<IEnumerable<string>>> SearchFunc { get; set; } = _ => Task.FromResult(Enumerable.Empty<string>());
 
     /// <summary>
     /// Maximum items to display, defaults to 10.

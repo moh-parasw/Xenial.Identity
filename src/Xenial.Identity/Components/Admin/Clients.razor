@@ -89,7 +89,7 @@
             </MudTooltip>
         </MudTd>
         <MudTd DataLabel="@(nameof(context.ClientId))">
-            <MudLink Href="@($"/Admin2/Client/{context.Id}")">
+            <MudLink Href="@($"/Admin2/Client/Advanced/{context.Id}")">
                 <MudHighlighter Text="@context.ClientId" HighlightedText="@search" />
             </MudLink>
         </MudTd>
@@ -110,7 +110,7 @@
                                    Variant="Variant.Filled"
                                    Color="Color.Primary"
                                    Size="Size.Small"
-                                   Href="@($"/Admin2/Client/{context.Id}")" />
+                                   Href="@($"/Admin2/Client/Advanced/{context.Id}")" />
                 </MudTooltip>
             </MudStack>
         </MudTd>
@@ -163,7 +163,7 @@
                            Variant="Variant.Filled"
                            Color="Color.Primary"
                            Size="Size.Small"
-                           Href="@($"/Admin2/Client/{HighlightedValue.Id}")">Edit</MudButton>
+                           Href="@($"/Admin2/Client/Advanced/{HighlightedValue.Id}")">Edit</MudButton>
                 </MudTooltip>
             </MudStack>
 

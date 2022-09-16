@@ -58,3 +58,62 @@ body, html {
   .blazor-error-boundary::after {
     content: "An error has occurred."
   }
+
+.full-height .mud-input-control-input-container,
+.full-height .mud-input-control-input-container .mud-input {
+  height: 100%;
+}
+
+.responsive-50 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  gap: 0.25rem;
+}
+
+.responsive-100 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.25rem;
+}
+
+.responsive-150 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.25rem;
+}
+
+.responsive-200 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.25rem;
+}
+
+.responsive-250 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 0.25rem;
+}
+
+.responsive-300 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 0.25rem;
+}
+
+.responsive-350 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 0.25rem;
+}
+
+.responsive-400 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 0.25rem;
+}
+
+.responsive-500 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 0.25rem;
+}

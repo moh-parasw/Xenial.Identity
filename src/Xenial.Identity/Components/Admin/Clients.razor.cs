@@ -10,6 +10,8 @@ namespace Xenial.Identity.Components.Admin;
 
 public partial class Clients
 {
+
+
     private async Task Delete(XpoClient resource)
     {
         var delete = await DialogService.ShowMessageBox("Delete Client", (MarkupString)$"""

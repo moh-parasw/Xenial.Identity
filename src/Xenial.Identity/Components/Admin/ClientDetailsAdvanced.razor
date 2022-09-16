@@ -1,7 +1,9 @@
-﻿@page "/Admin2/Client/{ClientId:int}"
+﻿@page "/Admin2/Client/Advanced/{ClientId:int}"
+@using Duende.IdentityServer.Models
 @using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
 @using MudBlazor.Utilities
+@using FairWebBlazor.Components
 @using Newtonsoft.Json
 @using Xenial.Identity.Data
 @using Xenial.Identity.Infrastructure
@@ -58,18 +60,45 @@
                                       FullWidth
                                       Margin="Margin.Dense"
                                       @bind-Value="@Client.Description" />
-                            <MudStack Row Class="justify-space-between">
-                                <MudSwitch @bind-Checked="@Client.Enabled" Label="Enabled" Color="Color.Secondary" />
-                                <MudSwitch @bind-Checked="@Client.EnableLocalLogin" Label="Enable Local Login" Color="Color.Secondary" />
-                            </MudStack>
-                            @*<MudStack Row Class="justify-space-between">
-                        <MudSwitch @bind-Checked="@Client.ShowInDiscoveryDocument" Label="Show in Discovery Document" Color="Color.Secondary" />
-                        <MudSwitch @bind-Checked="@Client.NonEditable" Label="Non Editable" Color="Color.Secondary" />
+                            <ResponsiveStack>
+                                <BoolSwitch @bind-Value="@Client.Enabled" Label="Enabled" Color="Color.Secondary" />
+                                <BoolSwitch @bind-Value="@Client.EnableLocalLogin" Label="Enable Local Login" Color="Color.Secondary" />
+                            </ResponsiveStack>
                         </MudStack>
-                        <MudStack Row Class="justify-space-between">
-                        <MudSwitch @bind-Checked="@Emphasize" Label="Emphasize" Color="Color.Secondary" />
-                        </MudStack>*@
-                        </MudStack>
+                    </MudTabPanel>
+                    <MudTabPanel ToolTip="Config" Icon="@Icons.Filled.Settings">
+                        <MudTextField Label="ProtocolType"
+                                  Variant="Variant.Filled"
+                                  FullWidth
+                                  Margin="Margin.Dense"
+                                  @bind-Value="@Client.ProtocolType" />
+                        <ResponsiveStack>
+                            <BoolSwitch @bind-Value="@Client.RequireClientSecret" Label="Require Client Secret" Color="Color.Secondary" />
+                            <BoolSwitch @bind-Value="@Client.RequirePkce" Label="Require PKCE" Color="Color.Secondary" />
+                        </ResponsiveStack>
+
+                        <ResponsiveStack>
+                            <BoolSwitch @bind-Value="@Client.AllowPlainTextPkce" Label="Allow PlainText PKCE" Color="Color.Secondary" />
+                            <BoolSwitch @bind-Value="@Client.AllowOfflineAccess" Label="Allow Offline Access" Color="Color.Secondary" />
+                        </ResponsiveStack>
+
+                        <ResponsiveStack>
+                            <BoolSwitch @bind-Value="@Client.AllowAccessTokensViaBrowser" Label="Allow Access Tokens via Browser" Color="Color.Secondary" />
+                            <MudSpacer />
+                        </ResponsiveStack>
+
+                        <MudText Typo="Typo.caption">Allowed Grant Types</MudText>
+                        <TagStringEdit @bind-Tags="@AllowedGrantTypes" SearchFunc="@((x) => Search(AvailableGrantTypes, AllowedGrantTypes, x))" />
+
+                        <MudText Typo="Typo.caption">Allowed Scopes</MudText>
+                        <TagStringEdit @bind-Tags="@AllowedScopes" SearchFunc="@((x) => Search(AvailableScopes, AllowedScopes, x))" />
+
+                        <MudText Typo="Typo.caption">Redirect Uri's</MudText>
+                        <TagStringEdit @bind-Tags="@RedirectUris" />
+
+                        <MudText Typo="Typo.caption">Allowed CORS Origins</MudText>
+                        <TagStringEdit @bind-Tags="@AllowedCorsOrigins" />
+
                     </MudTabPanel>
                     <MudTabPanel ToolTip="Resources" Icon="@Icons.Filled.Interests">
                         <MudText Typo="Typo.caption">Identity-Resources</MudText>
@@ -162,9 +191,48 @@
         await Reload();
     }
 
+    private IList<string> AllowedGrantTypes { get; set; } = Array.Empty<string>();
+
+    private IEnumerable<string> AvailableGrantTypes = GrantTypes.ClientCredentials
+            .Concat(GrantTypes.Code)
+            .Concat(GrantTypes.CodeAndClientCredentials)
+            .Concat(GrantTypes.DeviceFlow)
+            .Concat(GrantTypes.Hybrid)
+            .Concat(GrantTypes.HybridAndClientCredentials)
+            .Concat(GrantTypes.Implicit)
+            .Concat(GrantTypes.ImplicitAndClientCredentials)
+            .Concat(GrantTypes.ResourceOwnerPassword)
+            .Concat(GrantTypes.ResourceOwnerPasswordAndClientCredentials)
+            .Distinct();
+
+    private IList<string> AllowedScopes { get; set; } = Array.Empty<string>();
+    private IList<string> AvailableScopes { get; set; } = Array.Empty<string>();
+
+    private IList<string> RedirectUris { get; set; } = Array.Empty<string>();
+    private IList<string> AllowedCorsOrigins { get; set; } = Array.Empty<string>();
+
+
+    private Task<IEnumerable<string>> Search(IEnumerable<string> items, IEnumerable<string> except, string search)
+    {
+        if (string.IsNullOrEmpty(search))
+        {
+            return Task.FromResult(items.Except(except));
+        }
+
+        return Task.FromResult(items.Except(except).Where(v => v.Contains(search, StringComparison.InvariantCultureIgnoreCase)));
+    }
+
     protected async Task Reload()
     {
         Client = await UnitOfWork.GetObjectByKeyAsync<XpoClient>(ClientId);
+        AllowedGrantTypes = Client.AllowedGrantTypes.Select(m => m.GrantType).ToList();
+        AllowedScopes = Client.AllowedScopes.Select(m => m.Scope).ToList();
+        RedirectUris = Client.RedirectUris.Select(m => m.RedirectUri).ToList();
+        AllowedCorsOrigins = Client.AllowedCorsOrigins.Select(m => m.Origin).ToList();
+
+        AvailableScopes = (await UnitOfWork.Query<XpoApiScope>().Select(m => m.Name).ToArrayAsync())
+            .Concat(await UnitOfWork.Query<XpoIdentityResource>().Select(m => m.Name).ToArrayAsync())
+            .ToList();
         //Client.UserClaims.Reload();
         //Client.Scopes.Reload();
         //var existingScope = UnitOfWork.Query<XpoApiScope>().Where(s => s.Name == Client.Name).FirstOrDefault();

@@ -4,7 +4,7 @@ using Xenial.Identity.Xpo.Storage.Models;
 
 namespace Xenial.Identity.Components.Admin;
 
-public partial class ClientDetails
+public partial class ClientDetailsAdvanced
 {
     private IEnumerable<XpoApiResourceScope> Scopes { get; set; } = Enumerable.Empty<XpoApiResourceScope>();
 
