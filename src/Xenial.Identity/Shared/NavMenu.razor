@@ -1,41 +1,47 @@
 ﻿
-<MudStack Row="false" Spacing="0">
+<MudStack Row="false" Spacing="0" Style="height: 100%">
+    <div style="display: flex; flex-direction: column; height: 100%; overflow-y: auto;">
+        <MudTooltip Text="Application" Placement="Placement.Right" Inline="false">
+            <MudNavLink Icon="@Icons.Filled.SettingsApplications" Match="NavLinkMatch.All" Href="/Admin2/AppSettings">Application</MudNavLink>
+        </MudTooltip>
 
-    <MudTooltip Text="Application" Placement="Placement.Right">
-        <MudNavLink Icon="@Icons.Filled.SettingsApplications" Match="NavLinkMatch.All" Href="/Admin2/AppSettings">Application</MudNavLink>
-    </MudTooltip>
+        <MudDivider />
 
-    <MudDivider />
+        <MudTooltip Text="Theme" Placement="Placement.Right" Inline="false">
+            <MudNavLink Icon="@Icons.Filled.Colorize" Match="NavLinkMatch.All" Href="/Admin2/Theme">Theme</MudNavLink>
+        </MudTooltip>
+        <MudTooltip Text="Footer" Placement="Placement.Right" Inline="false">
+            <MudNavLink Icon="@Icons.Filled.BorderBottom" Match="NavLinkMatch.All" Href="/Admin2/Footer">Footer</MudNavLink>
+        </MudTooltip>
 
-    <MudTooltip Text="Theme" Placement="Placement.Right">
-        <MudNavLink  Icon="@Icons.Filled.Colorize" Match="NavLinkMatch.All" Href="/Admin2/Theme">Theme</MudNavLink>
-    </MudTooltip>
-    <MudTooltip Text="Footer" Placement="Placement.Right">
-        <MudNavLink Icon="@Icons.Filled.BorderBottom" Match="NavLinkMatch.All" Href="/Admin2/Footer">Footer</MudNavLink>
-    </MudTooltip>
+        <MudDivider />
 
-    <MudDivider />
+        <MudTooltip Text="Users" Placement="Placement.Right" Inline="false">
+            <MudNavLink Icon="@Icons.Filled.People" Match="NavLinkMatch.All" Href="/Admin2/Users">Users</MudNavLink>
+        </MudTooltip>
+        <MudTooltip Text="Groups" Placement="Placement.Right" Inline="false">
+            <MudNavLink Icon="@Icons.Filled.Groups" Match="NavLinkMatch.All" Href="/Admin2/Roles">Roles</MudNavLink>
+        </MudTooltip>
+        <MudTooltip Text="Identity Resources" Placement="Placement.Right" Inline="false">
+            <MudNavLink Icon="@Icons.Filled.Book" Match="NavLinkMatch.All" Href="/Admin2/IdentityResources">Identity Resources</MudNavLink>
+        </MudTooltip>
 
-    <MudTooltip Text="Users" Placement="Placement.Right">
-        <MudNavLink Icon="@Icons.Filled.People" Match="NavLinkMatch.All" Href="/Admin2/Users">Users</MudNavLink>
-    </MudTooltip>
-    <MudTooltip Text="Groups" Placement="Placement.Right">
-        <MudNavLink Icon="@Icons.Filled.Groups" Match="NavLinkMatch.All" Href="/Admin2/Roles">Roles</MudNavLink>
-    </MudTooltip>
-    <MudTooltip Text="Identity Resources" Placement="Placement.Right">
-        <MudNavLink Icon="@Icons.Filled.Book" Match="NavLinkMatch.All" Href="/Admin2/IdentityResources">Identity Resources</MudNavLink>
-    </MudTooltip>
-
-    <MudDivider />
-    <MudTooltip Text="Apis" Placement="Placement.Right">
-        <MudNavLink Icon="@Icons.Filled.Api" Match="NavLinkMatch.All" Href="/Admin2/Apis">Apis</MudNavLink>
-    </MudTooltip>
-
-
-    <MudDivider />
-    <MudTooltip Text="Clients" Placement="Placement.Right">
-        <MudNavLink Icon="@Icons.Filled.Cable" Match="NavLinkMatch.All" Href="/Admin2/Clients">Clients</MudNavLink>
-    </MudTooltip>
+        <MudDivider />
+        <MudTooltip Text="Apis" Placement="Placement.Right" Inline="false">
+            <MudNavLink Icon="@Icons.Filled.Api" Match="NavLinkMatch.All" Href="/Admin2/Apis">Apis</MudNavLink>
+        </MudTooltip>
 
 
+        <MudDivider />
+        <MudTooltip Text="Clients" Placement="Placement.Right" Inline="false">
+            <MudNavLink Icon="@Icons.Filled.Cable" Match="NavLinkMatch.All" Href="/Admin2/Clients">Clients</MudNavLink>
+        </MudTooltip>
+
+        <MudDivider Style="margin-top: auto;" />
+
+        <MudTooltip Text="Documentation" Placement="Placement.Right" Inline="false">
+            <MudNavLink Icon="@Icons.Filled.Help" Match="NavLinkMatch.All" Href="https://identityserver4.readthedocs.io/en/latest" Target="_blank">IdentityServer4</MudNavLink>
+            <MudNavLink Icon="@Icons.Filled.HelpOutline" Match="NavLinkMatch.All" Href="https://docs.duendesoftware.com/identityserver/v6" Target="_blank">Duende IDS6</MudNavLink>
+        </MudTooltip>
+    </div>
 </MudStack>

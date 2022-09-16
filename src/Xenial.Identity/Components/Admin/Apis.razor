@@ -193,31 +193,36 @@
             <MudCheckBox Label="Enabled"
                      Disabled
                      Checked="@HighlightedValue.Enabled"
-                     LabelPosition="LabelPosition.Start"
+                     LabelPosition="LabelPosition.End"
+                     Dense
                      Class="align-self-start" />
 
             <MudCheckBox Label="Required"
                      Disabled
                      Checked="@HighlightedValue.Required"
-                     LabelPosition="LabelPosition.Start"
+                     LabelPosition="LabelPosition.End"
+                     Dense
                      Class="align-self-start" />
 
             <MudCheckBox Label="Show in Discovery Document"
                      Disabled
                      Checked="@HighlightedValue.ShowInDiscoveryDocument"
-                     LabelPosition="LabelPosition.Start"
+                     LabelPosition="LabelPosition.End"
+                     Dense
                      Class="align-self-start" />
 
             <MudCheckBox Label="Non Editable"
                      Disabled
                      Checked="@HighlightedValue.NonEditable"
-                     LabelPosition="LabelPosition.Start"
+                     LabelPosition="LabelPosition.End"
+                     Dense
                      Class="align-self-start" />
 
             <MudCheckBox Label="Emphasize"
                      Disabled
                      Checked="@(UnitOfWork.Query<XpoApiScope>().Where(s => s.Name == HighlightedValue.Name).FirstOrDefault()?.Emphasize)"
-                     LabelPosition="LabelPosition.Start"
+                     LabelPosition="LabelPosition.End"
+                     Dense
                      Class="align-self-start" />
 
             <MudText Typo="Typo.caption">Scopes</MudText>

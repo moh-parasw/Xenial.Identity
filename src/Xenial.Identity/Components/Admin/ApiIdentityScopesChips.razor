@@ -4,6 +4,7 @@
 @if (Scopes.Count > 0)
 {
     <MudStack Row Class="flex-wrap">
+        <MudChip Size="Size.Small" Class="flex-grow-0">@Resource.Name</MudChip>
         @foreach (var scope in Scopes)
         {
             <MudChip Size="Size.Small" Class="flex-grow-0">@scope</MudChip>
