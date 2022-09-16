@@ -1,0 +1,20 @@
+﻿@namespace Xenial.Identity
+
+<MudStack Row="false">
+    <MudText Typo="Typo.caption">@Label</MudText>
+    <MudTextField Variant="Variant.Text"
+                  FullWidth
+                  Margin="Margin.Dense"
+                  OnKeyUp="@KeyUp"
+                  AdornmentIcon="@Icons.Filled.Add"
+                  AdornmentColor="Color.Success"
+                  Adornment="Adornment.End"
+                  OnAdornmentClick="@AddItem"
+                  @bind-Value="@Value" />
+    <MudChipSet AllClosable="true" OnClose="RemoveItem" Class="d-flex" Style="flex-flow: wrap;">
+        @foreach (var item in Items)
+        {
+            <MudChip Text="@item" Class="flex-grow-0"></MudChip>
+        }
+    </MudChipSet>
+</MudStack>

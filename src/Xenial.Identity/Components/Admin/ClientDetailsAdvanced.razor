@@ -93,11 +93,9 @@
                         <MudText Typo="Typo.caption">Allowed Scopes</MudText>
                         <TagStringEdit @bind-Tags="@AllowedScopes" SearchFunc="@((x) => Search(AvailableScopes, AllowedScopes, x))" />
 
-                        <MudText Typo="Typo.caption">Redirect Uri's</MudText>
-                        <TagStringEdit @bind-Tags="@RedirectUris" />
+                        <TagChipsEdit Label="Redirect Uri's" @bind-Items="@RedirectUris" ClearAfterAdd="false" />
 
-                        <MudText Typo="Typo.caption">Allowed CORS Origins</MudText>
-                        <TagStringEdit @bind-Tags="@AllowedCorsOrigins" />
+                        <TagChipsEdit Label="Allowed CORS Origins" @bind-Items="@AllowedCorsOrigins" ClearAfterAdd="false" />
 
                     </MudTabPanel>
                     <MudTabPanel ToolTip="Resources" Icon="@Icons.Filled.Interests">
@@ -208,8 +206,8 @@
     private IList<string> AllowedScopes { get; set; } = Array.Empty<string>();
     private IList<string> AvailableScopes { get; set; } = Array.Empty<string>();
 
-    private IList<string> RedirectUris { get; set; } = Array.Empty<string>();
-    private IList<string> AllowedCorsOrigins { get; set; } = Array.Empty<string>();
+    private IEnumerable<string> RedirectUris { get; set; } = Array.Empty<string>();
+    private IEnumerable<string> AllowedCorsOrigins { get; set; } = Array.Empty<string>();
 
 
     private Task<IEnumerable<string>> Search(IEnumerable<string> items, IEnumerable<string> except, string search)
