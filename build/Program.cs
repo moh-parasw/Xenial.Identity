@@ -8,11 +8,11 @@ using System.IO;
 var sln = "Xenial.Identity.sln";
 var projectName = "Xenial.Identity";
 var web = $"src/{projectName}/{projectName}.csproj";
-var iisPackageName = "identity.xenial.io";
+var iisPackageName = Environment.GetEnvironmentVariable("WEBDEPLOY_SITENAME") ?? "identity.xenial.io";
 var artifactsLocation = Path.GetFullPath($"./artifacts");
 var artifact = Path.GetFullPath($"{artifactsLocation}/{projectName}.zip");
 var configuration = "Release";
-var selfContained = false;
+var selfContained = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBDEPLOY_SELFHOST")) ? false : true;
 var packageAsSingleFile = false;
 
 var version = new Lazy<Task<string>>(async () => (await ReadToolAsync(() => ReadAsync("dotnet", "minver -v e", noEcho: true))).Trim());
