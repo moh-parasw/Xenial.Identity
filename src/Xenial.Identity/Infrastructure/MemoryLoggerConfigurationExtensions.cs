@@ -49,15 +49,12 @@ public static class MemoryLoggerConfigurationExtensions
         IFormatProvider? formatProvider = null,
         LoggingLevelSwitch? levelSwitch = null,
         Logging.MemoryConsole.Themes.ConsoleTheme? theme = null,
-        bool applyThemeToRedirectedOutput = false,
         object? syncRoot = null)
     {
         _ = sinkConfiguration ?? throw new ArgumentNullException(nameof(sinkConfiguration));
         _ = outputTemplate ?? throw new ArgumentNullException(nameof(outputTemplate));
 
-        var appliedTheme = !applyThemeToRedirectedOutput && (System.Console.IsOutputRedirected || System.Console.IsErrorRedirected) ?
-            Logging.MemoryConsole.Themes.ConsoleTheme.None :
-            theme ?? SystemConsoleThemes.Literate;
+        var appliedTheme = theme ?? SystemConsoleThemes.Literate;
 
         syncRoot ??= defaultSyncRoot;
 
