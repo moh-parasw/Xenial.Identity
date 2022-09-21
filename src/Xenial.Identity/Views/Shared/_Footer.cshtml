@@ -40,7 +40,7 @@
                 </p>
             }
             @{
-                var assembly = typeof(Xenial.Identity.Startup).Assembly;
+                var assembly = typeof(Xenial.Identity.App).Assembly;
                 var attributes = assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyMetadataAttribute), false).OfType<System.Reflection.AssemblyMetadataAttribute>().ToList();
                 var siteVersion = GetType().Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false).OfType<System.Reflection.AssemblyInformationalVersionAttribute>().FirstOrDefault()?.InformationalVersion;
                 var siteRepo = attributes.FirstOrDefault(m => m.Key == "RepositoryUrl")?.Value;

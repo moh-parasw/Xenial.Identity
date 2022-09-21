@@ -1,0 +1,32 @@
+﻿@page "/Admin2/Logs"
+@using Xenial.Identity.Infrastructure
+@inject InMemorySink Sink
+@implements IDisposable
+
+<MudText Typo="Typo.h3" GutterBottom>Logs</MudText>
+
+<MudPaper Elevation="10" Class="mb-1" Square>
+    <MudTable Items="@Sink">
+        <HeaderContent>
+            <MudTh>Log-Text</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Log-Text">@context.ToString()</MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@code {
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        Sink.Emitted -= Emitted;
+        Sink.Emitted += Emitted;
+    }
+
+    private void Emitted(object sender, EventArgs e)
+        => StateHasChanged();
+
+    public void Dispose()
+        => Sink.Emitted -= Emitted;
+}

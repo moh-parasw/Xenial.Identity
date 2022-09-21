@@ -1,21 +1,24 @@
-﻿using DevExpress.Data.Linq.Helpers;
+﻿using AutoMapper;
+
+using DevExpress.Data.Linq.Helpers;
 using DevExpress.Xpo;
 using DevExpress.Xpo.DB;
 
-using Duende.IdentityServer.Models;
+using Microsoft.AspNetCore.Identity;
 
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using MudBlazor.Services;
 
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 
-using System;
+using Westwind.AspNetCore.LiveReload;
 
-using Xenial.Identity;
+using Xenial.AspNetIdentity.Xpo.Mappers;
+using Xenial.AspNetIdentity.Xpo.Models;
+using Xenial.AspNetIdentity.Xpo.Stores;
+using Xenial.Identity.Areas.Admin.Pages.Clients;
+using Xenial.Identity.Data;
 using Xenial.Identity.Infrastructure;
 using Xenial.Identity.Models;
 using Xenial.Identity.Xpo.Storage.Models;
@@ -24,6 +27,8 @@ SQLiteConnectionProvider.Register();
 MySqlConnectionProvider.Register();
 
 DevExpress.Xpo.Logger.LogManager.SetTransport(new XpoConsoleLogger());
+
+var inMemoryLogSink = new InMemorySink();
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -41,19 +46,131 @@ Log.Logger = new LoggerConfiguration()
         flushToDiskInterval: TimeSpan.FromSeconds(1))
     //#endif
     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: AnsiConsoleTheme.Code)
-    .CreateLogger();
+    .WriteTo.Sink(inMemoryLogSink)
+.CreateLogger();
 
 try
 {
     Log.Information("Starting host...");
 
-    var host = CreateHostBuilder(args).Build();
+    var builder = WebApplication.CreateBuilder(args);
+    builder.Host.UseSerilog();
+
+    var Environment = builder.Environment;
+    var Configuration = builder.Configuration;
+    var services = builder.Services;
+
+    services.AddSingleton(inMemoryLogSink);
+    if (Environment.IsDevelopment())
+    {
+        services.AddLiveReload();
+    }
+
+    var mvcBuilder = services.AddControllersWithViews();
+
+    var razorPagesBuilder = services.AddRazorPages(o =>
+    {
+        o.Conventions.AuthorizeAreaFolder("Admin", "/", "Administrator");
+        o.Conventions.AuthorizePage("/_Host", "Administrator");
+    });
+
+    services.AddMudServices();
+    services.AddXpo(Configuration);
+    services.AddXpoDefaultUnitOfWork();
+
+    services.AddDefaultIdentity<XenialIdentityUser>(options =>
+    {
+        //TODO: Email Sender
+        options.SignIn.RequireConfirmedAccount = false;
+    }).AddXpoStores()
+      .AddDefaultTokenProviders();
+
+    services
+        .AddScoped<IUserStore<XenialIdentityUser>>(s => new XPUserStore<XenialIdentityUser, XpoXeniaIIdentityUser>(
+               s.GetService<UnitOfWork>(),
+               s.GetService<ILogger<XPUserStore<XenialIdentityUser, XpoXeniaIIdentityUser>>>(),
+               new IdentityErrorDescriber(),
+               new MapperConfiguration(cfg => cfg.AddProfile<XPIdentityMapperProfile<XenialIdentityUser, IdentityRole, XpoXeniaIIdentityUser, XpoIdentityRole>>())
+       ))
+        .AddScoped<IRoleStore<IdentityRole>>(s => new XPRoleStore(
+                s.GetService<UnitOfWork>(),
+                s.GetService<ILogger<XPRoleStore>>(),
+                new IdentityErrorDescriber()
+        ))
+        .AddScoped<UserManager<XenialIdentityUser>>()
+        .AddScoped<RoleManager<IdentityRole>>()
+        .AddScoped<IUserClaimsPrincipalFactory<XenialIdentityUser>, UserClaimsPrincipalFactory<XenialIdentityUser, IdentityRole>>()
+    ;
+
+    var idsBuilder = services.AddIdentityServer(options =>
+    {
+        options.Events.RaiseErrorEvents = true;
+        options.Events.RaiseInformationEvents = true;
+        options.Events.RaiseFailureEvents = true;
+        options.Events.RaiseSuccessEvents = true;
+
+        // see https://Duende.IdentityServer.readthedocs.io/en/latest/topics/resources.html
+        options.EmitStaticAudienceClaim = true;
+    })
+      .AddRedirectUriValidator<RedirectValidator>()
+      .AddAspNetIdentity<XenialIdentityUser>()
+      .AddXpoIdentityStore();
+
+    idsBuilder.AddCertificate(Environment, Configuration, null);
+
+    services.AddAuthentication()
+        .AddGitHub(options =>
+        {
+            options.ClientId = Configuration["GitHub:ClientId"];
+            options.ClientSecret = Configuration["GitHub:ClientSecret"];
+        });
+
+    services.AddAuthorization(o =>
+    {
+        o.AddPolicy("Administrator", policy =>
+        {
+            policy.RequireAuthenticatedUser();
+            policy.RequireRole("Administrator");
+        });
+    });
+
+    services.AddServerSideBlazor();
+
+    services.Configure<RouteOptions>(options =>
+    {
+        options.ConstraintMap.Add(nameof(ClientTypes), typeof(EnumRouteConstraint<ClientTypes>));
+    });
+
+    Log.Information("Creating Application");
+
+    var app = builder.Build();
+
+    if (Environment.IsDevelopment())
+    {
+        app.UseLiveReload();
+        app.UseDeveloperExceptionPage();
+    }
+
+    app.UseStaticFiles();
+
+    app.UseRouting();
+    app.UseIdentityServer();
+    app.UseAuthorization();
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapBlazorHub();
+        endpoints.MapRazorPages();
+        endpoints.MapControllers();
+        endpoints.MapDefaultControllerRoute();
+        endpoints.MapFallbackToPage("/_Host");
+    });
 
     Log.Information("Update Database");
 
     var serviceCollection = new ServiceCollection();
+
     serviceCollection
-        .AddXpo(host.Services.GetRequiredService<IConfiguration>(), AutoCreateOption.DatabaseAndSchema)
+        .AddXpo(Configuration, AutoCreateOption.DatabaseAndSchema)
         .AddXpoDefaultUnitOfWork();
 
     using (var provider = serviceCollection.BuildServiceProvider())
@@ -65,7 +182,8 @@ try
 
     Log.Information("Update Done");
 
-    host.Run();
+    Log.Information("Run Application");
+    app.Run();
     return 0;
 }
 catch (Exception ex)
@@ -77,14 +195,6 @@ finally
 {
     Log.CloseAndFlush();
 }
-
-static IHostBuilder CreateHostBuilder(string[] args)
-    => Host.CreateDefaultBuilder(args)
-        .UseSerilog()
-        .ConfigureWebHostDefaults(webBuilder =>
-        {
-            webBuilder.UseStartup<Startup>();
-        });
 
 static void SeedDatabase(UnitOfWork unitOfWork)
 {
