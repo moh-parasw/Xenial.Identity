@@ -5,27 +5,34 @@
 
 <MudText Typo="Typo.h3" GutterBottom>Logs</MudText>
 
-<MudPaper Elevation="10" Class="mb-1" Square>
-    <MudTable Items="@Sink">
-        <HeaderContent>
-            <MudTh>Log-Text</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Log-Text">@context.ToString()</MudTd>
-        </RowTemplate>
-    </MudTable>
-</MudPaper>
+<MudButton OnClick="@TerminalInititialized">Say Hello</MudButton>
+
+<XTerm @ref="@terminal" Initialized="@TerminalInititialized" />
 
 @code {
-    protected override void OnParametersSet()
+    private async Task TerminalInititialized()
     {
-        base.OnParametersSet();
-        Sink.Emitted -= Emitted;
-        Sink.Emitted += Emitted;
+        if (terminal is not null)
+        {
+            var items = Sink.ToArray();
+            foreach (var item in items)
+            {
+                await terminal.WriteLine("Hello World");
+            }
+            Sink.Emitted -= Emitted;
+            Sink.Emitted += Emitted;
+        }
     }
 
-    private void Emitted(object sender, EventArgs e)
-        => StateHasChanged();
+    private XTerm terminal;
+
+    private async void Emitted(object sender, EventArgs e)
+    {
+        if (terminal is not null)
+        {
+            await terminal.WriteLine("Emitted");
+        }
+    }
 
     public void Dispose()
         => Sink.Emitted -= Emitted;

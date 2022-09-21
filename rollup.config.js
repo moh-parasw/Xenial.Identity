@@ -25,6 +25,35 @@ export default (commandLineArgs) => {
 
   return [
     {
+      input: "./client/js/XTerm.ts",
+      output: [
+        {
+          dir: `src/Xenial.Identity.Components/wwwroot/js/XTerm`,
+          format: 'esm',
+          sourcemap: debug,
+          plugins: debug ? [] : [terser()],
+        },
+      ],
+      external: [],
+      plugins: [
+        resolve({ extensions }),
+        scss({
+          output: `src/Xenial.Identity.Components/wwwroot/css/XTerm-bundle.css`,
+          outputStyle: debug ? undefined : "compressed",
+        }),
+        nodeResolve({
+          sourceMap: debug
+        }),
+        commonjs({
+        }),
+        babel({
+          extensions,
+          exclude: "node_modules/**",
+          babelHelpers: 'bundled'
+        })
+      ]
+    },
+    {
       input: "./client/js/MonacoEdit.ts",
       output: [
         {
