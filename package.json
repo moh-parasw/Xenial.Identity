@@ -51,6 +51,7 @@
     "monaco-editor": "0.31.1",
     "notyf": "^3.9.0",
     "qrcode": "^1.4.4",
-    "xterm": "^5.0.0"
+    "xterm": "^5.0.0",
+    "xterm-addon-fit": "^0.6.0"
   }
 }

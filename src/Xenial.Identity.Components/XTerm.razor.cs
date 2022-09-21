@@ -13,6 +13,15 @@ public partial class XTerm
     [Parameter]
     public EventCallback Initialized { get; set; }
 
+    [Parameter]
+    public int? Columns { get; set; }
+
+    [Parameter]
+    public int? Rows { get; set; }
+
+    [Parameter]
+    public bool Autofit { get; set; }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
@@ -21,8 +30,41 @@ public partial class XTerm
             module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", Script);
             component?.Dispose();
             component = DotNetObjectReference.Create(this);
-            await module.InvokeVoidAsync("CreateTerminal", el);
+            await module.InvokeVoidAsync("CreateTerminal", el, Columns, Rows, Autofit);
             await Initialized.InvokeAsync();
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("ResizeTerminal", el, Columns, Rows);
+        }
+    }
+
+    public async Task ScrollToBottom()
+    {
+        if (module is { })
+        {
+            await module.InvokeVoidAsync("ScrollTerminalToBottom", el);
+        }
+    }
+
+    public async Task Fit()
+    {
+        if (module is { })
+        {
+            await module.InvokeVoidAsync("FitTerminal", el);
+        }
+    }
+
+    public async Task Clear()
+    {
+        if (module is { })
+        {
+            await module.InvokeVoidAsync("ClearTerminal", el);
         }
     }
 

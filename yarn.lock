@@ -713,6 +713,7 @@ __metadata:
     sass: ^1.54.9
     typescript: ^4.0.3
     xterm: ^5.0.0
+    xterm-addon-fit: ^0.6.0
     zlib: ^1.0.5
   languageName: unknown
   linkType: soft
@@ -2934,6 +2935,15 @@ __metadata:
   version: 1.0.2
   resolution: "wrappy@npm:1.0.2"
   checksum: 159da4805f7e84a3d003d8841557196034155008f817172d4e986bd591f74aa82aa7db55929a54222309e01079a65a92a9e6414da5a6aa4b01ee44a511ac3ee5
+  languageName: node
+  linkType: hard
+
+"xterm-addon-fit@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "xterm-addon-fit@npm:0.6.0"
+  peerDependencies:
+    xterm: ^5.0.0
+  checksum: 6115e130a58a5ec3d17b424bd0420f3d871e9a6bb455ca62e67c10724534eafbdd205dd35c4707d8037efe8107c09486b48cb4369ba2e3ac97ab78f805195319
   languageName: node
   linkType: hard
 

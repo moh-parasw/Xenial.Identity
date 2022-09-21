@@ -6,22 +6,90 @@
 
 <MudText Typo="Typo.h3" GutterBottom>Logs</MudText>
 
-<MudButton OnClick="@TerminalInititialized">Say Hello</MudButton>
 
-<XTerm @ref="@terminal" Initialized="@TerminalInititialized" />
+<MudPaper Elevation="10" Class="mb-1" Square>
+    <MudToolBar Dense>
+        <MudNumericField Immediate
+                         Clearable
+                         DebounceInterval="200"
+                         @bind-Value="@terminal.Rows"
+                         Label="Rows"
+                         Variant="Variant.Outlined"
+                         Margin="Margin.Dense"
+                         Style="width: 200px"
+                         Class="flex-grow-0" />
+        <MudNumericField Immediate
+                         Clearable
+                         DebounceInterval="200"
+                         @bind-Value="@terminal.Columns"
+                         Label="Columns"
+                         Variant="Variant.Outlined"
+                         Margin="Margin.Dense"
+                         Style="width: 200px"
+                         Class="flex-grow-0" />
+
+        <MudSpacer />
+        <MudTooltip Text="Fit to Window">
+            <MudIconButton Icon="@Icons.Filled.Square"
+                           OnClick="@(async () => await terminal.Fit())"
+                           Color="Color.Tertiary" />
+        </MudTooltip>
+        <MudTooltip Text="Scroll to bottom">
+            <MudIconButton Icon="@Icons.Filled.BorderBottom"
+                           OnClick="@(async () => await terminal.ScrollToBottom())"
+                           Color="Color.Tertiary" />
+        </MudTooltip>
+        <MudTooltip Text="Clear">
+            <MudIconButton Icon="@Icons.Filled.Clear"
+                           OnClick="@(async () => await terminal.Clear())"
+                           Color="Color.Success" />
+        </MudTooltip>
+        <MudTooltip Text="Refresh">
+            <MudIconButton Icon="@Icons.Filled.Refresh"
+                           OnClick="@(async () => await Refresh())"
+                           Color="Color.Primary" />
+        </MudTooltip>
+    </MudToolBar>
+</MudPaper>
+<XTerm @ref="@terminal"
+       Autofit
+       Initialized="@TerminalInititialized" />
 
 @code {
+    private async Task Refresh()
+    {
+        if (terminal is not null)
+        {
+            await terminal.Clear();
+            await WriteBufferToTerminal();
+        }
+    }
+
     private async Task TerminalInititialized()
     {
         if (terminal is not null)
         {
-            var items = Sink.ToArray();
-            foreach (var item in items)
+            await WriteBufferToTerminal();
+        }
+    }
+
+    private async Task WriteBufferToTerminal()
+    {
+        if (terminal is not null)
+        {
+            try
             {
-                await terminal.Write(item);
+                Sink.Emitted -= Emitted;
+                var items = Sink.ToArray();
+                foreach (var item in items)
+                {
+                    await terminal.Write(item);
+                }
             }
-            Sink.Emitted -= Emitted;
-            Sink.Emitted += Emitted;
+            finally
+            {
+                Sink.Emitted += Emitted;
+            }
         }
     }
 
