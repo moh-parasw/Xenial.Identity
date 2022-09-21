@@ -432,7 +432,7 @@ public partial class TagStringEdit : MudBaseInput<string>
         StateHasChanged();
     }
 
-    int _elementKey = 0;
+    private int _elementKey = 0;
 
     /// <summary>
     /// Clears the autocomplete's text

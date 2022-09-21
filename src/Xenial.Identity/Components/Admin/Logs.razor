@@ -1,5 +1,6 @@
 ﻿@page "/Admin2/Logs"
 @using Xenial.Identity.Infrastructure
+@using Xenial.Identity.Infrastructure.Logging.MemoryConsole
 @inject InMemorySink Sink
 @implements IDisposable
 
@@ -17,7 +18,7 @@
             var items = Sink.ToArray();
             foreach (var item in items)
             {
-                await terminal.WriteLine("Hello World");
+                await terminal.Write(item);
             }
             Sink.Emitted -= Emitted;
             Sink.Emitted += Emitted;
@@ -26,11 +27,11 @@
 
     private XTerm terminal;
 
-    private async void Emitted(object sender, EventArgs e)
+    private async void Emitted(object sender, InMemoryLogEventArgs e)
     {
         if (terminal is not null)
         {
-            await terminal.WriteLine("Emitted");
+            await terminal.Write(e.Log);
         }
     }
 

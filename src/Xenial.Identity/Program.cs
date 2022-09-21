@@ -10,7 +10,6 @@ using MudBlazor.Services;
 
 using Serilog;
 using Serilog.Events;
-using Serilog.Sinks.SystemConsole.Themes;
 
 using Westwind.AspNetCore.LiveReload;
 
@@ -20,6 +19,7 @@ using Xenial.AspNetIdentity.Xpo.Stores;
 using Xenial.Identity.Areas.Admin.Pages.Clients;
 using Xenial.Identity.Data;
 using Xenial.Identity.Infrastructure;
+using Xenial.Identity.Infrastructure.Logging.MemoryConsole.Themes;
 using Xenial.Identity.Models;
 using Xenial.Identity.Xpo.Storage.Models;
 
@@ -28,8 +28,6 @@ MySqlConnectionProvider.Register();
 
 DevExpress.Xpo.Logger.LogManager.SetTransport(new XpoConsoleLogger());
 
-var inMemoryLogSink = new InMemorySink();
-
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
@@ -37,6 +35,7 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("System", LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Information)
     .Enrich.FromLogContext()
+    .WriteTo.Memory(out var inMemoryLogSink, outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: AnsiConsoleTheme.Code)
     //#if !DEBUG
     .WriteTo.File(
         @"C:\logs\identity.xenial.io\Xenial.Platform.Identity.Api.log",
@@ -45,7 +44,7 @@ Log.Logger = new LoggerConfiguration()
         shared: true,
         flushToDiskInterval: TimeSpan.FromSeconds(1))
     //#endif
-    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: AnsiConsoleTheme.Code)
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme.Code)
     .WriteTo.Sink(inMemoryLogSink)
 .CreateLogger();
 

@@ -11,9 +11,9 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
 {
     public class ResetAuthenticatorModel : PageModel
     {
-        UserManager<XenialIdentityUser> _userManager;
+        private UserManager<XenialIdentityUser> _userManager;
         private readonly SignInManager<XenialIdentityUser> _signInManager;
-        ILogger<ResetAuthenticatorModel> _logger;
+        private ILogger<ResetAuthenticatorModel> _logger;
 
         public ResetAuthenticatorModel(
             UserManager<XenialIdentityUser> userManager,
