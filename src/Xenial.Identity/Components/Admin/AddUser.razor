@@ -34,6 +34,16 @@
                                       Margin="Margin.Dense"
                                       @bind-Value="@User.UserName" />
                         </MudStack>
+                        <MudTextField T="string"
+                                  @bind-Value="@Password"
+                                  Variant="Variant.Filled"
+                                  InputType="InputType.Password"
+                                  Label="Password" />
+                        <MudTextField T="string"
+                                  @bind-Value="@RepeatPassword"
+                                  InputType="InputType.Password"
+                                  Variant="Variant.Filled"
+                                  Label="Repeat Password" />
                     </MudTabPanel>
                 </MudTabs>
 

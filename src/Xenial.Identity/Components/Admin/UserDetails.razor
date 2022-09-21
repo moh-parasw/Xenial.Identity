@@ -8,6 +8,7 @@
 @inject UserManager<XenialIdentityUser> UserManager
 @inject RoleManager<IdentityRole> RolesManager
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 @inject NavigationManager NavigationManager
 
 <MudStack Row Spacing="2">
@@ -27,6 +28,10 @@
                             <MudText Typo="Typo.body1">@User.DisplayName</MudText>
                             <MudText Typo="Typo.body2">@User.Email</MudText>
                         </MudStack>
+                        <MudSpacer />
+                        <MudTooltip Text="Change Password" Inline="false">
+                            <MudFab Size="Size.Large" Icon="@Icons.Filled.Password" OnClick="@(async () => await ShowChangePasswordDialog())"></MudFab>
+                        </MudTooltip>
                     </MudStack>
                 </MudPaper>
 
@@ -235,5 +240,28 @@
             }
         }
         Roles = await UserManager.GetRolesAsync(User);
+    }
+
+    protected async Task ShowChangePasswordDialog()
+    {
+        var dialog = DialogService.Show<ChangePasswordDialog>(
+           "Change Password",
+           new DialogParameters
+               {
+                   [nameof(ChangePasswordDialog.User)] = User
+               },
+           new DialogOptions
+               {
+                   MaxWidth = MaxWidth.Small,
+                   FullWidth = true,
+                   CloseOnEscapeKey = true,
+                   DisableBackdropClick = true,
+               });
+
+        var refresh = await dialog.GetReturnValueAsync<bool?>();
+        if (refresh == true)
+        {
+            await ReloadUser();
+        }
     }
 }

@@ -57,7 +57,7 @@ public class InMemorySink : IEnumerable<string>, ILogEventSink
                 AutoFlush = true
             });
 
-    private readonly FixedSizedQueue<string> queue = new() { Limit = 1000 };
+    private readonly FixedSizedQueue<string> queue = new() { Limit = 250 };
 
     public event EventHandler<InMemoryLogEventArgs>? Emitted;
 
@@ -106,7 +106,7 @@ public class InMemorySink : IEnumerable<string>, ILogEventSink
         private readonly ConcurrentQueue<T> q = new();
         private readonly object lockObject = new();
 
-        private int limit = 1000;
+        private int limit = 250;
         public int Limit
         {
             get => limit; set
