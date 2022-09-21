@@ -13,7 +13,7 @@ var artifactsLocation = Path.GetFullPath($"./artifacts");
 var artifact = Path.GetFullPath($"{artifactsLocation}/{projectName}.zip");
 var configuration = "Release";
 var selfContained = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBDEPLOY_SELFHOST")) ? false : true;
-var skipExtraFilesOnServer = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBDEPLOY_REMOVEFILESONSERVER")) ? false : true;
+var skipExtraFilesOnServer = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBDEPLOY_REMOVEFILESONSERVER")) ? false : true;
 var packageAsSingleFile = false;
 
 var version = new Lazy<Task<string>>(async () => (await ReadToolAsync(() => ReadAsync("dotnet", "minver -v e", noEcho: true))).Trim());
