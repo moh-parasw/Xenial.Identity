@@ -12,6 +12,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="keys\.gitkeep" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="keys\.gitkeep">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.6" />    
     <PackageReference Include="Duende.IdentityServer" Version="6.1.2" />
     <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.1.2" />
