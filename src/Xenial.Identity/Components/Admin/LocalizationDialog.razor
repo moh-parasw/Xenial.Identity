@@ -9,11 +9,25 @@
     <DialogContent>
         <MudFocusTrap DefaultFocus="DefaultFocus.FirstChild">
             <MudStack Spacing="4">
-                <MudTextField Label="Key"
-                              Variant="Variant.Filled"
-                              FullWidth
-                              Margin="Margin.Dense"
-                              @bind-Value="@Localization.Key" />
+                @if (AllowEditKey)
+                {
+                    <MudAutocomplete T="string"
+                                 Label="Key"
+                                 Variant="Variant.Filled"
+                                 FullWidth
+                                 Margin="Margin.Dense"
+                                 @bind-Value="@Localization.Key"
+                                 CoerceValue
+                                 SearchFunc="@(async s => await SearchFunc(s))" />
+                }
+                else
+                {
+                    <MudField Label="Key"
+                          Variant="Variant.Filled"
+                          FullWidth
+                          Margin="Margin.Dense">@Localization.Key</MudField>
+                }
+
                 <MudTextField Label="Value"
                               Variant="Variant.Filled"
                               FullWidth
@@ -39,9 +53,23 @@
     [Parameter]
     public XpoLocalization Localization { get; set; }
 
+    [Parameter]
+    public bool AllowEditKey { get; set; } = true;
+
+    [Parameter]
+    public Func<string, Task<bool>> Validate { get; set; } = _ => Task.FromResult(true);
+
+    [Parameter]
+    public Func<string, Task<IEnumerable<string>>> SearchFunc { get; set; } = _ => Task.FromResult(Enumerable.Empty<string>());
+
     public void Cancel()
         => MudDialog.Cancel();
 
-    public void Save()
-        => MudDialog.Close(true);
+    public async Task Save()
+    {
+        if (await Validate(Localization.Key))
+        {
+            MudDialog.Close(true);
+        }
+    }
 }

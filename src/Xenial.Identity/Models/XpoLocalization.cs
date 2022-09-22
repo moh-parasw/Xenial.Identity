@@ -16,7 +16,7 @@ public class XpoLocalization : XpoIdentityBaseObjectString
     }
 
     private string key;
-    [Size(250)]
+    [Size(1000)]
     public string Key
     {
         get => key;
@@ -24,7 +24,7 @@ public class XpoLocalization : XpoIdentityBaseObjectString
     }
 
     private string value;
-    [Size(250)]
+    [Size(1000)]
     public string Value
     {
         get => value;

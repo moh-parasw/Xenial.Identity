@@ -26,6 +26,30 @@ public sealed class XpoStringLocalizer : IStringLocalizer, IHtmlLocalizer
         }
     }
 
+    private ImmutableArray<string> unmatchedLocalizations = ImmutableArray.Create<string>();
+    public ImmutableArray<string> UnmatchedLocalizations
+    {
+        get => unmatchedLocalizations;
+        private set
+        {
+            lock (locker)
+            {
+                unmatchedLocalizations = value;
+            }
+        }
+    }
+    private bool trackUnmatchedLocalizations;
+    public bool TrackUnmatchedLocalizations
+    {
+        get => trackUnmatchedLocalizations; set
+        {
+            lock (locker)
+            {
+                trackUnmatchedLocalizations = value;
+            }
+        }
+    }
+
     public void UpdateDictionary(IReadOnlyDictionary<string, string> newValues)
         => UpdateDictionary(newValues.Select(x => new KeyValuePair<string, string>(x.Key, x.Value)));
 
@@ -40,6 +64,10 @@ public sealed class XpoStringLocalizer : IStringLocalizer, IHtmlLocalizer
             {
                 return new LocalizedString(name, v);
             }
+            if (TrackUnmatchedLocalizations)
+            {
+                UnmatchedLocalizations = UnmatchedLocalizations.Add(name).Distinct().ToImmutableArray();
+            }
             return new LocalizedString(name, name);
         }
     }
@@ -51,6 +79,10 @@ public sealed class XpoStringLocalizer : IStringLocalizer, IHtmlLocalizer
             if (LocalizedKeys.TryGetValue(name, out var v))
             {
                 return new LocalizedString(name, string.Format(v, arguments));
+            }
+            if (TrackUnmatchedLocalizations)
+            {
+                UnmatchedLocalizations = UnmatchedLocalizations.Add(name).Distinct().ToImmutableArray();
             }
             return new LocalizedString(name, string.Format(name, arguments));
         }
@@ -64,6 +96,10 @@ public sealed class XpoStringLocalizer : IStringLocalizer, IHtmlLocalizer
             {
                 return new LocalizedHtmlString(name, v);
             }
+            if (TrackUnmatchedLocalizations)
+            {
+                UnmatchedLocalizations = UnmatchedLocalizations.Add(name).Distinct().ToImmutableArray();
+            }
             return new LocalizedHtmlString(name, name);
         }
     }
@@ -75,6 +111,10 @@ public sealed class XpoStringLocalizer : IStringLocalizer, IHtmlLocalizer
             if (LocalizedKeys.TryGetValue(name, out var v))
             {
                 return new LocalizedHtmlString(name, string.Format(v, arguments));
+            }
+            if (TrackUnmatchedLocalizations)
+            {
+                UnmatchedLocalizations = UnmatchedLocalizations.Add(name).Distinct().ToImmutableArray();
             }
             return new LocalizedHtmlString(name, string.Format(name, arguments));
         }

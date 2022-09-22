@@ -1,4 +1,9 @@
-﻿using Google.Protobuf.WellKnownTypes;
+﻿using System.Globalization;
+
+using DevExpress.Xpo;
+using DevExpress.XtraRichEdit.Fields.Expression;
+
+using Google.Protobuf.WellKnownTypes;
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
@@ -12,6 +17,51 @@ namespace Xenial.Identity.Components.Admin;
 
 public partial class Localization
 {
+    private async Task<IEnumerable<string>> SearchFunc(string x)
+    {
+        var existingKeys = await UOW.Query<XpoLocalization>().Select(m => m.Key).ToListAsync();
+        var keys = L.UnmatchedLocalizations.Except(existingKeys).Distinct();
+        if (string.IsNullOrEmpty(x))
+        {
+            return keys;
+        }
+        return keys.Where(k => k.Contains(x, StringComparison.InvariantCultureIgnoreCase));
+    }
+    private async Task<bool> Validate(string x)
+    {
+        if (string.IsNullOrEmpty(x))
+        {
+            Snackbar.Add($"""
+                    <ul>
+                        <li>
+                            There was an error when adding the localization!
+                        </li>
+                        <li>
+                          <em>Key must not be empty!</em><br>
+                        </li>
+                    </ul>
+                    """, MudBlazor.Severity.Error);
+            return false;
+        }
+
+        var existingKeys = await UOW.Query<XpoLocalization>().Select(m => m.Key).ToListAsync();
+        var contains = existingKeys.Contains(x);
+        if (contains)
+        {
+            Snackbar.Add($"""
+                    <ul>
+                        <li>
+                            There was an error when adding the localization!
+                        </li>
+                        <li>
+                          <em>Key: {x} does already exist!</em><br>
+                        </li>
+                    </ul>
+                    """, MudBlazor.Severity.Error);
+        }
+        return !contains;
+    }
+
     private async Task Add()
     {
         using var childUow = UOW.BeginNestedUnitOfWork();
@@ -20,6 +70,8 @@ public partial class Localization
         {
             [nameof(LocalizationDialog.UnitOfWork)] = childUow,
             [nameof(LocalizationDialog.Localization)] = loc,
+            [nameof(LocalizationDialog.SearchFunc)] = new Func<string, Task<IEnumerable<string>>>(SearchFunc),
+            [nameof(LocalizationDialog.Validate)] = new Func<string, Task<bool>>(Validate),
         }, new MudBlazor.DialogOptions
         {
             MaxWidth = MudBlazor.MaxWidth.Small,
@@ -53,6 +105,7 @@ public partial class Localization
         {
             [nameof(LocalizationDialog.UnitOfWork)] = childUow,
             [nameof(LocalizationDialog.Localization)] = loc2,
+            [nameof(LocalizationDialog.AllowEditKey)] = false
         }, new MudBlazor.DialogOptions
         {
             MaxWidth = MudBlazor.MaxWidth.Small,

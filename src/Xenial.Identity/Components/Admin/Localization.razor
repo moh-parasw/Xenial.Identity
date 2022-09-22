@@ -7,6 +7,7 @@
 @using Xenial.Identity.Infrastructure.Localization
 @inject UnitOfWork UOW
 @inject XpoStringLocalizerService LocalizerService
+@inject XpoStringLocalizer L
 @inject IJsApiService JsApiService
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
@@ -35,6 +36,9 @@
                       Style="width: 200px" />
 
         <MudSpacer />
+        <MudTooltip Text="Track unmatched Localizations">
+            <MudSwitch @bind-Checked="@L.TrackUnmatchedLocalizations" Color="Color.Primary" />
+        </MudTooltip>
         <MudTooltip Text="Add">
             <MudIconButton Icon="@Icons.Filled.Add"
                            OnClick="@(async () => await Add())"
@@ -184,10 +188,10 @@
                 .ToArrayAsync();
 
             return new TableData<XpoLocalization>()
-                {
-                    Items = result,
-                    TotalItems = total.Value
-                };
+            {
+                Items = result,
+                TotalItems = total.Value
+            };
         }
         finally
         {

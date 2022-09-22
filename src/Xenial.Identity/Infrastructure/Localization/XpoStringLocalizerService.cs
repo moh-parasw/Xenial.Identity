@@ -8,7 +8,10 @@ public record XpoStringLocalizerService(UnitOfWork UnitOfWork, XpoStringLocalize
 {
     public async Task Refresh()
     {
-        var items = await UnitOfWork.Query<XpoLocalization>().Select(m => new KeyValuePair<string, string>(m.Key, m.Value)).ToArrayAsync();
+        var items = await UnitOfWork.Query<XpoLocalization>()
+            .Where(m => !string.IsNullOrEmpty(m.Key))
+            .Select(m => new KeyValuePair<string, string>(m.Key, m.Value))
+            .ToArrayAsync();
         StringLocalizer.UpdateDictionary(items);
     }
 }
