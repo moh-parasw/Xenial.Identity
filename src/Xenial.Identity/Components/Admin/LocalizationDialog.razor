@@ -1,0 +1,47 @@
+﻿@using Duende.IdentityServer.Models
+@using Xenial.Identity.Configuration
+@using Xenial.Identity.Xpo.Storage.Models
+
+<MudDialog>
+    <TitleContent>
+        <text>Localization</text>
+    </TitleContent>
+    <DialogContent>
+        <MudFocusTrap DefaultFocus="DefaultFocus.FirstChild">
+            <MudStack Spacing="4">
+                <MudTextField Label="Key"
+                              Variant="Variant.Filled"
+                              FullWidth
+                              Margin="Margin.Dense"
+                              @bind-Value="@Localization.Key" />
+                <MudTextField Label="Value"
+                              Variant="Variant.Filled"
+                              FullWidth
+                              Margin="Margin.Dense"
+                              @bind-Value="@Localization.Value" />
+            </MudStack>
+        </MudFocusTrap>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@Save">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public UnitOfWork UnitOfWork { get; set; }
+
+    [Parameter]
+    public XpoLocalization Localization { get; set; }
+
+    public void Cancel()
+        => MudDialog.Cancel();
+
+    public void Save()
+        => MudDialog.Close(true);
+}

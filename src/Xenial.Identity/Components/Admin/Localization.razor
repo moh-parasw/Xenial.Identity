@@ -1,0 +1,198 @@
+﻿@page "/Admin2/Localization"
+@using DevExpress.Data.Filtering
+@using Microsoft.AspNetCore.Identity
+@using MudBlazor.Utilities
+@using Xenial.Identity.Areas.Identity.Pages.Account.Manage
+@using Xenial.Identity.Data
+@using Xenial.Identity.Infrastructure.Localization
+@inject UnitOfWork UOW
+@inject XpoStringLocalizerService LocalizerService
+@inject IJsApiService JsApiService
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+<MudText Typo="Typo.h3" GutterBottom>Localization</MudText>
+
+<MudPaper Elevation="10" Class="mb-1" Square>
+    <MudToolBar Dense>
+        @if (total.HasValue)
+        {
+            <MudText Class="mr-2"
+                 Typo="Typo.caption">Total: @total.Value</MudText>
+        }
+        <MudTextField Immediate
+                      Clearable
+                      DebounceInterval="200"
+                      Value="@search"
+                      ValueChanged="@(async (string s) => await SearchChanged(s))"
+                      Label="Search"
+                      Variant="Variant.Outlined"
+                      Adornment="Adornment.End"
+                      Margin="Margin.Dense"
+                      IconSize="Size.Small"
+                      AdornmentIcon="@Icons.Filled.Search"
+                      AdornmentColor="Color.Secondary"
+                      Style="width: 200px" />
+
+        <MudSpacer />
+        <MudTooltip Text="Add">
+            <MudIconButton Icon="@Icons.Filled.Add"
+                           OnClick="@(async () => await Add())"
+                           Color="Color.Success" />
+        </MudTooltip>
+        <MudTooltip Text="Refresh">
+            <MudIconButton Icon="@Icons.Filled.Refresh"
+                           OnClick="@table.ReloadServerData"
+                           Color="Color.Primary" />
+        </MudTooltip>
+    </MudToolBar>
+</MudPaper>
+<MudTable @ref="table"
+          RowsPerPage="100"
+          T="XpoLocalization"
+          Dense
+          FixedHeader
+          Elevation="10"
+          ServerData="@(new Func<TableState, Task<TableData<XpoLocalization>>>(ServerReload))"
+          Virtualize="true"
+          Height="calc(100vh - 21em)"
+          Class="mb-0"
+          Loading="IsLoading">
+    <HeaderContent>
+        <MudTh Style="width:0.1%; white-space: nowrap;">
+            <MudTableSortLabel T="XpoLocalization"
+                               SortLabel="@(nameof(XpoLocalization.Id))">Id</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel T="XpoLocalization"
+                               SortLabel="@(nameof(XpoLocalization.Key))">Key</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel T="XpoLocalization"
+                               SortLabel="@(nameof(XpoLocalization.Value))">Value</MudTableSortLabel>
+        </MudTh>
+        <MudTh Style="width:0.1%; white-space: nowrap;">
+
+        </MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="@(nameof(XpoLocalization.Id))">
+            <MudTooltip Text="@context.Id">
+                <MudIconButton Size="Size.Small"
+                               DisableElevation
+                               Color="Color.Transparent"
+                               Variant="Variant.Filled"
+                               Icon="@Icons.Filled.Fingerprint"
+                               Style="background-color: transparent"
+                               OnClick="async () => await CopyToClipboard(context.Id)" />
+            </MudTooltip>
+        </MudTd>
+        <MudTd DataLabel="@(nameof(context.Key))">
+            <MudHighlighter Text="@context.Key" HighlightedText="@search" />
+        </MudTd>
+        <MudTd DataLabel="@(nameof(context.Value))">
+            <MudHighlighter Text="@context.Value" HighlightedText="@search" />
+        </MudTd>
+        <MudTd>
+            <MudStack Row>
+                <MudTooltip Text="Delete">
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Error"
+                                   Size="Size.Small"
+                                   OnClick="async () => await Delete(context)" />
+                </MudTooltip>
+                <MudTooltip Text="Edit">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Size="Size.Small"
+                                   OnClick="async () => await Edit(context)" />
+                </MudTooltip>
+            </MudStack>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+    <NoRecordsContent>
+        @if (total > 0)
+        {
+            <ul>
+                <li>There are no localizations found matching '@search'</li>
+                <li><MudButton Size="Size.Small" Color="Color.Primary" OnClick="async () => await SearchChanged(string.Empty)">Clear Filter</MudButton></li>
+            </ul>
+        }
+        else
+        {
+            <ul>
+                <li>There are no localizations yet.</li>
+                <li>Do you want to <MudLink Class="cursor-pointer" onclick="@(async ()=> await Add())">Add a Localization</MudLink></li>
+            </ul>
+        }
+    </NoRecordsContent>
+</MudTable>
+
+@code {
+    private async Task CopyToClipboard(string content)
+    {
+        await JsApiService.CopyToClipboardAsync(content);
+        Snackbar.Add($"Copied {content} to clipboard!", Severity.Info);
+    }
+
+    private string search;
+    private int? total;
+    private MudTable<XpoLocalization> table;
+    private bool IsLoading = true;
+
+    private async Task SearchChanged(string search)
+    {
+        this.search = search;
+        await table.ReloadServerData();
+    }
+
+    private async Task<TableData<XpoLocalization>> ServerReload(TableState state)
+    {
+        try
+        {
+            total = await UOW.Query<XpoLocalization>().CountAsync();
+            IQueryable<XpoLocalization> items = UOW.Query<XpoLocalization>();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                var s = search.ToLowerInvariant();
+                items = items.Where(i =>
+                    i.Id.ToLower() == s
+                    || i.Key.ToLower().Contains(s)
+                    || i.Value.ToLower().Contains(s)
+                );
+            }
+
+            if (!string.IsNullOrEmpty(state.SortLabel))
+            {
+                items = state.SortLabel switch
+                {
+                    nameof(XpoLocalization.Id) => items.OrderByDirection(state.SortDirection, x => x.Id),
+                    nameof(XpoLocalization.Key) => items.OrderByDirection(state.SortDirection, x => x.Key),
+                    nameof(XpoLocalization.Value) => items.OrderByDirection(state.SortDirection, x => x.Value),
+                    _ => items
+                };
+            }
+
+            var result = await items.Skip(state.Page * state.PageSize)
+                .Take(state.PageSize)
+                .ToArrayAsync();
+
+            return new TableData<XpoLocalization>()
+                {
+                    Items = result,
+                    TotalItems = total.Value
+                };
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+}

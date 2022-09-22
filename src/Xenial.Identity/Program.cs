@@ -5,7 +5,10 @@ using DevExpress.Xpo;
 using DevExpress.Xpo.DB;
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 
 using MudBlazor.Services;
 
@@ -62,8 +65,10 @@ try
     var services = builder.Services;
 
     services.AddSingleton(inMemoryLogSink);
-    services.AddSingleton<XpoStringLocalizer>();
+    var localizer = new XpoStringLocalizer();
+    services.AddSingleton(localizer);
     services.AddSingleton<IStringLocalizer>(s => s.GetService<XpoStringLocalizer>());
+    services.AddScoped<XpoStringLocalizerService>();
 
     if (Environment.IsDevelopment())
     {
@@ -177,6 +182,8 @@ try
 
     serviceCollection
         .AddXpo(Configuration, AutoCreateOption.DatabaseAndSchema)
+        .AddSingleton(localizer)
+        .AddScoped<XpoStringLocalizerService>()
         .AddXpoDefaultUnitOfWork();
 
     using (var provider = serviceCollection.BuildServiceProvider())
@@ -184,6 +191,7 @@ try
     {
         unitOfWork.UpdateSchema();
         SeedDatabase(unitOfWork);
+        await provider.GetRequiredService<XpoStringLocalizerService>().Refresh();
     }
 
     Log.Information("Update Done");

@@ -16,9 +16,9 @@
             <input type="radio" id="tab2" name="tab-control" @(Model.SelectedPage == "register" ? "checked" : "")>
         }
         <ul class="login-page-tabs__list">
-            <li class="login-page-tabs__list-item" title="@ViewData["Title"]">
+            <li class="login-page-tabs__list-item" title="@L["Login"]">
                 <label class="login-page-tabs__list-item-label" for="tab1" role="button">
-                    <i class="fas fa-sign-in-alt"></i> <span>Login</span>
+                    <i class="fas fa-sign-in-alt"></i> <span>@L["Login"]</span>
                 </label>
             </li>
             @if (Model.AllowRegister)
@@ -46,7 +46,7 @@
                                 @foreach (var provider in Model.ExternalLogins)
                                 {
                                     <li class="login-page__providers-item">
-                                        <button type="submit" class="login-page__providers-item-button @provider.Name.ToLower()" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                                        <button type="submit" class="login-page__providers-item-button @provider.Name.ToLower()" name="provider" value="@provider.Name" title="@L["Log in using your {0} account", @provider.DisplayName]">@provider.DisplayName</button>
                                     </li>
                                 }
                             </ul>
@@ -59,17 +59,17 @@
                     <ul class="xenial-form__list">
                         <li class="xenial-form__list-item">
                             <input type="hidden" asp-for="ReturnUrl" />
-                            <label asp-for="LoginInput.Email"></label>
+                            <label asp-for="LoginInput.Email">@L["Email"]</label>
                             <input placeholder="Email" asp-for="LoginInput.Email" autofocus>
                             <span asp-validation-for="LoginInput.Email" class="text-danger"></span>
                         </li>
                         <li class="xenial-form__list-item">
-                            <label asp-for="LoginInput.Password"></label>
+                            <label asp-for="LoginInput.Password">@L["Password"]</label>
                             <input type="password" placeholder="Password" asp-for="LoginInput.Password" autocomplete="off">
                             <span asp-validation-for="LoginInput.Password" class="text-danger"></span>
                         </li>
                         <li class="xenial-form__list-item">
-                            <label asp-for="LoginInput.RememberMe"></label>
+                            <label asp-for="LoginInput.RememberMe">@L["Remember me?"]</label>
                             <input class="toggle" asp-for="LoginInput.RememberMe">
                             <span asp-validation-for="LoginInput.RememberMe" class="text-danger"></span>
                         </li>
@@ -91,17 +91,17 @@
                         <ul class="xenial-form__list">
                             <li class="xenial-form__list-item">
                                 <input type="hidden" asp-for="ReturnUrl" />
-                                <label asp-for="RegisterInput.Email"></label>
+                                <label asp-for="RegisterInput.Email">@L["Email"]</label>
                                 <input asp-for="RegisterInput.Email" />
                                 <span asp-validation-for="RegisterInput.Email" class="text-danger"></span>
                             </li>
                             <li class="xenial-form__list-item">
-                                <label asp-for="RegisterInput.Password"></label>
+                                <label asp-for="RegisterInput.Password">@L["Password"]</label>
                                 <input asp-for="RegisterInput.Password" />
                                 <span asp-validation-for="RegisterInput.Password" class="text-danger"></span>
                             </li>
                             <li class="xenial-form__list-item">
-                                <label asp-for="RegisterInput.RegisterConfirmPassword"></label>
+                                <label asp-for="RegisterInput.RegisterConfirmPassword">@L["Confirm password"]</label>
                                 <input asp-for="RegisterInput.RegisterConfirmPassword" />
                                 <span asp-validation-for="RegisterInput.RegisterConfirmPassword" class="text-danger"></span>
                             </li>
