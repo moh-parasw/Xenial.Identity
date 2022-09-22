@@ -1,4 +1,13 @@
-﻿<!DOCTYPE html>
+﻿@using DevExpress.Xpo
+@using Xenial.Identity.Models
+@inject UnitOfWork UOW
+
+@{
+    var theme = UOW.FindObject<XpoThemeSettings>(null);
+    var lockField = theme.ClassInfo.OptimisticLockField.GetValue(theme);
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -9,11 +18,11 @@
 
     <title>Xenial</title>
 
-    <link rel="shortcut icon" type="image/x-icon" href="~/themes/favicon" />
-    <link rel="icon" type="image/x-icon" href="~/themes/favicon" />
+    <link rel="shortcut icon" type="image/x-icon" href="~/themes/favicon?@lockField" />
+    <link rel="icon" type="image/x-icon" href="~/themes/favicon?@lockField" />
 
     <link rel="stylesheet" href="~/css/bundle.css" />
-    <link rel="stylesheet" href="~/themes/styles" />
+    <link rel="stylesheet" href="~/themes/styles?@lockField" />
 </head>
 <body>
     <input class="xenial__toggletheme-checkbox" id="xenial-toggle-theme" type="checkbox" aria-hidden="true">

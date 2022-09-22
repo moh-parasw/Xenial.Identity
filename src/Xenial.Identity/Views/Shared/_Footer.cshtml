@@ -1,11 +1,11 @@
 ﻿@using DevExpress.Xpo
 @using Xenial.Identity.Models
 @inject UnitOfWork UOW
+
 @{
-
     var settings = UOW.FindObject<XpoThemeSettings>(null);
-
 }
+
 @if (settings.ShowFooter)
 {
     <footer class="xenial-footer">
