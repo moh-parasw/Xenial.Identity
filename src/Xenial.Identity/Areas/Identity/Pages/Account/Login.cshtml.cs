@@ -117,7 +117,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
 
             ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-            if(!AllowGithub)
+            if (!AllowGithub)
             {
                 ExternalLogins = ExternalLogins
                     .Where(x => !"github".Equals(x.Name, StringComparison.InvariantCultureIgnoreCase))

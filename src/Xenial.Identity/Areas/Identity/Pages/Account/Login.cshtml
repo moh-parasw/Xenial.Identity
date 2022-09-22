@@ -1,8 +1,9 @@
 ﻿@page
 @model LoginModel
 @attribute [Xenial.Identity.Quickstart.SecurityHeaders]
+@inject IStringLocalizer L
 @{
-    ViewData["Title"] = "Log in";
+    ViewData["Title"] = @L["Login"];
     Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
 }
 
@@ -22,9 +23,9 @@
             </li>
             @if (Model.AllowRegister)
             {
-                <li class="login-page-tabs__list-item" title="Register a new account">
+                <li class="login-page-tabs__list-item" title="@L["Register a new account"]">
                     <label class="login-page-tabs__list-item-label" for="tab2" role="button">
-                        <i class="fas fa-user-plus"></i> <span>Signup</span>
+                        <i class="fas fa-user-plus"></i> <span>@L["Signup"]</span>
                     </label>
                 </li>
             }
@@ -35,7 +36,7 @@
         }
         <div class="login-page-tabs__content">
             <section class="login-form">
-                <h2>Login</h2>
+                <h2>@L["Login"]</h2>
                 @if (Model.AllowExternalProviders)
                 {
                     @if (Model.ExternalLogins.Any())
@@ -50,7 +51,7 @@
                                 }
                             </ul>
                         </form>
-                        <span class="login-page-or">or</span>
+                        <span class="login-page-or">@L["or"]</span>
                     }
                 }
 
@@ -73,10 +74,10 @@
                             <span asp-validation-for="LoginInput.RememberMe" class="text-danger"></span>
                         </li>
                         <li class="xenial-form__list-item">
-                            <a asp-page="ForgotPassword">Forgot password?</a>
+                            <a asp-page="ForgotPassword">@L["Forgot password?"]</a>
                         </li>
                         <li class="xenial-form__list-item">
-                            <button class="xenial-form__list-item-submit" name="button" value="login">Login</button>
+                            <button class="xenial-form__list-item-submit" name="button" value="login">@L["Login"]</button>
                         </li>
                     </ul>
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -85,7 +86,7 @@
             @if (Model.AllowRegister)
             {
                 <section class="login-form">
-                    <h2>Register</h2>
+                    <h2>@L["Register"]</h2>
                     <form method="post" class="xenial-form" asp-page-handler="register">
                         <ul class="xenial-form__list">
                             <li class="xenial-form__list-item">
@@ -105,7 +106,7 @@
                                 <span asp-validation-for="RegisterInput.RegisterConfirmPassword" class="text-danger"></span>
                             </li>
                             <li class="xenial-form__list-item">
-                                <button type="submit" class="xenial-form__list-item-submit">Register</button>
+                                <button type="submit" class="xenial-form__list-item-submit">@L["Register"]</button>
                             </li>
                         </ul>
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>

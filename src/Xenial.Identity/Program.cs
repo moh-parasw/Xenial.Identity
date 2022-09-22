@@ -5,6 +5,7 @@ using DevExpress.Xpo;
 using DevExpress.Xpo.DB;
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Localization;
 
 using MudBlazor.Services;
 
@@ -19,6 +20,7 @@ using Xenial.AspNetIdentity.Xpo.Stores;
 using Xenial.Identity.Areas.Admin.Pages.Clients;
 using Xenial.Identity.Data;
 using Xenial.Identity.Infrastructure;
+using Xenial.Identity.Infrastructure.Localization;
 using Xenial.Identity.Infrastructure.Logging.MemoryConsole.Themes;
 using Xenial.Identity.Models;
 using Xenial.Identity.Xpo.Storage.Models;
@@ -60,6 +62,9 @@ try
     var services = builder.Services;
 
     services.AddSingleton(inMemoryLogSink);
+    services.AddSingleton<XpoStringLocalizer>();
+    services.AddSingleton<IStringLocalizer>(s => s.GetService<XpoStringLocalizer>());
+
     if (Environment.IsDevelopment())
     {
         services.AddLiveReload();
