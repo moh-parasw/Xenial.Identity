@@ -50,11 +50,18 @@
             @if (settings.ShowRuntimeInformation)
             {
                 <p class="xenial-footer__fineprint-githash" aria-hidden="true">
-                    <a href="@siteRepo/commit/@gitHash"
-               title="Version: '@siteVersion' Last update: '@lastUpdate' Sha: '@gitHash'">
+                    <a href="@siteRepo/commit/@gitHash" title="Version: '@siteVersion' Last update: '@lastUpdate' Sha: '@gitHash'">
                         @siteVersion - @lastUpdate - @System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription
                     </a>
                 </p>
+            }
+            else
+            {
+                <!--
+                    <a href="@siteRepo/commit/@gitHash" title="Version: '@siteVersion' Last update: '@lastUpdate' Sha: '@gitHash'">
+                        @siteVersion - @lastUpdate - @System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription
+                    </a>
+                -->
             }
         </div>
     </footer>
