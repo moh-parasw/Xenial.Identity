@@ -2,6 +2,9 @@
 @inject IBreakpointService BreakpointService
 @inject NavigationManager NavigationManager
 @implements IAsyncDisposable
+@inject Microsoft.Extensions.Hosting.IApplicationLifetime ApplicationLifetime
+@inject IDialogService DialogService
+
 <PageTitle>Blazor Identity Server App</PageTitle>
 
 <MudThemeProvider @ref="_mudThemeProvider" IsDarkMode="@isDarkMode" />
@@ -22,6 +25,9 @@
             </MudLink>
         }
         <MudSpacer />
+        <MudTooltip Text="Restart Site">
+            <MudIconButton Icon="@Icons.Filled.Dangerous" OnClick="@(async() => await RestartApplication())" Color="Color.Error" Edge="Edge.End" />
+        </MudTooltip>
         <MudTooltip Text="Preview Site">
             <MudIconButton Icon="@Icons.Filled.RemoveRedEye" Href="@NavigationManager.BaseUri" Target="_blank" Color="Color.Inherit" Edge="Edge.End" />
         </MudTooltip>
@@ -101,4 +107,12 @@
         _ = await BreakpointService.Unsubscribe(subscriptionId);
     }
 
+    private async Task RestartApplication()
+    {
+        var result = await DialogService.ShowMessageBox("WARNING: RESTART APPLICATION", (MarkupString)"<em>This will restart the current site!</em><br><em>ARE YOU SURE???</em>", yesText: "RESTART");
+        if (result == true)
+        {
+            ApplicationLifetime.StopApplication();
+        }
+    }
 }
