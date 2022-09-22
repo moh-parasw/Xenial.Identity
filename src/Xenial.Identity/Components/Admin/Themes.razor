@@ -6,6 +6,11 @@
 
 <MudStack Row="false">
 
+    <MudTextField @bind-Value="@title"
+                  Label="Title"
+                  Placeholder="Xenial"
+                  Variant="Variant.Outlined" />
+
     <MudText Typo="Typo.caption" GutterBottom>Logo</MudText>
 
     <div style="max-height: 100px; display: grid;">
@@ -28,7 +33,7 @@
 
     <MudDivider />
 
-    
+
     <MudText Typo="Typo.caption" GutterBottom>Favicon</MudText>
 
     <div style="display: grid;">
@@ -81,12 +86,14 @@
     private string customStyleSheet;
     private string logoTeaserFirstRow;
     private string logoTeaserSecondRow;
+    private string title;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
         var theme = UOW.FindObject<XpoThemeSettings>(null);
+        title = theme.Title;
         customStyleSheet = theme.CustomCss;
         logoTeaserFirstRow = theme.LogoTeaserFirstRow;
         logoTeaserSecondRow = theme.LogoTeaserSecondRow;
@@ -160,6 +167,7 @@
     private void SaveChanges()
     {
         var theme = UOW.FindObject<XpoThemeSettings>(null);
+        theme.Title = title;
         theme.CustomCss = customStyleSheet;
         theme.LogoTeaserFirstRow = logoTeaserFirstRow;
         theme.LogoTeaserSecondRow = logoTeaserSecondRow;

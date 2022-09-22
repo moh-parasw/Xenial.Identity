@@ -13,6 +13,7 @@ public class XpoThemeSettings : XpoIdentityBaseObjectString
 
     public override void AfterConstruction()
     {
+        Title = "Xenial";
         Id = Guid.NewGuid().ToString();
         ShowFooter = true;
         ShowHearts = true;
@@ -120,6 +121,14 @@ owners.";
             } */
             """;
         base.AfterConstruction();
+    }
+
+    private string title;
+    [Size(SizeAttribute.DefaultStringMappingFieldSize)]
+    public string Title
+    {
+        get => title;
+        set => SetPropertyValue(nameof(Title), ref title, value);
     }
 
     private string customCss = "";
