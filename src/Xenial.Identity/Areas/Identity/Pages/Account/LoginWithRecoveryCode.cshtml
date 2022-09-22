@@ -1,7 +1,8 @@
 ﻿@page
+@inject IStringLocalizer L
 @model LoginWithRecoveryCodeModel
 @{
-    ViewData["Title"] = "Recovery code verification";
+    ViewData["Title"] = L["Recovery code verification"];
     Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
 }
 
@@ -20,18 +21,17 @@
         <div class="login-with-2fa-recovery-page-tabs__content">
             <form class="xenial-form" method="post">
                 <p>
-                    You have requested to log in with a recovery code. This login will not be remembered until you provide
-                    an authenticator app code at log in or disable 2FA and log in again.
+                    @L["You have requested to log in with a recovery code. This login will not be remembered until you provide an authenticator app code at log in or disable 2FA and log in again."]
                 </p>
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <ul class="xenial-form__list">
                     <li class="xenial-form__list-item">
-                        <label asp-for="Input.RecoveryCode"></label>
+                        <label asp-for="Input.RecoveryCode">@L["Recovery Code"]</label>
                         <input asp-for="Input.RecoveryCode" autocomplete="off" />
                         <span asp-validation-for="Input.RecoveryCode" class="text-danger"></span>
                     </li>
                     <li class="xenial-form__list-item">
-                        <button type="submit" class="xenial-form__list-item-submit">Log in</button>
+                        <button type="submit" class="xenial-form__list-item-submit">@L["Login"]</button>
                     </li>
                 </ul>
             </form>

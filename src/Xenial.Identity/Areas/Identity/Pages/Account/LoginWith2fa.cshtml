@@ -1,7 +1,8 @@
 ﻿@page
+@inject IStringLocalizer L
 @model LoginWith2faModel
 @{
-    ViewData["Title"] = "Two-factor authentication";
+    ViewData["Title"] = L["Two-factor authentication"];
     Layout = "/Views/Shared/_LayoutWithoutSide.cshtml";
 }
 

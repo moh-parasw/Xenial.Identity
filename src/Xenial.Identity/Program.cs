@@ -5,6 +5,8 @@ using DevExpress.Xpo;
 using DevExpress.Xpo.DB;
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Localization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 
 using MudBlazor.Services;
@@ -67,6 +69,7 @@ try
     var localizer = new XpoStringLocalizer();
     services.AddSingleton(localizer);
     services.AddSingleton<IStringLocalizer>(localizer);
+    services.AddSingleton<IHtmlLocalizer>(localizer);
     services.AddScoped<XpoStringLocalizerService>();
 
     await UpdateDatabase(Configuration, localizer);
@@ -89,6 +92,7 @@ try
         localizer.SetOptions(ops);
     });
     services.AddSingleton<IStringLocalizer>(localizer);
+    services.AddSingleton<IHtmlLocalizer>(localizer);
 
     services.AddMudServices();
     services.AddXpo(Configuration);

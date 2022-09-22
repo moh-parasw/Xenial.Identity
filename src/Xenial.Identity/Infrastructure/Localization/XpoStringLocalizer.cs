@@ -1,6 +1,7 @@
 ﻿
 using System.Collections.Immutable;
 
+using Microsoft.AspNetCore.Mvc.Localization;
 using Microsoft.Extensions.Localization;
 
 using XLocalizer;
@@ -8,7 +9,7 @@ using XLocalizer.ErrorMessages;
 
 namespace Xenial.Identity.Infrastructure.Localization;
 
-public sealed class XpoStringLocalizer : IStringLocalizer
+public sealed class XpoStringLocalizer : IStringLocalizer, IHtmlLocalizer
 {
     private static readonly object locker = new();
 
@@ -52,6 +53,30 @@ public sealed class XpoStringLocalizer : IStringLocalizer
                 return new LocalizedString(name, string.Format(v, arguments));
             }
             return new LocalizedString(name, string.Format(name, arguments));
+        }
+    }
+
+    LocalizedHtmlString IHtmlLocalizer.this[string name]
+    {
+        get
+        {
+            if (LocalizedKeys.TryGetValue(name, out var v))
+            {
+                return new LocalizedHtmlString(name, v);
+            }
+            return new LocalizedHtmlString(name, name);
+        }
+    }
+
+    LocalizedHtmlString IHtmlLocalizer.this[string name, params object[] arguments]
+    {
+        get
+        {
+            if (LocalizedKeys.TryGetValue(name, out var v))
+            {
+                return new LocalizedHtmlString(name, string.Format(v, arguments));
+            }
+            return new LocalizedHtmlString(name, string.Format(name, arguments));
         }
     }
 
@@ -123,4 +148,10 @@ public sealed class XpoStringLocalizer : IStringLocalizer
             DefaultError = this["An unknown failure has occurred."],
         };
     }
+
+    public LocalizedString GetString(string name) => throw new NotImplementedException();
+    public LocalizedString GetString(string name, params object[] arguments) => throw new NotImplementedException();
+    LocalizedString IHtmlLocalizer.GetString(string name) => throw new NotImplementedException();
+    LocalizedString IHtmlLocalizer.GetString(string name, params object[] arguments) => throw new NotImplementedException();
+    IEnumerable<LocalizedString> IHtmlLocalizer.GetAllStrings(bool includeParentCultures) => throw new NotImplementedException();
 }
