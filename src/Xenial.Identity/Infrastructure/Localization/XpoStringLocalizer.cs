@@ -2,6 +2,9 @@
 
 using Microsoft.Extensions.Localization;
 
+using XLocalizer;
+using XLocalizer.ErrorMessages;
+
 namespace Xenial.Identity.Infrastructure.Localization;
 
 public sealed class XpoStringLocalizer : IStringLocalizer
@@ -52,4 +55,32 @@ public sealed class XpoStringLocalizer : IStringLocalizer
     }
 
     public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures) => throw new NotImplementedException();
+
+    internal void SetOptions(XLocalizerOptions ops)
+    {
+        // Data annotation error messages
+        ops.ValidationErrors = new ValidationErrors
+        {
+            RequiredAttribute_ValidationError = this["The {0} field is required."],
+            CompareAttribute_MustMatch = "'{0}' and '{1}' do not match.",
+            StringLengthAttribute_ValidationError = "The field {0} must be a string with a maximum length of {1}.",
+            // ...
+        };
+
+        // Model binding error messages
+        ops.ModelBindingErrors = new ModelBindingErrors
+        {
+            AttemptedValueIsInvalidAccessor = "The value '{0}' is not valid for {1}.",
+            MissingBindRequiredValueAccessor = "A value for the '{0}' parameter or property was not provided.",
+            // ...
+        };
+
+        // Identity Errors
+        ops.IdentityErrors = new IdentityErrors
+        {
+            DuplicateEmail = "Email '{0}' is already taken.",
+            DuplicateUserName = "User name '{0}' is already taken.",
+            // ...
+        };
+    }
 }

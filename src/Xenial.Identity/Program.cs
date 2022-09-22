@@ -5,10 +5,7 @@ using DevExpress.Xpo;
 using DevExpress.Xpo.DB;
 
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
 
 using MudBlazor.Services;
 
@@ -27,6 +24,8 @@ using Xenial.Identity.Infrastructure.Localization;
 using Xenial.Identity.Infrastructure.Logging.MemoryConsole.Themes;
 using Xenial.Identity.Models;
 using Xenial.Identity.Xpo.Storage.Models;
+
+using XLocalizer;
 
 SQLiteConnectionProvider.Register();
 MySqlConnectionProvider.Register();
@@ -67,8 +66,10 @@ try
     services.AddSingleton(inMemoryLogSink);
     var localizer = new XpoStringLocalizer();
     services.AddSingleton(localizer);
-    services.AddSingleton<IStringLocalizer>(s => s.GetService<XpoStringLocalizer>());
+    services.AddSingleton<IStringLocalizer>(localizer);
     services.AddScoped<XpoStringLocalizerService>();
+
+    await UpdateDatabase(Configuration, localizer);
 
     if (Environment.IsDevelopment())
     {
@@ -82,6 +83,12 @@ try
         o.Conventions.AuthorizeAreaFolder("Admin", "/", "Administrator");
         o.Conventions.AuthorizePage("/_Host", "Administrator");
     });
+
+    razorPagesBuilder.AddXLocalizer<Program>(ops =>
+    {
+        localizer.SetOptions(ops);
+    });
+    services.AddSingleton<IStringLocalizer>(localizer);
 
     services.AddMudServices();
     services.AddXpo(Configuration);
@@ -176,26 +183,6 @@ try
         endpoints.MapFallbackToPage("/_Host");
     });
 
-    Log.Information("Update Database");
-
-    var serviceCollection = new ServiceCollection();
-
-    serviceCollection
-        .AddXpo(Configuration, AutoCreateOption.DatabaseAndSchema)
-        .AddSingleton(localizer)
-        .AddScoped<XpoStringLocalizerService>()
-        .AddXpoDefaultUnitOfWork();
-
-    using (var provider = serviceCollection.BuildServiceProvider())
-    using (var unitOfWork = provider.GetRequiredService<UnitOfWork>())
-    {
-        unitOfWork.UpdateSchema();
-        SeedDatabase(unitOfWork);
-        await provider.GetRequiredService<XpoStringLocalizerService>().Refresh();
-    }
-
-    Log.Information("Update Done");
-
     Log.Information("Run Application");
     app.Run();
     return 0;
@@ -287,4 +274,27 @@ static void SeedDatabase(UnitOfWork unitOfWork)
         resource.UserClaims.AddRange(xpoResources);
         unitOfWork.Save(resource);
     }
+}
+
+static async Task UpdateDatabase(ConfigurationManager Configuration, XpoStringLocalizer localizer)
+{
+    Log.Information("Update Database");
+
+    var serviceCollection = new ServiceCollection();
+
+    serviceCollection
+        .AddXpo(Configuration, AutoCreateOption.DatabaseAndSchema)
+        .AddSingleton(localizer)
+        .AddScoped<XpoStringLocalizerService>()
+        .AddXpoDefaultUnitOfWork();
+
+    using (var provider = serviceCollection.BuildServiceProvider())
+    using (var unitOfWork = provider.GetRequiredService<UnitOfWork>())
+    {
+        unitOfWork.UpdateSchema();
+        SeedDatabase(unitOfWork);
+        await provider.GetRequiredService<XpoStringLocalizerService>().Refresh();
+    }
+
+    Log.Information("Update Done");
 }
