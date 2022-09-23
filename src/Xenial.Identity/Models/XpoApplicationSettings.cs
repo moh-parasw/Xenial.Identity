@@ -17,6 +17,9 @@ public class XpoApplicationSettings : XpoIdentityBaseObjectString
         AllowRegister = true;
         AllowExternalProviders = true;
         AllowGithub = true;
+        AllowOTP = true;
+        enableSMSOTP = true;
+        EnableEmailOTP = true;
         base.AfterConstruction();
     }
 
@@ -39,5 +42,26 @@ public class XpoApplicationSettings : XpoIdentityBaseObjectString
     {
         get => allowGithub;
         set => SetPropertyValue(nameof(AllowGithub), ref allowGithub, value);
+    }
+
+    private bool allowOTP = true;
+    public bool AllowOTP
+    {
+        get => allowOTP;
+        set => SetPropertyValue(nameof(AllowOTP), ref allowOTP, value);
+    }
+
+    private bool enableSMSOTP = true;
+    public bool EnableSMSOTP
+    {
+        get => enableSMSOTP;
+        set => SetPropertyValue(nameof(EnableSMSOTP), ref enableSMSOTP, value);
+    }
+
+    private bool enableEmailOTP = true;
+    public bool EnableEmailOTP
+    {
+        get => enableEmailOTP;
+        set => SetPropertyValue(nameof(EnableEmailOTP), ref enableEmailOTP, value);
     }
 }
