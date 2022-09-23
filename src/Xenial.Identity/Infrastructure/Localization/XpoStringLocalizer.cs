@@ -56,6 +56,9 @@ public sealed class XpoStringLocalizer : IStringLocalizer, IHtmlLocalizer
     public void UpdateDictionary(IEnumerable<KeyValuePair<string, string>> newValues)
         => LocalizedKeys = LocalizedKeys.Clear().AddRange(newValues);
 
+    internal bool IsUnmatched(string name)
+        => !LocalizedKeys.ContainsKey(name);
+
     public LocalizedString this[string name]
     {
         get
@@ -194,4 +197,5 @@ public sealed class XpoStringLocalizer : IStringLocalizer, IHtmlLocalizer
     LocalizedString IHtmlLocalizer.GetString(string name) => throw new NotImplementedException();
     LocalizedString IHtmlLocalizer.GetString(string name, params object[] arguments) => throw new NotImplementedException();
     IEnumerable<LocalizedString> IHtmlLocalizer.GetAllStrings(bool includeParentCultures) => throw new NotImplementedException();
+
 }

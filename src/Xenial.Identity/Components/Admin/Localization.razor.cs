@@ -1,17 +1,14 @@
-﻿using System.Globalization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Reflection;
 
 using DevExpress.Xpo;
-using DevExpress.XtraRichEdit.Fields.Expression;
-
-using Google.Protobuf.WellKnownTypes;
 
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Identity;
 
-using Xenial.Identity.Data;
 using Xenial.Identity.Models;
 
-using static System.Formats.Asn1.AsnWriter;
+using XLocalizer;
 
 namespace Xenial.Identity.Components.Admin;
 
@@ -19,8 +16,32 @@ public partial class Localization
 {
     private async Task<IEnumerable<string>> SearchFunc(string x)
     {
-        var existingKeys = await UOW.Query<XpoLocalization>().Select(m => m.Key).ToListAsync();
-        var keys = L.UnmatchedLocalizations.Except(existingKeys).Distinct();
+        static IEnumerable<string> GetXLocalizerItems(object node)
+            => node.GetType()
+                .GetProperties()
+                .Where(x =>
+                    x.PropertyType == typeof(string)
+                    && x.GetCustomAttribute<RequiredAttribute>() is not null
+                )
+                .Select(x => x.GetValue(node))
+                .OfType<string>();
+
+        var existingKeys = await UOW
+            .Query<XpoLocalization>()
+            .Select(m => m.Key)
+            .ToListAsync();
+
+        var options = new XLocalizerOptions();
+        var xlocalizerItems = GetXLocalizerItems(options.ValidationErrors)
+            .Concat(GetXLocalizerItems(options.ModelBindingErrors))
+            .Concat(GetXLocalizerItems(options.IdentityErrors))
+            .Where(L.IsUnmatched);
+
+        var keys = L.UnmatchedLocalizations
+            .Concat(xlocalizerItems)
+            .Except(existingKeys)
+            .Distinct();
+
         if (string.IsNullOrEmpty(x))
         {
             return keys;
