@@ -7,6 +7,7 @@ public static class XenialIdentityModelTypeList
         typeof(XpoXeniaIIdentityUser),
         typeof(XpoThemeSettings),
         typeof(XpoApplicationSettings),
-        typeof(XpoLocalization)
+        typeof(XpoLocalization),
+        typeof(XpoCommunicationChannel)
     };
 }
