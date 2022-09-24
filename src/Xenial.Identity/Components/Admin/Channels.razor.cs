@@ -1,21 +1,56 @@
-﻿using System.Security.Cryptography.X509Certificates;
-
-using DevExpress.Xpo;
+﻿using DevExpress.Xpo;
 
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Identity;
 
-using Xenial.Identity.Data;
-using Xenial.Identity.Xpo.Storage.Models;
-
-using static System.Formats.Asn1.AsnWriter;
-using static MudBlazor.CategoryTypes;
+using Xenial.Identity.Infrastructure.Channels;
+using Xenial.Identity.Models;
 
 namespace Xenial.Identity.Components.Admin;
 
 public partial class Channels
 {
-    private async Task Delete(XpoApiResource resource)
+    private async Task Add(ICommunicationChannelRegistration registration)
+    {
+        //var settings = ChannelRegistry.GetChannel(registration).CreateChannelSettings();
+
+        using var childUow = UnitOfWork.BeginNestedUnitOfWork();
+        var channel = new XpoCommunicationChannel(childUow)
+        {
+            ChannelProviderType = registration.ProviderType,
+            ChannelDisplayName = registration.DisplayName,
+            ChannelType = registration.Type
+        };
+
+        var dialog = DialogService.Show<ChannelDialog>("Add Channel", new MudBlazor.DialogParameters
+        {
+            [nameof(ChannelDialog.UnitOfWork)] = childUow,
+            [nameof(ChannelDialog.Channel)] = channel,
+            [nameof(ChannelDialog.Registration)] = registration
+        }, new MudBlazor.DialogOptions
+        {
+            MaxWidth = MudBlazor.MaxWidth.Small,
+            FullWidth = true,
+            Position = MudBlazor.DialogPosition.TopCenter,
+            NoHeader = false,
+            CloseButton = true,
+            CloseOnEscapeKey = true
+        });
+
+        var result = await dialog.GetReturnValueAsync<bool?>();
+        if (result == true)
+        {
+            await childUow.SaveAsync(channel);
+            await childUow.CommitChangesAsync();
+            await UnitOfWork.CommitChangesAsync();
+        }
+        else
+        {
+            childUow.DropChanges();
+        }
+
+        await table.ReloadServerData();
+    }
+    private async Task Delete(XpoCommunicationChannel channel)
     {
         var delete = await DialogService.ShowMessageBox("Delete API", (MarkupString)$"""
             <ul>
@@ -23,7 +58,7 @@ public partial class Channels
                     Do your really want to delete the API?
                 </li>
                 <li>
-                    <em>{resource.Name}</em>
+                    <em>{channel.ChannelProviderType}</em>
                 </li>
                 <li>
                     <strong>This operation can <em>not</em> be undone!</strong>
@@ -35,25 +70,7 @@ public partial class Channels
         {
             try
             {
-                foreach (var scopeName in resource.Scopes.Select(m => m.Scope))
-                {
-                    var scopes = await UnitOfWork.Query<XpoApiScope>().Where(x => x.Name == scopeName).ToListAsync();
-                    if (scopes.Count > 0)
-                    {
-                        foreach (var item in scopes)
-                        {
-                            await UnitOfWork.DeleteAsync(item);
-                        }
-                    }
-                }
-
-                var scope = await UnitOfWork.Query<XpoApiScope>().Where(x => x.Name == resource.Name).FirstOrDefaultAsync();
-                if (scope is not null)
-                {
-                    await UnitOfWork.DeleteAsync(scope);
-                }
-
-                await UnitOfWork.DeleteAsync(resource);
+                await UnitOfWork.DeleteAsync(channel);
                 await UnitOfWork.CommitChangesAsync();
                 Snackbar.Add($"""
                     <ul>
@@ -61,7 +78,7 @@ public partial class Channels
                             API was successfully deleted!
                         </li>
                         <li>
-                            <em>{resource.Name}</em>
+                            <em>{channel.ChannelProviderType}</em>
                         </li>
                     </ul>
                     """, MudBlazor.Severity.Success);
@@ -77,7 +94,7 @@ public partial class Channels
                             There was an error when deleting the API!
                         </li>
                         <li>
-                            <em>{resource.Name}</em>
+                            <em>{channel.ChannelProviderType}</em>
                         </li>
                         {errors}
                     </ul>

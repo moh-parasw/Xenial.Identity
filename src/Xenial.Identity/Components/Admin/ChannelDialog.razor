@@ -1,0 +1,70 @@
+﻿@using Duende.IdentityServer.Models
+@using Xenial.Identity.Configuration
+@using Xenial.Identity.Infrastructure.Channels
+@using Xenial.Identity.Xpo.Storage.Models
+
+<MudDialog>
+    <TitleContent>
+        @if (IsNew)
+        {
+            <text>Add Channel</text>
+        }
+        else
+        {
+            <text>Edit Channel</text>
+        }
+    </TitleContent>
+    <DialogContent>
+        <MudFocusTrap DefaultFocus="DefaultFocus.FirstChild">
+            <MudStack Spacing="4">                
+                <MudField Label="Type"
+                          Variant="Variant.Filled"
+                          FullWidth
+                          Margin="Margin.Dense">@Channel.ChannelType</MudField>
+                <MudField Label="Provider"
+                          Variant="Variant.Filled"
+                          FullWidth
+                          Margin="Margin.Dense">@Channel.ChannelProviderType</MudField>
+                <MudField Label="DisplayName"
+                          Variant="Variant.Filled"
+                          FullWidth
+                          Margin="Margin.Dense">@Registration.DisplayName</MudField>
+            </MudStack>
+        </MudFocusTrap>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@Save">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+    }
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    [Parameter, EditorRequired]
+    public UnitOfWork UnitOfWork { get; set; }
+
+    [Parameter, EditorRequired]
+    public XpoCommunicationChannel Channel { get; set; }
+
+    [Parameter, EditorRequired]
+    public ICommunicationChannelRegistration Registration { get; set; }
+
+    private bool IsNew => UnitOfWork.IsNewObject(Channel);
+
+    public void Cancel() =>
+        MudDialog.Cancel();
+
+    public void Save()
+    {
+        UnitOfWork.Save(Channel);
+        MudDialog.Close(true);
+    }
+}

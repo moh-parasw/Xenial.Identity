@@ -13,6 +13,7 @@ public enum CommunicationChannelType
 
 public interface ICommunicationChannel
 {
+    object CreateChannelSettings();
     Task SetChannelSettings(string channelSettingsJson);
 }
 
@@ -21,6 +22,7 @@ public interface ICommunicationChannelRegistry
     IEnumerable<ICommunicationChannelRegistration> Registrations { get; }
 
     ICommunicationChannel GetChannel(CommunicationChannelType channelType, string channelProviderType);
+    ICommunicationChannel GetChannel(ICommunicationChannelRegistration registration);
 
     void AddChannel(ICommunicationChannelRegistration registration);
 }
@@ -41,6 +43,9 @@ internal record CommunicationChannelRegistry(IServiceProvider Provider) : ICommu
         var registration = Registrations.First(m => m.Type == channelType && m.ProviderType == channelProviderType);
         return Provider.GetServices<ICommunicationChannel>().First(m => m.GetType() == registration.ChannelType);
     }
+
+    public ICommunicationChannel GetChannel(ICommunicationChannelRegistration registration)
+        => GetChannel(registration.Type, registration.ProviderType);
 }
 
 public interface ICommunicationChannelRegistration

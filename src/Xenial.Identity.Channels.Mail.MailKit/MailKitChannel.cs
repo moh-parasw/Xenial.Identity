@@ -5,6 +5,7 @@ namespace Xenial.Identity.Channels.Mail.MailKit;
 
 internal class MailKitChannel : ICommunicationChannel
 {
+    public object CreateChannelSettings() => new object();
     public Task SetChannelSettings(string channelSettingsJson) => throw new NotImplementedException();
 }
 

@@ -15,6 +15,8 @@ public class XpoCommunicationChannel : XpoIdentityBaseObjectString
         base.AfterConstruction();
         Id = Guid.NewGuid().ToString();
         ChannelType = CommunicationChannelType.Email;
+        ChannelDisplayName = "";
+        Enabled = true;
     }
 
     private CommunicationChannelType channelType = CommunicationChannelType.Email;
@@ -30,6 +32,21 @@ public class XpoCommunicationChannel : XpoIdentityBaseObjectString
     {
         get => channelProviderType;
         set => SetPropertyValue(nameof(ChannelProviderType), ref channelProviderType, value);
+    }
+
+    private string channelDisplayName = "";
+    [Size(SizeAttribute.DefaultStringMappingFieldSize)]
+    public string ChannelDisplayName
+    {
+        get => channelDisplayName;
+        set => SetPropertyValue(nameof(ChannelDisplayName), ref channelDisplayName, value);
+    }
+        
+    private bool enabled = true;
+    public bool Enabled
+    {
+        get => enabled;
+        set => SetPropertyValue(nameof(Enabled), ref enabled, value);
     }
 
     private string channelSettings = "";

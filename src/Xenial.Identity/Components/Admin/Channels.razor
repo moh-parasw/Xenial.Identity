@@ -46,7 +46,7 @@
                 {
                     var icon = item.Type == CommunicationChannelType.Sms ? Icons.Filled.PhoneAndroid : Icons.Filled.Email;
 
-                    <MudMenuItem Icon="@icon">@item.DisplayName</MudMenuItem>
+                    <MudMenuItem Icon="@icon" OnClick="@(async () => await Add(item))">@item.DisplayName</MudMenuItem>
                 }
             </MudMenu>
         </MudTooltip>
@@ -59,11 +59,11 @@
 </MudPaper>
 <MudTable @ref="table"
           RowsPerPage="100"
-          T="XpoApiResource"
+          T="XpoCommunicationChannel"
           Dense
           FixedHeader
           Elevation="10"
-          ServerData="@(new Func<TableState, Task<TableData<XpoApiResource>>>(ServerReload))"
+          ServerData="@(new Func<TableState, Task<TableData<XpoCommunicationChannel>>>(ServerReload))"
           Virtualize="true"
           Height="calc(100vh - 21em)"
           Class="mb-0"
@@ -72,31 +72,31 @@
           OnRowClick="RowClickEvent">
     <HeaderContent>
         <MudTh Style="width:0.1%; white-space: nowrap;">
-            <MudTableSortLabel T="XpoApiResource"
-                               SortLabel="@(nameof(XpoApiResource.Id))">Id</MudTableSortLabel>
+            <MudTableSortLabel T="XpoCommunicationChannel"
+                               SortLabel="@(nameof(XpoCommunicationChannel.Id))">Id</MudTableSortLabel>
         </MudTh>
         <MudTh>
-            <MudTableSortLabel T="XpoApiResource"
-                               SortLabel="@(nameof(XpoApiResource.Name))">Name</MudTableSortLabel>
+            <MudTableSortLabel T="XpoCommunicationChannel"
+                               SortLabel="@(nameof(XpoCommunicationChannel.ChannelType))">Type</MudTableSortLabel>
         </MudTh>
         <MudTh>
-            <MudTableSortLabel T="XpoApiResource"
-                               SortLabel="@(nameof(XpoApiResource.DisplayName))">Displayname</MudTableSortLabel>
+            <MudTableSortLabel T="XpoCommunicationChannel"
+                               SortLabel="@(nameof(XpoCommunicationChannel.ChannelProviderType))">Provider</MudTableSortLabel>
         </MudTh>
         <MudTh>
-            <MudTableSortLabel T="XpoApiResource"
-                               SortLabel="@(nameof(XpoApiResource.Description))">Description</MudTableSortLabel>
+            <MudTableSortLabel T="XpoCommunicationChannel"
+                               SortLabel="@(nameof(XpoCommunicationChannel.ChannelDisplayName))">Displayname</MudTableSortLabel>
         </MudTh>
         <MudTh Style="width:0.1%; white-space: nowrap;">
-            <MudTableSortLabel T="XpoApiResource"
-                               SortLabel="@(nameof(XpoApiResource.Enabled))">Enabled</MudTableSortLabel>
+            <MudTableSortLabel T="XpoCommunicationChannel"
+                               SortLabel="@(nameof(XpoCommunicationChannel.Enabled))">Enabled</MudTableSortLabel>
         </MudTh>
         <MudTh Style="width:0.1%; white-space: nowrap;">
 
         </MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="@(nameof(XpoApiResource.Id))">
+        <MudTd DataLabel="@(nameof(XpoCommunicationChannel.Id))">
             <MudTooltip Text="@context.Id.ToString()">
                 <MudIconButton Size="Size.Small"
                                DisableElevation
@@ -107,16 +107,16 @@
                                OnClick="async () => await CopyToClipboard(context.Id.ToString())" />
             </MudTooltip>
         </MudTd>
-        <MudTd DataLabel="@(nameof(context.Name))">
-            <MudLink Href="@($"/Admin2/Api/{context.Id}")" Class="cursor-pointer">
-                <MudHighlighter Text="@context.Name" HighlightedText="@search" />
-            </MudLink>
+        <MudTd DataLabel="@(nameof(context.ChannelType))">
+            <MudHighlighter Text="@context.ChannelType.ToString()" HighlightedText="@search" />
+            @*<MudLink Href="@($"/Admin2/Api/{context.Id}")" Class="cursor-pointer">
+            </MudLink>*@
         </MudTd>
-        <MudTd DataLabel="@(nameof(context.DisplayName))">
-            <MudHighlighter Text="@context.DisplayName" HighlightedText="@search" />
+        <MudTd DataLabel="@(nameof(context.ChannelProviderType))">
+            <MudHighlighter Text="@context.ChannelProviderType" HighlightedText="@search" />
         </MudTd>
-        <MudTd DataLabel="@(nameof(context.Description))">
-            <MudHighlighter Text="@context.Description" HighlightedText="@search" />
+        <MudTd DataLabel="@(nameof(context.ChannelDisplayName))">
+            <MudHighlighter Text="@context.ChannelDisplayName" HighlightedText="@search" />
         </MudTd>
         <MudTd DataLabel="@(nameof(context.Enabled))">
             <MudCheckBox Checked="@context.Enabled" Disabled />
@@ -147,14 +147,14 @@
         @if (total > 0)
         {
             <ul>
-                <li>There are no API's found matching '@search'</li>
+                <li>There are no Channels found matching '@search'</li>
                 <li><MudButton Size="Size.Small" Color="Color.Primary" OnClick="async () => await SearchChanged(string.Empty)">Clear Filter</MudButton></li>
             </ul>
         }
         else
         {
             <ul>
-                <li>There are no API's yet.</li>
+                <li>There are no Channels yet.</li>
                 <li>Do you want to <MudLink Class="cursor-pointer" Href="/Admin2/AddApi">Add an API</MudLink></li>
             </ul>
         }
@@ -169,7 +169,7 @@
                 <MudAvatar Color="Color.Secondary" Variant="Variant.Outlined">
                     <MudIcon Icon="@Icons.Filled.Api" />
                 </MudAvatar>
-                <MudText Typo="Typo.h6">@HighlightedValue.Name</MudText>
+                <MudText Typo="Typo.h6">@HighlightedValue.ChannelType</MudText>
                 <MudSpacer />
                 <MudIcon Icon="@Icons.Filled.Close"
                      Class="cursor-pointer"
@@ -195,53 +195,16 @@
                 </MudTooltip>
             </MudStack>
             <MudField Label="Name"
-                  Variant="Variant.Text">@HighlightedValue.Name</MudField>
+                  Variant="Variant.Text">@HighlightedValue.ChannelProviderType</MudField>
             <MudField Label="Displayname"
-                  Variant="Variant.Text">@HighlightedValue.DisplayName</MudField>
-            <MudField Label="Description"
-                  Variant="Variant.Text">@HighlightedValue.Description</MudField>
-
+                  Variant="Variant.Text">@HighlightedValue.ChannelDisplayName</MudField>
+            
             <MudCheckBox Label="Enabled"
                      Disabled
                      Checked="@HighlightedValue.Enabled"
                      LabelPosition="LabelPosition.End"
                      Dense
                      Class="align-self-start" />
-
-            <MudCheckBox Label="Required"
-                     Disabled
-                     Checked="@HighlightedValue.Required"
-                     LabelPosition="LabelPosition.End"
-                     Dense
-                     Class="align-self-start" />
-
-            <MudCheckBox Label="Show in Discovery Document"
-                     Disabled
-                     Checked="@HighlightedValue.ShowInDiscoveryDocument"
-                     LabelPosition="LabelPosition.End"
-                     Dense
-                     Class="align-self-start" />
-
-            <MudCheckBox Label="Non Editable"
-                     Disabled
-                     Checked="@HighlightedValue.NonEditable"
-                     LabelPosition="LabelPosition.End"
-                     Dense
-                     Class="align-self-start" />
-
-            <MudCheckBox Label="Emphasize"
-                     Disabled
-                     Checked="@(UnitOfWork.Query<XpoApiScope>().Where(s => s.Name == HighlightedValue.Name).FirstOrDefault()?.Emphasize)"
-                     LabelPosition="LabelPosition.End"
-                     Dense
-                     Class="align-self-start" />
-
-            <MudText Typo="Typo.caption">Scopes</MudText>
-            <ApiIdentityScopesChips Resource="@HighlightedValue" />
-            <MudText Typo="Typo.caption">Roles</MudText>
-            <ApiIdentityResourcesChips Resource="@HighlightedValue" />
-            <MudText Typo="Typo.caption">Properties</MudText>
-            <ApiPropertiesSmall Resource="@HighlightedValue" />
         </MudStack>
     </MudDrawer>
 }
@@ -249,17 +212,17 @@
 
 
     bool openDrawer;
-    private XpoApiResource HighlightedValue;
+    private XpoCommunicationChannel HighlightedValue;
 
     private void CloseDrawer()
         => openDrawer = false;
 
-    private string SelectedRowClassFunc(XpoApiResource element, int rowNumber)
+    private string SelectedRowClassFunc(XpoCommunicationChannel element, int rowNumber)
         => new CssBuilder("cursor-pointer")
-            .AddClass("mud-selected-item mud-primary-hover", EqualityComparer<XpoApiResource>.Default.Equals(HighlightedValue, element))
+            .AddClass("mud-selected-item mud-primary-hover", EqualityComparer<XpoCommunicationChannel>.Default.Equals(HighlightedValue, element))
             .Build();
 
-    private async Task RowClickEvent(TableRowClickEventArgs<XpoApiResource> e)
+    private async Task RowClickEvent(TableRowClickEventArgs<XpoCommunicationChannel> e)
     {
         //We delay, so navigating await will not open the drawer
         await Task.Delay(100);
@@ -283,7 +246,7 @@
 
     private string search;
     private int? total;
-    private MudTable<XpoApiResource> table;
+    private MudTable<XpoCommunicationChannel> table;
     private bool IsLoading = true;
 
     private async Task SearchChanged(string search)
@@ -298,11 +261,11 @@
         Snackbar.Add($"Copied {content} to clipboard!", Severity.Info);
     }
 
-    private async Task<TableData<XpoApiResource>> ServerReload(TableState state)
+    private async Task<TableData<XpoCommunicationChannel>> ServerReload(TableState state)
     {
         try
         {
-            var query = UnitOfWork.Query<XpoApiResource>().AsQueryable();
+            var query = UnitOfWork.Query<XpoCommunicationChannel>().AsQueryable();
             total = await query.CountAsync();
             var items = query;
 
@@ -310,9 +273,8 @@
             {
                 var s = search.ToLowerInvariant();
                 items = items.Where(i =>
-                    i.Name.ToLower().Contains(s)
-                    || i.DisplayName.ToLower().Contains(s)
-                    || i.Description.ToLower().Contains(s)
+                    i.ChannelDisplayName.ToLower().Contains(s)
+                    || i.ChannelProviderType.ToLower().Contains(s)
                 );
             }
 
@@ -320,11 +282,11 @@
             {
                 items = state.SortLabel switch
                 {
-                    nameof(XpoApiResource.Id) => items.OrderByDirection(state.SortDirection, x => x.Id),
-                    nameof(XpoApiResource.Name) => items.OrderByDirection(state.SortDirection, x => x.Name),
-                    nameof(XpoApiResource.DisplayName) => items.OrderByDirection(state.SortDirection, x => x.DisplayName),
-                    nameof(XpoApiResource.Description) => items.OrderByDirection(state.SortDirection, x => x.Description),
-                    nameof(XpoApiResource.Enabled) => items.OrderByDirection(state.SortDirection, x => x.Enabled),
+                    nameof(XpoCommunicationChannel.Id) => items.OrderByDirection(state.SortDirection, x => x.Id),
+                    nameof(XpoCommunicationChannel.ChannelType) => items.OrderByDirection(state.SortDirection, x => x.ChannelType),
+                    nameof(XpoCommunicationChannel.ChannelProviderType) => items.OrderByDirection(state.SortDirection, x => x.ChannelProviderType),
+                    nameof(XpoCommunicationChannel.ChannelDisplayName) => items.OrderByDirection(state.SortDirection, x => x.ChannelDisplayName),
+                    nameof(XpoCommunicationChannel.Enabled) => items.OrderByDirection(state.SortDirection, x => x.Enabled),
                     _ => items
                 };
             }
@@ -333,7 +295,7 @@
                 .Take(state.PageSize)
                 .ToArrayAsync();
 
-            return new TableData<XpoApiResource>()
+            return new TableData<XpoCommunicationChannel>()
                 {
                     Items = result,
                     TotalItems = total.Value
