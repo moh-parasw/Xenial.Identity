@@ -11,12 +11,8 @@
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
 @inject ICommunicationChannelRegistry ChannelRegistry
-<MudText Typo="Typo.h3" GutterBottom>Channels</MudText>
 
-@foreach(var item in ChannelRegistry.Registrations)
-{
-    @item.ChannelType.ToString()
-}
+<MudText Typo="Typo.h3" GutterBottom>Channels</MudText>
 
 <MudPaper Elevation="10" Class="mb-1" Square>
     <MudToolBar Dense>
@@ -41,9 +37,18 @@
 
         <MudSpacer />
         <MudTooltip Text="Add">
-            <MudIconButton Icon="@Icons.Filled.Add"
-                           Href="/Admin2/AddApi"
-                           Color="Color.Success" />
+            <MudMenu Icon="@Icons.Filled.Add"
+                     Variant="Variant.Text"
+                     Color="Color.Success"
+                     EndIcon="@Icons.Filled.KeyboardArrowDown" IconColor="Color.Secondary"
+                     Dense>
+                @foreach (var item in ChannelRegistry.Registrations)
+                {
+                    var icon = item.Type == CommunicationChannelType.Sms ? Icons.Filled.PhoneAndroid : Icons.Filled.Email;
+
+                    <MudMenuItem Icon="@icon">@item.DisplayName</MudMenuItem>
+                }
+            </MudMenu>
         </MudTooltip>
         <MudTooltip Text="Refresh">
             <MudIconButton Icon="@Icons.Filled.Refresh"
