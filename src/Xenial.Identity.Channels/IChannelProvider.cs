@@ -3,9 +3,13 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 
-using Xenial.Identity.Models;
-
 namespace Xenial.Identity.Infrastructure.Channels;
+
+public enum CommunicationChannelType
+{
+    Email,
+    Sms
+}
 
 public interface ICommunicationChannel
 {
@@ -66,7 +70,7 @@ public interface ICommunicationChannelOptions
       where TSettingsComponent : ComponentBase;
 }
 
-public record CommunicationChannelOptions(IServiceCollection ServiceCollection) : ICommunicationChannelOptions
+public class CommunicationChannelOptions : ICommunicationChannelOptions
 {
     internal record Registration(
         Type Channel,
@@ -76,7 +80,7 @@ public record CommunicationChannelOptions(IServiceCollection ServiceCollection) 
         string DisplayName
     );
 
-    private ImmutableArray<Registration> registrations = new ImmutableArray<Registration>();
+    private ImmutableArray<Registration> registrations = ImmutableArray.Create<Registration>();
     internal IReadOnlyList<Registration> Registrations => registrations;
 
     ICommunicationChannelOptions ICommunicationChannelOptions.RegisterChannel
@@ -86,16 +90,15 @@ public record CommunicationChannelOptions(IServiceCollection ServiceCollection) 
             string displayName
     )
     {
-        registrations = registrations.Add(
-            new Registration(
+        var registration = new Registration(
                 typeof(TChannel),
                 typeof(TSettingsComponent),
                 channelType,
                 channelProviderType,
-                displayName)
-        );
+                displayName);
 
-        ServiceCollection.AddScoped<ICommunicationChannel, TChannel>();
+        registrations = registrations.Add(registration);
+
         return this;
     }
 }
@@ -107,7 +110,7 @@ public static class ChannelsServiceCollectionExtension
         _ = services ?? throw new ArgumentNullException(nameof(services));
         _ = options ?? throw new ArgumentNullException(nameof(options));
 
-        var opt = new CommunicationChannelOptions(services);
+        var opt = new CommunicationChannelOptions();
 
         services.AddSingleton<ICommunicationChannelRegistry, CommunicationChannelRegistry>(s =>
         {
@@ -122,6 +125,7 @@ public static class ChannelsServiceCollectionExtension
                     registration.Channel,
                     registration.SettingsComponent
                 ));
+                services.AddScoped(typeof(ICommunicationChannel), registration.Channel);
             }
 
             return registry;

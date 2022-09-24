@@ -1,6 +1,7 @@
 ﻿using DevExpress.Xpo;
 
 using Xenial.AspNetIdentity.Xpo.Models;
+using Xenial.Identity.Infrastructure.Channels;
 
 namespace Xenial.Identity.Models;
 
@@ -38,10 +39,4 @@ public class XpoCommunicationChannel : XpoIdentityBaseObjectString
         get => channelSettings;
         set => SetPropertyValue(nameof(ChannelSettings), ref channelSettings, value);
     }
-}
-
-public enum CommunicationChannelType
-{
-    Email,
-    Sms
 }

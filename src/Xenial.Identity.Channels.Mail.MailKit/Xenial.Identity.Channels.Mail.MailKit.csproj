@@ -15,4 +15,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.9" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Xenial.Identity.Channels\Xenial.Identity.Channels.csproj" />
+  </ItemGroup>
+
 </Project>

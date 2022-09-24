@@ -20,8 +20,10 @@ using Xenial.AspNetIdentity.Xpo.Mappers;
 using Xenial.AspNetIdentity.Xpo.Models;
 using Xenial.AspNetIdentity.Xpo.Stores;
 using Xenial.Identity.Areas.Admin.Pages.Clients;
+using Xenial.Identity.Channels.Mail.MailKit;
 using Xenial.Identity.Data;
 using Xenial.Identity.Infrastructure;
+using Xenial.Identity.Infrastructure.Channels;
 using Xenial.Identity.Infrastructure.Localization;
 using Xenial.Identity.Infrastructure.Logging.MemoryConsole.Themes;
 using Xenial.Identity.Models;
@@ -71,6 +73,11 @@ try
     services.AddSingleton<IStringLocalizer>(localizer);
     services.AddSingleton<IHtmlLocalizer>(localizer);
     services.AddScoped<XpoStringLocalizerService>();
+
+    services.AddCommunicationChannels(o =>
+    {
+        o.AddMailKit();
+    });
 
     await UpdateDatabase(Configuration, localizer);
 
