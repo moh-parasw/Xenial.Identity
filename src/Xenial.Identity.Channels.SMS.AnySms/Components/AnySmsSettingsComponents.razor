@@ -1,0 +1,34 @@
+﻿
+<MudTextField Label="Server"
+              Variant="Variant.Filled"
+              FullWidth
+              Margin="Margin.Dense"
+              @bind-Value="@Settings.Server" />
+
+<MudTextField Label="Account Id"
+              Variant="Variant.Filled"
+              FullWidth
+              Margin="Margin.Dense"
+              @bind-Value="@Settings.AccountId" />
+
+<MudTextField Label="Account Password"
+              Variant="Variant.Filled"
+              FullWidth
+              Margin="Margin.Dense"
+              InputType="@(showPassword ? InputType.Text : InputType.Password)"
+              Adornment="Adornment.End"
+              AdornmentIcon="@Icons.Filled.RemoveRedEye"
+              OnAdornmentClick="() => showPassword = !showPassword"
+              @bind-Value="@Settings.AccountPassword" />
+
+<MudTextField Label="Account Gateway"
+              Variant="Variant.Filled"
+              FullWidth
+              Margin="Margin.Dense"
+              @bind-Value="@Settings.AccountGateway" />
+
+@code {
+    private bool showPassword = false;
+    [Parameter]
+    public AnySmsSettings Settings { get; set; } = default!;
+}

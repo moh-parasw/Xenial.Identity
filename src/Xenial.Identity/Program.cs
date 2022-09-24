@@ -21,6 +21,7 @@ using Xenial.AspNetIdentity.Xpo.Models;
 using Xenial.AspNetIdentity.Xpo.Stores;
 using Xenial.Identity.Areas.Admin.Pages.Clients;
 using Xenial.Identity.Channels.Mail.MailKit;
+using Xenial.Identity.Channels.SMS.AnySms;
 using Xenial.Identity.Data;
 using Xenial.Identity.Infrastructure;
 using Xenial.Identity.Infrastructure.Channels;
@@ -77,6 +78,7 @@ try
     services.AddCommunicationChannels(o =>
     {
         o.AddMailKit();
+        o.AddAnySms();
     });
 
     await UpdateDatabase(Configuration, localizer);
