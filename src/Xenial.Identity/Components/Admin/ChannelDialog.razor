@@ -16,19 +16,30 @@
     </TitleContent>
     <DialogContent>
         <MudFocusTrap DefaultFocus="DefaultFocus.FirstChild">
-            <MudStack Spacing="4">                
-                <MudField Label="Type"
-                          Variant="Variant.Filled"
-                          FullWidth
-                          Margin="Margin.Dense">@Channel.ChannelType</MudField>
-                <MudField Label="Provider"
-                          Variant="Variant.Filled"
-                          FullWidth
-                          Margin="Margin.Dense">@Channel.ChannelProviderType</MudField>
-                <MudField Label="DisplayName"
-                          Variant="Variant.Filled"
-                          FullWidth
-                          Margin="Margin.Dense">@Registration.DisplayName</MudField>
+            <MudStack Spacing="4">
+                <MudStack Row Spacing="2">
+                    <MudField Label="Type"
+                              Variant="Variant.Filled"
+                              Class="flex-grow-0"
+                              Margin="Margin.Dense">@Channel.ChannelType</MudField>
+                    <MudField Label="Provider"
+                              Variant="Variant.Filled"
+                              FullWidth
+                              Margin="Margin.Dense">@Channel.ChannelProviderType</MudField>
+                </MudStack>
+                <MudTextField Label="DisplayName"
+                              Variant="Variant.Filled"
+                              FullWidth
+                              Margin="Margin.Dense"
+                              @bind-Value="@Channel.ChannelDisplayName" />
+
+                <MudSwitch T="bool"
+                           Label="Enabled"
+                           Color="Color.Primary"
+                           @bind-Checked="@Channel.Enabled" />
+
+                <DynamicComponent Type="@Registration.SettingsComponent" Parameters="@GetParameters()" />
+
             </MudStack>
         </MudFocusTrap>
     </DialogContent>
@@ -57,6 +68,9 @@
     [Parameter, EditorRequired]
     public ICommunicationChannelRegistration Registration { get; set; }
 
+    [Parameter, EditorRequired]
+    public object Settings { get; set; }
+
     private bool IsNew => UnitOfWork.IsNewObject(Channel);
 
     public void Cancel() =>
@@ -66,5 +80,13 @@
     {
         UnitOfWork.Save(Channel);
         MudDialog.Close(true);
+    }
+
+    private Dictionary<string, object> GetParameters()
+    {
+        return new Dictionary<string, object>()
+            {
+                [nameof(Settings)] = Settings
+            };
     }
 }

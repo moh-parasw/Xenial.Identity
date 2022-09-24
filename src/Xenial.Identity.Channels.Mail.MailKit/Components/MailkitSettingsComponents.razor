@@ -1,5 +1,48 @@
-﻿<h3>MailkitSettingsComponents</h3>
+﻿<MudStack Row Spacing="2">
+    <MudTextField Label="Server"
+                  Variant="Variant.Filled"
+                  FullWidth
+                  Margin="Margin.Dense"
+
+                  @bind-Value="@Settings.Server" />
+
+    <MudNumericField Label="Port"
+                     Variant="Variant.Filled"
+                     Margin="Margin.Dense"
+                     Class="flex-grow-0"
+                     @bind-Value="@Settings.Port" />
+</MudStack>
+<MudTextField Label="Username"
+              Variant="Variant.Filled"
+              FullWidth
+              Margin="Margin.Dense"
+              @bind-Value="@Settings.Username" />
+
+<MudTextField Label="Password"
+              Variant="Variant.Filled"
+              FullWidth
+              Margin="Margin.Dense"
+              InputType="@(showPassword ? InputType.Text : InputType.Password)"
+              Adornment="Adornment.End"
+              AdornmentIcon="@Icons.Filled.RemoveRedEye"
+              OnAdornmentClick="() => showPassword = !showPassword"
+              @bind-Value="@Settings.Password" />
+
+<MudTextField Label="From Email"
+              Variant="Variant.Filled"
+              FullWidth
+              Margin="Margin.Dense"
+              @bind-Value="@Settings.FromEmail" />
+
+<MudTextField Label="From Name"
+              Variant="Variant.Filled"
+              FullWidth
+              Margin="Margin.Dense"
+              @bind-Value="@Settings.FromName" />
+
 
 @code {
-
+    private bool showPassword = false;
+    [Parameter]
+    public MailKitSettings Settings { get; set; } = default!;
 }

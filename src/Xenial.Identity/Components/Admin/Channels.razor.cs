@@ -11,7 +11,8 @@ public partial class Channels
 {
     private async Task Add(ICommunicationChannelRegistration registration)
     {
-        //var settings = ChannelRegistry.GetChannel(registration).CreateChannelSettings();
+        var channelSerivce = ChannelRegistry.GetChannel(registration);
+        var settings = channelSerivce.CreateChannelSettings();
 
         using var childUow = UnitOfWork.BeginNestedUnitOfWork();
         var channel = new XpoCommunicationChannel(childUow)
@@ -25,7 +26,8 @@ public partial class Channels
         {
             [nameof(ChannelDialog.UnitOfWork)] = childUow,
             [nameof(ChannelDialog.Channel)] = channel,
-            [nameof(ChannelDialog.Registration)] = registration
+            [nameof(ChannelDialog.Registration)] = registration,
+            [nameof(ChannelDialog.Settings)] = settings,
         }, new MudBlazor.DialogOptions
         {
             MaxWidth = MudBlazor.MaxWidth.Small,
@@ -39,6 +41,7 @@ public partial class Channels
         var result = await dialog.GetReturnValueAsync<bool?>();
         if (result == true)
         {
+            channel.ChannelSettings = channelSerivce.SerializeChannelSettings(settings);
             await childUow.SaveAsync(channel);
             await childUow.CommitChangesAsync();
             await UnitOfWork.CommitChangesAsync();

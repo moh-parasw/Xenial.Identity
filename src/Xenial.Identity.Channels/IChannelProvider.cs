@@ -14,6 +14,7 @@ public enum CommunicationChannelType
 public interface ICommunicationChannel
 {
     object CreateChannelSettings();
+    string SerializeChannelSettings(object settings);
     Task SetChannelSettings(string channelSettingsJson);
 }
 
@@ -103,7 +104,7 @@ public record CommunicationChannelOptions(IServiceCollection Services) : ICommun
                 displayName);
 
         registrations = registrations.Add(registration);
-        Services.AddScoped<ICommunicationChannel, TChannel>();
+        Services.AddTransient<ICommunicationChannel, TChannel>();
 
         return this;
     }
