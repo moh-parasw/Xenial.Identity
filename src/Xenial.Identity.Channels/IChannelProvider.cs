@@ -16,7 +16,7 @@ public interface ICommunicationChannel
     Task SetChannelSettings(string channelSettingsJson);
 }
 
-internal interface ICommunicationChannelRegistry
+public interface ICommunicationChannelRegistry
 {
     IEnumerable<ICommunicationChannelRegistration> Registrations { get; }
 
@@ -43,7 +43,7 @@ internal record CommunicationChannelRegistry(IServiceProvider Provider) : ICommu
     }
 }
 
-internal interface ICommunicationChannelRegistration
+public interface ICommunicationChannelRegistration
 {
     CommunicationChannelType Type { get; }
     string ProviderType { get; }
@@ -70,7 +70,7 @@ public interface ICommunicationChannelOptions
       where TSettingsComponent : ComponentBase;
 }
 
-public class CommunicationChannelOptions : ICommunicationChannelOptions
+public record CommunicationChannelOptions(IServiceCollection Services) : ICommunicationChannelOptions
 {
     internal record Registration(
         Type Channel,
@@ -98,6 +98,7 @@ public class CommunicationChannelOptions : ICommunicationChannelOptions
                 displayName);
 
         registrations = registrations.Add(registration);
+        Services.AddScoped<ICommunicationChannel, TChannel>();
 
         return this;
     }
@@ -110,7 +111,7 @@ public static class ChannelsServiceCollectionExtension
         _ = services ?? throw new ArgumentNullException(nameof(services));
         _ = options ?? throw new ArgumentNullException(nameof(options));
 
-        var opt = new CommunicationChannelOptions();
+        var opt = new CommunicationChannelOptions(services);
 
         services.AddSingleton<ICommunicationChannelRegistry, CommunicationChannelRegistry>(s =>
         {
@@ -125,7 +126,6 @@ public static class ChannelsServiceCollectionExtension
                     registration.Channel,
                     registration.SettingsComponent
                 ));
-                services.AddScoped(typeof(ICommunicationChannel), registration.Channel);
             }
 
             return registry;

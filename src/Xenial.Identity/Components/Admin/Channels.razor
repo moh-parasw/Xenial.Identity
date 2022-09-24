@@ -4,13 +4,19 @@
 @using MudBlazor.Utilities
 @using Xenial.Identity.Areas.Identity.Pages.Account.Manage
 @using Xenial.Identity.Data
+@using Xenial.Identity.Infrastructure.Channels
 @using Xenial.Identity.Xpo.Storage.Models
 @inject UnitOfWork UnitOfWork
 @inject IJsApiService JsApiService
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
-
+@inject ICommunicationChannelRegistry ChannelRegistry
 <MudText Typo="Typo.h3" GutterBottom>Channels</MudText>
+
+@foreach(var item in ChannelRegistry.Registrations)
+{
+    @item.ChannelType.ToString()
+}
 
 <MudPaper Elevation="10" Class="mb-1" Square>
     <MudToolBar Dense>
