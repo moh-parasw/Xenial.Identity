@@ -1,7 +1,9 @@
 ﻿@using Duende.IdentityServer.Models
+@using Xenial.Identity.Channels.Client
 @using Xenial.Identity.Configuration
 @using Xenial.Identity.Channels
 @using Xenial.Identity.Xpo.Storage.Models
+@inject IHttpClientFactory HttpClientFactory
 
 <MudDialog>
     <TitleContent>
@@ -39,7 +41,6 @@
                            @bind-Checked="@Channel.Enabled" />
 
                 <DynamicComponent Type="@Registration.SettingsComponent" Parameters="@GetParameters()" />
-
             </MudStack>
         </MudFocusTrap>
     </DialogContent>

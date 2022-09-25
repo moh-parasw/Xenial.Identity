@@ -135,7 +135,7 @@
                                    Variant="Variant.Filled"
                                    Color="Color.Primary"
                                    Size="Size.Small"
-                                   Href="@($"/Admin2/Api/{context.Id}")" />
+                                   OnClick="async () => await Edit(context)" />
                 </MudTooltip>
             </MudStack>
         </MudTd>
@@ -198,7 +198,7 @@
                   Variant="Variant.Text">@HighlightedValue.ChannelProviderType</MudField>
             <MudField Label="Displayname"
                   Variant="Variant.Text">@HighlightedValue.ChannelDisplayName</MudField>
-            
+
             <MudCheckBox Label="Enabled"
                      Disabled
                      Checked="@HighlightedValue.Enabled"

@@ -15,6 +15,7 @@ public interface ICommunicationChannel
 {
     object CreateChannelSettings();
     string SerializeChannelSettings(object settings);
+    object DeserializeChannelSettings(string channelSettingsJson);
     Task SetChannelSettings(string channelSettingsJson);
 }
 
@@ -23,6 +24,7 @@ public interface ICommunicationChannelRegistry
     IEnumerable<ICommunicationChannelRegistration> Registrations { get; }
 
     ICommunicationChannel GetChannel(CommunicationChannelType channelType, string channelProviderType);
+    ICommunicationChannelRegistration GetChannelRegistration(CommunicationChannelType channelType, string channelProviderType);
     ICommunicationChannel GetChannel(ICommunicationChannelRegistration registration);
 
     void AddChannel(ICommunicationChannelRegistration registration);
@@ -47,6 +49,9 @@ internal record CommunicationChannelRegistry(IServiceProvider Provider) : ICommu
 
     public ICommunicationChannel GetChannel(ICommunicationChannelRegistration registration)
         => GetChannel(registration.Type, registration.ProviderType);
+    public ICommunicationChannelRegistration GetChannelRegistration(
+        CommunicationChannelType type,
+        string providerType) => Registrations.First(m => m.Type == type && m.ProviderType == providerType);
 }
 
 public interface ICommunicationChannelRegistration

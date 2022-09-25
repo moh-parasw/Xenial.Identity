@@ -1,4 +1,5 @@
-﻿using DevExpress.Xpo;
+﻿using DevExpress.ExpressApp.Model;
+using DevExpress.Xpo;
 
 using Microsoft.AspNetCore.Components;
 
@@ -9,6 +10,46 @@ namespace Xenial.Identity.Components.Admin;
 
 public partial class Channels
 {
+    private async Task Edit(XpoCommunicationChannel channel)
+    {
+        var registration = ChannelRegistry.GetChannelRegistration(channel.ChannelType, channel.ChannelProviderType);
+        var channelSerivce = ChannelRegistry.GetChannel(channel.ChannelType, channel.ChannelProviderType);
+        var settings = channelSerivce.DeserializeChannelSettings(channel.ChannelSettings);
+
+        using var childUow = UnitOfWork.BeginNestedUnitOfWork();
+
+        var dialog = DialogService.Show<ChannelDialog>("Add Channel", new MudBlazor.DialogParameters
+        {
+            [nameof(ChannelDialog.UnitOfWork)] = childUow,
+            [nameof(ChannelDialog.Channel)] = childUow.GetObjectByKey<XpoCommunicationChannel>(channel.Id),
+            [nameof(ChannelDialog.Registration)] = registration,
+            [nameof(ChannelDialog.Settings)] = settings,
+        }, new MudBlazor.DialogOptions
+        {
+            MaxWidth = MudBlazor.MaxWidth.Small,
+            FullWidth = true,
+            Position = MudBlazor.DialogPosition.TopCenter,
+            NoHeader = false,
+            CloseButton = true,
+            CloseOnEscapeKey = true
+        });
+
+        var result = await dialog.GetReturnValueAsync<bool?>();
+        if (result == true)
+        {
+            channel.ChannelSettings = channelSerivce.SerializeChannelSettings(settings);
+            await childUow.SaveAsync(channel);
+            await childUow.CommitChangesAsync();
+            await UnitOfWork.CommitChangesAsync();
+        }
+        else
+        {
+            childUow.DropChanges();
+        }
+
+        await table.ReloadServerData();
+    }
+
     private async Task Add(ICommunicationChannelRegistration registration)
     {
         var channelSerivce = ChannelRegistry.GetChannel(registration);

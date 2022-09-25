@@ -7,7 +7,7 @@ namespace Xenial.Identity.Channels;
 internal class AnySmsChannel : ICommunicationChannel
 {
     public object CreateChannelSettings() => new AnySmsSettings();
-    public object LoadChannelSettings(string settings) => LoadChannelSetting(settings);
+    public object DeserializeChannelSettings(string settings) => LoadChannelSetting(settings);
     private AnySmsSettings LoadChannelSetting(string settings) => JsonConvert.DeserializeObject<AnySmsSettings>(settings)!;
     public string SerializeChannelSettings(object settings) => JsonConvert.SerializeObject(settings, Formatting.Indented);
 

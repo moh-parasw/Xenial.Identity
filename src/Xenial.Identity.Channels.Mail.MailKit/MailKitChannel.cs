@@ -7,7 +7,7 @@ namespace Xenial.Identity.Channels;
 internal class MailKitChannel : ICommunicationChannel
 {
     public object CreateChannelSettings() => new MailKitSettings();
-    public object LoadChannelSettings(string settings) => LoadChannelSetting(settings);
+    public object DeserializeChannelSettings(string settings) => LoadChannelSetting(settings);
     private MailKitSettings LoadChannelSetting(string settings) => JsonConvert.DeserializeObject<MailKitSettings>(settings)!;
     public string SerializeChannelSettings(object settings) => JsonConvert.SerializeObject(settings, Formatting.Indented);
 
