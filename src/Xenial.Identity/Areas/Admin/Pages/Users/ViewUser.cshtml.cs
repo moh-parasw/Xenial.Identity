@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -63,7 +57,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
             var claims = await userManager.GetClaimsAsync(user);
             var roleNames = await userManager.GetRolesAsync(user);
 
-            var roleTasks = roleNames.Select(r => roleManager.NormalizeKey(r)).Select(async r => await roleManager.FindByNameAsync(r));
+            var roleTasks = roleNames.Select(roleManager.NormalizeKey).Select(roleManager.FindByNameAsync);
 
             var roles = await Task.WhenAll(roleTasks);
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 using AutoMapper;
 
@@ -11,7 +7,6 @@ using DevExpress.Xpo.DB.Exceptions;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 
 using Xenial.Identity.Configuration;
 using Xenial.Identity.Xpo.Storage.Models;
@@ -52,13 +47,13 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
         {
             public IdentityResourceMappingConfiguration()
             {
-                CreateMap<IdentityResourceInputModel, XpoIdentityResource>()
+                _ = CreateMap<IdentityResourceInputModel, XpoIdentityResource>()
                     .ForMember(api => api.UserClaims, o => o.Ignore())
                     .ForMember(api => api.Properties, o => o.Ignore())
                     .ReverseMap()
                 ;
 
-                CreateMap<PropertiesOutputModel, XpoIdentityResourceProperty>()
+                _ = CreateMap<PropertiesOutputModel, XpoIdentityResourceProperty>()
                     .ReverseMap();
             }
         }
@@ -97,7 +92,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
             Input = Mapper.Map<IdentityResourceInputModel>(apiResource);
 
             Input.UserClaims = string.Join(",", apiResource.UserClaims.Select(userClaim => userClaim.Type));
-            Properties = apiResource.Properties.Select(propertey => Mapper.Map<PropertiesOutputModel>(propertey)).ToList();
+            Properties = apiResource.Properties.Select(Mapper.Map<PropertiesOutputModel>).ToList();
 
             return Page();
         }
@@ -121,7 +116,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.IdentityResources
 
                     foreach (var userClaim in identityResource.UserClaims.ToList())
                     {
-                        identityResource.UserClaims.Remove(userClaim);
+                        _ = identityResource.UserClaims.Remove(userClaim);
                     }
 
                     var userClaimsString = string.IsNullOrEmpty(Input.UserClaims) ? string.Empty : Input.UserClaims;

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading;
 
 using DevExpress.Xpo;
@@ -24,7 +22,10 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
         {
             var dataLayer = XpoDefault.GetDataLayer(connectionString, DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema);
 
-            UnitOfWork unitOfWorkFactory() => new UnitOfWork(dataLayer);
+            UnitOfWork unitOfWorkFactory()
+            {
+                return new UnitOfWork(dataLayer);
+            }
 
             (XPRoleStore<IdentityRole, string, IdentityUserRole<string>, IdentityRoleClaim<string>, XpoIdentityRole, XpoIdentityUser, XpoIdentityRoleClaim> store, UnitOfWork uow) CreateStore()
             {
@@ -45,14 +46,17 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 return (store, uow);
             }
 
-            XpoIdentityRole CreateRole(UnitOfWork uow, string id = null) => new XpoIdentityRole(uow)
+            XpoIdentityRole CreateRole(UnitOfWork uow, string id = null)
             {
-                Id = id ?? Guid.NewGuid().ToString(),
-                Name = Guid.NewGuid().ToString(),
-                NormalizedName = Guid.NewGuid().ToString(),
-            };
+                return new XpoIdentityRole(uow)
+                {
+                    Id = id ?? Guid.NewGuid().ToString(),
+                    Name = Guid.NewGuid().ToString(),
+                    NormalizedName = Guid.NewGuid().ToString(),
+                };
+            }
 
-            It("CreateAsync", async () =>
+            _ = It("CreateAsync", async () =>
             {
                 var id = Guid.NewGuid().ToString();
                 var name = Guid.NewGuid().ToString();
@@ -72,7 +76,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 }
             });
 
-            It("DeleteAsync", async () =>
+            _ = It("DeleteAsync", async () =>
             {
                 using var uow1 = unitOfWorkFactory();
                 var role = CreateRole(uow1);
@@ -87,7 +91,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     {
                         Id = role.Id
                     }, CancellationToken.None);
-                    result.Should().Be(IdentityResult.Success);
+                    _ = result.Should().Be(IdentityResult.Success);
                 }
 
                 using var uow2 = unitOfWorkFactory();
@@ -95,7 +99,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 return roleInDb == null;
             });
 
-            It("UpdateAsync", async () =>
+            _ = It("UpdateAsync", async () =>
             {
                 using var uow1 = unitOfWorkFactory();
                 var role = CreateRole(uow1);
@@ -112,15 +116,15 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         Id = role.Id,
                         Name = newName,
                     }, CancellationToken.None);
-                    result.Should().Be(IdentityResult.Success);
+                    _ = result.Should().Be(IdentityResult.Success);
                 }
 
                 using var uow2 = unitOfWorkFactory();
                 var roleInDb = await uow2.GetObjectByKeyAsync<XpoIdentityRole>(role.Id);
-                roleInDb.Name.Should().Be(newName);
+                _ = roleInDb.Name.Should().Be(newName);
             });
 
-            It("FindByIdAsync", async () =>
+            _ = It("FindByIdAsync", async () =>
             {
                 using var uow1 = unitOfWorkFactory();
                 var role = CreateRole(uow1);
@@ -133,12 +137,12 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 using (store)
                 {
                     var result = await store.FindByIdAsync(role.Id, CancellationToken.None);
-                    result.Should().NotBeNull();
-                    result.Name.Should().Be(role.Name);
+                    _ = result.Should().NotBeNull();
+                    _ = result.Name.Should().Be(role.Name);
                 }
             });
 
-            It("FindByNameAsync", async () =>
+            _ = It("FindByNameAsync", async () =>
             {
                 using var uow1 = unitOfWorkFactory();
                 var role = CreateRole(uow1);
@@ -151,14 +155,14 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 using (store)
                 {
                     var result = await store.FindByNameAsync(role.NormalizedName, CancellationToken.None);
-                    result.Should().NotBeNull();
-                    result.Name.Should().Be(role.Name);
+                    _ = result.Should().NotBeNull();
+                    _ = result.Name.Should().Be(role.Name);
                 }
             });
 
-            Describe("Claims", () =>
+            _ = Describe("Claims", () =>
             {
-                It("Add Claim", async () =>
+                _ = It("Add Claim", async () =>
                 {
                     using var uow1 = unitOfWorkFactory();
                     var role = CreateRole(uow1);
@@ -175,17 +179,17 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         var identityRole = await store.FindByIdAsync(role.Id, CancellationToken.None);
 
                         await store.AddClaimAsync(identityRole, new Claim(claimType, claimValue), CancellationToken.None);
-                        await store.UpdateAsync(identityRole, CancellationToken.None);
+                        _ = await store.UpdateAsync(identityRole, CancellationToken.None);
                     }
 
                     using var uow2 = unitOfWorkFactory();
                     var roleInDb = await uow2.GetObjectByKeyAsync<XpoIdentityRole>(role.Id);
-                    roleInDb.Claims.Should().NotBeEmpty();
-                    roleInDb.Claims.First().Type.Should().Be(claimType);
-                    roleInDb.Claims.First().Value.Should().Be(claimValue);
+                    _ = roleInDb.Claims.Should().NotBeEmpty();
+                    _ = roleInDb.Claims.First().Type.Should().Be(claimType);
+                    _ = roleInDb.Claims.First().Value.Should().Be(claimValue);
                 });
 
-                It("List Claims", async () =>
+                _ = It("List Claims", async () =>
                 {
                     using var uow1 = unitOfWorkFactory();
                     var role = CreateRole(uow1);
@@ -206,13 +210,13 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         var identityRole = await store.FindByIdAsync(role.Id, CancellationToken.None);
 
                         var claims = await store.GetClaimsAsync(identityRole, CancellationToken.None);
-                        claims.Should().NotBeEmpty();
-                        claims.First().Type.Should().Be(claim.Type);
-                        claims.First().Value.Should().Be(claim.Value);
+                        _ = claims.Should().NotBeEmpty();
+                        _ = claims.First().Type.Should().Be(claim.Type);
+                        _ = claims.First().Value.Should().Be(claim.Value);
                     }
                 });
 
-                It("remove Claim", async () =>
+                _ = It("remove Claim", async () =>
                 {
                     using var uow1 = unitOfWorkFactory();
                     var role = CreateRole(uow1);
@@ -234,12 +238,12 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
 
                         await store.RemoveClaimAsync(identityRole, new Claim(claim.Type, claim.Value), CancellationToken.None);
 
-                        await store.UpdateAsync(identityRole, CancellationToken.None);
+                        _ = await store.UpdateAsync(identityRole, CancellationToken.None);
                     }
 
                     using var uow2 = unitOfWorkFactory();
                     var roleInDb = await uow2.GetObjectByKeyAsync<XpoIdentityRole>(role.Id);
-                    roleInDb.Claims.Should().BeEmpty();
+                    _ = roleInDb.Claims.Should().BeEmpty();
                 });
             });
         });

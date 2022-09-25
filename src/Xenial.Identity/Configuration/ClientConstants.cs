@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Xenial.Identity.Configuration
+﻿namespace Xenial.Identity.Configuration
 {
     public static class ClientConstants
     {

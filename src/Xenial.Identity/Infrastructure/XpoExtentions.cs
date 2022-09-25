@@ -1,9 +1,4 @@
-﻿using System.Linq;
-
-using DevExpress.Xpo.DB;
-
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using DevExpress.Xpo.DB;
 
 using Xenial.AspNetIdentity.Xpo.Models;
 using Xenial.Identity.Models;

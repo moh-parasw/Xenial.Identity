@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 using AutoMapper;
 
 using DevExpress.Xpo;
 using DevExpress.Xpo.DB.Exceptions;
 
+using Duende.IdentityServer.Models;
+using Duende.IdentityServer.Stores;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 using Xenial.Identity.Xpo.Storage.Models;
-
-using Duende.IdentityServer.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json.Schema;
-using Duende.IdentityServer.Stores;
 
 namespace Xenial.Identity.Areas.Admin.Pages.Clients
 {
@@ -168,7 +162,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
         {
             public ClientMappingConfiguration()
             {
-                CreateMap<ClientInputModel, XpoClient>()
+                _ = CreateMap<ClientInputModel, XpoClient>()
                     .ForMember(m => m.AllowedScopes, o => o.Ignore())
                     .ForMember(m => m.RedirectUris, o => o.Ignore())
                     .ForMember(m => m.AllowedGrantTypes, o => o.Ignore())
@@ -184,13 +178,13 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
                     .ForMember(m => m.IdentityProviderRestrictions, o => o.Ignore())
                 ;
 
-                CreateMap<SecretsOutputModel, XpoClientSecret>()
+                _ = CreateMap<SecretsOutputModel, XpoClientSecret>()
                     .ReverseMap();
 
-                CreateMap<PropertiesOutputModel, XpoClientProperty>()
+                _ = CreateMap<PropertiesOutputModel, XpoClientProperty>()
                     .ReverseMap();
 
-                CreateMap<ClaimsOutputModel, XpoClientClaim>()
+                _ = CreateMap<ClaimsOutputModel, XpoClientClaim>()
                     .ReverseMap();
             }
         }
@@ -243,9 +237,9 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
 
         private void FetchSubLists(XpoClient client)
         {
-            Secrets = client.ClientSecrets.Select(secret => Mapper.Map<SecretsOutputModel>(secret)).ToList();
-            Properties = client.Properties.Select(property => Mapper.Map<PropertiesOutputModel>(property)).ToList();
-            Claims = client.Claims.Select(claim => Mapper.Map<ClaimsOutputModel>(claim)).ToList();
+            Secrets = client.ClientSecrets.Select(Mapper.Map<SecretsOutputModel>).ToList();
+            Properties = client.Properties.Select(Mapper.Map<PropertiesOutputModel>).ToList();
+            Claims = client.Claims.Select(Mapper.Map<ClaimsOutputModel>).ToList();
         }
 
         internal class Tag

@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-
-namespace Xenial.Identity.Infrastructure
+﻿namespace Xenial.Identity.Infrastructure
 {
     public class EnumRouteConstraint<TEnum> : IRouteConstraint
         where TEnum : struct, Enum

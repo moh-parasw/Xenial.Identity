@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 using DevExpress.Xpo;
 
-using FluentAssertions;
-
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Stores;
 using Duende.IdentityServer.Test;
+
+using FluentAssertions;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,29 +30,29 @@ namespace Xenial.Identity.Xpo.Storage.Tests.TokenCleanup
             TokenCleanupService CreateSut()
             {
                 IServiceCollection services = new ServiceCollection();
-                services.AddIdentityServer()
+                _ = services.AddIdentityServer()
                     .AddTestUsers(new List<TestUser>())
                     .AddInMemoryClients(new List<Client>())
                     .AddInMemoryIdentityResources(new List<IdentityResource>())
                     .AddInMemoryApiResources(new List<ApiResource>());
 
-                services.AddTransient(_ =>
+                _ = services.AddTransient(_ =>
                 {
                     var uow = new UnitOfWork(dataLayer);
                     uow.UpdateSchema();
                     return uow;
                 });
 
-                services.AddTransient<IPersistedGrantStore, PersistedGrantStore>();
-                services.AddTransient<IDeviceFlowStore, DeviceFlowStore>();
+                _ = services.AddTransient<IPersistedGrantStore, PersistedGrantStore>();
+                _ = services.AddTransient<IDeviceFlowStore, DeviceFlowStore>();
 
-                services.AddTransient<TokenCleanupService>();
-                services.AddSingleton(storeOptions);
+                _ = services.AddTransient<TokenCleanupService>();
+                _ = services.AddSingleton(storeOptions);
 
                 return services.BuildServiceProvider().GetRequiredService<TokenCleanupService>();
             }
 
-            It("RemoveExpiredGrantsAsync when expired grants exist should remove expired grants", async () =>
+            _ = It("RemoveExpiredGrantsAsync when expired grants exist should remove expired grants", async () =>
             {
                 var key = Guid.NewGuid().ToString();
                 using (var uow1 = new UnitOfWork(dataLayer))
@@ -73,15 +73,13 @@ namespace Xenial.Identity.Xpo.Storage.Tests.TokenCleanup
 
                 await CreateSut().RemoveExpiredGrantsAsync();
 
-                using (var uow2 = new UnitOfWork(dataLayer))
-                {
-                    (await uow2.Query<XpoPersistedGrant>()
-                        .FirstOrDefaultAsync(x => x.Key == key)
-                    ).Should().BeNull();
-                }
+                using var uow2 = new UnitOfWork(dataLayer);
+                _ = (await uow2.Query<XpoPersistedGrant>()
+                    .FirstOrDefaultAsync(x => x.Key == key)
+                ).Should().BeNull();
             });
 
-            It("RemoveExpiredGrantsAsync when valid Grants exist expect valid Grants in Db", async () =>
+            _ = It("RemoveExpiredGrantsAsync when valid Grants exist expect valid Grants in Db", async () =>
             {
                 var key = Guid.NewGuid().ToString();
 
@@ -103,15 +101,13 @@ namespace Xenial.Identity.Xpo.Storage.Tests.TokenCleanup
 
                 await CreateSut().RemoveExpiredGrantsAsync();
 
-                using (var uow2 = new UnitOfWork(dataLayer))
-                {
-                    (await uow2.Query<XpoPersistedGrant>()
-                        .FirstOrDefaultAsync(x => x.Key == key)
-                    ).Should().NotBeNull();
-                }
+                using var uow2 = new UnitOfWork(dataLayer);
+                _ = (await uow2.Query<XpoPersistedGrant>()
+                    .FirstOrDefaultAsync(x => x.Key == key)
+                ).Should().NotBeNull();
             });
 
-            It("RemoveExpiredGrantsAsync when expired DeviceGrants exist expect expired DeviceGrants to be removed", async () =>
+            _ = It("RemoveExpiredGrantsAsync when expired DeviceGrants exist expect expired DeviceGrants to be removed", async () =>
             {
                 var deviceCode = Guid.NewGuid().ToString();
 
@@ -133,15 +129,13 @@ namespace Xenial.Identity.Xpo.Storage.Tests.TokenCleanup
 
                 await CreateSut().RemoveExpiredGrantsAsync();
 
-                using (var uow2 = new UnitOfWork(dataLayer))
-                {
-                    (await uow2.Query<XpoDeviceFlowCodes>()
-                        .FirstOrDefaultAsync(x => x.DeviceCode == deviceCode)
-                    ).Should().BeNull();
-                }
+                using var uow2 = new UnitOfWork(dataLayer);
+                _ = (await uow2.Query<XpoDeviceFlowCodes>()
+                    .FirstOrDefaultAsync(x => x.DeviceCode == deviceCode)
+                ).Should().BeNull();
             });
 
-            It("RemoveExpiredGrantsAsync when valid DeviceGrants exist expect valid DeviceGrants to be in Db", async () =>
+            _ = It("RemoveExpiredGrantsAsync when valid DeviceGrants exist expect valid DeviceGrants to be in Db", async () =>
             {
                 var deviceCode = Guid.NewGuid().ToString();
                 using (var uow1 = new UnitOfWork(dataLayer))
@@ -162,12 +156,10 @@ namespace Xenial.Identity.Xpo.Storage.Tests.TokenCleanup
 
                 await CreateSut().RemoveExpiredGrantsAsync();
 
-                using (var uow2 = new UnitOfWork(dataLayer))
-                {
-                    (await uow2.Query<XpoDeviceFlowCodes>()
-                        .FirstOrDefaultAsync(x => x.DeviceCode == deviceCode)
-                    ).Should().NotBeNull();
-                }
+                using var uow2 = new UnitOfWork(dataLayer);
+                _ = (await uow2.Query<XpoDeviceFlowCodes>()
+                    .FirstOrDefaultAsync(x => x.DeviceCode == deviceCode)
+                ).Should().NotBeNull();
             });
         });
     }

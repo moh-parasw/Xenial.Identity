@@ -12,10 +12,7 @@ namespace Xenial.Identity.Quickstart.Home
         {
         }
 
-        public ErrorViewModel(string error)
-        {
-            Error = new ErrorMessage { Error = error };
-        }
+        public ErrorViewModel(string error) => Error = new ErrorMessage { Error = error };
 
         public ErrorMessage Error { get; set; }
     }

@@ -160,7 +160,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 .ProjectTo<TUser>(MapperConfiguration);
 
         #region CRUD
-        public async override Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken)
+        public override async Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -183,7 +183,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
 
-        public async override Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken)
+        public override async Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -209,7 +209,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
 
-        public async override Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken)
+        public override async Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -248,7 +248,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         public override Task<TUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
             => FindUserAsync(ConvertIdFromString(userId), cancellationToken);
 
-        protected async override Task<TUser> FindUserAsync(TKey userId, CancellationToken cancellationToken)
+        protected override async Task<TUser> FindUserAsync(TKey userId, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -264,7 +264,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
             catch (Exception ex)
             {
-                HandleGenericException("find by Id", ex);
+                _ = HandleGenericException("find by Id", ex);
             }
             return null;
         }
@@ -272,7 +272,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         protected virtual CriteriaOperator CreateUserNameCriteria(string normalizedUserName)
             => new BinaryOperator("NormalizedUserName", normalizedUserName, BinaryOperatorType.Equal);
 
-        public async override Task<TUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        public override async Task<TUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -292,7 +292,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
             catch (Exception ex)
             {
-                HandleGenericException("find by Name", ex);
+                _ = HandleGenericException("find by Name", ex);
             }
             return null;
         }
@@ -300,7 +300,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         protected virtual CriteriaOperator CreateEmailCriteria(string normalizedEmail)
             => new BinaryOperator("NormalizedEmail", normalizedEmail, BinaryOperatorType.Equal);
 
-        public async override Task<TUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken = default)
+        public override async Task<TUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -320,7 +320,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
             catch (Exception ex)
             {
-                HandleGenericException("find by Name", ex);
+                _ = HandleGenericException("find by Name", ex);
             }
             return null;
         }
@@ -329,7 +329,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         #region Logins
 
-        public async override Task AddLoginAsync(
+        public override async Task AddLoginAsync(
             TUser user,
             UserLoginInfo login,
             CancellationToken cancellationToken = default
@@ -363,7 +363,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             await UnitOfWork.SaveAsync(persistentLogin, cancellationToken);
         }
 
-        protected async override Task<TUserLogin> FindUserLoginAsync(
+        protected override async Task<TUserLogin> FindUserLoginAsync(
             TKey userId,
             string loginProvider,
             string providerKey,
@@ -404,7 +404,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 new BinaryOperator(new OperandProperty(userPropertyName), new OperandValue(userKey), BinaryOperatorType.Equal)
             );
 
-        protected async override Task<TUserLogin> FindUserLoginAsync(
+        protected override async Task<TUserLogin> FindUserLoginAsync(
             string loginProvider,
             string providerKey,
             CancellationToken cancellationToken
@@ -425,7 +425,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             return null;
         }
 
-        public async override Task RemoveLoginAsync(
+        public override async Task RemoveLoginAsync(
             TUser user,
             string loginProvider,
             string providerKey,
@@ -452,7 +452,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
 
-        public async override Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user, CancellationToken cancellationToken = default)
+        public override async Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -480,7 +480,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
         #region Claims
 
-        public async override Task AddClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default)
+        public override async Task AddClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -506,7 +506,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 UnitOfWork.GetClassInfo<TXPUserClaim>().FindMember("User")?.SetValue(persistentClaim, persistentUser);
             }
         }
-        public async override Task<IList<Claim>> GetClaimsAsync(TUser user, CancellationToken cancellationToken = default)
+        public override async Task<IList<Claim>> GetClaimsAsync(TUser user, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -542,7 +542,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 new BinaryOperator(new OperandProperty("Value"), new OperandValue(claimValue), BinaryOperatorType.Equal)
             );
 
-        public async override Task ReplaceClaimAsync(TUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken = default)
+        public override async Task ReplaceClaimAsync(TUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -573,7 +573,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
 
-        public async override Task RemoveClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default)
+        public override async Task RemoveClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -597,7 +597,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
 
-        public async override Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default)
+        public override async Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -614,7 +614,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
             var users = collection
                 .Select(c => memberInfo.GetValue(c))
-                .Select(u => mapper.Map<TUser>(u))
+                .Select(mapper.Map<TUser>)
                 .ToList();
 
             return users;
@@ -631,7 +631,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 new BinaryOperator(new OperandProperty("Name"), new OperandValue(name), BinaryOperatorType.Equal)
             );
 
-        protected async override Task<TUserToken> FindTokenAsync(
+        protected override async Task<TUserToken> FindTokenAsync(
             TUser user,
             string loginProvider,
             string name,
@@ -660,7 +660,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             return null;
         }
 
-        protected async override Task AddUserTokenAsync(TUserToken token)
+        protected override async Task AddUserTokenAsync(TUserToken token)
         {
             var user = await UnitOfWork.GetObjectByKeyAsync<TXPUser>(token.UserId);
             if (user == null)
@@ -678,7 +678,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             await UnitOfWork.SaveAsync(persistentToken);
         }
 
-        protected async override Task RemoveUserTokenAsync(TUserToken token)
+        protected override async Task RemoveUserTokenAsync(TUserToken token)
         {
             var userPropertyName = $"User.{UnitOfWork.GetClassInfo(typeof(TXPUser)).KeyProperty}";
             var persistentToken = await UnitOfWork.FindObjectAsync<TXPUserToken>(
@@ -726,14 +726,14 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
 
-        protected async virtual Task UpdateUserTokenAsync(TUserToken token)
+        protected virtual async Task UpdateUserTokenAsync(TUserToken token)
         {
             var userPropertyName = $"User.{UnitOfWork.GetClassInfo(typeof(TXPUser)).KeyProperty}";
             var persistentToken = await UnitOfWork.FindObjectAsync<TXPUserToken>(CreateTokenCriteria(userPropertyName, token.UserId, token.LoginProvider, token.Name));
             if (persistentToken != null)
             {
                 var mapper = MapperConfiguration.CreateMapper();
-                mapper.Map(token, persistentToken);
+                _ = mapper.Map(token, persistentToken);
                 await UnitOfWork.SaveAsync(persistentToken);
             }
         }
@@ -789,7 +789,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
 
             if (rolesInDb is IList<TXPRole> roles)
             {
-                roles.Remove(role);
+                _ = roles.Remove(role);
             }
             await UnitOfWork.SaveAsync(userInDb);
             await UnitOfWork.SaveAsync(role);

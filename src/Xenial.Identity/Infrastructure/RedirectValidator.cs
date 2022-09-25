@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-using Duende.IdentityServer.Models;
+﻿using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Validation;
 
 namespace Xenial.Identity.Infrastructure;
@@ -12,12 +9,7 @@ public class RedirectValidator : StrictRedirectUriValidator
     {
         var result = await base.IsRedirectUriValidAsync(requestedUri, client);
 
-        if (!result && TryIsLocalhost(requestedUri, out var isLocalhost))
-        {
-            return isLocalhost;
-        }
-
-        return result;
+        return !result && TryIsLocalhost(requestedUri, out var isLocalhost) ? isLocalhost : result;
     }
 
     private static bool TryIsLocalhost(string requestedUri, out bool isLocalhost)
@@ -46,11 +38,6 @@ public class RedirectValidator : StrictRedirectUriValidator
     {
         var result = await base.IsPostLogoutRedirectUriValidAsync(requestedUri, client);
 
-        if (!result && TryIsLocalhost(requestedUri, out var isLocalhost))
-        {
-            return isLocalhost;
-        }
-
-        return result;
+        return !result && TryIsLocalhost(requestedUri, out var isLocalhost) ? isLocalhost : result;
     }
 }

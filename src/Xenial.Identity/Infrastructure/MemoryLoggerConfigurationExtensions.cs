@@ -1,12 +1,13 @@
-﻿using Serilog.Configuration;
+﻿using Serilog;
+using Serilog.Configuration;
 using Serilog.Core;
 using Serilog.Events;
-using Serilog.Sinks.SystemConsole.Themes;
-using Xenial.Identity.Infrastructure.Logging.MemoryConsole.Themes;
-using Serilog;
 using Serilog.Formatting;
-using Xenial.Identity.Infrastructure.Logging.MemoryConsole.Output;
+using Serilog.Sinks.SystemConsole.Themes;
+
 using Xenial.Identity.Infrastructure.Logging.MemoryConsole;
+using Xenial.Identity.Infrastructure.Logging.MemoryConsole.Output;
+using Xenial.Identity.Infrastructure.Logging.MemoryConsole.Themes;
 
 #nullable enable
 
@@ -17,7 +18,7 @@ namespace Xenial.Identity.Infrastructure;
 /// </summary>
 public static class MemoryLoggerConfigurationExtensions
 {
-    private static readonly object defaultSyncRoot = new object();
+    private static readonly object defaultSyncRoot = new();
     private const string defaultConsoleOutputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}";
 
     /// <summary>

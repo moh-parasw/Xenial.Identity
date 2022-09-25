@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 using AutoMapper;
 
 using DevExpress.Xpo;
 using DevExpress.Xpo.DB.Exceptions;
 
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 
-using Xenial.Identity.Data;
 using Xenial.Identity.Xpo.Storage.Models;
 
 namespace Xenial.Identity.Areas.Admin.Pages.Clients.Secrets

@@ -46,7 +46,7 @@ public class InMemorySink : IEnumerable<string>, ILogEventSink
     private TextWriter SelectOutputStream()
         => CreateOutputWriter(stream);
 
-    private static readonly MemoryStream stream = new MemoryStream();
+    private static readonly MemoryStream stream = new();
 
     private static TextWriter CreateOutputWriter(Stream outputStream) => TextWriter.Synchronized(outputStream == Stream.Null ?
             StreamWriter.Null :

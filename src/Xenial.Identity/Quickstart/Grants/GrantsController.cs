@@ -2,15 +2,13 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using Duende.IdentityServer.Services;
-using Duende.IdentityServer.Stores;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Duende.IdentityServer.Events;
 using Duende.IdentityServer.Extensions;
+using Duende.IdentityServer.Services;
+using Duende.IdentityServer.Stores;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Xenial.Identity.Quickstart.Grants
 {
@@ -41,10 +39,7 @@ namespace Xenial.Identity.Quickstart.Grants
         /// Show list of grants
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> Index()
-        {
-            return View("Index", await BuildViewModelAsync());
-        }
+        public async Task<IActionResult> Index() => View("Index", await BuildViewModelAsync());
 
         /// <summary>
         /// Handle postback to revoke a client

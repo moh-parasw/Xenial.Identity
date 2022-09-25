@@ -1,15 +1,8 @@
-﻿using System.Security.Cryptography.X509Certificates;
-
-using DevExpress.Xpo;
+﻿using DevExpress.Xpo;
 
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Identity;
 
-using Xenial.Identity.Data;
 using Xenial.Identity.Xpo.Storage.Models;
-
-using static System.Formats.Asn1.AsnWriter;
-using static MudBlazor.CategoryTypes;
 
 namespace Xenial.Identity.Components.Admin;
 
@@ -55,7 +48,7 @@ public partial class Apis
 
                 await UnitOfWork.DeleteAsync(resource);
                 await UnitOfWork.CommitChangesAsync();
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             API was successfully deleted!
@@ -71,7 +64,7 @@ public partial class Apis
             {
                 var errors = ex.Message;
 
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             There was an error when deleting the API!

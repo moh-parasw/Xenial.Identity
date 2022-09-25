@@ -47,6 +47,7 @@
     <ProjectReference Include="..\Xenial.AspNetIdentity.Xpo\Xenial.AspNetIdentity.Xpo.csproj" />
     <ProjectReference Include="..\Xenial.Identity.Channels.Mail.MailKit\Xenial.Identity.Channels.Mail.MailKit.csproj" />
     <ProjectReference Include="..\Xenial.Identity.Channels.SMS.AnySms\Xenial.Identity.Channels.SMS.AnySms.csproj" />
+    <ProjectReference Include="..\Xenial.Identity.Channels.SMS.WebSmsCom\Xenial.Identity.Channels.SMS.WebSmsCom.csproj" />
     <ProjectReference Include="..\Xenial.Identity.Channels\Xenial.Identity.Channels.csproj" />
     <ProjectReference Include="..\Xenial.Identity.Components\Xenial.Identity.Components.csproj" />
     <ProjectReference Include="..\Xenial.Identity.Xpo\Xenial.Identity.Xpo.csproj" />

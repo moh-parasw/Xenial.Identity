@@ -2,11 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 using Duende.IdentityServer.Configuration;
 using Duende.IdentityServer.Events;
 using Duende.IdentityServer.Extensions;
@@ -16,7 +11,6 @@ using Duende.IdentityServer.Validation;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Xenial.Identity.Quickstart.Consent;
@@ -69,12 +63,7 @@ namespace Xenial.Identity.Quickstart.Device
         public async Task<IActionResult> UserCodeCapture(string userCode)
         {
             var vm = await BuildViewModelAsync(userCode);
-            if (vm == null)
-            {
-                return View("Error");
-            }
-
-            return View("UserCodeConfirmation", vm);
+            return vm == null ? View("Error") : (IActionResult)View("UserCodeConfirmation", vm);
         }
 
         [HttpPost]
@@ -87,12 +76,7 @@ namespace Xenial.Identity.Quickstart.Device
             }
 
             var result = await ProcessConsent(model);
-            if (result.HasValidationError)
-            {
-                return View("Error");
-            }
-
-            return View("Success");
+            return result.HasValidationError ? View("Error") : (IActionResult)View("Success");
         }
 
         private async Task<ProcessConsentResult> ProcessConsent(DeviceAuthorizationInputModel model)
@@ -150,7 +134,7 @@ namespace Xenial.Identity.Quickstart.Device
             if (grantedConsent != null)
             {
                 // communicate outcome of consent back to identityserver
-                await interaction.HandleRequestAsync(model.UserCode, grantedConsent);
+                _ = await interaction.HandleRequestAsync(model.UserCode, grantedConsent);
 
                 // indicate that's it ok to redirect back to authorization endpoint
                 result.RedirectUri = model.ReturnUrl;
@@ -168,12 +152,7 @@ namespace Xenial.Identity.Quickstart.Device
         private async Task<DeviceAuthorizationViewModel> BuildViewModelAsync(string userCode, DeviceAuthorizationInputModel model = null)
         {
             var request = await interaction.GetAuthorizationContextAsync(userCode);
-            if (request != null)
-            {
-                return CreateConsentViewModel(userCode, model, request);
-            }
-
-            return null;
+            return request != null ? CreateConsentViewModel(userCode, model, request) : null;
         }
 
         private DeviceAuthorizationViewModel CreateConsentViewModel(string userCode, DeviceAuthorizationInputModel model, DeviceFlowAuthorizationRequest request)
@@ -214,7 +193,7 @@ namespace Xenial.Identity.Quickstart.Device
         }
 
         private ScopeViewModel CreateScopeViewModel(IdentityResource identity, bool check)
-            => new ScopeViewModel
+            => new()
             {
                 Value = identity.Name,
                 DisplayName = identity.DisplayName ?? identity.Name,
@@ -225,7 +204,7 @@ namespace Xenial.Identity.Quickstart.Device
             };
 
         public ScopeViewModel CreateScopeViewModel(ParsedScopeValue parsedScopeValue, ApiScope apiScope, bool check)
-            => new ScopeViewModel
+            => new()
             {
                 Value = parsedScopeValue.RawValue,
                 // todo: use the parsed scope value in the display?
@@ -237,7 +216,7 @@ namespace Xenial.Identity.Quickstart.Device
             };
 
         private ScopeViewModel GetOfflineAccessScope(bool check)
-            => new ScopeViewModel
+            => new()
             {
                 Value = Duende.IdentityServer.IdentityServerConstants.StandardScopes.OfflineAccess,
                 DisplayName = ConsentOptions.OfflineAccessDisplayName,

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using DevExpress.Persistent.Validation;
+﻿using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
 
 namespace Xenial.Identity.Xpo.Storage.Models

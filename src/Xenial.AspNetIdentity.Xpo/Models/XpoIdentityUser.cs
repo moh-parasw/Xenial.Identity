@@ -1,12 +1,4 @@
-﻿using System;
-using System.Security.Claims;
-
-using DevExpress.Xpo;
-
-
-using Microsoft.AspNetCore.Identity;
-
-using Xenial.AspNetIdentity.Xpo;
+﻿using DevExpress.Xpo;
 
 namespace Xenial.AspNetIdentity.Xpo.Models
 {

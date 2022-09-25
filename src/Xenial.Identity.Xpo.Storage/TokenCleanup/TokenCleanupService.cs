@@ -72,7 +72,7 @@ namespace Xenial.Identity.Xpo.Storage.TokenCleanup
         /// <returns></returns>
         protected virtual async Task RemoveGrantsAsync()
         {
-            var found = Int32.MaxValue;
+            var found = int.MaxValue;
 
             while (found >= options.TokenCleanupBatchSize)
             {
@@ -105,7 +105,7 @@ namespace Xenial.Identity.Xpo.Storage.TokenCleanup
         /// <returns></returns>
         protected virtual async Task RemoveDeviceCodesAsync()
         {
-            var found = Int32.MaxValue;
+            var found = int.MaxValue;
 
             while (found >= options.TokenCleanupBatchSize)
             {

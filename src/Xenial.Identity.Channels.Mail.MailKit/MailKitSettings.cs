@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Xenial.Identity.Channels.Mail.MailKit;
+﻿namespace Xenial.Identity.Channels;
 
 public record MailKitSettings
 {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 using DevExpress.Xpo;
 
@@ -140,7 +136,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Users
                             StatusMessage = "Error updating roles";
                             return Page();
                         }
-                        var roleNames = Input.Roles.Split(",").Select(r => roleManager.NormalizeKey(r));
+                        var roleNames = Input.Roles.Split(",").Select(roleManager.NormalizeKey);
                         try
                         {
                             var rolesResult = await userManager.AddToRolesAsync(user, roleNames);

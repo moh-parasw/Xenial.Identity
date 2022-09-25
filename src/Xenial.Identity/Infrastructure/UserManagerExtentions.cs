@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
 
 using Microsoft.AspNetCore.Identity;
 
@@ -18,11 +14,11 @@ namespace Xenial.Identity.Infrastructure
             if (claims.Any(c => c.Type == newClaim.Type))
             {
                 var claim = claims.First(c => c.Type == newClaim.Type);
-                await userManager.ReplaceClaimAsync(user, claim, newClaim);
+                _ = await userManager.ReplaceClaimAsync(user, claim, newClaim);
             }
             else
             {
-                await userManager.AddClaimAsync(user, newClaim);
+                _ = await userManager.AddClaimAsync(user, newClaim);
             }
         }
 
@@ -32,7 +28,7 @@ namespace Xenial.Identity.Infrastructure
             if (claims.Any(c => c.Type == claimType))
             {
                 var claim = claims.First(c => c.Type == claimType);
-                await userManager.RemoveClaimAsync(user, claim);
+                _ = await userManager.RemoveClaimAsync(user, claim);
             }
         }
     }

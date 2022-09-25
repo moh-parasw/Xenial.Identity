@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-using AutoMapper.QueryableExtensions;
-
-using DevExpress.Xpo;
+﻿using DevExpress.Xpo;
 
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 using Xenial.Identity.Areas.Identity.Pages.Account.Manage;

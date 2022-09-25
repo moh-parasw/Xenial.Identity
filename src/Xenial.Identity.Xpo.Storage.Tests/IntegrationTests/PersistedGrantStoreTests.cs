@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 using DevExpress.Xpo;
 
-using FluentAssertions;
-
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Stores;
+
+using FluentAssertions;
 
 using Xenial.Identity.Xpo.Storage.Mappers;
 using Xenial.Identity.Xpo.Storage.Models;
@@ -35,7 +33,8 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
             }
 
             static PersistedGrant CreateTestObject(string sub = null, string clientId = null, string sid = null, string type = null)
-                => new PersistedGrant
+            {
+                return new PersistedGrant
                 {
                     Key = Guid.NewGuid().ToString(),
                     Type = type ?? "authorization_code",
@@ -46,8 +45,9 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                     Expiration = new DateTime(2016, 08, 31),
                     Data = Guid.NewGuid().ToString()
                 };
+            }
 
-            It("StoreAsync when PersistedGrant is stored should succeed", async () =>
+            _ = It("StoreAsync when PersistedGrant is stored should succeed", async () =>
             {
                 var persistedGrant = CreateTestObject();
 
@@ -57,14 +57,12 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                     await store.StoreAsync(persistedGrant);
                 }
 
-                using (var uow1 = new UnitOfWork(dataLayer))
-                {
-                    var foundGrant = await uow1.Query<XpoPersistedGrant>().FirstOrDefaultAsync(x => x.Key == persistedGrant.Key);
-                    foundGrant.Should().NotBeNull();
-                }
+                using var uow1 = new UnitOfWork(dataLayer);
+                var foundGrant = await uow1.Query<XpoPersistedGrant>().FirstOrDefaultAsync(x => x.Key == persistedGrant.Key);
+                _ = foundGrant.Should().NotBeNull();
             });
 
-            It("GetAsync with Key and existing PersistedGrant expect PersistedGrant to be returned", async () =>
+            _ = It("GetAsync with Key and existing PersistedGrant expect PersistedGrant to be returned", async () =>
             {
                 var persistedGrant = CreateTestObject();
 
@@ -78,11 +76,11 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 using (uow)
                 {
                     var foundPersistedGrant = await store.GetAsync(persistedGrant.Key);
-                    foundPersistedGrant.Should().NotBeNull();
+                    _ = foundPersistedGrant.Should().NotBeNull();
                 }
             });
 
-            It("GetAllAsync with Sub and Type and existing PersistedGrant expect PersistedGrant to be returned", async () =>
+            _ = It("GetAllAsync with Sub and Type and existing PersistedGrant expect PersistedGrant to be returned", async () =>
             {
                 var persistedGrant = CreateTestObject();
 
@@ -96,12 +94,12 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 using (uow)
                 {
                     var foundPersistedGrants = (await store.GetAllAsync(new PersistedGrantFilter { SubjectId = persistedGrant.SubjectId })).ToList();
-                    foundPersistedGrants.Should().NotBeNull();
-                    foundPersistedGrants.Should().NotBeEmpty();
+                    _ = foundPersistedGrants.Should().NotBeNull();
+                    _ = foundPersistedGrants.Should().NotBeEmpty();
                 }
             });
 
-            It("GetAllAsync should filter", async () =>
+            _ = It("GetAllAsync should filter", async () =>
             {
                 using (var uow1 = new UnitOfWork(dataLayer))
                 {
@@ -121,54 +119,54 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 var (store, uow) = CreateStore();
                 using (uow)
                 {
-                    (await store.GetAllAsync(new PersistedGrantFilter
+                    _ = (await store.GetAllAsync(new PersistedGrantFilter
                     {
                         SubjectId = "sub1"
                     })).ToList().Count.Should().Be(9);
-                    (await store.GetAllAsync(new PersistedGrantFilter
+                    _ = (await store.GetAllAsync(new PersistedGrantFilter
                     {
                         SubjectId = "sub2"
                     })).ToList().Count.Should().Be(0);
-                    (await store.GetAllAsync(new PersistedGrantFilter
+                    _ = (await store.GetAllAsync(new PersistedGrantFilter
                     {
                         SubjectId = "sub1",
                         ClientId = "c1"
                     })).ToList().Count.Should().Be(4);
-                    (await store.GetAllAsync(new PersistedGrantFilter
+                    _ = (await store.GetAllAsync(new PersistedGrantFilter
                     {
                         SubjectId = "sub1",
                         ClientId = "c2"
                     })).ToList().Count.Should().Be(4);
-                    (await store.GetAllAsync(new PersistedGrantFilter
+                    _ = (await store.GetAllAsync(new PersistedGrantFilter
                     {
                         SubjectId = "sub1",
                         ClientId = "c3"
                     })).ToList().Count.Should().Be(1);
-                    (await store.GetAllAsync(new PersistedGrantFilter
+                    _ = (await store.GetAllAsync(new PersistedGrantFilter
                     {
                         SubjectId = "sub1",
                         ClientId = "c4"
                     })).ToList().Count.Should().Be(0);
-                    (await store.GetAllAsync(new PersistedGrantFilter
+                    _ = (await store.GetAllAsync(new PersistedGrantFilter
                     {
                         SubjectId = "sub1",
                         ClientId = "c1",
                         SessionId = "s1"
                     })).ToList().Count.Should().Be(2);
-                    (await store.GetAllAsync(new PersistedGrantFilter
+                    _ = (await store.GetAllAsync(new PersistedGrantFilter
                     {
                         SubjectId = "sub1",
                         ClientId = "c3",
                         SessionId = "s1"
                     })).ToList().Count.Should().Be(0);
-                    (await store.GetAllAsync(new PersistedGrantFilter
+                    _ = (await store.GetAllAsync(new PersistedGrantFilter
                     {
                         SubjectId = "sub1",
                         ClientId = "c1",
                         SessionId = "s1",
                         Type = "t1"
                     })).ToList().Count.Should().Be(1);
-                    (await store.GetAllAsync(new PersistedGrantFilter
+                    _ = (await store.GetAllAsync(new PersistedGrantFilter
                     {
                         SubjectId = "sub1",
                         ClientId = "c1",
@@ -178,7 +176,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 }
             });
 
-            It("RemoveAsync when Key of existing received should be deleted", async () =>
+            _ = It("RemoveAsync when Key of existing received should be deleted", async () =>
             {
                 var persistedGrant = CreateTestObject();
 
@@ -194,15 +192,13 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                     await store.RemoveAsync(persistedGrant.Key);
                 }
 
-                using (var uow2 = new UnitOfWork(dataLayer))
-                {
-                    var foundGrant = await uow2.Query<XpoPersistedGrant>().FirstOrDefaultAsync(x => x.Key == persistedGrant.Key);
+                using var uow2 = new UnitOfWork(dataLayer);
+                var foundGrant = await uow2.Query<XpoPersistedGrant>().FirstOrDefaultAsync(x => x.Key == persistedGrant.Key);
 
-                    foundGrant.Should().BeNull();
-                }
+                _ = foundGrant.Should().BeNull();
             });
 
-            It("RemoveAllAsync when SubId and ClientId of existing received should be deleted", async () =>
+            _ = It("RemoveAllAsync when SubId and ClientId of existing received should be deleted", async () =>
             {
                 var persistedGrant = CreateTestObject();
 
@@ -222,15 +218,13 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                     });
                 }
 
-                using (var uow2 = new UnitOfWork(dataLayer))
-                {
-                    var foundGrant = await uow2.Query<XpoPersistedGrant>().FirstOrDefaultAsync(x => x.Key == persistedGrant.Key);
+                using var uow2 = new UnitOfWork(dataLayer);
+                var foundGrant = await uow2.Query<XpoPersistedGrant>().FirstOrDefaultAsync(x => x.Key == persistedGrant.Key);
 
-                    foundGrant.Should().BeNull();
-                }
+                _ = foundGrant.Should().BeNull();
             });
 
-            It("RemoveAllAsync when SubId, ClientId and Type of existing received should be deleted", async () =>
+            _ = It("RemoveAllAsync when SubId, ClientId and Type of existing received should be deleted", async () =>
             {
                 var persistedGrant = CreateTestObject();
 
@@ -251,33 +245,29 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                     });
                 }
 
-                using (var uow2 = new UnitOfWork(dataLayer))
-                {
-                    var foundGrant = await uow2.Query<XpoPersistedGrant>().FirstOrDefaultAsync(x => x.Key == persistedGrant.Key);
+                using var uow2 = new UnitOfWork(dataLayer);
+                var foundGrant = await uow2.Query<XpoPersistedGrant>().FirstOrDefaultAsync(x => x.Key == persistedGrant.Key);
 
-                    foundGrant.Should().BeNull();
-                }
+                _ = foundGrant.Should().BeNull();
             });
 
-            It("RemoveAllAsync should filter", async () =>
+            _ = It("RemoveAllAsync should filter", async () =>
             {
                 async Task PopulateDb()
                 {
-                    using (var uow = new UnitOfWork(dataLayer))
-                    {
-                        await uow.DeleteAsync(await uow.Query<XpoPersistedGrant>().ToListAsync());
-                        await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c1", sid: "s1", type: "t1").ToEntity(uow));
-                        await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c1", sid: "s1", type: "t2").ToEntity(uow));
-                        await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c1", sid: "s2", type: "t1").ToEntity(uow));
-                        await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c1", sid: "s2", type: "t2").ToEntity(uow));
-                        await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c2", sid: "s1", type: "t1").ToEntity(uow));
-                        await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c2", sid: "s1", type: "t2").ToEntity(uow));
-                        await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c2", sid: "s2", type: "t1").ToEntity(uow));
-                        await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c2", sid: "s2", type: "t2").ToEntity(uow));
-                        await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c3", sid: "s3", type: "t3").ToEntity(uow));
-                        await uow.SaveAsync(CreateTestObject().ToEntity(uow));
-                        await uow.CommitChangesAsync();
-                    }
+                    using var uow = new UnitOfWork(dataLayer);
+                    await uow.DeleteAsync(await uow.Query<XpoPersistedGrant>().ToListAsync());
+                    await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c1", sid: "s1", type: "t1").ToEntity(uow));
+                    await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c1", sid: "s1", type: "t2").ToEntity(uow));
+                    await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c1", sid: "s2", type: "t1").ToEntity(uow));
+                    await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c1", sid: "s2", type: "t2").ToEntity(uow));
+                    await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c2", sid: "s1", type: "t1").ToEntity(uow));
+                    await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c2", sid: "s1", type: "t2").ToEntity(uow));
+                    await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c2", sid: "s2", type: "t1").ToEntity(uow));
+                    await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c2", sid: "s2", type: "t2").ToEntity(uow));
+                    await uow.SaveAsync(CreateTestObject(sub: "sub1", clientId: "c3", sid: "s3", type: "t3").ToEntity(uow));
+                    await uow.SaveAsync(CreateTestObject().ToEntity(uow));
+                    await uow.CommitChangesAsync();
                 }
 
                 await PopulateDb();
@@ -289,7 +279,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                         SubjectId = "sub1"
                     });
 
-                    (await uow1.Query<XpoPersistedGrant>().CountAsync()).Should().Be(1);
+                    _ = (await uow1.Query<XpoPersistedGrant>().CountAsync()).Should().Be(1);
                 }
 
                 await PopulateDb();
@@ -300,7 +290,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                     {
                         SubjectId = "sub2"
                     });
-                    (await uow2.Query<XpoPersistedGrant>().CountAsync()).Should().Be(10);
+                    _ = (await uow2.Query<XpoPersistedGrant>().CountAsync()).Should().Be(10);
                 }
 
                 await PopulateDb();
@@ -312,7 +302,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                         SubjectId = "sub1",
                         ClientId = "c1"
                     });
-                    (await uow3.Query<XpoPersistedGrant>().CountAsync()).Should().Be(6);
+                    _ = (await uow3.Query<XpoPersistedGrant>().CountAsync()).Should().Be(6);
                 }
 
                 await PopulateDb();
@@ -324,7 +314,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                         SubjectId = "sub1",
                         ClientId = "c2"
                     });
-                    (await uow4.Query<XpoPersistedGrant>().CountAsync()).Should().Be(6);
+                    _ = (await uow4.Query<XpoPersistedGrant>().CountAsync()).Should().Be(6);
                 }
 
                 await PopulateDb();
@@ -336,7 +326,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                         SubjectId = "sub1",
                         ClientId = "c3"
                     });
-                    (await uow5.Query<XpoPersistedGrant>().CountAsync()).Should().Be(9);
+                    _ = (await uow5.Query<XpoPersistedGrant>().CountAsync()).Should().Be(9);
                 }
 
 
@@ -349,7 +339,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                         SubjectId = "sub1",
                         ClientId = "c4"
                     });
-                    (await uow6.Query<XpoPersistedGrant>().CountAsync()).Should().Be(10);
+                    _ = (await uow6.Query<XpoPersistedGrant>().CountAsync()).Should().Be(10);
                 }
 
                 await PopulateDb();
@@ -362,7 +352,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                         ClientId = "c1",
                         SessionId = "s1"
                     });
-                    (await uow7.Query<XpoPersistedGrant>().CountAsync()).Should().Be(8);
+                    _ = (await uow7.Query<XpoPersistedGrant>().CountAsync()).Should().Be(8);
                 }
 
                 await PopulateDb();
@@ -375,7 +365,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                         ClientId = "c3",
                         SessionId = "s1"
                     });
-                    (await uow8.Query<XpoPersistedGrant>().CountAsync()).Should().Be(10);
+                    _ = (await uow8.Query<XpoPersistedGrant>().CountAsync()).Should().Be(10);
                 }
 
                 await PopulateDb();
@@ -389,7 +379,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                         SessionId = "s1",
                         Type = "t1"
                     });
-                    (await uow9.Query<XpoPersistedGrant>().CountAsync()).Should().Be(9);
+                    _ = (await uow9.Query<XpoPersistedGrant>().CountAsync()).Should().Be(9);
                 }
 
                 await PopulateDb();
@@ -403,12 +393,12 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                         SessionId = "s1",
                         Type = "t3"
                     });
-                    (await uow10.Query<XpoPersistedGrant>().CountAsync()).Should().Be(10);
+                    _ = (await uow10.Query<XpoPersistedGrant>().CountAsync()).Should().Be(10);
                 }
             });
 
 
-            It("Store should create new record if key does not exist", async () =>
+            _ = It("Store should create new record if key does not exist", async () =>
             {
                 var persistedGrant = CreateTestObject();
 
@@ -416,7 +406,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 {
                     var foundGrant = await uow1.Query<XpoPersistedGrant>().FirstOrDefaultAsync(x => x.Key == persistedGrant.Key);
 
-                    foundGrant.Should().BeNull();
+                    _ = foundGrant.Should().BeNull();
                 }
 
                 var (store, uow) = CreateStore();
@@ -429,11 +419,11 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 {
                     var foundGrant = await uow2.Query<XpoPersistedGrant>().FirstOrDefaultAsync(x => x.Key == persistedGrant.Key);
 
-                    foundGrant.Should().NotBeNull();
+                    _ = foundGrant.Should().NotBeNull();
                 }
             });
 
-            It("Store should update record if key already exists", async () =>
+            _ = It("Store should update record if key already exists", async () =>
             {
                 var persistedGrant = CreateTestObject();
 
@@ -451,12 +441,10 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                     await store.StoreAsync(persistedGrant);
                 }
 
-                using (var uow2 = new UnitOfWork(dataLayer))
-                {
-                    var foundGrant = await uow2.Query<XpoPersistedGrant>().FirstOrDefaultAsync(x => x.Key == persistedGrant.Key);
-                    foundGrant.Should().NotBeNull();
-                    foundGrant.Expiration.Should().Be(newDate);
-                }
+                using var uow2 = new UnitOfWork(dataLayer);
+                var foundGrant = await uow2.Query<XpoPersistedGrant>().FirstOrDefaultAsync(x => x.Key == persistedGrant.Key);
+                _ = foundGrant.Should().NotBeNull();
+                _ = foundGrant.Expiration.Should().Be(newDate);
             });
         });
     }

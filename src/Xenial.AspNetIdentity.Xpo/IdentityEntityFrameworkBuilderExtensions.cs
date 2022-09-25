@@ -33,7 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new InvalidOperationException("AddXpoStores can only be called with a user that derives from IdentityUser<TKey>.");
             }
 
-            var keyType = identityUserType.GenericTypeArguments[0];
+            _ = identityUserType.GenericTypeArguments[0];
 
             if (roleType != null)
             {

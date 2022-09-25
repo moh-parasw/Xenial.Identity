@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using Xenial.Identity.Xpo.Storage.Options;
 using Xenial.Identity.Xpo.Storage.TokenCleanup;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Xenial.Identity.Xpo
 {
     /// <summary>
     /// Helper to cleanup expired persisted grants.
@@ -54,7 +53,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-                Task.Factory.StartNew(() => StartInternalAsync(cancellationTokenSource.Token));
+                _ = Task.Factory.StartNew(() => StartInternalAsync(cancellationTokenSource.Token));
             }
 
             return Task.CompletedTask;
@@ -120,11 +119,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             try
             {
-                using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
-                {
-                    var tokenCleanupService = serviceScope.ServiceProvider.GetRequiredService<TokenCleanupService>();
-                    await tokenCleanupService.RemoveExpiredGrantsAsync();
-                }
+                using var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope();
+                var tokenCleanupService = serviceScope.ServiceProvider.GetRequiredService<TokenCleanupService>();
+                await tokenCleanupService.RemoveExpiredGrantsAsync();
             }
             catch (Exception ex)
             {

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 
 using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
@@ -26,7 +24,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
     public class XpoClient : XpoStorageBaseObject
     {
         private XpoClientType clientType;
-        private static readonly Client @default = new Client();
+        private static readonly Client @default = new();
         private string DebuggerDisplay => ClientId ?? $"{{{typeof(Client)}}}";
 
         public XpoClient(Session session) : base(session) { }

@@ -2,9 +2,9 @@
 
 using DevExpress.Xpo;
 
-using FluentAssertions;
-
 using Duende.IdentityServer.Models;
+
+using FluentAssertions;
 
 using Xenial.Identity.Xpo.Storage.Mappers;
 
@@ -16,20 +16,20 @@ namespace Xenial.Identity.Xpo.Storage.Tests.Mappers
     {
         public static void Tests() => Describe(nameof(ScopeMappers), () =>
         {
-            It("Scope Automapper Configuration is valid", () => ScopeMappers.Mapper.ConfigurationProvider.AssertConfigurationIsValid<ScopeMapperProfile>());
+            _ = It("Scope Automapper Configuration is valid", () => ScopeMappers.Mapper.ConfigurationProvider.AssertConfigurationIsValid<ScopeMapperProfile>());
 
-            It("Can map scope", () =>
+            _ = It("Can map scope", () =>
             {
                 using var session = new Session();
                 var model = new ApiScope();
                 var mappedEntity = model.ToEntity(session);
                 var mappedModel = mappedEntity.ToModel();
 
-                mappedModel.Should().NotBeNull();
-                mappedEntity.Should().NotBeNull();
+                _ = mappedModel.Should().NotBeNull();
+                _ = mappedEntity.Should().NotBeNull();
             });
 
-            It("Properties map", () =>
+            _ = It("Properties map", () =>
             {
                 using var session = new Session();
 
@@ -48,28 +48,28 @@ namespace Xenial.Identity.Xpo.Storage.Tests.Mappers
 
 
                 var mappedEntity = model.ToEntity(session);
-                mappedEntity.Description.Should().Be("description");
-                mappedEntity.DisplayName.Should().Be("displayname");
-                mappedEntity.Name.Should().Be("foo");
+                _ = mappedEntity.Description.Should().Be("description");
+                _ = mappedEntity.DisplayName.Should().Be("displayname");
+                _ = mappedEntity.Name.Should().Be("foo");
 
-                mappedEntity.UserClaims.Count.Should().Be(2);
-                mappedEntity.UserClaims.Select(x => x.Type).Should().BeEquivalentTo(new[] { "c1", "c2" });
-                mappedEntity.Properties.Count.Should().Be(2);
-                mappedEntity.Properties.Should().Contain(x => x.Key == "x" && x.Value == "xx");
-                mappedEntity.Properties.Should().Contain(x => x.Key == "y" && x.Value == "yy");
+                _ = mappedEntity.UserClaims.Count.Should().Be(2);
+                _ = mappedEntity.UserClaims.Select(x => x.Type).Should().BeEquivalentTo(new[] { "c1", "c2" });
+                _ = mappedEntity.Properties.Count.Should().Be(2);
+                _ = mappedEntity.Properties.Should().Contain(x => x.Key == "x" && x.Value == "xx");
+                _ = mappedEntity.Properties.Should().Contain(x => x.Key == "y" && x.Value == "yy");
 
 
                 var mappedModel = mappedEntity.ToModel();
 
-                mappedModel.Description.Should().Be("description");
-                mappedModel.DisplayName.Should().Be("displayname");
-                mappedModel.Enabled.Should().BeFalse();
-                mappedModel.Name.Should().Be("foo");
-                mappedModel.UserClaims.Count.Should().Be(2);
-                mappedModel.UserClaims.Should().BeEquivalentTo(new[] { "c1", "c2" });
-                mappedModel.Properties.Count.Should().Be(2);
-                mappedModel.Properties["x"].Should().Be("xx");
-                mappedModel.Properties["y"].Should().Be("yy");
+                _ = mappedModel.Description.Should().Be("description");
+                _ = mappedModel.DisplayName.Should().Be("displayname");
+                _ = mappedModel.Enabled.Should().BeFalse();
+                _ = mappedModel.Name.Should().Be("foo");
+                _ = mappedModel.UserClaims.Count.Should().Be(2);
+                _ = mappedModel.UserClaims.Should().BeEquivalentTo(new[] { "c1", "c2" });
+                _ = mappedModel.Properties.Count.Should().Be(2);
+                _ = mappedModel.Properties["x"].Should().Be("xx");
+                _ = mappedModel.Properties["y"].Should().Be("yy");
             });
         });
     }

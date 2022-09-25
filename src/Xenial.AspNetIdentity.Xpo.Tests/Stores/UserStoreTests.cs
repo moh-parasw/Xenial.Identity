@@ -23,7 +23,10 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
         {
             var dataLayer = XpoDefault.GetDataLayer(connectionString, DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema);
 
-            UnitOfWork unitOfWorkFactory() => new UnitOfWork(dataLayer);
+            UnitOfWork unitOfWorkFactory()
+            {
+                return new UnitOfWork(dataLayer);
+            }
 
             (XPUserStore<IdentityUser, string, IdentityUserClaim<string>, IdentityUserLogin<string>, IdentityUserToken<string>, XpoIdentityUser, XpoIdentityRole, XpoIdentityUserClaim, XpoIdentityUserLogin, XpoIdentityUserToken> store, UnitOfWork uow) CreateStore()
             {
@@ -46,14 +49,17 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 );
                 return (store, uow);
             }
-            XpoIdentityUser CreateUser(UnitOfWork uow, string id = null) => new XpoIdentityUser(uow)
+            XpoIdentityUser CreateUser(UnitOfWork uow, string id = null)
             {
-                Id = id ?? Guid.NewGuid().ToString(),
-                UserName = Guid.NewGuid().ToString(),
-                Email = Guid.NewGuid().ToString(),
-            };
+                return new XpoIdentityUser(uow)
+                {
+                    Id = id ?? Guid.NewGuid().ToString(),
+                    UserName = Guid.NewGuid().ToString(),
+                    Email = Guid.NewGuid().ToString(),
+                };
+            }
 
-            It($"Can CreateAsync", async () =>
+            _ = It($"Can CreateAsync", async () =>
             {
                 var (store, uow) = CreateStore();
                 using (store)
@@ -64,7 +70,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 }
             });
 
-            It($"Can DeleteAsync", async () =>
+            _ = It($"Can DeleteAsync", async () =>
             {
                 using var uow = unitOfWorkFactory();
                 var id = Guid.NewGuid().ToString();
@@ -82,9 +88,9 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 }
             });
 
-            Describe($"Can FindByIdAsync", () =>
+            _ = Describe($"Can FindByIdAsync", () =>
             {
-                It($"with existing", async () =>
+                _ = It($"with existing", async () =>
                 {
                     using var uow = unitOfWorkFactory();
                     var id = Guid.NewGuid().ToString();
@@ -102,7 +108,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     }
                 });
 
-                It($"with not existing", async () =>
+                _ = It($"with not existing", async () =>
                 {
                     var id = Guid.NewGuid().ToString();
                     var (store, uow) = CreateStore();
@@ -115,9 +121,9 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 });
             });
 
-            Describe($"Can FindByNameAsync", () =>
+            _ = Describe($"Can FindByNameAsync", () =>
             {
-                It($"with existing", async () =>
+                _ = It($"with existing", async () =>
                 {
                     using var uow = unitOfWorkFactory();
                     var name = Guid.NewGuid().ToString();
@@ -136,7 +142,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     }
                 });
 
-                It($"with not existing", async () =>
+                _ = It($"with not existing", async () =>
                 {
                     var id = Guid.NewGuid().ToString();
                     var (store, uow) = CreateStore();
@@ -149,9 +155,9 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 });
             });
 
-            Describe($"Can UpdateAsync", () =>
+            _ = Describe($"Can UpdateAsync", () =>
             {
-                It($"with existing", async () =>
+                _ = It($"with existing", async () =>
                 {
                     using var uow = unitOfWorkFactory();
                     var id = Guid.NewGuid().ToString();
@@ -176,7 +182,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     }
                 });
 
-                It($"with not existing", async () =>
+                _ = It($"with not existing", async () =>
                 {
                     var id = Guid.NewGuid().ToString();
 
@@ -191,9 +197,9 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                 });
             });
 
-            Describe($"Can FindByEmailAsync", () =>
+            _ = Describe($"Can FindByEmailAsync", () =>
             {
-                It($"with existing", async () =>
+                _ = It($"with existing", async () =>
                 {
                     using var uow = unitOfWorkFactory();
                     var name = Guid.NewGuid().ToString();
@@ -212,7 +218,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     }
                 });
 
-                It($"with not existing", async () =>
+                _ = It($"with not existing", async () =>
                 {
                     var id = Guid.NewGuid().ToString();
 
@@ -225,11 +231,11 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     }
                 });
             });
-            Describe("Tokens", () =>
+            _ = Describe("Tokens", () =>
             {
-                Describe("GetTokenAsync", () =>
+                _ = Describe("GetTokenAsync", () =>
                 {
-                    It("non existing token", async () =>
+                    _ = It("non existing token", async () =>
                     {
                         var (store, uow) = CreateStore();
                         using (store)
@@ -241,7 +247,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         }
                     });
 
-                    It("existing token", async () =>
+                    _ = It("existing token", async () =>
                     {
                         using var uow = unitOfWorkFactory();
                         var name = Guid.NewGuid().ToString();
@@ -276,9 +282,9 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                     });
                 });
 
-                Describe("SetTokenAsync", () =>
+                _ = Describe("SetTokenAsync", () =>
                 {
-                    It("non existing user and token", async () =>
+                    _ = It("non existing user and token", async () =>
                     {
                         var loginProvider = Guid.NewGuid().ToString();
                         var loginProviderName = Guid.NewGuid().ToString();
@@ -289,11 +295,11 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         using (uow)
                         {
                             var action = new Func<Task>(async () => await store.SetTokenAsync(new IdentityUser(), loginProvider, loginProviderName, tokenValue, CancellationToken.None));
-                            await action.Should().ThrowAsync<ArgumentNullException>();
+                            _ = await action.Should().ThrowAsync<ArgumentNullException>();
                         }
                     });
 
-                    It("adds non existing token", async () =>
+                    _ = It("adds non existing token", async () =>
                     {
                         var loginProvider = Guid.NewGuid().ToString();
                         var loginProviderName = Guid.NewGuid().ToString();
@@ -309,16 +315,16 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         {
                             var identityUser = await store.FindByIdAsync(user.Id, CancellationToken.None);
                             await store.SetTokenAsync(identityUser, loginProvider, loginProviderName, tokenValue, CancellationToken.None);
-                            await store.UpdateAsync(identityUser, CancellationToken.None);
+                            _ = await store.UpdateAsync(identityUser, CancellationToken.None);
                         }
                         using var uow2 = unitOfWorkFactory();
                         var userInDb = await uow2.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
 
-                        userInDb.Tokens.Should().NotBeEmpty();
-                        userInDb.Tokens.First().Value.Should().Be(tokenValue);
+                        _ = userInDb.Tokens.Should().NotBeEmpty();
+                        _ = userInDb.Tokens.First().Value.Should().Be(tokenValue);
                     });
 
-                    It("updates existing token", async () =>
+                    _ = It("updates existing token", async () =>
                     {
                         var loginProvider = Guid.NewGuid().ToString();
                         var loginProviderName = Guid.NewGuid().ToString();
@@ -343,20 +349,20 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         {
                             var identityUser = await store.FindByIdAsync(user.Id, CancellationToken.None);
                             await store.SetTokenAsync(identityUser, loginProvider, loginProviderName, newTokenValue, CancellationToken.None);
-                            await store.UpdateAsync(identityUser, CancellationToken.None);
+                            _ = await store.UpdateAsync(identityUser, CancellationToken.None);
                         }
                         using var uow2 = unitOfWorkFactory();
                         var userInDb = await uow2.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
 
-                        userInDb.Tokens.Should().NotBeEmpty();
-                        userInDb.Tokens.Count.Should().Be(1);
-                        userInDb.Tokens.First().Value.Should().Be(newTokenValue);
+                        _ = userInDb.Tokens.Should().NotBeEmpty();
+                        _ = userInDb.Tokens.Count.Should().Be(1);
+                        _ = userInDb.Tokens.First().Value.Should().Be(newTokenValue);
                     });
                 });
 
-                Describe("RemoveTokenAsync", () =>
+                _ = Describe("RemoveTokenAsync", () =>
                 {
-                    It("non existing user and token", async () =>
+                    _ = It("non existing user and token", async () =>
                     {
                         var loginProvider = Guid.NewGuid().ToString();
                         var loginProviderName = Guid.NewGuid().ToString();
@@ -366,11 +372,11 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         using (uow)
                         {
                             var action = new Func<Task>(async () => await store.RemoveTokenAsync(new IdentityUser(), loginProvider, loginProviderName, CancellationToken.None));
-                            await action.Should().NotThrowAsync();
+                            _ = await action.Should().NotThrowAsync();
                         }
                     });
 
-                    It("removed existing token", async () =>
+                    _ = It("removed existing token", async () =>
                     {
                         var loginProvider = Guid.NewGuid().ToString();
                         var loginProviderName = Guid.NewGuid().ToString();
@@ -394,21 +400,21 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         {
                             var identityUser = await store.FindByIdAsync(user.Id, CancellationToken.None);
                             await store.RemoveTokenAsync(identityUser, loginProvider, loginProviderName, CancellationToken.None);
-                            await store.UpdateAsync(identityUser, CancellationToken.None);
+                            _ = await store.UpdateAsync(identityUser, CancellationToken.None);
                         }
                         using var uow2 = unitOfWorkFactory();
                         var userInDb = await uow2.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
 
-                        userInDb.Tokens.Should().BeEmpty();
+                        _ = userInDb.Tokens.Should().BeEmpty();
                     });
                 });
             });
 
-            Describe("Logins", () =>
+            _ = Describe("Logins", () =>
             {
-                Describe("AddLoginAsync", () =>
+                _ = Describe("AddLoginAsync", () =>
                 {
-                    It("adds login", async () =>
+                    _ = It("adds login", async () =>
                     {
                         using var uow = unitOfWorkFactory();
                         var user = CreateUser(uow);
@@ -427,21 +433,21 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         {
                             var identityUser = await store.FindByIdAsync(user.Id, CancellationToken.None);
                             await store.AddLoginAsync(identityUser, loginInfo, CancellationToken.None);
-                            await store.UpdateAsync(identityUser, CancellationToken.None);
+                            _ = await store.UpdateAsync(identityUser, CancellationToken.None);
                         }
 
                         using var uow2 = unitOfWorkFactory();
                         var userInDb = await uow2.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
-                        userInDb.Logins.Should().NotBeEmpty();
-                        userInDb.Logins.First().ProviderDisplayName.Should().Be(loginInfo.ProviderDisplayName);
-                        userInDb.Logins.First().ProviderKey.Should().Be(loginInfo.ProviderKey);
-                        userInDb.Logins.First().LoginProvider.Should().Be(loginInfo.LoginProvider);
+                        _ = userInDb.Logins.Should().NotBeEmpty();
+                        _ = userInDb.Logins.First().ProviderDisplayName.Should().Be(loginInfo.ProviderDisplayName);
+                        _ = userInDb.Logins.First().ProviderKey.Should().Be(loginInfo.ProviderKey);
+                        _ = userInDb.Logins.First().LoginProvider.Should().Be(loginInfo.LoginProvider);
                     });
                 });
 
-                Describe("FindByLoginAsync", () =>
+                _ = Describe("FindByLoginAsync", () =>
                 {
-                    It("with non existent user and login", async () =>
+                    _ = It("with non existent user and login", async () =>
                     {
                         var loginProvider = Guid.NewGuid().ToString();
                         var providerKey = Guid.NewGuid().ToString();
@@ -454,7 +460,7 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         }
                     });
 
-                    It("with existent user and login", async () =>
+                    _ = It("with existent user and login", async () =>
                     {
                         var loginProvider = Guid.NewGuid().ToString();
                         var providerKey = Guid.NewGuid().ToString();
@@ -474,18 +480,18 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         using (uow1)
                         {
                             var userFromStore = await store.FindByLoginAsync(loginProvider, providerKey, CancellationToken.None);
-                            userFromStore.Should().NotBeNull();
+                            _ = userFromStore.Should().NotBeNull();
                         }
                         using var uow2 = unitOfWorkFactory();
                         var userInDb = await uow2.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
 
-                        userInDb.Logins.Should().NotBeEmpty();
+                        _ = userInDb.Logins.Should().NotBeEmpty();
                     });
                 });
 
-                Describe("RemoveLoginAsync", () =>
+                _ = Describe("RemoveLoginAsync", () =>
                 {
-                    It("with existent user and login", async () =>
+                    _ = It("with existent user and login", async () =>
                     {
                         var loginProvider = Guid.NewGuid().ToString();
                         var providerKey = Guid.NewGuid().ToString();
@@ -506,19 +512,19 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         {
                             var userFromStore = await store.FindByIdAsync(user.Id, CancellationToken.None);
                             await store.RemoveLoginAsync(userFromStore, loginProvider, providerKey, CancellationToken.None);
-                            await store.UpdateAsync(userFromStore, CancellationToken.None);
+                            _ = await store.UpdateAsync(userFromStore, CancellationToken.None);
                         }
 
                         using var uow2 = unitOfWorkFactory();
                         var userInDb = await uow2.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
 
-                        userInDb.Logins.Should().BeEmpty();
+                        _ = userInDb.Logins.Should().BeEmpty();
                     });
                 });
 
-                Describe("GetLoginsAsync", () =>
+                _ = Describe("GetLoginsAsync", () =>
                 {
-                    It("With non existent user and login", async () =>
+                    _ = It("With non existent user and login", async () =>
                     {
                         using var uow = unitOfWorkFactory();
                         var user = CreateUser(uow);
@@ -531,11 +537,11 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         {
                             var userFromStore = await store.FindByIdAsync(user.Id, CancellationToken.None);
                             var logins = await store.GetLoginsAsync(userFromStore, CancellationToken.None);
-                            logins.Should().BeEmpty();
+                            _ = logins.Should().BeEmpty();
                         }
                     });
 
-                    It("With existent user and login", async () =>
+                    _ = It("With existent user and login", async () =>
                     {
                         using var uow = unitOfWorkFactory();
                         var user = CreateUser(uow);
@@ -560,18 +566,18 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         {
                             var userFromStore = await store.FindByIdAsync(user.Id, CancellationToken.None);
                             var logins = await store.GetLoginsAsync(userFromStore, CancellationToken.None);
-                            logins.Should().NotBeEmpty();
-                            logins.Count.Should().Be(2);
+                            _ = logins.Should().NotBeEmpty();
+                            _ = logins.Count.Should().Be(2);
                         }
                     });
                 });
             });
 
-            Describe("Claims", () =>
+            _ = Describe("Claims", () =>
             {
-                Describe("AddClaimsAsync", () =>
+                _ = Describe("AddClaimsAsync", () =>
                 {
-                    It("adds claims", async () =>
+                    _ = It("adds claims", async () =>
                     {
                         var claimType = Guid.NewGuid().ToString();
                         var claimValue = Guid.NewGuid().ToString();
@@ -589,20 +595,20 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                             {
                                 new Claim(claimType, claimValue)
                             }, CancellationToken.None);
-                            await store.UpdateAsync(identityUser, CancellationToken.None);
+                            _ = await store.UpdateAsync(identityUser, CancellationToken.None);
                         }
                         using var uow2 = unitOfWorkFactory();
                         var userInDb = await uow2.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
 
-                        userInDb.Claims.Should().NotBeEmpty();
-                        userInDb.Claims.First().Type.Should().Be(claimType);
-                        userInDb.Claims.First().Value.Should().Be(claimValue);
+                        _ = userInDb.Claims.Should().NotBeEmpty();
+                        _ = userInDb.Claims.First().Type.Should().Be(claimType);
+                        _ = userInDb.Claims.First().Value.Should().Be(claimValue);
                     });
                 });
 
-                Describe("ReplaceClaimAsync", () =>
+                _ = Describe("ReplaceClaimAsync", () =>
                 {
-                    It("replaces claims", async () =>
+                    _ = It("replaces claims", async () =>
                     {
                         var claimType = Guid.NewGuid().ToString();
                         var claimValue = Guid.NewGuid().ToString();
@@ -631,20 +637,20 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                                 new Claim(newClaimType, newClaimValue),
                                 CancellationToken.None
                             );
-                            await store.UpdateAsync(identityUser, CancellationToken.None);
+                            _ = await store.UpdateAsync(identityUser, CancellationToken.None);
                             using var uow2 = unitOfWorkFactory();
                             var userInDb = await uow2.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
 
-                            userInDb.Claims.Should().NotBeEmpty();
-                            userInDb.Claims.First().Type.Should().Be(newClaimType);
-                            userInDb.Claims.First().Value.Should().Be(newClaimValue);
+                            _ = userInDb.Claims.Should().NotBeEmpty();
+                            _ = userInDb.Claims.First().Type.Should().Be(newClaimType);
+                            _ = userInDb.Claims.First().Value.Should().Be(newClaimValue);
                         }
                     });
                 });
 
-                Describe("RemoveClaimsAsync", () =>
+                _ = Describe("RemoveClaimsAsync", () =>
                 {
-                    It("removes claims", async () =>
+                    _ = It("removes claims", async () =>
                     {
                         var claimType = Guid.NewGuid().ToString();
                         var claimValue = Guid.NewGuid().ToString();
@@ -672,18 +678,18 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                                 new[] { new Claim(claimType, claimValue) },
                                 CancellationToken.None
                             );
-                            await store.UpdateAsync(identityUser, CancellationToken.None);
+                            _ = await store.UpdateAsync(identityUser, CancellationToken.None);
                             using var uow2 = unitOfWorkFactory();
                             var userInDb = await uow2.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
 
-                            userInDb.Claims.Should().BeEmpty();
+                            _ = userInDb.Claims.Should().BeEmpty();
                         }
                     });
                 });
 
-                Describe("GetClaimsAsync", () =>
+                _ = Describe("GetClaimsAsync", () =>
                 {
-                    It("lists claims", async () =>
+                    _ = It("lists claims", async () =>
                     {
                         var claimType = Guid.NewGuid().ToString();
                         var claimValue = Guid.NewGuid().ToString();
@@ -709,18 +715,18 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                                 identityUser,
                                 CancellationToken.None
                             );
-                            await store.UpdateAsync(identityUser, CancellationToken.None);
+                            _ = await store.UpdateAsync(identityUser, CancellationToken.None);
 
-                            claims.Should().NotBeEmpty();
-                            claims.First().Type.Should().Be(claimType);
-                            claims.First().Value.Should().Be(claimValue);
+                            _ = claims.Should().NotBeEmpty();
+                            _ = claims.First().Type.Should().Be(claimType);
+                            _ = claims.First().Value.Should().Be(claimValue);
                         }
                     });
                 });
 
-                Describe("GetUsersForClaimAsync", () =>
+                _ = Describe("GetUsersForClaimAsync", () =>
                 {
-                    It("lists users", async () =>
+                    _ = It("lists users", async () =>
                     {
                         var claimType = Guid.NewGuid().ToString();
                         var claimValue = Guid.NewGuid().ToString();
@@ -745,15 +751,15 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                                 CancellationToken.None
                             );
 
-                            users.Should().NotBeEmpty();
-                            users.First().UserName.Should().Be(user.UserName);
+                            _ = users.Should().NotBeEmpty();
+                            _ = users.First().UserName.Should().Be(user.UserName);
                         }
                     });
                 });
 
-                Describe("Roles", () =>
+                _ = Describe("Roles", () =>
                 {
-                    It("Add to role throws if not existing", async () =>
+                    _ = It("Add to role throws if not existing", async () =>
                     {
                         using var uow = unitOfWorkFactory();
                         var user = CreateUser(uow);
@@ -767,11 +773,11 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                             var identityUser = await store.FindByIdAsync(user.Id, CancellationToken.None);
 
                             Func<Task> action = async () => await store.AddToRoleAsync(identityUser, "foo", CancellationToken.None);
-                            await action.Should().ThrowAsync<InvalidOperationException>();
+                            _ = await action.Should().ThrowAsync<InvalidOperationException>();
                         }
                     });
 
-                    It("Add to role", async () =>
+                    _ = It("Add to role", async () =>
                     {
                         using var uow = unitOfWorkFactory();
                         var user = CreateUser(uow);
@@ -791,17 +797,17 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                             var identityUser = await store.FindByIdAsync(user.Id, CancellationToken.None);
 
                             await store.AddToRoleAsync(identityUser, role.NormalizedName, CancellationToken.None);
-                            await store.UpdateAsync(identityUser, CancellationToken.None);
+                            _ = await store.UpdateAsync(identityUser, CancellationToken.None);
                         }
 
                         using var uow2 = unitOfWorkFactory();
                         var userInDb = await uow2.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
 
-                        userInDb.Roles.Should().NotBeEmpty();
-                        userInDb.Roles.First().Name.Should().Be(role.Name);
+                        _ = userInDb.Roles.Should().NotBeEmpty();
+                        _ = userInDb.Roles.First().Name.Should().Be(role.Name);
                     });
 
-                    It("Remove from role", async () =>
+                    _ = It("Remove from role", async () =>
                     {
                         using var uow = unitOfWorkFactory();
                         var user = CreateUser(uow);
@@ -822,16 +828,16 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                             var identityUser = await store.FindByIdAsync(user.Id, CancellationToken.None);
 
                             await store.RemoveFromRoleAsync(identityUser, role.NormalizedName, CancellationToken.None);
-                            await store.UpdateAsync(identityUser, CancellationToken.None);
+                            _ = await store.UpdateAsync(identityUser, CancellationToken.None);
                         }
 
                         using var uow2 = unitOfWorkFactory();
                         var userInDb = await uow2.GetObjectByKeyAsync<XpoIdentityUser>(user.Id);
 
-                        userInDb.Roles.Should().BeEmpty();
+                        _ = userInDb.Roles.Should().BeEmpty();
                     });
 
-                    It("GetRoles", async () =>
+                    _ = It("GetRoles", async () =>
                     {
                         using var uow = unitOfWorkFactory();
                         var user = CreateUser(uow);
@@ -853,12 +859,12 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
 
                             var roles = await store.GetRolesAsync(identityUser, CancellationToken.None);
 
-                            roles.Should().NotBeEmpty();
-                            roles.Should().Contain(role.Name);
+                            _ = roles.Should().NotBeEmpty();
+                            _ = roles.Should().Contain(role.Name);
                         }
                     });
 
-                    It("GetUsersInRoleAsync", async () =>
+                    _ = It("GetUsersInRoleAsync", async () =>
                     {
                         using var uow = unitOfWorkFactory();
                         var user = CreateUser(uow);
@@ -878,12 +884,12 @@ namespace Xenial.AspNetIdentity.Xpo.Tests.Stores
                         {
                             var users = await store.GetUsersInRoleAsync(role.NormalizedName, CancellationToken.None);
 
-                            users.Should().NotBeEmpty();
-                            users.First().UserName.Should().Be(user.UserName);
+                            _ = users.Should().NotBeEmpty();
+                            _ = users.First().UserName.Should().Be(user.UserName);
                         }
                     });
 
-                    It("IsInRoleAsync", async () =>
+                    _ = It("IsInRoleAsync", async () =>
                     {
                         using var uow = unitOfWorkFactory();
                         var user = CreateUser(uow);

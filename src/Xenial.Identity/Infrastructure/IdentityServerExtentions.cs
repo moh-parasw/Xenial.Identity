@@ -1,12 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Security.Cryptography.X509Certificates;
-
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+﻿using System.Security.Cryptography.X509Certificates;
 
 using Serilog.Extensions.Logging;
 
@@ -25,7 +17,7 @@ namespace Xenial.Identity.Infrastructure
             if (environment.IsDevelopment())
             {
                 logger.LogInformation("IDS: AddDeveloperSigningCredential");
-                builder.AddDeveloperSigningCredential(true);
+                _ = builder.AddDeveloperSigningCredential(true);
             }
             else
             {
@@ -40,7 +32,7 @@ namespace Xenial.Identity.Infrastructure
 
             if (certificate != null)
             {
-                builder.AddSigningCredential(certificate);
+                _ = builder.AddSigningCredential(certificate);
             }
             else
             {

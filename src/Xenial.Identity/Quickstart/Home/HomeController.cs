@@ -5,13 +5,8 @@
 using Duende.IdentityServer.Services;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
-using System.Threading.Tasks;
 
 using Xenial.Identity.Data;
 
@@ -38,14 +33,7 @@ namespace Xenial.Identity.Quickstart.Home
             this.signInManager = signInManager;
         }
 
-        public IActionResult Index()
-        {
-            if (signInManager.IsSignedIn(User))
-            {
-                return Redirect("~/Identity/Account/Manage");
-            }
-            return Redirect("~/Identity/Account/Login");
-        }
+        public IActionResult Index() => signInManager.IsSignedIn(User) ? Redirect("~/Identity/Account/Manage") : (IActionResult)Redirect("~/Identity/Account/Login");
 
         /// <summary>
         /// Shows the error page

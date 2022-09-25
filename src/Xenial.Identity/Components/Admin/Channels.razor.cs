@@ -2,7 +2,7 @@
 
 using Microsoft.AspNetCore.Components;
 
-using Xenial.Identity.Infrastructure.Channels;
+using Xenial.Identity.Channels;
 using Xenial.Identity.Models;
 
 namespace Xenial.Identity.Components.Admin;
@@ -75,7 +75,7 @@ public partial class Channels
             {
                 await UnitOfWork.DeleteAsync(channel);
                 await UnitOfWork.CommitChangesAsync();
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             API was successfully deleted!
@@ -91,7 +91,7 @@ public partial class Channels
             {
                 var errors = ex.Message;
 
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             There was an error when deleting the API!

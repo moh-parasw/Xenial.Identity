@@ -3,7 +3,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Xenial.Identity.Infrastructure.Channels;
+namespace Xenial.Identity.Channels;
 
 public enum CommunicationChannelType
 {
@@ -104,7 +104,7 @@ public record CommunicationChannelOptions(IServiceCollection Services) : ICommun
                 displayName);
 
         registrations = registrations.Add(registration);
-        Services.AddTransient<ICommunicationChannel, TChannel>();
+        _ = Services.AddTransient<ICommunicationChannel, TChannel>();
 
         return this;
     }
@@ -119,7 +119,7 @@ public static class ChannelsServiceCollectionExtension
 
         var opt = new CommunicationChannelOptions(services);
 
-        services.AddSingleton<ICommunicationChannelRegistry, CommunicationChannelRegistry>(s =>
+        _ = services.AddSingleton<ICommunicationChannelRegistry, CommunicationChannelRegistry>(s =>
         {
             var registry = new CommunicationChannelRegistry(s);
 

@@ -3,9 +3,9 @@ using System.Linq;
 
 using DevExpress.Xpo;
 
-using FluentAssertions;
-
 using Duende.IdentityServer.Models;
+
+using FluentAssertions;
 
 using Xenial.Identity.Xpo.Storage.Mappers;
 using Xenial.Identity.Xpo.Storage.Models;
@@ -18,20 +18,20 @@ namespace Xenial.Identity.Xpo.Storage.Tests.Mappers
     {
         public static void Tests() => Describe(nameof(ClientMappers), () =>
         {
-            It("Automapper Configuration is valid", () => ClientMappers.Mapper.ConfigurationProvider.AssertConfigurationIsValid<ClientMapperProfile>());
+            _ = It("Automapper Configuration is valid", () => ClientMappers.Mapper.ConfigurationProvider.AssertConfigurationIsValid<ClientMapperProfile>());
 
-            It("Can map", () =>
+            _ = It("Can map", () =>
             {
                 using var session = new Session();
                 var model = new Client();
                 var mappedEntity = model.ToEntity(session);
                 var mappedModel = mappedEntity.ToModel();
 
-                mappedModel.Should().NotBeNull();
-                mappedEntity.Should().NotBeNull();
+                _ = mappedModel.Should().NotBeNull();
+                _ = mappedEntity.Should().NotBeNull();
             });
 
-            It("Properties map", () =>
+            _ = It("Properties map", () =>
             {
                 using var session = new Session();
                 var model = new Client()
@@ -46,24 +46,24 @@ namespace Xenial.Identity.Xpo.Storage.Tests.Mappers
 
                 var mappedEntity = model.ToEntity(session);
 
-                mappedEntity.Properties.Count.Should().Be(2);
+                _ = mappedEntity.Properties.Count.Should().Be(2);
                 var foo1 = mappedEntity.Properties.FirstOrDefault(x => x.Key == "foo1");
-                foo1.Should().NotBeNull();
-                foo1.Value.Should().Be("bar1");
+                _ = foo1.Should().NotBeNull();
+                _ = foo1.Value.Should().Be("bar1");
                 var foo2 = mappedEntity.Properties.FirstOrDefault(x => x.Key == "foo2");
-                foo2.Should().NotBeNull();
-                foo2.Value.Should().Be("bar2");
+                _ = foo2.Should().NotBeNull();
+                _ = foo2.Value.Should().Be("bar2");
 
                 var mappedModel = mappedEntity.ToModel();
 
-                mappedModel.Properties.Count.Should().Be(2);
-                mappedModel.Properties.ContainsKey("foo1").Should().BeTrue();
-                mappedModel.Properties.ContainsKey("foo2").Should().BeTrue();
-                mappedModel.Properties["foo1"].Should().Be("bar1");
-                mappedModel.Properties["foo2"].Should().Be("bar2");
+                _ = mappedModel.Properties.Count.Should().Be(2);
+                _ = mappedModel.Properties.ContainsKey("foo1").Should().BeTrue();
+                _ = mappedModel.Properties.ContainsKey("foo2").Should().BeTrue();
+                _ = mappedModel.Properties["foo1"].Should().Be("bar1");
+                _ = mappedModel.Properties["foo2"].Should().Be("bar2");
             });
 
-            It("duplicate properties in db map", () =>
+            _ = It("duplicate properties in db map", () =>
             {
                 using var session = new Session();
                 var entity = new XpoClient(session)
@@ -76,10 +76,10 @@ namespace Xenial.Identity.Xpo.Storage.Tests.Mappers
                 };
 
                 Action modelAction = () => entity.ToModel();
-                modelAction.Should().Throw<Exception>();
+                _ = modelAction.Should().Throw<Exception>();
             });
 
-            It("missing values should use defaults", () =>
+            _ = It("missing values should use defaults", () =>
             {
                 using var session = new Session();
                 var entity = new XpoClient(session)
@@ -96,8 +96,8 @@ namespace Xenial.Identity.Xpo.Storage.Tests.Mappers
                 };
 
                 var model = entity.ToModel();
-                model.ProtocolType.Should().Be(def.ProtocolType);
-                model.ClientSecrets.First().Type.Should().Be(def.ClientSecrets.First().Type);
+                _ = model.ProtocolType.Should().Be(def.ProtocolType);
+                _ = model.ClientSecrets.First().Type.Should().Be(def.ClientSecrets.First().Type);
             });
         });
     }

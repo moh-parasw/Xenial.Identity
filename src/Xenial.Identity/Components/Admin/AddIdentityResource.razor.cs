@@ -9,7 +9,7 @@ public partial class AddIdentityResource
             await UnitOfWork.SaveAsync(IdentityResource);
             await UnitOfWork.CommitChangesAsync();
 
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         IdentityResource was successfully added!
@@ -24,7 +24,7 @@ public partial class AddIdentityResource
         catch (Exception ex)
         {
             var errors = ex.Message;
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         There was an error when adding the IdendityResource!

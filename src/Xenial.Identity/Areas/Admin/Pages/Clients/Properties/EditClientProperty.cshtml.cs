@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 using AutoMapper;
 
@@ -11,7 +7,6 @@ using DevExpress.Xpo.DB.Exceptions;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 
 using Xenial.Identity.Xpo.Storage.Models;
 
@@ -91,7 +86,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients.Properties
                         return Page();
                     }
 
-                    Mapper.Map(Input, clientProperty);
+                    _ = Mapper.Map(Input, clientProperty);
 
                     await unitOfWork.SaveAsync(client);
                     await unitOfWork.CommitChangesAsync();

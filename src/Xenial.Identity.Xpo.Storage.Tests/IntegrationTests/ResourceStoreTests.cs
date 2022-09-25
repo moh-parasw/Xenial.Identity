@@ -4,11 +4,11 @@ using System.Linq;
 
 using DevExpress.Xpo;
 
+using Duende.IdentityServer.Models;
+
 using FluentAssertions;
 
 using IdentityModel;
-
-using Duende.IdentityServer.Models;
 
 using Xenial.Identity.Xpo.Storage.Mappers;
 using Xenial.Identity.Xpo.Storage.Stores;
@@ -33,7 +33,8 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
             }
 
             static IdentityResource CreateIdentityTestResource()
-                => new IdentityResource()
+            {
+                return new IdentityResource()
                 {
                     Name = Guid.NewGuid().ToString(),
                     DisplayName = Guid.NewGuid().ToString(),
@@ -45,9 +46,11 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                         JwtClaimTypes.Name,
                     }
                 };
+            }
 
             static ApiResource CreateApiResourceTestResource()
-                => new ApiResource
+            {
+                return new ApiResource
                 {
                     Name = Guid.NewGuid().ToString(),
                     ApiSecrets = new List<Secret> { new Secret("secret".ToSha256()) },
@@ -58,9 +61,11 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                             Guid.NewGuid().ToString(),
                     }
                 };
+            }
 
             static ApiScope CreateApiScopeTestResource()
-                => new ApiScope
+            {
+                return new ApiScope
                 {
                     Name = Guid.NewGuid().ToString(),
                     UserClaims =
@@ -69,8 +74,9 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                             Guid.NewGuid().ToString(),
                     }
                 };
+            }
 
-            It("FindApiResourcesByNameAsync when Resource exists should return Resource and Collections", async () =>
+            _ = It("FindApiResourcesByNameAsync when Resource exists should return Resource and Collections", async () =>
             {
                 var resource = CreateApiResourceTestResource();
 
@@ -85,19 +91,19 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 {
                     var foundResource = (await store.FindApiResourcesByNameAsync(new[] { resource.Name })).SingleOrDefault();
 
-                    foundResource.Should().NotBeNull();
-                    foundResource.Name.Should().Be(resource.Name);
+                    _ = foundResource.Should().NotBeNull();
+                    _ = foundResource.Name.Should().Be(resource.Name);
 
-                    foundResource.UserClaims.Should().NotBeNull();
-                    foundResource.UserClaims.Should().NotBeEmpty();
-                    foundResource.ApiSecrets.Should().NotBeNull();
-                    foundResource.ApiSecrets.Should().NotBeEmpty();
-                    foundResource.Scopes.Should().NotBeNull();
-                    foundResource.Scopes.Should().NotBeEmpty();
+                    _ = foundResource.UserClaims.Should().NotBeNull();
+                    _ = foundResource.UserClaims.Should().NotBeEmpty();
+                    _ = foundResource.ApiSecrets.Should().NotBeNull();
+                    _ = foundResource.ApiSecrets.Should().NotBeEmpty();
+                    _ = foundResource.Scopes.Should().NotBeNull();
+                    _ = foundResource.Scopes.Should().NotBeEmpty();
                 }
             });
 
-            It("FindApiResourcesByNameAsync when Resources exist should only return requested Resources", async () =>
+            _ = It("FindApiResourcesByNameAsync when Resources exist should only return requested Resources", async () =>
             {
                 var resource = CreateApiResourceTestResource();
 
@@ -113,19 +119,19 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 {
                     var foundResource = (await store.FindApiResourcesByNameAsync(new[] { resource.Name })).SingleOrDefault();
 
-                    foundResource.Should().NotBeNull();
-                    foundResource.Name.Should().Be(resource.Name);
+                    _ = foundResource.Should().NotBeNull();
+                    _ = foundResource.Name.Should().Be(resource.Name);
 
-                    foundResource.UserClaims.Should().NotBeNull();
-                    foundResource.UserClaims.Should().NotBeEmpty();
-                    foundResource.ApiSecrets.Should().NotBeNull();
-                    foundResource.ApiSecrets.Should().NotBeEmpty();
-                    foundResource.Scopes.Should().NotBeNull();
-                    foundResource.Scopes.Should().NotBeEmpty();
+                    _ = foundResource.UserClaims.Should().NotBeNull();
+                    _ = foundResource.UserClaims.Should().NotBeEmpty();
+                    _ = foundResource.ApiSecrets.Should().NotBeNull();
+                    _ = foundResource.ApiSecrets.Should().NotBeEmpty();
+                    _ = foundResource.Scopes.Should().NotBeNull();
+                    _ = foundResource.Scopes.Should().NotBeEmpty();
                 }
             });
 
-            It("FindApiResourcesByScopeNameAsync when Resources exist should return Resources", async () =>
+            _ = It("FindApiResourcesByScopeNameAsync when Resources exist should return Resources", async () =>
             {
                 var testApiResource = CreateApiResourceTestResource();
                 var testApiScope = CreateApiScopeTestResource();
@@ -146,14 +152,14 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                         testApiScope.Name
                     });
 
-                    resources.Should().NotBeNull();
-                    resources.Should().NotBeEmpty();
-                    resources.SingleOrDefault(x => x.Name == testApiResource.Name)
+                    _ = resources.Should().NotBeNull();
+                    _ = resources.Should().NotBeEmpty();
+                    _ = resources.SingleOrDefault(x => x.Name == testApiResource.Name)
                         .Should().NotBeNull();
                 }
             });
 
-            It("FindApiResourcesByScopeNameAsync when Resources exist should only return Resources requested", async () =>
+            _ = It("FindApiResourcesByScopeNameAsync when Resources exist should only return Resources requested", async () =>
             {
                 var testIdentityResource = CreateIdentityTestResource();
                 var testApiResource = CreateApiResourceTestResource();
@@ -179,14 +185,14 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                         testApiScope.Name
                     });
 
-                    resources.Should().NotBeNull();
-                    resources.Should().NotBeEmpty();
-                    resources.SingleOrDefault(x => x.Name == testApiResource.Name)
+                    _ = resources.Should().NotBeNull();
+                    _ = resources.Should().NotBeEmpty();
+                    _ = resources.SingleOrDefault(x => x.Name == testApiResource.Name)
                         .Should().NotBeNull();
                 }
             });
 
-            It("FindIdentityResourcesByScopeNameAsync when Resource exists should return Resource and Collections", async () =>
+            _ = It("FindIdentityResourcesByScopeNameAsync when Resource exists should return Resource and Collections", async () =>
             {
                 var resource = CreateIdentityTestResource();
 
@@ -204,18 +210,18 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                         resource.Name
                     })).ToList();
 
-                    resources.Should().NotBeNull();
-                    resources.Should().NotBeEmpty();
+                    _ = resources.Should().NotBeNull();
+                    _ = resources.Should().NotBeEmpty();
                     var foundScope = resources.SingleOrDefault();
 
-                    foundScope.Should().NotBeNull();
-                    foundScope.Name.Should().Be(resource.Name);
-                    foundScope.UserClaims.Should().NotBeNull();
-                    foundScope.UserClaims.Should().NotBeEmpty();
+                    _ = foundScope.Should().NotBeNull();
+                    _ = foundScope.Name.Should().Be(resource.Name);
+                    _ = foundScope.UserClaims.Should().NotBeNull();
+                    _ = foundScope.UserClaims.Should().NotBeEmpty();
                 }
             });
 
-            It("FindIdentityResourcesByScopeNameAsync when Resources exist should only return Requested", async () =>
+            _ = It("FindIdentityResourcesByScopeNameAsync when Resources exist should only return Requested", async () =>
             {
                 var resource = CreateIdentityTestResource();
 
@@ -234,13 +240,13 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                         resource.Name
                     })).ToList();
 
-                    resources.Should().NotBeNull();
-                    resources.Should().NotBeEmpty();
-                    resources.SingleOrDefault(x => x.Name == resource.Name).Should().NotBeNull();
+                    _ = resources.Should().NotBeNull();
+                    _ = resources.Should().NotBeEmpty();
+                    _ = resources.SingleOrDefault(x => x.Name == resource.Name).Should().NotBeNull();
                 }
             });
 
-            It("FindApiScopesByNameAsync when Resource exists should retrun Resource and Collections", async () =>
+            _ = It("FindApiScopesByNameAsync when Resource exists should retrun Resource and Collections", async () =>
             {
                 var resource = CreateApiScopeTestResource();
 
@@ -258,18 +264,18 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                         resource.Name
                     })).ToList();
 
-                    resources.Should().NotBeNull();
-                    resources.Should().NotBeEmpty();
+                    _ = resources.Should().NotBeNull();
+                    _ = resources.Should().NotBeEmpty();
                     var foundScope = resources.SingleOrDefault();
 
-                    foundScope.Should().NotBeNull();
-                    foundScope.Name.Should().Be(resource.Name);
-                    foundScope.UserClaims.Should().NotBeNull();
-                    foundScope.UserClaims.Should().NotBeEmpty();
+                    _ = foundScope.Should().NotBeNull();
+                    _ = foundScope.Name.Should().Be(resource.Name);
+                    _ = foundScope.UserClaims.Should().NotBeNull();
+                    _ = foundScope.UserClaims.Should().NotBeEmpty();
                 }
             });
 
-            It("FindApiScopesByNameAsync when Resources exist should only return Requested", async () =>
+            _ = It("FindApiScopesByNameAsync when Resources exist should only return Requested", async () =>
             {
                 var resource = CreateApiScopeTestResource();
 
@@ -288,13 +294,13 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                         resource.Name
                     })).ToList();
 
-                    resources.Should().NotBeNull();
-                    resources.Should().NotBeEmpty();
-                    resources.Single().Name.Should().Be(resource.Name);
+                    _ = resources.Should().NotBeNull();
+                    _ = resources.Should().NotBeEmpty();
+                    _ = resources.Single().Name.Should().Be(resource.Name);
                 }
             });
 
-            It("GetAllResources when all Resources are requested should return all Resources including hidden ones", async () =>
+            _ = It("GetAllResources when all Resources are requested should return all Resources including hidden ones", async () =>
             {
                 var visibleIdentityResource = CreateIdentityTestResource();
                 var visibleApiResource = CreateApiResourceTestResource();
@@ -330,19 +336,19 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 {
                     var resources = await store.GetAllResourcesAsync();
 
-                    resources.Should().NotBeNull();
-                    resources.IdentityResources.Should().NotBeEmpty();
-                    resources.ApiResources.Should().NotBeEmpty();
-                    resources.ApiScopes.Should().NotBeEmpty();
+                    _ = resources.Should().NotBeNull();
+                    _ = resources.IdentityResources.Should().NotBeEmpty();
+                    _ = resources.ApiResources.Should().NotBeEmpty();
+                    _ = resources.ApiScopes.Should().NotBeEmpty();
 
-                    resources.IdentityResources.Should().Contain(x => x.Name == visibleIdentityResource.Name);
-                    resources.IdentityResources.Should().Contain(x => x.Name == hiddenIdentityResource.Name);
+                    _ = resources.IdentityResources.Should().Contain(x => x.Name == visibleIdentityResource.Name);
+                    _ = resources.IdentityResources.Should().Contain(x => x.Name == hiddenIdentityResource.Name);
 
-                    resources.ApiResources.Should().Contain(x => x.Name == visibleApiResource.Name);
-                    resources.ApiResources.Should().Contain(x => x.Name == hiddenApiResource.Name);
+                    _ = resources.ApiResources.Should().Contain(x => x.Name == visibleApiResource.Name);
+                    _ = resources.ApiResources.Should().Contain(x => x.Name == hiddenApiResource.Name);
 
-                    resources.ApiScopes.Should().Contain(x => x.Name == visibleApiScope.Name);
-                    resources.ApiScopes.Should().Contain(x => x.Name == hiddenApiScope.Name);
+                    _ = resources.ApiScopes.Should().Contain(x => x.Name == visibleApiScope.Name);
+                    _ = resources.ApiScopes.Should().Contain(x => x.Name == hiddenApiScope.Name);
                 }
             });
         });

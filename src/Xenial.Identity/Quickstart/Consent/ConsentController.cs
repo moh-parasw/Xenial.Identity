@@ -3,18 +3,14 @@
 
 
 using Duende.IdentityServer.Events;
+using Duende.IdentityServer.Extensions;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
-using Duende.IdentityServer.Extensions;
+using Duende.IdentityServer.Stores;
+using Duende.IdentityServer.Validation;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Linq;
-using System.Threading.Tasks;
-using Duende.IdentityServer.Validation;
-using System.Collections.Generic;
-using System;
-using Duende.IdentityServer.Stores;
 
 namespace Xenial.Identity.Quickstart.Consent
 {
@@ -51,12 +47,7 @@ namespace Xenial.Identity.Quickstart.Consent
         public async Task<IActionResult> Index(string returnUrl)
         {
             var vm = await BuildViewModelAsync(returnUrl);
-            if (vm != null)
-            {
-                return View("Index", vm);
-            }
-
-            return View("Error");
+            return vm != null ? View("Index", vm) : (IActionResult)View("Error");
         }
 
         /// <summary>
@@ -86,12 +77,7 @@ namespace Xenial.Identity.Quickstart.Consent
                 ModelState.AddModelError(string.Empty, result.ValidationError);
             }
 
-            if (result.ShowView)
-            {
-                return View("Index", result.ViewModel);
-            }
-
-            return View("Error");
+            return result.ShowView ? View("Index", result.ViewModel) : (IActionResult)View("Error");
         }
 
         /*****************************************/
@@ -224,7 +210,7 @@ namespace Xenial.Identity.Quickstart.Consent
         }
 
         private ScopeViewModel CreateScopeViewModel(IdentityResource identity, bool check)
-            => new ScopeViewModel
+            => new()
             {
                 Value = identity.Name,
                 DisplayName = identity.DisplayName ?? identity.Name,
@@ -254,7 +240,7 @@ namespace Xenial.Identity.Quickstart.Consent
         }
 
         private ScopeViewModel GetOfflineAccessScope(bool check)
-            => new ScopeViewModel
+            => new()
             {
                 Value = Duende.IdentityServer.IdentityServerConstants.StandardScopes.OfflineAccess,
                 DisplayName = ConsentOptions.OfflineAccessDisplayName,

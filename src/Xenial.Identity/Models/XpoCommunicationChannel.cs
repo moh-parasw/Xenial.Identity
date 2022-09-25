@@ -1,7 +1,7 @@
 ﻿using DevExpress.Xpo;
 
 using Xenial.AspNetIdentity.Xpo.Models;
-using Xenial.Identity.Infrastructure.Channels;
+using Xenial.Identity.Channels;
 
 namespace Xenial.Identity.Models;
 
@@ -41,7 +41,7 @@ public class XpoCommunicationChannel : XpoIdentityBaseObjectString
         get => channelDisplayName;
         set => SetPropertyValue(nameof(ChannelDisplayName), ref channelDisplayName, value);
     }
-        
+
     private bool enabled = true;
     public bool Enabled
     {

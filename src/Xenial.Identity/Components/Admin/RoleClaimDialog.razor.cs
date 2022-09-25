@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Identity;
 
 using MudBlazor;
 
-using Xenial.Identity.Data;
-
 namespace Xenial.Identity.Components.Admin;
 
 public partial class RoleClaimDialog
@@ -38,11 +36,7 @@ public partial class RoleClaimDialog
                 return await RolesManager.AddClaimAsync(Role, new Claim(type, value));
             }
             var result = await RolesManager.RemoveClaimAsync(Role, oldClaim);
-            if (result.Succeeded)
-            {
-                return await RolesManager.AddClaimAsync(Role, newClaim);
-            }
-            return result;
+            return result.Succeeded ? await RolesManager.AddClaimAsync(Role, newClaim) : result;
         }
 
         if (result.Succeeded)
@@ -53,7 +47,7 @@ public partial class RoleClaimDialog
         {
             var errors = string.Join("\n", result.Errors.Select(e => $"<li>Code: {e.Code}: {e.Description}</li>"));
 
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         There was an error when updating the claim!

@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 
-using Xenial.Identity.Data;
-
 namespace Xenial.Identity.Components.Admin;
 
 public partial class Roles
@@ -28,7 +26,7 @@ public partial class Roles
             var result = await RolesManager.DeleteAsync(role);
             if (result.Succeeded)
             {
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             Role was successfully deleted!
@@ -44,7 +42,7 @@ public partial class Roles
             {
                 var errors = string.Join("\n", result.Errors.Select(e => $"<li>Code: {e.Code}: {e.Description}</li>"));
 
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             There was an error when deleting the role!

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Xenial.Identity.Areas.Admin.Pages.Clients
+﻿namespace Xenial.Identity.Areas.Admin.Pages.Clients
 {
     public static class EnumHelper
     {

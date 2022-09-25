@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text;
-using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -17,10 +16,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
     {
         private readonly UserManager<XenialIdentityUser> _userManager;
 
-        public ResetPasswordModel(UserManager<XenialIdentityUser> userManager)
-        {
-            _userManager = userManager;
-        }
+        public ResetPasswordModel(UserManager<XenialIdentityUser> userManager) => _userManager = userManager;
 
         [BindProperty]
         public InputModel Input { get; set; }

@@ -38,11 +38,7 @@ public partial class UserClaimDialog
                 return await UserManager.AddClaimAsync(User, new Claim(type, value));
             }
             var result = await UserManager.RemoveClaimAsync(User, oldClaim);
-            if (result.Succeeded)
-            {
-                return await UserManager.AddClaimAsync(User, newClaim);
-            }
-            return result;
+            return result.Succeeded ? await UserManager.AddClaimAsync(User, newClaim) : result;
         }
 
         if (result.Succeeded)
@@ -53,7 +49,7 @@ public partial class UserClaimDialog
         {
             var errors = string.Join("\n", result.Errors.Select(e => $"<li>Code: {e.Code}: {e.Description}</li>"));
 
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         There was an error when updating the claim!

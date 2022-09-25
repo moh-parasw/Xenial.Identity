@@ -1,15 +1,6 @@
-﻿using DevExpress.Data.Filtering;
-using DevExpress.Xpo;
-
-using Duende.IdentityServer.Models;
-
-using Google.Protobuf.WellKnownTypes;
-
-using Microsoft.AspNetCore.Identity;
+﻿using DevExpress.Xpo;
 
 using Xenial.Identity.Xpo.Storage.Models;
-
-using static MudBlazor.CategoryTypes;
 
 namespace Xenial.Identity.Components.Admin;
 
@@ -123,12 +114,9 @@ public partial class ApiDetails
     {
         var resources = await UnitOfWork.Query<XpoIdentityResource>().Select(r => r.Name).ToArrayAsync();
 
-        if (string.IsNullOrEmpty(x))
-        {
-            return resources.Except(IdentityResources);
-        }
-
-        return resources.Except(IdentityResources).Where(v => v.Contains(x, StringComparison.InvariantCultureIgnoreCase));
+        return string.IsNullOrEmpty(x)
+            ? resources.Except(IdentityResources)
+            : resources.Except(IdentityResources).Where(v => v.Contains(x, StringComparison.InvariantCultureIgnoreCase));
     }
 
     public async Task Save()
@@ -137,7 +125,7 @@ public partial class ApiDetails
         {
             foreach (var userClaim in Api.UserClaims.ToList())
             {
-                Api.UserClaims.Remove(userClaim);
+                _ = Api.UserClaims.Remove(userClaim);
             }
 
             Api.UserClaims.AddRange(IdentityResources.Select(userClaim => new XpoApiResourceClaim(UnitOfWork)
@@ -158,7 +146,7 @@ public partial class ApiDetails
 
             foreach (var userClaim in existingScope.UserClaims.ToList())
             {
-                existingScope.UserClaims.Remove(userClaim);
+                _ = existingScope.UserClaims.Remove(userClaim);
             }
 
             existingScope.UserClaims.AddRange(IdentityResources.Select(userClaim => new XpoApiScopeClaim(UnitOfWork)
@@ -170,7 +158,7 @@ public partial class ApiDetails
             await UnitOfWork.SaveAsync(Api);
             await UnitOfWork.CommitChangesAsync();
             await Reload();
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         Api was successfully updated!
@@ -185,7 +173,7 @@ public partial class ApiDetails
         {
             var errors = ex.Message;
 
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         There was an error when updating the Api!

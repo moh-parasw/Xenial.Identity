@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 
 using Xenial.Identity.Data;
 
@@ -27,11 +26,7 @@ public partial class AddUser
                 isValid = false;
             }
         }
-        if (!isValid)
-        {
-            return IdentityResult.Failed(errors.ToArray());
-        }
-        return IdentityResult.Success;
+        return !isValid ? IdentityResult.Failed(errors.ToArray()) : IdentityResult.Success;
     }
 
     protected async Task SaveUser()
@@ -74,7 +69,7 @@ public partial class AddUser
         {
             if (result.Succeeded)
             {
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         User was successfully created!
@@ -103,7 +98,7 @@ public partial class AddUser
 
             var errors = string.Join("\n", result.Errors.Select(e => $"<li>Code: {e.Code}: {e.Description}</li>"));
 
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         There was an error when {message}!

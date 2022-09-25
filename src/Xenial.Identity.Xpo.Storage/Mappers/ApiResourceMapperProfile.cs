@@ -17,28 +17,28 @@ namespace Xenial.Identity.Xpo.Storage.Mappers
         /// </summary>
         public ApiResourceMapperProfile()
         {
-            CreateMap<Models.XpoApiResourceProperty, KeyValuePair<string, string>>()
+            _ = CreateMap<Models.XpoApiResourceProperty, KeyValuePair<string, string>>()
                 .ReverseMap()
                 .ConstructUsingServiceLocator();
 
-            CreateMap<Models.XpoApiResource, ApiResource>(MemberList.Destination)
+            _ = CreateMap<Models.XpoApiResource, ApiResource>(MemberList.Destination)
                 .ConstructUsing(src => new ApiResource())
                 .ForMember(x => x.ApiSecrets, opts => opts.MapFrom(x => x.Secrets))
                 .ReverseMap()
                 .ConstructUsingServiceLocator();
 
-            CreateMap<Models.XpoApiResourceClaim, string>()
+            _ = CreateMap<Models.XpoApiResourceClaim, string>()
                 .ConstructUsing(x => x.Type)
                 .ReverseMap()
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src))
                 .ConstructUsingServiceLocator();
 
-            CreateMap<Models.XpoApiResourceSecret, Secret>(MemberList.Destination)
+            _ = CreateMap<Models.XpoApiResourceSecret, Secret>(MemberList.Destination)
                 .ForMember(dest => dest.Type, opt => opt.Condition(srs => srs != null))
                 .ReverseMap()
                 .ConstructUsingServiceLocator();
 
-            CreateMap<Models.XpoApiResourceScope, string>()
+            _ = CreateMap<Models.XpoApiResourceScope, string>()
                 .ConstructUsing(x => x.Scope)
                 .ReverseMap()
                 .ForMember(dest => dest.Scope, opt => opt.MapFrom(src => src))

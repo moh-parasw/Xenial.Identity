@@ -6,7 +6,6 @@ using DevExpress.Xpo.DB;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Localization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 
 using MudBlazor.Services;
@@ -16,18 +15,18 @@ using Serilog.Events;
 
 using Westwind.AspNetCore.LiveReload;
 
+using Xenial.AspNetIdentity.Xpo;
 using Xenial.AspNetIdentity.Xpo.Mappers;
 using Xenial.AspNetIdentity.Xpo.Models;
 using Xenial.AspNetIdentity.Xpo.Stores;
 using Xenial.Identity.Areas.Admin.Pages.Clients;
-using Xenial.Identity.Channels.Mail.MailKit;
-using Xenial.Identity.Channels.SMS.AnySms;
+using Xenial.Identity.Channels;
 using Xenial.Identity.Data;
 using Xenial.Identity.Infrastructure;
-using Xenial.Identity.Infrastructure.Channels;
 using Xenial.Identity.Infrastructure.Localization;
 using Xenial.Identity.Infrastructure.Logging.MemoryConsole.Themes;
 using Xenial.Identity.Models;
+using Xenial.Identity.Xpo;
 using Xenial.Identity.Xpo.Storage.Models;
 
 using XLocalizer;
@@ -79,6 +78,7 @@ try
     {
         o.AddMailKit();
         o.AddAnySms();
+        o.AddWebSmsCom();
     });
 
     await UpdateDatabase(Configuration, localizer);

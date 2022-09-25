@@ -1,9 +1,7 @@
 ﻿using DevExpress.Xpo;
 
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Identity;
 
-using Xenial.Identity.Data;
 using Xenial.Identity.Xpo.Storage.Models;
 
 namespace Xenial.Identity.Components.Admin;
@@ -34,7 +32,7 @@ public partial class Clients
             {
                 await UnitOfWork.DeleteAsync(resource);
                 await UnitOfWork.CommitChangesAsync();
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             Client was successfully deleted!
@@ -49,7 +47,7 @@ public partial class Clients
             {
                 var errors = ex.Message;
 
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             There was an error when deleting the Client!

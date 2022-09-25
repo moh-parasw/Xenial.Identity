@@ -1,10 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 
 using Xenial.Identity.Data;
 
@@ -29,17 +25,11 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
         public async Task<IActionResult> OnGet()
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
-
-            if (!await _userManager.GetTwoFactorEnabledAsync(user))
-            {
-                throw new InvalidOperationException($"Cannot disable 2FA for user with ID '{_userManager.GetUserId(User)}' as it's not currently enabled.");
-            }
-
-            return Page();
+            return user == null
+                ? NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.")
+                : !await _userManager.GetTwoFactorEnabledAsync(user)
+                ? throw new InvalidOperationException($"Cannot disable 2FA for user with ID '{_userManager.GetUserId(User)}' as it's not currently enabled.")
+                : (IActionResult)Page();
         }
 
         public async Task<IActionResult> OnPostAsync()

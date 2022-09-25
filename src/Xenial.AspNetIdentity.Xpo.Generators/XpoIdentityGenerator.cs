@@ -84,22 +84,22 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                             }
                             if (attributeData is not null)
                             {
-                                foreach (var manyField in ManyFields)
+                                foreach (var (attributeFieldName, propertyName, isAggregated, additionalAttributes) in ManyFields)
                                 {
-                                    var manySymbol = attributeData.NamedArguments.FirstOrDefault(a => a.Key == manyField.attributeFieldName);
+                                    var manySymbol = attributeData.NamedArguments.FirstOrDefault(a => a.Key == attributeFieldName);
 
                                     if (manySymbol.Key is not null && manySymbol.Value is TypedConstant userTypedConstant)
                                     {
                                         var manyTypeName = userTypedConstant.Value.ToString();
                                         writer.WriteLine();
-                                        var propertyDeclaration = $"public XPCollection<{manyTypeName}> {manyField.propertyName} => GetCollection<{manyTypeName}>(\"{manyField.propertyName}\");";
+                                        var propertyDeclaration = $"public XPCollection<{manyTypeName}> {propertyName} => GetCollection<{manyTypeName}>(\"{propertyName}\");";
                                         writer.WriteLine("[Association]");
-                                        if (manyField.isAggregated)
+                                        if (isAggregated)
                                         {
                                             writer.WriteLine("[Aggregated]");
                                         }
 
-                                        foreach (var additionalAttribute in manyField.additionalAttributes)
+                                        foreach (var additionalAttribute in additionalAttributes)
                                         {
                                             writer.WriteLine($"[{additionalAttribute}]");
                                         }
@@ -109,24 +109,24 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
                                     }
                                 }
 
-                                foreach (var oneField in OneFields)
+                                foreach (var (attributeFieldName, propertyName, isAggregated, additionalAttributes) in OneFields)
                                 {
-                                    var oneSymbol = attributeData.NamedArguments.FirstOrDefault(a => a.Key == oneField.attributeFieldName);
+                                    var oneSymbol = attributeData.NamedArguments.FirstOrDefault(a => a.Key == attributeFieldName);
 
                                     if (oneSymbol.Key is not null && oneSymbol.Value is TypedConstant userTypedConstant)
                                     {
                                         var oneTypeName = userTypedConstant.Value.ToString();
                                         writer.WriteLine();
-                                        writer.WriteLine($"private {oneTypeName} {GetFieldName(oneField.propertyName)};");
-                                        var propertyDeclaration = $"public {oneTypeName} {oneField.propertyName} {{ get => {GetFieldName(oneField.propertyName)}; set => SetPropertyValue(\"{oneField.propertyName}\", ref {GetFieldName(oneField.propertyName)}, value); }}";
-                                        writer.WriteLine($"[Persistent(\"{oneField.propertyName}Id\")]");
+                                        writer.WriteLine($"private {oneTypeName} {GetFieldName(propertyName)};");
+                                        var propertyDeclaration = $"public {oneTypeName} {propertyName} {{ get => {GetFieldName(propertyName)}; set => SetPropertyValue(\"{propertyName}\", ref {GetFieldName(propertyName)}, value); }}";
+                                        writer.WriteLine($"[Persistent(\"{propertyName}Id\")]");
                                         writer.WriteLine("[Association]");
-                                        if (oneField.isAggregated)
+                                        if (isAggregated)
                                         {
                                             writer.WriteLine("[Aggregated]");
                                         }
 
-                                        foreach (var additionalAttribute in oneField.additionalAttributes)
+                                        foreach (var additionalAttribute in additionalAttributes)
                                         {
                                             writer.WriteLine($"[{additionalAttribute}]");
                                         }
@@ -172,20 +172,9 @@ namespace Xenial.AspNetIdentity.Xpo.Generators
             {
                 str = char.ToLower(str[0]) + str.Substring(1);
             }
-            if (str == "value") //Reserved keyword for fieldName
-            {
-                return "val";
-            }
-            return str;
+            return str == "value" ? "val" : str;
         }
 
-        private string ToType(Type type)
-        {
-            if (Nullable.GetUnderlyingType(type) != null)
-            {
-                return $"Nullable<{Nullable.GetUnderlyingType(type).FullName}>";
-            }
-            return type.FullName;
-        }
+        private string ToType(Type type) => Nullable.GetUnderlyingType(type) != null ? $"Nullable<{Nullable.GetUnderlyingType(type).FullName}>" : type.FullName;
     }
 }

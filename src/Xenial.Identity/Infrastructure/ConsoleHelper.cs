@@ -141,15 +141,7 @@ public class ConsoleHelper
         AnsiConsole.Write(markup);
     }
 
-    private static Color GetColor(int colorId, Theme theme)
-    {
-        if (colorId == -1)
-        {
-            return Color.Default;
-        }
-
-        return HexToColor(theme.GetColor(colorId));
-    }
+    private static Color GetColor(int colorId, Theme theme) => colorId == -1 ? Color.Default : HexToColor(theme.GetColor(colorId));
 
     private static Decoration GetDecoration(int fontStyle)
     {
@@ -187,7 +179,7 @@ public class ConsoleHelper
         }
 
 #pragma warning disable CA1305 // Specify IFormatProvider
-        var r = byte.Parse(hexString.Substring(0, 2), NumberStyles.AllowHexSpecifier);
+        var r = byte.Parse(hexString[..2], NumberStyles.AllowHexSpecifier);
         var g = byte.Parse(hexString.Substring(2, 2), NumberStyles.AllowHexSpecifier);
         var b = byte.Parse(hexString.Substring(4, 2), NumberStyles.AllowHexSpecifier);
 #pragma warning restore CA1305 // Specify IFormatProvider

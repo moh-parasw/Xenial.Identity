@@ -1,11 +1,7 @@
 ﻿using DevExpress.Xpo;
 
-using Google.Protobuf.WellKnownTypes;
-
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Identity;
 
-using Xenial.Identity.Data;
 using Xenial.Identity.Xpo.Storage.Models;
 
 namespace Xenial.Identity.Components.Admin;
@@ -78,7 +74,7 @@ public partial class ApiSecrets
                 await UnitOfWork.DeleteAsync(secret);
                 await UnitOfWork.CommitChangesAsync();
                 await Reload();
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             API was successfully deleted!
@@ -93,7 +89,7 @@ public partial class ApiSecrets
             {
                 var errors = ex.Message;
 
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             There was an error when deleting the secret!

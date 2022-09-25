@@ -14,8 +14,6 @@ public partial class TagStringEdit : MudBaseInput<string>
 {
     [Inject] private IScrollManager ScrollManager { get; set; } = default!;
 
-    private bool dense;
-
     protected string Classname =>
         new CssBuilder("mud-select")
         .AddClass(Class)
@@ -68,11 +66,7 @@ public partial class TagStringEdit : MudBaseInput<string>
     /// </summary>
     [Parameter]
     [Category(CategoryTypes.FormComponent.ListAppearance)]
-    public bool Dense
-    {
-        get => dense;
-        set => dense = value;
-    }
+    public bool Dense { get; set; }
 
     /// <summary>
     /// The Open Autocomplete Icon
@@ -300,16 +294,22 @@ public partial class TagStringEdit : MudBaseInput<string>
 
         await SetValueAsync(value);
         if (_items != null)
+        {
             _selectedListItemIndex = Array.IndexOf(_items, value);
+        }
+
         var optionText = GetItemString(value);
         if (!isCleared)
+        {
             await SetTextAsync(optionText, false);
+        }
+
         _timer?.Dispose();
         IsOpen = false;
         BeginValidate();
         if (!isCleared)
         {
-            elementReference?.SetText(optionText);
+            _ = (elementReference?.SetText(optionText));
         }
         elementReference?.FocusAsync().AndForget();
         StateHasChanged();
@@ -351,7 +351,9 @@ public partial class TagStringEdit : MudBaseInput<string>
     {
         var text = GetItemString(Value);
         if (!string.IsNullOrWhiteSpace(text))
+        {
             Text = text;
+        }
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -369,20 +371,25 @@ public partial class TagStringEdit : MudBaseInput<string>
     {
         _timer?.Dispose();
         // This keeps the text from being set when clear() was called
-        if (isCleared)
-            return Task.CompletedTask;
-        return base.UpdateTextPropertyAsync(updateValue);
+        return isCleared ? Task.CompletedTask : base.UpdateTextPropertyAsync(updateValue);
     }
 
     protected override async Task UpdateValuePropertyAsync(bool updateText)
     {
         _timer?.Dispose();
         if (ResetValueOnEmptyText && string.IsNullOrWhiteSpace(Text))
+        {
             await SetValueAsync("", updateText);
+        }
+
         if (DebounceInterval <= 0)
+        {
             await OnSearchAsync();
+        }
         else
+        {
             _timer = new Timer(OnTimerComplete, null, DebounceInterval, Timeout.Infinite);
+        }
     }
 
     private void OnTimerComplete(object stateInfo) => InvokeAsync(OnSearchAsync);
@@ -432,7 +439,7 @@ public partial class TagStringEdit : MudBaseInput<string>
         StateHasChanged();
     }
 
-    private int _elementKey = 0;
+    private readonly int _elementKey = 0;
 
     /// <summary>
     /// Clears the autocomplete's text
@@ -443,7 +450,10 @@ public partial class TagStringEdit : MudBaseInput<string>
         IsOpen = false;
         await SetTextAsync(string.Empty, updateValue: false);
         if (elementReference != null)
+        {
             await elementReference.SetText("");
+        }
+
         _timer?.Dispose();
         StateHasChanged();
     }
@@ -458,7 +468,10 @@ public partial class TagStringEdit : MudBaseInput<string>
     private string GetItemString(string item)
     {
         if (item == null)
+        {
             return string.Empty;
+        }
+
         try
         {
             return Converter.Set(item);
@@ -475,11 +488,19 @@ public partial class TagStringEdit : MudBaseInput<string>
                 // NOTE: We need to catch Tab in Keydown because a tab will move focus to the next element and thus
                 // in OnInputKeyUp we'd never get the tab key
                 if (!IsOpen)
+                {
                     return;
+                }
+
                 if (SelectValueOnTab)
+                {
                     await OnEnterKey();
+                }
                 else
+                {
                     IsOpen = false;
+                }
+
                 break;
         }
     }
@@ -531,18 +552,26 @@ public partial class TagStringEdit : MudBaseInput<string>
             case "Tab":
                 await Task.Delay(1);
                 if (!IsOpen)
+                {
                     return;
+                }
+
                 if (SelectValueOnTab)
+                {
                     await OnEnterKey();
+                }
                 else
+                {
                     await ToggleMenu();
+                }
+
                 break;
             case "Backspace":
                 if (args.CtrlKey == true && args.ShiftKey == true)
                 {
                     if (string.IsNullOrEmpty(Text) && Tags.Count > 0)
                     {
-                        Tags.Remove(Tags.Last());
+                        _ = Tags.Remove(Tags.Last());
                         await TagsChanged.InvokeAsync(Tags);
                     }
                     Reset();
@@ -555,9 +584,11 @@ public partial class TagStringEdit : MudBaseInput<string>
     private ValueTask SelectNextItem(int increment)
     {
         if (increment == 0 || _items == null || _items.Length == 0 || !_enabledItemIndices.Any())
+        {
             return ValueTask.CompletedTask;
+        }
         // if we are at the end, or the beginning we just do an rollover
-        _selectedListItemIndex = Math.Clamp(value: (10 * _items.Length + _selectedListItemIndex + increment) % _items.Length, min: 0, max: _items.Length - 1);
+        _selectedListItemIndex = Math.Clamp(value: ((10 * _items.Length) + _selectedListItemIndex + increment) % _items.Length, min: 0, max: _items.Length - 1);
         return ScrollToListItem(_selectedListItemIndex);
     }
 
@@ -591,29 +622,27 @@ public partial class TagStringEdit : MudBaseInput<string>
     //This restores the scroll position after closing the menu and element being 0
     private void RestoreScrollPosition()
     {
-        if (_selectedListItemIndex != 0) return;
-        ScrollManager.ScrollToListItemAsync(GetListItemId(0));
+        if (_selectedListItemIndex != 0)
+        {
+            return;
+        }
+
+        _ = ScrollManager.ScrollToListItemAsync(GetListItemId(0));
     }
 
-    private string GetListItemId(in int index)
-    {
-        return $"{_componentId}_item{index}";
-    }
+    private string GetListItemId(in int index) => $"{_componentId}_item{index}";
 
-    internal Task OnEnterKey()
-    {
-        if (IsOpen == false)
-            return Task.CompletedTask;
-        if (_items == null || _items.Length == 0)
-            return Task.CompletedTask;
-        if (_selectedListItemIndex >= 0 && _selectedListItemIndex < _items.Length)
-            return SelectOption(_items[_selectedListItemIndex]);
-        return Task.CompletedTask;
-    }
+    internal Task OnEnterKey() => IsOpen == false
+            ? Task.CompletedTask
+            : _items == null || _items.Length == 0
+            ? Task.CompletedTask
+            : _selectedListItemIndex >= 0 && _selectedListItemIndex < _items.Length
+            ? SelectOption(_items[_selectedListItemIndex])
+            : Task.CompletedTask;
 
     private Task OnInputBlurred(FocusEventArgs args)
     {
-        OnBlur.InvokeAsync(args);
+        _ = OnBlur.InvokeAsync(args);
         return Task.CompletedTask;
         // we should not validate on blur in autocomplete, because the user needs to click out of the input to select a value,
         // resulting in a premature validation. thus, don't call base
@@ -629,48 +658,36 @@ public partial class TagStringEdit : MudBaseInput<string>
     /// <summary>
     /// Focus the input in the Autocomplete component.
     /// </summary>
-    public override ValueTask FocusAsync()
-    {
-        return elementReference.FocusAsync();
-    }
+    public override ValueTask FocusAsync() => elementReference.FocusAsync();
 
     /// <summary>
     /// Blur from the input in the Autocomplete component.
     /// </summary>
-    public override ValueTask BlurAsync()
-    {
-        return elementReference.BlurAsync();
-    }
+    public override ValueTask BlurAsync() => elementReference.BlurAsync();
 
     /// <summary>
     /// Select all text within the Autocomplete input.
     /// </summary>
-    public override ValueTask SelectAsync()
-    {
-        return elementReference.SelectAsync();
-    }
+    public override ValueTask SelectAsync() => elementReference.SelectAsync();
 
     /// <summary>
     /// Select all text within the Autocomplete input and aligns its start and end points to the text content of the current input.
     /// </summary>
-    public override ValueTask SelectRangeAsync(int pos1, int pos2)
-    {
-        return elementReference.SelectRangeAsync(pos1, pos2);
-    }
+    public override ValueTask SelectRangeAsync(int pos1, int pos2) => elementReference.SelectRangeAsync(pos1, pos2);
 
     private async Task OnTextChanged(string text)
     {
         await base.TextChanged.InvokeAsync();
 
         if (text == null)
+        {
             return;
+        }
+
         await SetTextAsync(text, true);
     }
 
-    private async Task ListItemOnClick(string item)
-    {
-        await SelectOption(item);
-    }
+    private async Task ListItemOnClick(string item) => await SelectOption(item);
 
     private void Closed(MudChip chip) => Tags.Remove(chip.Text);
 }

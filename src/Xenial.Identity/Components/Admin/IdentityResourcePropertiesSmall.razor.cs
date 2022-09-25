@@ -10,43 +10,41 @@ public partial class IdentityResourcePropertiesSmall
 {
     private async Task Edit(XpoIdentityResourceProperty property = null)
     {
-        using (var uow = UnitOfWork.BeginNestedUnitOfWork())
+        using var uow = UnitOfWork.BeginNestedUnitOfWork();
+        var resource = uow.GetObjectByKey<XpoIdentityResource>(Resource.Id);
+        var currentProperty = property switch
         {
-            var resource = uow.GetObjectByKey<XpoIdentityResource>(Resource.Id);
-            var currentProperty = property switch
+            { } => uow.GetObjectByKey<XpoIdentityResourceProperty>(property.Id),
+            _ => new XpoIdentityResourceProperty(uow) { IdentityResource = resource }
+        };
+        var dialog = DialogService.Show<IdentityResourcePropertiesDialog>(
+            property == null ? "Add Property" : "Edit Property",
+            new DialogParameters
             {
-                { } => uow.GetObjectByKey<XpoIdentityResourceProperty>(property.Id),
-                _ => new XpoIdentityResourceProperty(uow) { IdentityResource = resource }
-            };
-            var dialog = DialogService.Show<IdentityResourcePropertiesDialog>(
-                property == null ? "Add Property" : "Edit Property",
-                new DialogParameters
-                {
-                    [nameof(IdentityResourcePropertiesDialog.Property)] = currentProperty,
-                    [nameof(IdentityResourcePropertiesDialog.IsNew)] = property == null,
-                    [nameof(IdentityResourcePropertiesDialog.Resource)] = resource,
-                },
-                new DialogOptions
-                {
-                    MaxWidth = MaxWidth.Small,
-                    FullWidth = true,
-                    CloseOnEscapeKey = true,
-                    DisableBackdropClick = true,
-                });
+                [nameof(IdentityResourcePropertiesDialog.Property)] = currentProperty,
+                [nameof(IdentityResourcePropertiesDialog.IsNew)] = property == null,
+                [nameof(IdentityResourcePropertiesDialog.Resource)] = resource,
+            },
+            new DialogOptions
+            {
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true,
+                CloseOnEscapeKey = true,
+                DisableBackdropClick = true,
+            });
 
-            var refresh = await dialog.GetReturnValueAsync<bool?>();
-            if (refresh == true)
-            {
-                await uow.SaveAsync(currentProperty);
-                await uow.CommitChangesAsync();
-                await UnitOfWork.SaveAsync(Resource);
-                await UnitOfWork.CommitChangesAsync();
-                await Refresh();
-            }
-            else
-            {
-                uow.DropChanges();
-            }
+        var refresh = await dialog.GetReturnValueAsync<bool?>();
+        if (refresh == true)
+        {
+            await uow.SaveAsync(currentProperty);
+            await uow.CommitChangesAsync();
+            await UnitOfWork.SaveAsync(Resource);
+            await UnitOfWork.CommitChangesAsync();
+            await Refresh();
+        }
+        else
+        {
+            uow.DropChanges();
         }
     }
 
@@ -67,7 +65,7 @@ public partial class IdentityResourcePropertiesSmall
                 await UnitOfWork.DeleteAsync(property);
                 await UnitOfWork.CommitChangesAsync();
 
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             Property was successfully deleted!
@@ -82,7 +80,7 @@ public partial class IdentityResourcePropertiesSmall
             {
                 var errors = ex.Message;
 
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             There was an error when deleting the property!

@@ -1,8 +1,8 @@
 ﻿using DevExpress.Xpo;
 
-using FluentAssertions;
-
 using Duende.IdentityServer.Models;
+
+using FluentAssertions;
 
 using Xenial.Identity.Xpo.Storage.Mappers;
 
@@ -14,17 +14,17 @@ namespace Xenial.Identity.Xpo.Storage.Tests.Mappers
     {
         public static void Tests() => Describe(nameof(IdentityResourceMappers), () =>
         {
-            It("IdentityResource Automapper Configuration is valid", () => IdentityResourceMappers.Mapper.ConfigurationProvider.AssertConfigurationIsValid<IdentityResourceMapperProfile>());
+            _ = It("IdentityResource Automapper Configuration is valid", () => IdentityResourceMappers.Mapper.ConfigurationProvider.AssertConfigurationIsValid<IdentityResourceMapperProfile>());
 
-            It("Can map IdentityResources", () =>
+            _ = It("Can map IdentityResources", () =>
             {
                 using var session = new Session();
                 var model = new IdentityResource();
                 var mappedEntity = model.ToEntity(session);
                 var mappedModel = mappedEntity.ToModel();
 
-                mappedModel.Should().NotBeNull();
-                mappedEntity.Should().NotBeNull();
+                _ = mappedModel.Should().NotBeNull();
+                _ = mappedEntity.Should().NotBeNull();
             });
         });
     }

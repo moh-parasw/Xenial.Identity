@@ -1,6 +1,4 @@
-﻿using System;
-
-using DevExpress.Xpo;
+﻿using DevExpress.Xpo;
 
 namespace Xenial.AspNetIdentity.Xpo.Models
 {

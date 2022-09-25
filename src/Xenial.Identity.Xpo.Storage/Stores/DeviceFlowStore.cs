@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 using DevExpress.Xpo;
 using DevExpress.Xpo.DB.Exceptions;
 
-using IdentityModel;
-
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Stores;
 using Duende.IdentityServer.Stores.Serialization;
+
+using IdentityModel;
 
 using Microsoft.Extensions.Logging;
 
@@ -63,7 +62,7 @@ namespace Xenial.Identity.Xpo.Storage.Stores
         /// <returns></returns>
         public virtual async Task StoreDeviceAuthorizationAsync(string deviceCode, string userCode, DeviceCode data)
         {
-            ToEntity(data, deviceCode, userCode);
+            _ = ToEntity(data, deviceCode, userCode);
 
             await UnitOfWork.CommitChangesAsync();
         }
@@ -169,15 +168,9 @@ namespace Xenial.Identity.Xpo.Storage.Stores
         /// <param name="deviceCode"></param>
         /// <param name="userCode"></param>
         /// <returns></returns>
-        protected XpoDeviceFlowCodes ToEntity(DeviceCode model, string deviceCode, string userCode)
-        {
-            if (model == null || deviceCode == null || userCode == null)
-            {
-                return null;
-            }
-
-            return ToEntity(model, new XpoDeviceFlowCodes(UnitOfWork), deviceCode, userCode);
-        }
+        protected XpoDeviceFlowCodes ToEntity(DeviceCode model, string deviceCode, string userCode) => model == null || deviceCode == null || userCode == null
+                ? null
+                : ToEntity(model, new XpoDeviceFlowCodes(UnitOfWork), deviceCode, userCode);
 
         /// <summary>
         /// Converts a model to an entity.

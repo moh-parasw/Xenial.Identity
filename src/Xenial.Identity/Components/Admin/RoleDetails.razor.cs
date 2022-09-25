@@ -1,18 +1,4 @@
-﻿using IdentityModel;
-
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Identity;
-
-using MudBlazor.Utilities;
-
-using Newtonsoft.Json;
-
-using System.IO;
-using System.Security.Claims;
-
-using TextMateSharp.Themes;
-
-using Xenial.Identity.Infrastructure;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace Xenial.Identity.Components.Admin;
 
@@ -29,7 +15,7 @@ public partial class RoleDetails
             if (result.Succeeded)
             {
                 await ReloadRole();
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         Role was successfully updated!
@@ -55,7 +41,7 @@ public partial class RoleDetails
 
             var errors = string.Join("\n", result.Errors.Select(e => $"<li>Code: {e.Code}: {e.Description}</li>"));
 
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         There was an error when {message}!

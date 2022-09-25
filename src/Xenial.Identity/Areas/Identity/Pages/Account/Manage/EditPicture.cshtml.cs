@@ -1,28 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
-
-using DevExpress.XtraReports.Design;
 
 using IdentityModel;
 
-using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.Extensions.Logging;
 
-using Xenial.Identity.Areas.Identity.Controllers;
 using Xenial.Identity.Data;
 using Xenial.Identity.Infrastructure;
 
@@ -97,50 +82,40 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                     }
 
                     string AbsolutePictureUri(string pictureId)
-                        => $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/api/profile/picture/{pictureId}";
+                    {
+                        return $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/api/profile/picture/{pictureId}";
+                    }
 
                     var picture = AbsolutePictureUri(user.PictureId);
                     await userManager.SetOrUpdateClaimAsync(user, new System.Security.Claims.Claim("picture", picture));
                 }
                 var result = await userManager.UpdateAsync(user);
-                if (result.Succeeded)
-                {
-                    StatusMessage = "Profile image updated";
-                }
-                else
-                {
-                    StatusMessage = "Error: Profile image upload failed";
-                }
+                StatusMessage = result.Succeeded ? "Profile image updated" : "Error: Profile image upload failed";
             }
 
             ProfilePicture = new ProfilePictureModel(user);
-            if (!ModelState.IsValid)
-            {
-                return isJson ? new JsonResult(ModelState)
+            return !ModelState.IsValid
+                ? isJson ? new JsonResult(ModelState)
                 {
                     StatusCode = 400
+                } : Page()
+                : isJson ? new JsonResult(new
+                {
+                    StatusMessage,
+                    ProfilePicture
+                })
+                {
+                    StatusCode = 200
                 } : Page();
-            }
-
-            return isJson ? new JsonResult(new
-            {
-                StatusMessage,
-                ProfilePicture
-            })
-            {
-                StatusCode = 200
-            } : Page();
         }
 
         public string GeMimeTypeFromImageByteArray(byte[] byteArray)
         {
             try
             {
-                using (var stream = new MemoryStream(byteArray))
-                using (var image = Image.FromStream(stream))
-                {
-                    return ImageCodecInfo.GetImageEncoders().FirstOrDefault(codec => codec.FormatID == image.RawFormat.Guid).MimeType;
-                }
+                using var stream = new MemoryStream(byteArray);
+                using var image = Image.FromStream(stream);
+                return ImageCodecInfo.GetImageEncoders().FirstOrDefault(codec => codec.FormatID == image.RawFormat.Guid).MimeType;
             }
             catch (Exception ex)
             {
@@ -166,14 +141,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
             await userManager.RemoveClaimAsync(user, "picture");
 
             var result = await userManager.UpdateAsync(user);
-            if (result.Succeeded)
-            {
-                StatusMessage = "Profile image deleted";
-            }
-            else
-            {
-                StatusMessage = "Error: Profile image deletion failed";
-            }
+            StatusMessage = result.Succeeded ? "Profile image deleted" : "Error: Profile image deletion failed";
             ProfilePicture = new ProfilePictureModel(user);
             ModelState.Clear();
             return RedirectToPage("./EditPicture");

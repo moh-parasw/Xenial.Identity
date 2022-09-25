@@ -1,6 +1,4 @@
-﻿using System;
-
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
 {

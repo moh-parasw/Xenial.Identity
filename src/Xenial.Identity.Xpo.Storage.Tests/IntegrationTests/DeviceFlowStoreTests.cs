@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 
 using DevExpress.Xpo;
 using DevExpress.Xpo.DB.Exceptions;
 
+using Duende.IdentityServer.Models;
+using Duende.IdentityServer.Stores.Serialization;
+
 using FluentAssertions;
 
 using IdentityModel;
-
-using Duende.IdentityServer.Models;
-using Duende.IdentityServer.Stores.Serialization;
 
 using Xenial.Identity.Xpo.Storage.Models;
 using Xenial.Identity.Xpo.Storage.Stores;
@@ -38,7 +37,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 return (new DeviceFlowStore(uow, new PersistentGrantSerializer(), new FakeLogger<DeviceFlowStore>()), uow);
             }
 
-            It("StoreDeviceAuthorizationAsync when successful should store DeviceCode and UserCode", async () =>
+            _ = It("StoreDeviceAuthorizationAsync when successful should store DeviceCode and UserCode", async () =>
             {
                 var deviceCode = Guid.NewGuid().ToString();
                 var userCode = Guid.NewGuid().ToString();
@@ -55,17 +54,15 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                     await store.StoreDeviceAuthorizationAsync(deviceCode, userCode, data);
                 }
 
-                using (var uow1 = new UnitOfWork(dataLayer))
-                {
-                    var foundDeviceFlowCodes = await uow1.Query<XpoDeviceFlowCodes>().FirstOrDefaultAsync(x => x.DeviceCode == deviceCode);
+                using var uow1 = new UnitOfWork(dataLayer);
+                var foundDeviceFlowCodes = await uow1.Query<XpoDeviceFlowCodes>().FirstOrDefaultAsync(x => x.DeviceCode == deviceCode);
 
-                    foundDeviceFlowCodes.Should().NotBeNull();
-                    foundDeviceFlowCodes?.DeviceCode.Should().Be(deviceCode);
-                    foundDeviceFlowCodes?.UserCode.Should().Be(userCode);
-                }
+                _ = foundDeviceFlowCodes.Should().NotBeNull();
+                _ = (foundDeviceFlowCodes?.DeviceCode.Should().Be(deviceCode));
+                _ = (foundDeviceFlowCodes?.UserCode.Should().Be(userCode));
             });
 
-            It("StoreDeviceAuthorizationAsync when successful should store Data", async () =>
+            _ = It("StoreDeviceAuthorizationAsync when successful should store Data", async () =>
             {
                 var deviceCode = Guid.NewGuid().ToString();
                 var userCode = Guid.NewGuid().ToString();
@@ -82,20 +79,18 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                     await store.StoreDeviceAuthorizationAsync(deviceCode, userCode, data);
                 }
 
-                using (var uow1 = new UnitOfWork(dataLayer))
-                {
-                    var foundDeviceFlowCodes = await uow1.Query<XpoDeviceFlowCodes>().FirstOrDefaultAsync(x => x.DeviceCode == deviceCode);
+                using var uow1 = new UnitOfWork(dataLayer);
+                var foundDeviceFlowCodes = await uow1.Query<XpoDeviceFlowCodes>().FirstOrDefaultAsync(x => x.DeviceCode == deviceCode);
 
-                    foundDeviceFlowCodes.Should().NotBeNull();
-                    var deserializedData = new PersistentGrantSerializer().Deserialize<DeviceCode>(foundDeviceFlowCodes?.Data);
+                _ = foundDeviceFlowCodes.Should().NotBeNull();
+                var deserializedData = new PersistentGrantSerializer().Deserialize<DeviceCode>(foundDeviceFlowCodes?.Data);
 
-                    deserializedData.CreationTime.Should().BeCloseTo(data.CreationTime, TimeSpan.FromMilliseconds(100));
-                    deserializedData.ClientId.Should().Be(data.ClientId);
-                    deserializedData.Lifetime.Should().Be(data.Lifetime);
-                }
+                _ = deserializedData.CreationTime.Should().BeCloseTo(data.CreationTime, TimeSpan.FromMilliseconds(100));
+                _ = deserializedData.ClientId.Should().Be(data.ClientId);
+                _ = deserializedData.Lifetime.Should().Be(data.Lifetime);
             });
 
-            It("StoreDeviceAuthorizationAsync throws ConstraintViolationException when UserCode already", async () =>
+            _ = It("StoreDeviceAuthorizationAsync throws ConstraintViolationException when UserCode already", async () =>
             {
                 var existingUserCode = $"user_{Guid.NewGuid()}";
                 var deviceCodeData = new DeviceCode
@@ -111,7 +106,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
 
                 using (var uow1 = new UnitOfWork(dataLayer))
                 {
-                    new XpoDeviceFlowCodes(uow1)
+                    _ = new XpoDeviceFlowCodes(uow1)
                     {
                         DeviceCode = $"device_{Guid.NewGuid()}",
                         UserCode = existingUserCode,
@@ -130,11 +125,11 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 {
                     var action = new Func<Task>(async () => await store.StoreDeviceAuthorizationAsync($"device_{Guid.NewGuid()}", existingUserCode, deviceCodeData));
 
-                    await action.Should().ThrowAsync<ConstraintViolationException>();
+                    _ = await action.Should().ThrowAsync<ConstraintViolationException>();
                 }
             });
 
-            It("StoreDeviceAuthorizationAsync throws ConstraintViolationException when DeviceCode already exists", async () =>
+            _ = It("StoreDeviceAuthorizationAsync throws ConstraintViolationException when DeviceCode already exists", async () =>
             {
                 var existingDeviceCode = $"device_{Guid.NewGuid()}";
                 var deviceCodeData = new DeviceCode
@@ -150,7 +145,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
 
                 using (var uow1 = new UnitOfWork(dataLayer))
                 {
-                    new XpoDeviceFlowCodes(uow1)
+                    _ = new XpoDeviceFlowCodes(uow1)
                     {
                         DeviceCode = existingDeviceCode,
                         UserCode = $"user_{Guid.NewGuid()}",
@@ -168,11 +163,11 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 {
                     var action = new Func<Task>(async () => await store.StoreDeviceAuthorizationAsync(existingDeviceCode, $"user_{Guid.NewGuid()}", deviceCodeData));
 
-                    await action.Should().ThrowAsync<ConstraintViolationException>();
+                    _ = await action.Should().ThrowAsync<ConstraintViolationException>();
                 }
             });
 
-            It("FindByUserCodeAsync when UserCode exists retrieves Data correctly", async () =>
+            _ = It("FindByUserCodeAsync when UserCode exists retrieves Data correctly", async () =>
             {
                 var testDeviceCode = $"device_{Guid.NewGuid()}";
                 var testUserCode = $"user_{Guid.NewGuid()}";
@@ -190,7 +185,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
 
                 using (var uow1 = new UnitOfWork(dataLayer))
                 {
-                    new XpoDeviceFlowCodes(uow1)
+                    _ = new XpoDeviceFlowCodes(uow1)
                     {
                         DeviceCode = testDeviceCode,
                         UserCode = testUserCode,
@@ -208,24 +203,24 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 {
                     var code = await store.FindByUserCodeAsync(testUserCode);
 
-                    code.Should().BeEquivalentTo(expectedDeviceCodeData,
+                    _ = code.Should().BeEquivalentTo(expectedDeviceCodeData,
                         assertionOptions => assertionOptions.Excluding(x => x.Subject));
 
-                    code.Subject.Claims.FirstOrDefault(x => x.Type == JwtClaimTypes.Subject && x.Value == expectedSubject).Should().NotBeNull();
+                    _ = code.Subject.Claims.FirstOrDefault(x => x.Type == JwtClaimTypes.Subject && x.Value == expectedSubject).Should().NotBeNull();
                 }
             });
 
-            It("FindByUserCodeAsync when UserCode does not exist returns null", async () =>
+            _ = It("FindByUserCodeAsync when UserCode does not exist returns null", async () =>
             {
                 var (store, uow) = CreateStore();
                 using (uow)
                 {
                     var code = await store.FindByUserCodeAsync($"user_{Guid.NewGuid()}");
-                    code.Should().BeNull();
+                    _ = code.Should().BeNull();
                 }
             });
 
-            It("FindByDeviceCodeAsync when DeviceCode exists retrieves Data correctly", async () =>
+            _ = It("FindByDeviceCodeAsync when DeviceCode exists retrieves Data correctly", async () =>
             {
                 var testDeviceCode = $"device_{Guid.NewGuid()}";
                 var testUserCode = $"user_{Guid.NewGuid()}";
@@ -243,7 +238,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
 
                 using (var uow1 = new UnitOfWork(dataLayer))
                 {
-                    new XpoDeviceFlowCodes(uow1)
+                    _ = new XpoDeviceFlowCodes(uow1)
                     {
                         DeviceCode = testDeviceCode,
                         UserCode = testUserCode,
@@ -260,24 +255,24 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 using (uow)
                 {
                     var code = await store.FindByDeviceCodeAsync(testDeviceCode);
-                    code.Should().BeEquivalentTo(expectedDeviceCodeData,
+                    _ = code.Should().BeEquivalentTo(expectedDeviceCodeData,
                         assertionOptions => assertionOptions.Excluding(x => x.Subject));
 
-                    code.Subject.Claims.FirstOrDefault(x => x.Type == JwtClaimTypes.Subject && x.Value == expectedSubject).Should().NotBeNull();
+                    _ = code.Subject.Claims.FirstOrDefault(x => x.Type == JwtClaimTypes.Subject && x.Value == expectedSubject).Should().NotBeNull();
                 }
             });
 
-            It("FindByDeviceCodeAsync when DeviceCode does not exist returns null", async () =>
+            _ = It("FindByDeviceCodeAsync when DeviceCode does not exist returns null", async () =>
             {
                 var (store, uow) = CreateStore();
                 using (uow)
                 {
                     var code = await store.FindByDeviceCodeAsync($"device_{Guid.NewGuid()}");
-                    code.Should().BeNull();
+                    _ = code.Should().BeNull();
                 }
             });
 
-            It("UpdateByUserCodeAsync when DeviceCode is authorized should update Subject and Data", async () =>
+            _ = It("UpdateByUserCodeAsync when DeviceCode is authorized should update Subject and Data", async () =>
             {
                 var testDeviceCode = $"device_{Guid.NewGuid()}";
                 var testUserCode = $"user_{Guid.NewGuid()}";
@@ -294,7 +289,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
 
                 using (var uow1 = new UnitOfWork(dataLayer))
                 {
-                    new XpoDeviceFlowCodes(uow1)
+                    _ = new XpoDeviceFlowCodes(uow1)
                     {
                         DeviceCode = testDeviceCode,
                         UserCode = testUserCode,
@@ -324,24 +319,22 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                     await store.UpdateByUserCodeAsync(testUserCode, authorizedDeviceCode);
                 }
 
-                using (var uow2 = new UnitOfWork(dataLayer))
-                {
-                    var updatedCodes = await uow2.Query<XpoDeviceFlowCodes>().SingleAsync(x => x.UserCode == testUserCode);
+                using var uow2 = new UnitOfWork(dataLayer);
+                var updatedCodes = await uow2.Query<XpoDeviceFlowCodes>().SingleAsync(x => x.UserCode == testUserCode);
 
-                    // should be unchanged
-                    updatedCodes.DeviceCode.Should().Be(testDeviceCode);
-                    updatedCodes.ClientId.Should().Be(unauthorizedDeviceCode.ClientId);
-                    updatedCodes.CreationTime.Should().Be(unauthorizedDeviceCode.CreationTime);
-                    updatedCodes.Expiration.Should().Be(unauthorizedDeviceCode.CreationTime.AddSeconds(authorizedDeviceCode.Lifetime));
+                // should be unchanged
+                _ = updatedCodes.DeviceCode.Should().Be(testDeviceCode);
+                _ = updatedCodes.ClientId.Should().Be(unauthorizedDeviceCode.ClientId);
+                _ = updatedCodes.CreationTime.Should().Be(unauthorizedDeviceCode.CreationTime);
+                _ = updatedCodes.Expiration.Should().Be(unauthorizedDeviceCode.CreationTime.AddSeconds(authorizedDeviceCode.Lifetime));
 
-                    // should be changed
-                    var parsedCode = serializer.Deserialize<DeviceCode>(updatedCodes.Data);
-                    parsedCode.Should().BeEquivalentTo(authorizedDeviceCode, assertionOptions => assertionOptions.Excluding(x => x.Subject));
-                    parsedCode.Subject.Claims.FirstOrDefault(x => x.Type == JwtClaimTypes.Subject && x.Value == expectedSubject).Should().NotBeNull();
-                }
+                // should be changed
+                var parsedCode = serializer.Deserialize<DeviceCode>(updatedCodes.Data);
+                _ = parsedCode.Should().BeEquivalentTo(authorizedDeviceCode, assertionOptions => assertionOptions.Excluding(x => x.Subject));
+                _ = parsedCode.Subject.Claims.FirstOrDefault(x => x.Type == JwtClaimTypes.Subject && x.Value == expectedSubject).Should().NotBeNull();
             });
 
-            It("RemoveByDeviceCodeAsync when DeviceCodeExists should delete DeviceCode", async () =>
+            _ = It("RemoveByDeviceCodeAsync when DeviceCodeExists should delete DeviceCode", async () =>
             {
                 var testDeviceCode = $"device_{Guid.NewGuid()}";
                 var testUserCode = $"user_{Guid.NewGuid()}";
@@ -357,7 +350,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
 
                 using (var uow1 = new UnitOfWork(dataLayer))
                 {
-                    new XpoDeviceFlowCodes(uow1)
+                    _ = new XpoDeviceFlowCodes(uow1)
                     {
                         DeviceCode = testDeviceCode,
                         UserCode = testUserCode,
@@ -375,14 +368,12 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                     await store.RemoveByDeviceCodeAsync(testDeviceCode);
                 }
 
-                using (var uow2 = new UnitOfWork(dataLayer))
-                {
-                    var code = await uow2.Query<XpoDeviceFlowCodes>().FirstOrDefaultAsync(x => x.UserCode == testUserCode);
-                    code.Should().BeNull();
-                }
+                using var uow2 = new UnitOfWork(dataLayer);
+                var code = await uow2.Query<XpoDeviceFlowCodes>().FirstOrDefaultAsync(x => x.UserCode == testUserCode);
+                _ = code.Should().BeNull();
             });
 
-            It("RemoveByDeviceCodeAsync when DeviceCode does not exists should succeed", async () =>
+            _ = It("RemoveByDeviceCodeAsync when DeviceCode does not exists should succeed", async () =>
             {
                 var (store, uow) = CreateStore();
                 using (uow)

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,10 +23,10 @@ namespace Xenial.Identity.Xpo.Storage.Configuration
             Action<OperationalStoreOptions> storeOptionsAction = null)
         {
             var storeOptions = new OperationalStoreOptions();
-            services.AddSingleton(storeOptions);
+            _ = services.AddSingleton(storeOptions);
             storeOptionsAction?.Invoke(storeOptions);
 
-            services.AddTransient<TokenCleanupService>();
+            _ = services.AddTransient<TokenCleanupService>();
 
             return services;
         }

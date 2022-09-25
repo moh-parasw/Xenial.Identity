@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using DevExpress.Persistent.Validation;
+﻿using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
 
 using Duende.IdentityServer.Models;
@@ -12,7 +8,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
     [Persistent("ClientClaims")]
     public class XpoClientClaim : XpoStorageBaseObject
     {
-        private static readonly ClientClaim @default = new ClientClaim();
+        private static readonly ClientClaim @default = new();
         private int id;
         private string type = @default.Type;
         private string val = @default.Value;

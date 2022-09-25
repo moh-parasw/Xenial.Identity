@@ -1,18 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+
+using Duende.IdentityServer.Stores;
 
 using Microsoft.Extensions.DependencyInjection;
-
-using Xenial.Identity.Xpo.Storage.TokenCleanup;
-using Xenial.Identity.Xpo.Storage.Configuration;
 using Microsoft.Extensions.Hosting;
-using Duende.IdentityServer.Stores;
-using Xenial.Identity.Xpo.Storage.Stores;
-using Xenial.Identity.Xpo.Storage.Options;
-using Xenial.Identity.Xpo.Services;
 
-namespace Microsoft.Extensions.DependencyInjection
+using Xenial.Identity.Xpo;
+using Xenial.Identity.Xpo.Services;
+using Xenial.Identity.Xpo.Storage.Configuration;
+using Xenial.Identity.Xpo.Storage.Options;
+using Xenial.Identity.Xpo.Storage.Stores;
+using Xenial.Identity.Xpo.Storage.TokenCleanup;
+
+namespace Xenial.Identity.Xpo
 {
     public static class IdentityServerXpoBuilderExtensions
     {
@@ -27,14 +27,14 @@ namespace Microsoft.Extensions.DependencyInjection
             this IIdentityServerBuilder builder,
             Action<OperationalStoreOptions> storeOptionsAction = null)
         {
-            builder.Services.AddXpoIdentityStorage(storeOptionsAction);
+            _ = builder.Services.AddXpoIdentityStorage(storeOptionsAction);
 
-            builder.AddClientStore<ClientStore>();
-            builder.AddResourceStore<ResourceStore>();
-            builder.AddCorsPolicyService<CorsPolicyService>();
-            builder.Services.AddTransient<IPersistedGrantStore, PersistedGrantStore>();
-            builder.Services.AddTransient<IDeviceFlowStore, DeviceFlowStore>();
-            builder.Services.AddSingleton<IHostedService, TokenCleanupHost>();
+            _ = builder.AddClientStore<ClientStore>();
+            _ = builder.AddResourceStore<ResourceStore>();
+            _ = builder.AddCorsPolicyService<CorsPolicyService>();
+            _ = builder.Services.AddTransient<IPersistedGrantStore, PersistedGrantStore>();
+            _ = builder.Services.AddTransient<IDeviceFlowStore, DeviceFlowStore>();
+            _ = builder.Services.AddSingleton<IHostedService, TokenCleanupHost>();
 
             return builder;
         }
@@ -49,7 +49,7 @@ namespace Microsoft.Extensions.DependencyInjection
            this IIdentityServerBuilder builder)
            where T : class, IOperationalStoreNotification
         {
-            builder.Services.AddXpoStoreNotification<T>();
+            _ = builder.Services.AddXpoStoreNotification<T>();
             return builder;
         }
     }

@@ -1,9 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-using Xenial.Identity.Channels.SMS.AnySms.Components;
-using Xenial.Identity.Infrastructure.Channels;
+using Xenial.Identity.Channels.Components;
 
-namespace Xenial.Identity.Channels.SMS.AnySms;
+namespace Xenial.Identity.Channels;
 
 internal class AnySmsChannel : ICommunicationChannel
 {
@@ -18,11 +17,13 @@ internal class AnySmsChannel : ICommunicationChannel
 
         return Task.CompletedTask;
     }
-
 }
 
 public static class CommunicationChannelOptionsExtensions
 {
     public static void AddAnySms(this ICommunicationChannelOptions options)
-        => options.RegisterChannel<AnySmsChannel, AnySmsSettingsComponents>(CommunicationChannelType.Sms, "AnySms", "SMS (AnySms)");
+        => options.RegisterChannel<AnySmsChannel, AnySmsSettingsComponents>(
+            CommunicationChannelType.Sms,
+            "AnySms",
+            "SMS (AnySms)");
 }

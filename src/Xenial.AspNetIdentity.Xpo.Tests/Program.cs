@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using DevExpress.Xpo;
 using DevExpress.Xpo.DB;
 
-using Xenial.AspNetIdentity.Xpo.Models;
 using Xenial.AspNetIdentity.Xpo.Tests.Stores;
 
 using static Xenial.Tasty;

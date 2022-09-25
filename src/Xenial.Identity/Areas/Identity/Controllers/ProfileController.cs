@@ -1,7 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 using DevExpress.Xpo;
 
@@ -34,9 +31,9 @@ namespace Xenial.Identity.Areas.Identity.Controllers
 
             var user = await unitOfWork.Query<XpoXeniaIIdentityUser>().Where(u => u.PictureId == pictureId).Select(u => new
             {
-                PictureMimeType = u.PictureMimeType,
-                Picture = u.Picture,
-                Initials = u.Initials,
+                u.PictureMimeType,
+                u.Picture,
+                u.Initials,
                 BackColor = u.Color
             }).FirstOrDefaultAsync();
 

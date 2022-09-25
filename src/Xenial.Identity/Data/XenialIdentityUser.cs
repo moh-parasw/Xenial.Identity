@@ -1,7 +1,4 @@
-﻿
-using System;
-
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace Xenial.Identity.Data
 {

@@ -1,21 +1,19 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
-using Xenial.Identity.Data;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.AspNetCore.Identity.UI.Services;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+
 using DevExpress.Xpo;
-using Microsoft.Extensions.Configuration;
+
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.WebUtilities;
+
+using Xenial.Identity.Data;
 using Xenial.Identity.Models;
 
 namespace Xenial.Identity.Areas.Identity.Pages.Account
@@ -110,7 +108,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
                 ModelState.AddModelError(string.Empty, ErrorMessage);
             }
 
-            returnUrl = returnUrl ?? Url.Content("~/");
+            returnUrl ??= Url.Content("~/");
 
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
@@ -130,7 +128,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPostLoginAsync(string returnUrl = null)
         {
             SelectedPage = "login";
-            returnUrl = returnUrl ?? Url.Content("~/");
+            returnUrl ??= Url.Content("~/");
             ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             MarkAllFieldsAsSkipped(nameof(LoginInput));
@@ -146,7 +144,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = LoginInput.RememberMe });
+                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, LoginInput.RememberMe });
                 }
                 if (result.IsLockedOut)
                 {
@@ -181,7 +179,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
             }
 
             SelectedPage = "register";
-            returnUrl = returnUrl ?? Url.Content("~/");
+            returnUrl ??= Url.Content("~/");
             ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             MarkAllFieldsAsSkipped(nameof(RegisterInput));
@@ -195,7 +193,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
                 {
                     if (!await roleManager.RoleExistsAsync(AdminRole))
                     {
-                        await roleManager.CreateAsync(new IdentityRole(AdminRole));
+                        _ = await roleManager.CreateAsync(new IdentityRole(AdminRole));
                         logger.LogInformation($"Created new '{AdminRole}' role.");
                     }
                 }
@@ -223,7 +221,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
                     var callbackUrl = Url.Page(
                         "/Account/ConfirmEmail",
                         pageHandler: null,
-                        values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
+                        values: new { area = "Identity", userId = user.Id, code, returnUrl },
                         protocol: Request.Scheme);
 
                     await emailSender.SendEmailAsync(RegisterInput.Email, "Confirm your email",
@@ -231,7 +229,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
 
                     if (userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-                        return RedirectToPage("RegisterConfirmation", new { email = RegisterInput.Email, returnUrl = returnUrl });
+                        return RedirectToPage("RegisterConfirmation", new { email = RegisterInput.Email, returnUrl });
                     }
                     else
                     {

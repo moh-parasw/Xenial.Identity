@@ -114,12 +114,9 @@ public partial class ClientDetailsAdvanced
     {
         var resources = await UnitOfWork.Query<XpoIdentityResource>().Select(r => r.Name).ToArrayAsync();
 
-        if (string.IsNullOrEmpty(x))
-        {
-            return resources.Except(IdentityResources);
-        }
-
-        return resources.Except(IdentityResources).Where(v => v.Contains(x, StringComparison.InvariantCultureIgnoreCase));
+        return string.IsNullOrEmpty(x)
+            ? resources.Except(IdentityResources)
+            : resources.Except(IdentityResources).Where(v => v.Contains(x, StringComparison.InvariantCultureIgnoreCase));
     }
 
     public async Task Save()
@@ -174,7 +171,7 @@ public partial class ClientDetailsAdvanced
         }
         catch (Exception ex)
         {
-            var errors = ex.Message;
+            _ = ex.Message;
 
             //Snackbar.Add($"""
             //    <ul>

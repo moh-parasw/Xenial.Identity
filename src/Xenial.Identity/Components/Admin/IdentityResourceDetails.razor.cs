@@ -23,7 +23,7 @@ public partial class IdentityResourceDetails
             await UnitOfWork.CommitChangesAsync();
 
             await Refresh();
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         IdentityResource was successfully updated!
@@ -37,7 +37,7 @@ public partial class IdentityResourceDetails
         catch (Exception ex)
         {
             var errors = ex.Message;
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         There was an error when updating the IdendityResource!

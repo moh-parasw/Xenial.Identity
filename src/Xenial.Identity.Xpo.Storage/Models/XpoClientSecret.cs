@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
@@ -12,7 +10,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
     [Persistent("ClientSecrets")]
     public class XpoClientSecret : XpoStorageBaseObject
     {
-        private static readonly Secret @default = new Secret();
+        private static readonly Secret @default = new();
         private int id;
         private string description = @default.Description;
         private string val = @default.Value;

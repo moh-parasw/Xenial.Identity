@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 
 using Xenial.Identity.Data;
 
@@ -60,12 +58,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
             }
 
             var hasPassword = await userManager.HasPasswordAsync(user);
-            if (!hasPassword)
-            {
-                return RedirectToPage("./SetPassword");
-            }
-
-            return Page();
+            return !hasPassword ? RedirectToPage("./SetPassword") : Page();
         }
 
         public async Task<IActionResult> OnPostAsync()

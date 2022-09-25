@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,10 +15,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
     {
         private readonly UserManager<XenialIdentityUser> _userManager;
 
-        public ConfirmEmailModel(UserManager<XenialIdentityUser> userManager)
-        {
-            _userManager = userManager;
-        }
+        public ConfirmEmailModel(UserManager<XenialIdentityUser> userManager) => _userManager = userManager;
 
         [TempData]
         public string StatusMessage { get; set; }

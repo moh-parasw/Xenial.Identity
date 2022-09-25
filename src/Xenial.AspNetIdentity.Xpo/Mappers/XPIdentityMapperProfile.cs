@@ -1,6 +1,4 @@
-﻿
-using System;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
 using AutoMapper;
 
@@ -24,45 +22,45 @@ namespace Xenial.AspNetIdentity.Xpo.Mappers
     {
         public XPIdentityMapperProfile()
         {
-            CreateMap<TXPUser, TUser>()
+            _ = CreateMap<TXPUser, TUser>()
                 //TODO: Convert from DateTimeOffset to DateTime and via versa
                 .ForMember(o => o.LockoutEnd, o => o.Ignore())
                 .ReverseMap()
                 .ConstructUsingServiceLocator();
 
-            CreateMap<Models.XpoIdentityUserClaim, IdentityUserClaim<string>>()
+            _ = CreateMap<Models.XpoIdentityUserClaim, IdentityUserClaim<string>>()
                 .ReverseMap()
                 .ConstructUsingServiceLocator();
 
-            CreateMap<Models.XpoIdentityUserClaim, Claim>()
+            _ = CreateMap<Models.XpoIdentityUserClaim, Claim>()
                 .ConstructUsing(c => new Claim(c.Type, c.Value))
                 .ReverseMap()
                 .ConstructUsingServiceLocator();
 
-            CreateMap<Models.XpoIdentityUserLogin, IdentityUserLogin<string>>()
+            _ = CreateMap<Models.XpoIdentityUserLogin, IdentityUserLogin<string>>()
                 .ReverseMap()
                 .ConstructUsingServiceLocator();
 
-            CreateMap<Models.XpoIdentityUserToken, IdentityUserToken<string>>()
+            _ = CreateMap<Models.XpoIdentityUserToken, IdentityUserToken<string>>()
                 .ReverseMap()
                 .ForMember(m => m.User, o => o.Ignore())
                 .ConstructUsingServiceLocator();
 
-            CreateMap<Models.XpoIdentityUserLogin, UserLoginInfo>()
+            _ = CreateMap<Models.XpoIdentityUserLogin, UserLoginInfo>()
                 .ConstructUsing(l => new UserLoginInfo(l.LoginProvider, l.ProviderKey, l.ProviderDisplayName))
                 .ReverseMap()
                 .ForMember(m => m.User, o => o.Ignore())
                 .ConstructUsingServiceLocator();
 
-            CreateMap<TXPRole, TRole>()
+            _ = CreateMap<TXPRole, TRole>()
                 .ReverseMap()
                 .ConstructUsingServiceLocator();
 
-            CreateMap<Models.XpoIdentityRoleClaim, IdentityRoleClaim<string>>()
+            _ = CreateMap<Models.XpoIdentityRoleClaim, IdentityRoleClaim<string>>()
                 .ReverseMap()
                 .ConstructUsingServiceLocator();
 
-            CreateMap<Models.XpoIdentityRoleClaim, Claim>()
+            _ = CreateMap<Models.XpoIdentityRoleClaim, Claim>()
                 .ConstructUsing(c => new Claim(c.Type, c.Value))
                 .ReverseMap()
                 .ConstructUsingServiceLocator();

@@ -19,16 +19,16 @@ namespace Xenial.Identity.Xpo.Storage.Mappers
         /// </summary>
         public IdentityResourceMapperProfile()
         {
-            CreateMap<XpoIdentityResourceProperty, KeyValuePair<string, string>>()
+            _ = CreateMap<XpoIdentityResourceProperty, KeyValuePair<string, string>>()
                 .ReverseMap()
                 .ConstructUsingServiceLocator();
 
-            CreateMap<XpoIdentityResource, IdentityResource>(MemberList.Destination)
+            _ = CreateMap<XpoIdentityResource, IdentityResource>(MemberList.Destination)
                 .ConstructUsing(src => new IdentityResource())
                 .ReverseMap()
                 .ConstructUsingServiceLocator();
 
-            CreateMap<XpoIdentityResourceClaim, string>()
+            _ = CreateMap<XpoIdentityResourceClaim, string>()
                .ConstructUsing(x => x.Type)
                .ReverseMap()
                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src))

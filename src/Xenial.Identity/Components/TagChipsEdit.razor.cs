@@ -1,12 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
 using MudBlazor;
-using MudBlazor.Utilities;
-
-using Spectre.Console;
 
 namespace Xenial.Identity;
 

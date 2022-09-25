@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Xenial.Identity.Areas.Admin.Pages.Clients
+﻿namespace Xenial.Identity.Areas.Admin.Pages.Clients
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
     public sealed class IconAttribute : Attribute

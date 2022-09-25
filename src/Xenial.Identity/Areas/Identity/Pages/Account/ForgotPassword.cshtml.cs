@@ -1,13 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Encodings.Web;
 using System.Text;
-using System.Threading.Tasks;
+using System.Text.Encodings.Web;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+
 using Xenial.Identity.Data;
 
 namespace Xenial.Identity.Areas.Identity.Pages.Account
@@ -39,7 +40,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(Input.Email);
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                if (user == null || !await _userManager.IsEmailConfirmedAsync(user))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
                     return RedirectToPage("./ForgotPasswordConfirmation");

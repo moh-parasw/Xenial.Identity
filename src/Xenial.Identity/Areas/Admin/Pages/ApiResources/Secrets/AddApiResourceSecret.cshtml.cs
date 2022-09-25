@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 using AutoMapper;
 
@@ -11,11 +7,9 @@ using DevExpress.Xpo.DB.Exceptions;
 
 using Duende.IdentityServer.Models;
 
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Logging;
 
 using Xenial.Identity.Configuration;
 using Xenial.Identity.Xpo.Storage.Models;
@@ -45,8 +39,8 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources.Secrets
             }
         }
 
-        public readonly SelectList SecretTypes = new SelectList(ClientConstants.SecretTypes);
-        public readonly SelectList HashTypes = new SelectList(Enum.GetValues(typeof(ApiResourceSecretInputModel.HashTypes)));
+        public readonly SelectList SecretTypes = new(ClientConstants.SecretTypes);
+        public readonly SelectList HashTypes = new(Enum.GetValues(typeof(ApiResourceSecretInputModel.HashTypes)));
 
         internal class ApiResourceMappingConfiguration : Profile
         {

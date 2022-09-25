@@ -1,9 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-using Xenial.Identity.Channels.Mail.MailKit.Components;
-using Xenial.Identity.Infrastructure.Channels;
+using Xenial.Identity.Channels.Components;
 
-namespace Xenial.Identity.Channels.Mail.MailKit;
+namespace Xenial.Identity.Channels;
 
 internal class MailKitChannel : ICommunicationChannel
 {
@@ -18,11 +17,13 @@ internal class MailKitChannel : ICommunicationChannel
 
         return Task.CompletedTask;
     }
-
 }
 
 public static class CommunicationChannelOptionsExtensions
 {
     public static void AddMailKit(this ICommunicationChannelOptions options)
-        => options.RegisterChannel<MailKitChannel, MailkitSettingsComponents>(CommunicationChannelType.Email, "MailKit", "E-Mail (MailKit)");
+        => options.RegisterChannel<MailKitChannel, MailkitSettingsComponents>(
+            CommunicationChannelType.Email,
+            "MailKit",
+            "E-Mail (MailKit)");
 }

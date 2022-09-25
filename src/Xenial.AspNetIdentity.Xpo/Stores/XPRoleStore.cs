@@ -63,7 +63,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                 .Query<TXPRole>()
                 .ProjectTo<TRole>(MapperConfiguration);
 
-        public async override Task<IdentityResult> CreateAsync(TRole role, CancellationToken cancellationToken = default)
+        public override async Task<IdentityResult> CreateAsync(TRole role, CancellationToken cancellationToken = default)
         {
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
@@ -89,7 +89,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
 
-        public async override Task<IdentityResult> DeleteAsync(TRole role, CancellationToken cancellationToken = default)
+        public override async Task<IdentityResult> DeleteAsync(TRole role, CancellationToken cancellationToken = default)
         {
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
@@ -117,7 +117,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
 
-        public async override Task<IdentityResult> UpdateAsync(TRole role, CancellationToken cancellationToken = default)
+        public override async Task<IdentityResult> UpdateAsync(TRole role, CancellationToken cancellationToken = default)
         {
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
@@ -148,7 +148,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
         }
 
-        public async override Task<TRole> FindByIdAsync(string id, CancellationToken cancellationToken = default)
+        public override async Task<TRole> FindByIdAsync(string id, CancellationToken cancellationToken = default)
         {
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
@@ -165,7 +165,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
         protected virtual CriteriaOperator CreateRoleOperator(string normalizedName)
             => new BinaryOperator("NormalizedName", normalizedName, BinaryOperatorType.Equal);
 
-        public async override Task<TRole> FindByNameAsync(string normalizedName, CancellationToken cancellationToken = default)
+        public override async Task<TRole> FindByNameAsync(string normalizedName, CancellationToken cancellationToken = default)
         {
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
@@ -180,7 +180,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             return mapper.Map<TRole>(persistentRole);
         }
 
-        public async override Task AddClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default)
+        public override async Task AddClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default)
         {
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
@@ -209,7 +209,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             }
             catch (Exception ex)
             {
-                HandleGenericException("add claim", ex);
+                _ = HandleGenericException("add claim", ex);
             }
         }
 
@@ -223,7 +223,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
                new BinaryOperator(new OperandProperty("Value"), new OperandValue(claimValue), BinaryOperatorType.Equal)
             );
 
-        public async override Task<IList<Claim>> GetClaimsAsync(TRole role, CancellationToken cancellationToken = default)
+        public override async Task<IList<Claim>> GetClaimsAsync(TRole role, CancellationToken cancellationToken = default)
         {
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
@@ -245,7 +245,7 @@ namespace Xenial.AspNetIdentity.Xpo.Stores
             return claims;
         }
 
-        public async override Task RemoveClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default)
+        public override async Task RemoveClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default)
         {
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();

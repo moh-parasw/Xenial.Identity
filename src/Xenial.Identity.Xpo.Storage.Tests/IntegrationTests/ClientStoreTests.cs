@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 using DevExpress.Xpo;
 
-using FluentAssertions;
-
 using Duende.IdentityServer.Models;
+
+using FluentAssertions;
 
 using Xenial.Identity.Xpo.Storage.Mappers;
 using Xenial.Identity.Xpo.Storage.Stores;
@@ -31,17 +29,17 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 return (new ClientStore(uow, new FakeLogger<ClientStore>()), uow);
             }
 
-            It("FindClientByIdAsync when client does not exist returns null", async () =>
+            _ = It("FindClientByIdAsync when client does not exist returns null", async () =>
             {
                 var (store, uow) = CreateStore();
                 using (uow)
                 {
                     var client = await store.FindClientByIdAsync(Guid.NewGuid().ToString());
-                    client.Should().BeNull();
+                    _ = client.Should().BeNull();
                 }
             });
 
-            It("FindClientByIdAsync when client exists returns existing client", async () =>
+            _ = It("FindClientByIdAsync when client exists returns existing client", async () =>
             {
                 var testClient = new Client
                 {
@@ -51,7 +49,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
 
                 using (var unitOfWork = new UnitOfWork(dataLayer))
                 {
-                    testClient.ToEntity(unitOfWork);
+                    _ = testClient.ToEntity(unitOfWork);
                     await unitOfWork.CommitChangesAsync();
                 }
 
@@ -60,11 +58,11 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 {
                     var client = await store.FindClientByIdAsync(testClient.ClientId);
 
-                    client.Should().NotBeNull();
+                    _ = client.Should().NotBeNull();
                 }
             });
 
-            It("FindClientByIdAsync when client exists with collections should return client with collections", async () =>
+            _ = It("FindClientByIdAsync when client exists with collections should return client with collections", async () =>
             {
                 var testClient = new Client
                 {
@@ -83,7 +81,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
 
                 using (var uow1 = new UnitOfWork(dataLayer))
                 {
-                    testClient.ToEntity(uow1);
+                    _ = testClient.ToEntity(uow1);
                     await uow1.CommitChangesAsync();
                 }
 
@@ -91,11 +89,11 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                 using (uow)
                 {
                     var client = await store.FindClientByIdAsync(testClient.ClientId);
-                    client.Should().BeEquivalentTo(testClient);
+                    _ = client.Should().BeEquivalentTo(testClient);
                 }
             });
 
-            It("FindClientByIdAsync when clients exist with many collections should return in under five seconds", async () =>
+            _ = It("FindClientByIdAsync when clients exist with many collections should return in under five seconds", async () =>
             {
                 var testClient = new Client
                 {
@@ -114,11 +112,11 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
 
                 using (var uow1 = new UnitOfWork(dataLayer))
                 {
-                    testClient.ToEntity(uow1);
+                    _ = testClient.ToEntity(uow1);
 
                     for (var i = 0; i < 50; i++)
                     {
-                        new Client()
+                        _ = new Client()
                         {
                             ClientId = testClient.ClientId + i,
                             ClientName = testClient.ClientName,
@@ -142,7 +140,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.IntegrationTests
                     if (await Task.WhenAny(task, Task.Delay(timeout)) == task)
                     {
                         var client = await task;
-                        client.Should().BeEquivalentTo(testClient);
+                        _ = client.Should().BeEquivalentTo(testClient);
                     }
                     else
                     {

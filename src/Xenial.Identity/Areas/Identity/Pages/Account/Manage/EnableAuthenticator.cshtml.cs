@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Linq;
-using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
+
 using Xenial.Identity.Data;
 
 namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
@@ -91,7 +90,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
-            await _userManager.SetTwoFactorEnabledAsync(user, true);
+            _ = await _userManager.SetTwoFactorEnabledAsync(user, true);
             var userId = await _userManager.GetUserIdAsync(user);
             _logger.LogInformation("User with ID '{UserId}' has enabled 2FA with an authenticator app.", userId);
 
@@ -115,7 +114,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
             var unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
             if (string.IsNullOrEmpty(unformattedKey))
             {
-                await _userManager.ResetAuthenticatorKeyAsync(user);
+                _ = await _userManager.ResetAuthenticatorKeyAsync(user);
                 unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
             }
 
@@ -128,27 +127,24 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
         private string FormatKey(string unformattedKey)
         {
             var result = new StringBuilder();
-            int currentPosition = 0;
+            var currentPosition = 0;
             while (currentPosition + 4 < unformattedKey.Length)
             {
-                result.Append(unformattedKey.Substring(currentPosition, 4)).Append(" ");
+                _ = result.Append(unformattedKey.Substring(currentPosition, 4)).Append(" ");
                 currentPosition += 4;
             }
             if (currentPosition < unformattedKey.Length)
             {
-                result.Append(unformattedKey.Substring(currentPosition));
+                _ = result.Append(unformattedKey[currentPosition..]);
             }
 
             return result.ToString().ToLowerInvariant();
         }
 
-        private string GenerateQrCodeUri(string email, string unformattedKey)
-        {
-            return string.Format(
+        private string GenerateQrCodeUri(string email, string unformattedKey) => string.Format(
                 AuthenticatorUriFormat,
                 _urlEncoder.Encode("Xenial.Identity"),
                 _urlEncoder.Encode(email),
                 unformattedKey);
-        }
     }
 }

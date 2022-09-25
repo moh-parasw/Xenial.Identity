@@ -1,11 +1,7 @@
-﻿using System.Security.Claims;
-
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Components;
 
 using MudBlazor;
 
-using Xenial.Identity.Data;
 using Xenial.Identity.Xpo.Storage.Models;
 
 namespace Xenial.Identity.Components.Admin;

@@ -18,13 +18,10 @@ public partial class UserDetails
 {
     private async Task<IEnumerable<string>> SearchRoles(string x)
     {
-        var roles = (await RolesManager.Roles.Select(x => x.Name).ToListAsync());
-        if (string.IsNullOrEmpty(x))
-        {
-            return roles.Except(Roles);
-        }
-
-        return roles.Except(Roles).Where(v => v.Contains(x, StringComparison.InvariantCultureIgnoreCase));
+        var roles = await RolesManager.Roles.Select(x => x.Name).ToListAsync();
+        return string.IsNullOrEmpty(x)
+            ? roles.Except(Roles)
+            : roles.Except(Roles).Where(v => v.Contains(x, StringComparison.InvariantCultureIgnoreCase));
     }
 
     protected async Task SaveUser()
@@ -114,7 +111,7 @@ public partial class UserDetails
             if (result.Succeeded)
             {
                 await ReloadUser();
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         User was successfully updated!
@@ -140,7 +137,7 @@ public partial class UserDetails
 
             var errors = string.Join("\n", result.Errors.Select(e => $"<li>Code: {e.Code}: {e.Description}</li>"));
 
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         There was an error when {message}!
@@ -168,7 +165,9 @@ public partial class UserDetails
         }
 
         string AbsolutePictureUri(string pictureId)
-            => $"{NavigationManager.BaseUri}api/profile/picture/{pictureId}";
+        {
+            return $"{NavigationManager.BaseUri}api/profile/picture/{pictureId}";
+        }
 
         var picture = AbsolutePictureUri(User.PictureId);
         await UserManager.SetOrUpdateClaimAsync(User, new System.Security.Claims.Claim("picture", picture));
@@ -178,7 +177,7 @@ public partial class UserDetails
         if (result.Succeeded)
         {
             await ReloadUser();
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         Profile picture was successfully updated!
@@ -193,7 +192,7 @@ public partial class UserDetails
         {
             var errors = string.Join("\n", result.Errors.Select(e => $"<li>Code: {e.Code}: {e.Description}</li>"));
 
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         There was an error when updating the profile picture!
@@ -219,7 +218,7 @@ public partial class UserDetails
         if (result.Succeeded)
         {
             await ReloadUser();
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         Profile picture was successfully removed!
@@ -234,7 +233,7 @@ public partial class UserDetails
         {
             var errors = string.Join("\n", result.Errors.Select(e => $"<li>Code: {e.Code}: {e.Description}</li>"));
 
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         There was an error when removing the profile picture!

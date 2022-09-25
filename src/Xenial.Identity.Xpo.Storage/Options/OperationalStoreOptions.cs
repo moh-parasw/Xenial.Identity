@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Xenial.Identity.Xpo.Storage.Options
+﻿namespace Xenial.Identity.Xpo.Storage.Options
 {
     /// <summary>
     /// Options for configuring the operational context.

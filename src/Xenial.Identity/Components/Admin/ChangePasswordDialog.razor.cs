@@ -44,7 +44,7 @@ public partial class ChangePasswordDialog
         {
             if (result.Succeeded)
             {
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         Password was successfully changed!
@@ -71,7 +71,7 @@ public partial class ChangePasswordDialog
 
             var errors = string.Join("\n", result.Errors.Select(e => $"<li>Code: {e.Code}: {e.Description}</li>"));
 
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         There was an error when {message}!

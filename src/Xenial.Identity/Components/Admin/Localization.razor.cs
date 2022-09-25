@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Reflection;
 
 using DevExpress.Xpo;
@@ -17,14 +16,16 @@ public partial class Localization
     private async Task<IEnumerable<string>> SearchFunc(string x)
     {
         static IEnumerable<string> GetXLocalizerItems(object node)
-            => node.GetType()
-                .GetProperties()
-                .Where(x =>
-                    x.PropertyType == typeof(string)
-                    && x.GetCustomAttribute<RequiredAttribute>() is not null
-                )
-                .Select(x => x.GetValue(node))
-                .OfType<string>();
+        {
+            return node.GetType()
+                        .GetProperties()
+                        .Where(x =>
+                            x.PropertyType == typeof(string)
+                            && x.GetCustomAttribute<RequiredAttribute>() is not null
+                        )
+                        .Select(x => x.GetValue(node))
+                        .OfType<string>();
+        }
 
         var existingKeys = await UOW
             .Query<XpoLocalization>()
@@ -42,17 +43,13 @@ public partial class Localization
             .Except(existingKeys)
             .Distinct();
 
-        if (string.IsNullOrEmpty(x))
-        {
-            return keys;
-        }
-        return keys.Where(k => k.Contains(x, StringComparison.InvariantCultureIgnoreCase));
+        return string.IsNullOrEmpty(x) ? keys : keys.Where(k => k.Contains(x, StringComparison.InvariantCultureIgnoreCase));
     }
     private async Task<bool> Validate(string x)
     {
         if (string.IsNullOrEmpty(x))
         {
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             There was an error when adding the localization!
@@ -69,7 +66,7 @@ public partial class Localization
         var contains = existingKeys.Contains(x);
         if (contains)
         {
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             There was an error when adding the localization!
@@ -177,7 +174,7 @@ public partial class Localization
             {
                 await UOW.DeleteAsync(localization);
                 await UOW.CommitChangesAsync();
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             Localization was successfully deleted!
@@ -193,7 +190,7 @@ public partial class Localization
             {
                 var errors = ex.Message;
 
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             There was an error when deleting the localization!

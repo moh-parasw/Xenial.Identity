@@ -1,13 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities;
 
 using Xenial.Identity.Data;
 
@@ -111,14 +107,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
             //    StatusMessage = "Confirmation link to change phone number sent. Please check your phones messages.";
             //    return RedirectToPage();
             //}
-            if (result.Succeeded)
-            {
-                StatusMessage = "Your phone number was updated.";
-            }
-            else
-            {
-                StatusMessage = "Error updating your phone number.";
-            }
+            StatusMessage = result.Succeeded ? "Your phone number was updated." : "Error updating your phone number.";
             return RedirectToPage();
         }
 

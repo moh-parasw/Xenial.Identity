@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 using DevExpress.Xpo;
 
@@ -11,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Xenial.Identity.Xpo.Services;
 using Xenial.Identity.Xpo.Storage.Mappers;
-using Xenial.Identity.Xpo.Storage.Models;
 
 using static Xenial.Tasty;
 
@@ -30,17 +28,19 @@ namespace Xenial.Identity.Xpo.Storage.Tests.Services
             {
                 var ctx = new DefaultHttpContext();
                 var svcs = new ServiceCollection();
-                svcs.AddTransient(_ => new UnitOfWork(dataLayer));
+                _ = svcs.AddTransient(_ => new UnitOfWork(dataLayer));
                 var serviceProvider = svcs.BuildServiceProvider();
                 ctx.RequestServices = serviceProvider;
-                var ctxAccessor = new HttpContextAccessor();
-                ctxAccessor.HttpContext = ctx;
+                var ctxAccessor = new HttpContextAccessor
+                {
+                    HttpContext = ctx
+                };
 
                 var service = new CorsPolicyService(ctxAccessor, FakeLogger<CorsPolicyService>.Create());
                 return (service, serviceProvider);
             }
 
-            It("IsOriginAllowedAsync when origin is allowed", async () =>
+            _ = It("IsOriginAllowedAsync when origin is allowed", async () =>
             {
                 const string testCorsOrigin = "https://identityserver.io/";
 
@@ -70,7 +70,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.Services
                 }
             });
 
-            It("IsOriginAllowedAsync when origin is not allowed", async () =>
+            _ = It("IsOriginAllowedAsync when origin is not allowed", async () =>
             {
                 using (var uow = new UnitOfWork(dataLayer))
                 {

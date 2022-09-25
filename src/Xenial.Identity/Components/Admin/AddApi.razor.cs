@@ -10,7 +10,7 @@ public partial class AddApi
         {
             await UnitOfWork.SaveAsync(Api);
             await UnitOfWork.CommitChangesAsync();
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         Api was successfully created!
@@ -26,7 +26,7 @@ public partial class AddApi
         {
             var errors = ex.Message;
 
-            Snackbar.Add($"""
+            _ = Snackbar.Add($"""
                 <ul>
                     <li>
                         There was an error when creating the Api!

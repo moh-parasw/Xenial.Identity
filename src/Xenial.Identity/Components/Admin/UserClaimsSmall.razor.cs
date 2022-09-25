@@ -1,10 +1,6 @@
 ﻿using System.Security.Claims;
 
-using Microsoft.AspNetCore.Components;
-
 using MudBlazor;
-
-using Xenial.Identity.Data;
 
 namespace Xenial.Identity.Components.Admin;
 
@@ -50,7 +46,7 @@ public partial class UserClaimsSmall
             var result = await UserManager.RemoveClaimAsync(User, claim);
             if (result.Succeeded)
             {
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             Claim was successfully deleted!
@@ -65,7 +61,7 @@ public partial class UserClaimsSmall
             {
                 var errors = string.Join("\n", result.Errors.Select(e => $"<li>Code: {e.Code}: {e.Description}</li>"));
 
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             There was an error when deleting the claim!

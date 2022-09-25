@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 using AutoMapper;
 
@@ -11,7 +7,6 @@ using DevExpress.Xpo.DB.Exceptions;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 
 using Xenial.Identity.Xpo.Storage.Models;
 
@@ -62,7 +57,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
         {
             public ApiResourceMappingConfiguration()
             {
-                CreateMap<ApiResourceInputModel, XpoApiResource>()
+                _ = CreateMap<ApiResourceInputModel, XpoApiResource>()
                                    .ForMember(api => api.UserClaims, o => o.Ignore())
                                    .ForMember(api => api.Scopes, o => o.Ignore())
                                    .ForMember(api => api.Secrets, o => o.Ignore())
@@ -70,10 +65,10 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
                                    .ReverseMap()
                                ;
 
-                CreateMap<SecretsOutputModel, XpoApiResourceSecret>()
+                _ = CreateMap<SecretsOutputModel, XpoApiResourceSecret>()
                     .ReverseMap();
 
-                CreateMap<PropertiesOutputModel, XpoApiResourceProperty>()
+                _ = CreateMap<PropertiesOutputModel, XpoApiResourceProperty>()
                     .ReverseMap();
             }
         }
@@ -122,8 +117,8 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
 
         private void FetchSubLists(XpoApiResource apiResource)
         {
-            Secrets = apiResource.Secrets.Select(secret => Mapper.Map<SecretsOutputModel>(secret)).ToList();
-            Properties = apiResource.Properties.Select(propertey => Mapper.Map<PropertiesOutputModel>(propertey)).ToList();
+            Secrets = apiResource.Secrets.Select(Mapper.Map<SecretsOutputModel>).ToList();
+            Properties = apiResource.Properties.Select(Mapper.Map<PropertiesOutputModel>).ToList();
         }
 
         public async Task<IActionResult> OnPost([FromRoute] int id)
@@ -147,7 +142,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
                     apiResource = Mapper.Map(Input, apiResource);
                     foreach (var userClaim in apiResource.UserClaims.ToList())
                     {
-                        apiResource.UserClaims.Remove(userClaim);
+                        _ = apiResource.UserClaims.Remove(userClaim);
                     }
 
                     var userClaimsString = string.IsNullOrEmpty(Input.UserClaims) ? string.Empty : Input.UserClaims;
@@ -159,7 +154,7 @@ namespace Xenial.Identity.Areas.Admin.Pages.ApiResources
 
                     foreach (var scope in apiResource.Scopes.ToList())
                     {
-                        apiResource.Scopes.Remove(scope);
+                        _ = apiResource.Scopes.Remove(scope);
                     }
 
                     var apiScopesString = string.IsNullOrEmpty(Input.ApiScopes) ? string.Empty : Input.ApiScopes;

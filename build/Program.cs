@@ -1,9 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
-using static SimpleExec.Command;
 using static Bullseye.Targets;
-using System.IO;
+using static SimpleExec.Command;
 
 var sln = "Xenial.Identity.sln";
 var projectName = "Xenial.Identity";

@@ -2,9 +2,9 @@
 
 using DevExpress.Xpo;
 
-using FluentAssertions;
-
 using Duende.IdentityServer.Models;
+
+using FluentAssertions;
 
 using Xenial.Identity.Xpo.Storage.Mappers;
 using Xenial.Identity.Xpo.Storage.Models;
@@ -17,20 +17,20 @@ namespace Xenial.Identity.Xpo.Storage.Tests.Mappers
     {
         public static void Tests() => Describe(nameof(ApiResourceMappers), () =>
         {
-            It("Automapper Configuration is valid", () => ApiResourceMappers.Mapper.ConfigurationProvider.AssertConfigurationIsValid<ApiResourceMapperProfile>());
+            _ = It("Automapper Configuration is valid", () => ApiResourceMappers.Mapper.ConfigurationProvider.AssertConfigurationIsValid<ApiResourceMapperProfile>());
 
-            It("Can map", () =>
+            _ = It("Can map", () =>
             {
                 using var session = new Session();
                 var model = new ApiResource();
                 var mappedEntity = model.ToEntity(session);
                 var mappedModel = mappedEntity.ToModel();
 
-                mappedModel.Should().NotBeNull();
-                mappedEntity.Should().NotBeNull();
+                _ = mappedModel.Should().NotBeNull();
+                _ = mappedEntity.Should().NotBeNull();
             });
 
-            It("Properties map", () =>
+            _ = It("Properties map", () =>
             {
                 using var session = new Session();
                 var model = new ApiResource()
@@ -45,22 +45,22 @@ namespace Xenial.Identity.Xpo.Storage.Tests.Mappers
 
                 var mappedEntity = model.ToEntity(session);
 
-                mappedEntity.Scopes.Count.Should().Be(2);
+                _ = mappedEntity.Scopes.Count.Should().Be(2);
                 var foo1 = mappedEntity.Scopes.FirstOrDefault(x => x.Scope == "foo1");
-                foo1.Should().NotBeNull();
+                _ = foo1.Should().NotBeNull();
                 var foo2 = mappedEntity.Scopes.FirstOrDefault(x => x.Scope == "foo2");
-                foo2.Should().NotBeNull();
+                _ = foo2.Should().NotBeNull();
 
 
                 var mappedModel = mappedEntity.ToModel();
 
-                mappedModel.Description.Should().Be("description");
-                mappedModel.DisplayName.Should().Be("displayname");
-                mappedModel.Enabled.Should().BeFalse();
-                mappedModel.Name.Should().Be("foo");
+                _ = mappedModel.Description.Should().Be("description");
+                _ = mappedModel.DisplayName.Should().Be("displayname");
+                _ = mappedModel.Enabled.Should().BeFalse();
+                _ = mappedModel.Name.Should().Be("foo");
             });
 
-            It("Missing values should use defaults", () =>
+            _ = It("Missing values should use defaults", () =>
             {
                 using var session = new Session();
                 var entity = new XpoApiResource(session)
@@ -77,7 +77,7 @@ namespace Xenial.Identity.Xpo.Storage.Tests.Mappers
                 };
 
                 var model = entity.ToModel();
-                model.ApiSecrets.First().Type.Should().Be(def.ApiSecrets.First().Type);
+                _ = model.ApiSecrets.First().Type.Should().Be(def.ApiSecrets.First().Type);
             });
         });
     }

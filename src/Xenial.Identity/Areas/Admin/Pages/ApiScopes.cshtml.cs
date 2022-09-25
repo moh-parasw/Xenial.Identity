@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-
-using DevExpress.Xpo;
+﻿using DevExpress.Xpo;
 
 using Microsoft.AspNetCore.Mvc.RazorPages;
 

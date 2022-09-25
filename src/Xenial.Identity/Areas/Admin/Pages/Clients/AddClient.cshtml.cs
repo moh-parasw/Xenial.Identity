@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 using AutoMapper;
 
 using DevExpress.Xpo;
 using DevExpress.Xpo.DB.Exceptions;
 
+using Duende.IdentityServer.Models;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 
 using Xenial.Identity.Xpo.Storage.Models;
-
-using Duende.IdentityServer.Models;
 
 namespace Xenial.Identity.Areas.Admin.Pages.Clients
 {
@@ -139,7 +134,9 @@ namespace Xenial.Identity.Areas.Admin.Pages.Clients
             }
 
             static IEnumerable<XpoClientGrantType> CreateGrantTypes(IEnumerable<string> grantTypes, XpoClient client)
-                => grantTypes.Select(grant => new XpoClientGrantType(client.Session) { GrantType = grant });
+            {
+                return grantTypes.Select(grant => new XpoClientGrantType(client.Session) { GrantType = grant });
+            }
         }
     }
 }

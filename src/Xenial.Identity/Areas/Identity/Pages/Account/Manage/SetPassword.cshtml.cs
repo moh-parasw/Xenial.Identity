@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -52,12 +51,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
 
             var hasPassword = await _userManager.HasPasswordAsync(user);
 
-            if (hasPassword)
-            {
-                return RedirectToPage("./ChangePassword");
-            }
-
-            return Page();
+            return hasPassword ? RedirectToPage("./ChangePassword") : Page();
         }
 
         public async Task<IActionResult> OnPostAsync()

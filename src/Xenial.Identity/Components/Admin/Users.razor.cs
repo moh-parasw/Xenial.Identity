@@ -27,7 +27,7 @@ public partial class Users
             var result = await UserManager.DeleteAsync(user);
             if (result.Succeeded)
             {
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             User was successfully deleted!
@@ -43,7 +43,7 @@ public partial class Users
             {
                 var errors = string.Join("\n", result.Errors.Select(e => $"<li>Code: {e.Code}: {e.Description}</li>"));
 
-                Snackbar.Add($"""
+                _ = Snackbar.Add($"""
                     <ul>
                         <li>
                             There was an error when deleting the user!
