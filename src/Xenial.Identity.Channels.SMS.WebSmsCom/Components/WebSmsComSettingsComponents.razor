@@ -5,13 +5,19 @@
               Margin="Margin.Dense"
               @bind-Value="@Settings.Server" />
 
-<MudTextField Label="Account Id"
+<MudSwitch Label="Use Basic-Auth"
+           Color="Color.Primary"
+           @bind-Checked="@Settings.UseBasicAuth" />
+
+@if (Settings.UseBasicAuth)
+{
+    <MudTextField Label="Username"
               Variant="Variant.Filled"
               FullWidth
               Margin="Margin.Dense"
-              @bind-Value="@Settings.AccountId" />
+              @bind-Value="@Settings.Username" />
 
-<MudTextField Label="Account Password"
+    <MudTextField Label="Password"
               Variant="Variant.Filled"
               FullWidth
               Margin="Margin.Dense"
@@ -19,14 +25,16 @@
               Adornment="Adornment.End"
               AdornmentIcon="@Icons.Filled.RemoveRedEye"
               OnAdornmentClick="() => showPassword = !showPassword"
-              @bind-Value="@Settings.AccountPassword" />
-
-<MudTextField Label="Account Gateway"
+              @bind-Value="@Settings.Password" />
+}
+else
+{
+    <MudTextField Label="Api-Key"
               Variant="Variant.Filled"
               FullWidth
               Margin="Margin.Dense"
-              @bind-Value="@Settings.AccountGateway" />
-
+              @bind-Value="@Settings.ApiKey" />
+}
 @code {
     private bool showPassword = false;
     [Parameter]

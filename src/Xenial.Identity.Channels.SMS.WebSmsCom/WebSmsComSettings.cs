@@ -2,8 +2,11 @@
 
 public record WebSmsComSettings
 {
-    public string Server { get; set; } = "http://gateway.any-sms.biz/send_sms.php";
-    public string AccountId { get; set; } = "";
-    public string AccountPassword { get; set; } = "";
-    public string AccountGateway { get; set; } = "";
+    public string Server { get; set; } = "https://api.websms.com/rest/";
+
+    public bool UseBasicAuth { get; set; } = true;
+
+    public string Username { get; set; } = "";
+    public string Password { get; set; } = "";
+    public string ApiKey { get; set; } = "";
 }
