@@ -84,10 +84,8 @@
     }
 
     private Dictionary<string, object> GetParameters()
-    {
-        return new Dictionary<string, object>()
-            {
-                [nameof(Settings)] = Settings
-            };
-    }
+        => new Dictionary<string, object>()
+        {
+            [nameof(Settings)] = Settings
+        };
 }
