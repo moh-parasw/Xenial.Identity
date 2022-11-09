@@ -26,6 +26,8 @@ jobs:
         dotnet-version: 6.0.402
     - name: Setup Node.js environment
       uses: actions/setup-node@v2.1.2
+    - name: Remove Vertiq Source
+      run: dotnet nuget remove source vertiq-io
     - name: Add Vertiq Source
       run: dotnet nuget add source --username biohazard999 --password ${{ secrets.VERTIQ_TOKEN }} --store-password-in-clear-text --name vertiq-io "https://nuget.pkg.github.com/vertiq-io/index.json"
     - name: Build
