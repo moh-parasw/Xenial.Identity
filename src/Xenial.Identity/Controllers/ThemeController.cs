@@ -7,14 +7,14 @@ using Xenial.Identity.Models;
 namespace Xenial.Identity.Controllers;
 
 [ApiController]
-public class ThemeController : Controller
+public sealed class ThemeController : Controller
 {
     private readonly UnitOfWork unitOfWork;
     private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment environment;
 
-    public ThemeController(UnitOfWork unitOfWork, Microsoft.AspNetCore.Hosting.IHostingEnvironment _environment)
+    public ThemeController(UnitOfWork unitOfWork, Microsoft.AspNetCore.Hosting.IHostingEnvironment environment)
     {
-        environment = _environment;
+        this.environment = environment;
         this.unitOfWork = unitOfWork;
     }
 

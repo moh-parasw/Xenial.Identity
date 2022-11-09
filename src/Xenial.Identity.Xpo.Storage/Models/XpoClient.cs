@@ -69,6 +69,9 @@ namespace Xenial.Identity.Xpo.Storage.Models
         private bool alwaysSendClientClaims = @default.AlwaysSendClientClaims;
         private int? userSsoLifetime;
         private int deviceCodeLifetime = @default.DeviceCodeLifetime;
+        private int? cibaLifetime;
+        private int? pollingInterval;
+        private bool? coordinateLifetimeWithUserSession;
 
         #region Fields with mappings
 
@@ -180,6 +183,15 @@ namespace Xenial.Identity.Xpo.Storage.Models
         [Persistent("UserCodeType")]
         [Size(100)]
         public string UserCodeType { get => userCodeType; set => SetPropertyValue(ref userCodeType, value); }
+
+        [Persistent("CibaLifetime")]
+        public int? CibaLifetime { get => cibaLifetime; set => SetPropertyValue(ref cibaLifetime, value); }
+
+        [Persistent("PollingInterval")]
+        public int? PollingInterval { get => pollingInterval; set => SetPropertyValue(ref pollingInterval, value); }
+
+        [Persistent("CoordinateLifetimeWithUserSession")]
+        public bool? CoordinateLifetimeWithUserSession { get => coordinateLifetimeWithUserSession; set => SetPropertyValue(ref coordinateLifetimeWithUserSession, value); }
 
         /// <summary>
         /// Signing algorithm for identity token. If empty, will use the server default signing algorithm.

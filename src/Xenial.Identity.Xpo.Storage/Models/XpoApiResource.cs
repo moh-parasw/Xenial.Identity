@@ -23,6 +23,7 @@ namespace Xenial.Identity.Xpo.Storage.Models
         private DateTime? updated;
         private DateTime? lastAccessed;
         private bool nonEditable;
+        private bool requireResourceIndicator;
 
         public XpoApiResource(Session session) : base(session) { }
 
@@ -85,5 +86,8 @@ namespace Xenial.Identity.Xpo.Storage.Models
 
         [Persistent("NonEditable")]
         public bool NonEditable { get => nonEditable; set => SetPropertyValue(ref nonEditable, value); }
+
+        [Persistent("RequireResourceIndicator")]
+        public bool RequireResourceIndicator { get => requireResourceIndicator; set => SetPropertyValue(ref requireResourceIndicator, value); }
     }
 }

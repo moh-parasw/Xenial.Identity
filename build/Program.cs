@@ -16,18 +16,18 @@ var selfContained = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEB
 var skipExtraFilesOnServer = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBDEPLOY_REMOVEFILESONSERVER")) ? false : true;
 var packageAsSingleFile = false;
 
-var version = new Lazy<Task<string>>(async () => (await ReadToolAsync(() => ReadAsync("dotnet", "minver -v e", noEcho: true))).Trim());
-var branch = new Lazy<Task<string>>(async () => (await ReadAsync("git", "rev-parse --abbrev-ref HEAD", noEcho: true)).Trim());
-var lastUpdate = new Lazy<Task<string>>(async () => $"{UnixTimeStampToDateTime(await ReadAsync("git", "log -1 --format=%ct", noEcho: true)):yyyy-MM-dd}");
-var hash = new Lazy<Task<string>>(async () => (await ReadAsync("git", "rev-parse HEAD", noEcho: true)).Trim());
+var version = new Lazy<Task<string>>(async () => (await ReadToolAsync(() => ReadTrimmedAsync("dotnet", "minver -v e"))).Trim());
+var branch = new Lazy<Task<string>>(async () => await ReadTrimmedAsync("git", "rev-parse --abbrev-ref HEAD"));
+var lastUpdate = new Lazy<Task<string>>(async () => $"{UnixTimeStampToDateTime(await ReadTrimmedAsync("git", "log -1 --format=%ct")):yyyy-MM-dd}");
+var hash = new Lazy<Task<string>>(async () => await ReadTrimmedAsync("git", "rev-parse HEAD"));
 
 Func<Task<string>> assemblyProperties = async () => $"/property:LastUpdate={await lastUpdate.Value} /property:GitBranch={await branch.Value} /property:GitHash={await hash.Value}";
 
-Target("restore:yarn", () => RunAsync("cmd.exe", $"/C yarn install"));
+Target("restore:yarn", () => RunAsync("yarn", $"install"));
 Target("restore:dotnet", () => RunAsync("dotnet", $"restore {sln}"));
 Target("restore", DependsOn("restore:yarn", "restore:dotnet"));
 
-Target("build:yarn", () => RunAsync("cmd.exe", $"/C yarn build"));
+Target("build:yarn", () => RunAsync("yarn", $"build"));
 Target("build:dotnet", DependsOn("restore:dotnet"), async () => await RunAsync("dotnet", $"build {sln} --no-restore {await assemblyProperties()}"));
 Target("build", DependsOn("restore", "build:yarn", "build:dotnet"));
 
@@ -39,13 +39,19 @@ Target("default", DependsOn("publish"));
 
 await RunTargetsAndExitAsync(args);
 
+static async Task<string> ReadTrimmedAsync(string command, string arguments)
+{
+    var (output, _) = await ReadAsync(command, arguments);
+    return output.Trim();
+}
+
 static async Task<string> ReadToolAsync(Func<Task<string>> action)
 {
     try
     {
         return await action();
     }
-    catch (SimpleExec.NonZeroExitCodeException)
+    catch (SimpleExec.ExitCodeReadException)
     {
         Console.WriteLine("Tool seams missing. Try to restore");
         await RunAsync("dotnet", "tool restore");
