@@ -11,7 +11,7 @@ namespace Xenial.Identity.Infrastructure
         public static IServiceCollection AddXpo(
             this IServiceCollection services,
             IConfiguration configuration,
-            AutoCreateOption autoCreateOption = AutoCreateOption.None
+            AutoCreateOption autoCreateOption = AutoCreateOption.DatabaseAndSchema
         )
             => services.AddXpoDefaultDataLayer(ServiceLifetime.Singleton, dl => dl
                 .UseConnectionString(configuration.GetConnectionString("DefaultConnection"))

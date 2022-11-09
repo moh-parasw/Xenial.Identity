@@ -19,6 +19,7 @@ using Xenial.AspNetIdentity.Xpo;
 using Xenial.AspNetIdentity.Xpo.Mappers;
 using Xenial.AspNetIdentity.Xpo.Models;
 using Xenial.AspNetIdentity.Xpo.Stores;
+using Xenial.Identity;
 using Xenial.Identity.Areas.Admin.Pages.Clients;
 using Xenial.Identity.Channels;
 using Xenial.Identity.Data;
@@ -36,25 +37,32 @@ MySqlConnectionProvider.Register();
 
 DevExpress.Xpo.Logger.LogManager.SetTransport(new XpoConsoleLogger());
 
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug()
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
-    .MinimumLevel.Override("System", LogEventLevel.Warning)
-    .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Information)
-    .Enrich.FromLogContext()
-    .WriteTo.Memory(out var inMemoryLogSink, outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: AnsiConsoleTheme.Code)
-    //#if !DEBUG
-    .WriteTo.File(
-        @"C:\logs\identity.xenial.io\Xenial.Platform.Identity.Api.log",
-        fileSizeLimitBytes: 1_000_000,
-        rollOnFileSizeLimit: true,
-        shared: true,
-        flushToDiskInterval: TimeSpan.FromSeconds(1))
-    //#endif
-    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme.Code)
-    .WriteTo.Sink(inMemoryLogSink)
-.CreateLogger();
+
+var loggerConfig = new LoggerConfiguration()
+        .MinimumLevel.Debug()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+        .MinimumLevel.Override("System", LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Information)
+        .Enrich.FromLogContext()
+        .WriteTo.Memory(out var inMemoryLogSink, outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: AnsiConsoleTheme.Code)
+        ;
+
+if (CreateLogger)
+{
+    loggerConfig = loggerConfig.WriteTo.File(
+            @"C:\logs\identity.xenial.io\Xenial.Platform.Identity.Api.log",
+            fileSizeLimitBytes: 1_000_000,
+            rollOnFileSizeLimit: true,
+            shared: true,
+            flushToDiskInterval: TimeSpan.FromSeconds(1));
+}
+
+loggerConfig = loggerConfig
+        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme.Code)
+        .WriteTo.Sink(inMemoryLogSink);
+
+Log.Logger = loggerConfig.CreateLogger();
 
 try
 {
@@ -81,8 +89,6 @@ try
         o.AddWebSmsCom();
     });
 
-    await UpdateDatabase(Configuration, localizer);
-
     if (Environment.IsDevelopment())
     {
         services.AddLiveReload();
@@ -105,6 +111,7 @@ try
 
     services.AddMudServices();
     services.AddXpo(Configuration);
+    services.AddSingleton<DatabaseUpdateHandler>();
     services.AddXpoDefaultUnitOfWork();
 
     services.AddDefaultIdentity<XenialIdentityUser>(options =>
@@ -180,6 +187,7 @@ try
         app.UseDeveloperExceptionPage();
     }
 
+    app.UseMiddleware<UpdateDatabaseMiddleware>();
     app.UseHttpsRedirection();
 
     app.UseStaticFiles();
@@ -189,6 +197,7 @@ try
     app.UseAuthorization();
     app.UseEndpoints(endpoints =>
     {
+        endpoints.MapGet("/ping", () => DateTime.UtcNow);
         endpoints.MapBlazorHub();
         endpoints.MapRazorPages();
         endpoints.MapControllers();
@@ -210,104 +219,7 @@ finally
     Log.CloseAndFlush();
 }
 
-static void SeedDatabase(UnitOfWork unitOfWork)
+public partial class Program
 {
-    if (unitOfWork.FindObject<XpoThemeSettings>(null) is null)
-    {
-        unitOfWork.Save(new XpoThemeSettings(unitOfWork));
-        unitOfWork.CommitChanges();
-    }
-    if (unitOfWork.FindObject<XpoApplicationSettings>(null) is null)
-    {
-        unitOfWork.Save(new XpoApplicationSettings(unitOfWork));
-        unitOfWork.CommitChanges();
-    }
-    if (unitOfWork.Query<XpoIdentityResource>().Count() <= 0)
-    {
-        AddResource("profile", "Profile", new[] {
-            "profile",
-            "name",
-            "given_name",
-            "family_name",
-            "middle_name",
-            "nickname",
-            "preferred_username"
-        });
-
-        AddResource("email", "E-mail", new[] {
-            "email",
-            "email_verified",
-        });
-
-        AddResource("openid", "User-Id", new[] {
-            "openid",
-            "sub",
-        });
-
-        AddResource("phone", "Phonenumber", new[] {
-            "phone",
-            "phone_verified",
-        });
-
-        AddResource("role", "Role", new[] {
-            "role",
-        });
-
-        AddResource("xenial", "Avatar", new[] {
-            "xenial",
-            "xenial_backcolor",
-            "xenial_forecolor",
-            "xenial_initials",
-        });
-
-        unitOfWork.CommitChanges();
-    }
-
-    void AddResource(
-        string name,
-        string displayName,
-        string[] resources,
-        bool enabled = true,
-        bool showInDiscoveryDocument = true
-    )
-    {
-        var xpoResources = resources.Select(
-            type => new XpoIdentityResourceClaim(unitOfWork)
-            {
-                Type = type
-            }).ToArray();
-
-        var resource = new XpoIdentityResource(unitOfWork)
-        {
-            Name = name,
-            DisplayName = displayName,
-            Enabled = true,
-            ShowInDiscoveryDocument = true
-        };
-        resource.UserClaims.AddRange(xpoResources);
-        unitOfWork.Save(resource);
-    }
-}
-
-static async Task UpdateDatabase(ConfigurationManager Configuration, XpoStringLocalizer localizer)
-{
-    Log.Information("Update Database");
-
-    var serviceCollection = new ServiceCollection();
-
-    serviceCollection
-        .AddXpo(Configuration, AutoCreateOption.DatabaseAndSchema)
-        .AddSingleton(localizer)
-        .AddScoped<XpoStringLocalizerService>()
-        .AddXpoDefaultUnitOfWork();
-
-    using (var provider = serviceCollection.BuildServiceProvider())
-    using (var unitOfWork = provider.GetRequiredService<UnitOfWork>())
-    {
-        unitOfWork.UpdateSchema();
-        SeedDatabase(unitOfWork);
-        await provider.GetRequiredService<XpoStringLocalizerService>().Refresh();
-    }
-
-    Log.Information("Update Done");
+    public static bool CreateLogger { get; set; } = true;
 }

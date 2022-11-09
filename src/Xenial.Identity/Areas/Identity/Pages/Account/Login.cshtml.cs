@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Text;
 using System.Text.Encodings.Web;
 
@@ -43,6 +44,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
             this.emailSender = emailSender;
             this.configuration = configuration;
             var settings = uow.FindObject<XpoApplicationSettings>(null);
+
             AllowRegister = settings.AllowRegister;
             AllowExternalProviders = settings.AllowExternalProviders;
             AllowGithub = settings.AllowGithub;

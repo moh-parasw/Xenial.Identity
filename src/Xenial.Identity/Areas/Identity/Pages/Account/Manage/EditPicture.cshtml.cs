@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Runtime.Versioning;
 
 using IdentityModel;
 
@@ -74,7 +75,11 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                     await Upload.CopyToAsync(stream);
                     stream.Position = 0;
                     user.Picture = stream.ToArray();
-                    user.PictureMimeType = GeMimeTypeFromImageByteArray(user.Picture);
+
+                    if (OperatingSystem.IsWindows())
+                    {
+                        user.PictureMimeType = GeMimeTypeFromImageByteArray(user.Picture);
+                    }
 
                     if (string.IsNullOrEmpty(user.PictureId)) //We only set a new one if there wasn't one before
                     {
@@ -109,6 +114,7 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account.Manage
                 } : Page();
         }
 
+        [SupportedOSPlatform("Windows")]
         public string GeMimeTypeFromImageByteArray(byte[] byteArray)
         {
             try

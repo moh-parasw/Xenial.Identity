@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <UserSecretsId>9941a3cb-8710-45b7-bd66-b7dc8363cc0a</UserSecretsId>
     <LangVersion>preview</LangVersion>
     <DefaultConnectionString>PLEASE SET BEFORE USE</DefaultConnectionString>
@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.6" />    
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.6" />
     <PackageReference Include="Duende.IdentityServer" Version="6.1.2" />
     <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.1.2" />
     <PackageReference Include="MudBlazor" Version="6.0.15" />
@@ -57,13 +57,6 @@
     <DestinationConnectionStrings Include="DefaultConnection">
       <Value>$(DefaultConnectionString)</Value>
     </DestinationConnectionStrings>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="MinVer" Version="4.1.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
   
 </Project>
