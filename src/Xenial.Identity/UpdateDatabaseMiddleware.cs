@@ -123,33 +123,28 @@ public sealed class DatabaseUpdateHandler
 
         if (createAdminUser)
         {
-            var role = unitOfWork
-                .Query<XpoIdentityRole>()
-                .FirstOrDefault(m => m.NormalizedName == "ADMINISTRATOR");
+            var roleManager = provider.GetRequiredService<RoleManager<IdentityRole>>();
+            const string roleName = "Administrator";
+            const string userName = "Admin";
+            const string password = "!Admin321";
+            var role = await roleManager.FindByNameAsync(roleName);
 
             if (role is null)
             {
-                role = new XpoIdentityRole(unitOfWork)
-                {
-                    Id = CryptoRandom.CreateUniqueId(),
-                    Name = "Administrator",
-                    NormalizedName = "ADMINISTRATOR"
-                };
-                unitOfWork.Save(role);
-                unitOfWork.CommitChanges();
+                await roleManager.CreateAsync(new IdentityRole(roleName));
             }
 
             var userManager = provider.GetRequiredService<UserManager<XenialIdentityUser>>();
-            var user = await userManager.FindByNameAsync("Admin");
+            var user = await userManager.FindByNameAsync(userName);
 
             if (user is null)
             {
                 var result = await userManager.CreateAsync(new XenialIdentityUser
                 {
-                    UserName = "Admin"
-                }, "!Admin321");
-                user = await userManager.FindByNameAsync("Admin");
-                await userManager.AddToRoleAsync(user, "Administrator");
+                    UserName = userName
+                }, password);
+                user = await userManager.FindByNameAsync(userName);
+                await userManager.AddToRoleAsync(user, roleName);
             }
         }
 
