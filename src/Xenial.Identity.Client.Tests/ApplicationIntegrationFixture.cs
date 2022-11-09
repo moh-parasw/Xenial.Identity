@@ -23,6 +23,10 @@ public sealed class ApplicationIntegrationFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
+        if (!string.IsNullOrEmpty(new DockerRunningFactAttribute().Skip))
+        {
+            return;
+        }
         Program.CreateLogger = false;
 
         Database = new TestcontainersBuilder<MySqlTestcontainer>()
@@ -46,6 +50,11 @@ public sealed class ApplicationIntegrationFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        if (!string.IsNullOrEmpty(new DockerRunningFactAttribute().Skip))
+        {
+            return;
+        }
+
         await using (factory) { }
         await Database.StopAsync();
         await using (Database) { }
