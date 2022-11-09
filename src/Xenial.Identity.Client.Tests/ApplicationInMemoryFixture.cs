@@ -19,7 +19,7 @@ public sealed class ApplicationInMemoryFixture : IAsyncLifetime
     public HttpClient HttpClient { get; private set; } = default!;
     public string ConnectionString { get; private set; } = default!;
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         Program.CreateLogger = false;
 
@@ -28,7 +28,10 @@ public sealed class ApplicationInMemoryFixture : IAsyncLifetime
         factory = new IdentityWebApplicationFactory<Program>(this);
 
         HttpClient = factory.CreateClient();
-        return Task.CompletedTask;
+
+        var handler = factory.Services.GetRequiredService<DatabaseUpdateHandler>();
+
+        await handler.UpdateDatabase();
     }
 
     public async Task DisposeAsync()
@@ -51,7 +54,8 @@ public sealed class ApplicationInMemoryFixture : IAsyncLifetime
             {
                 config.AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    ["ConnectionStrings:DefaultConnection"] = fixture.ConnectionString
+                    ["ConnectionStrings:DefaultConnection"] = fixture.ConnectionString,
+                    ["Xenial:SeedAdminUser"] = "true",
                 });
             });
 

@@ -10,7 +10,7 @@ namespace Xenial.Identity.Quickstart.Consent
     {
         public bool IsRedirect => RedirectUri != null;
         public string RedirectUri { get; set; }
-        public Client Client { get; set; }
+        public Duende.IdentityServer.Models.Client Client { get; set; }
 
         public bool ShowView => ViewModel != null;
         public ConsentViewModel ViewModel { get; set; }

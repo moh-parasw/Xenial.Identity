@@ -5,7 +5,7 @@ namespace Xenial.Identity.Infrastructure;
 
 public class RedirectValidator : StrictRedirectUriValidator
 {
-    public override async Task<bool> IsRedirectUriValidAsync(string requestedUri, Client client)
+    public override async Task<bool> IsRedirectUriValidAsync(string requestedUri, Duende.IdentityServer.Models.Client client)
     {
         var result = await base.IsRedirectUriValidAsync(requestedUri, client);
 
@@ -34,7 +34,7 @@ public class RedirectValidator : StrictRedirectUriValidator
         return false;
     }
 
-    public override async Task<bool> IsPostLogoutRedirectUriValidAsync(string requestedUri, Client client)
+    public override async Task<bool> IsPostLogoutRedirectUriValidAsync(string requestedUri, Duende.IdentityServer.Models.Client client)
     {
         var result = await base.IsPostLogoutRedirectUriValidAsync(requestedUri, client);
 

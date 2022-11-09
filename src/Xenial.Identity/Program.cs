@@ -35,8 +35,10 @@ using XLocalizer;
 SQLiteConnectionProvider.Register();
 MySqlConnectionProvider.Register();
 
-DevExpress.Xpo.Logger.LogManager.SetTransport(new XpoConsoleLogger());
-
+if (CreateLogger)
+{
+    DevExpress.Xpo.Logger.LogManager.SetTransport(new XpoConsoleLogger());
+}
 
 var loggerConfig = new LoggerConfiguration()
         .MinimumLevel.Debug()
@@ -50,16 +52,18 @@ var loggerConfig = new LoggerConfiguration()
 
 if (CreateLogger)
 {
-    loggerConfig = loggerConfig.WriteTo.File(
+    loggerConfig = loggerConfig
+        .WriteTo.File(
             @"C:\logs\identity.xenial.io\Xenial.Platform.Identity.Api.log",
             fileSizeLimitBytes: 1_000_000,
             rollOnFileSizeLimit: true,
             shared: true,
-            flushToDiskInterval: TimeSpan.FromSeconds(1));
+            flushToDiskInterval: TimeSpan.FromSeconds(1))
+        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme.Code)
+        ;
 }
 
 loggerConfig = loggerConfig
-        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme.Code)
         .WriteTo.Sink(inMemoryLogSink);
 
 Log.Logger = loggerConfig.CreateLogger();

@@ -8,6 +8,10 @@ using Xenial.Identity.Xpo.Storage.Models;
 using Serilog;
 using Microsoft.AspNetCore.Mvc;
 using DevExpress.Xpo.Metadata;
+using Xenial.AspNetIdentity.Xpo.Models;
+using IdentityModel;
+using Microsoft.AspNetCore.Identity;
+using Xenial.Identity.Data;
 
 namespace Xenial.Identity;
 
@@ -32,9 +36,13 @@ public sealed class DatabaseUpdateHandler
     private bool IsDatabaseUpToDate { get; set; }
 
     private readonly IServiceProvider provider;
+    private readonly IConfiguration configuration;
 
-    public DatabaseUpdateHandler(IServiceProvider provider)
-        => this.provider = provider;
+    public DatabaseUpdateHandler(IServiceProvider provider, IConfiguration configuration)
+    {
+        this.configuration = configuration;
+        this.provider = provider;
+    }
 
     public async Task UpdateDatabase()
     {
@@ -47,7 +55,7 @@ public sealed class DatabaseUpdateHandler
             using (var scope = provider.CreateScope())
             using (var uow = scope.ServiceProvider.GetRequiredService<UnitOfWork>())
             {
-                await UpdateDatabase(uow, scope.ServiceProvider);
+                await UpdateDatabase(uow, scope.ServiceProvider, configuration);
             }
         }
         finally
@@ -56,7 +64,11 @@ public sealed class DatabaseUpdateHandler
         }
     }
 
-    private static void SeedDatabase(UnitOfWork unitOfWork)
+    private static async Task SeedDatabase(
+        UnitOfWork unitOfWork,
+        IServiceProvider provider,
+        bool createAdminUser = false
+    )
     {
         if (unitOfWork.FindObject<XpoThemeSettings>(null) is null)
         {
@@ -71,42 +83,74 @@ public sealed class DatabaseUpdateHandler
         if (unitOfWork.Query<XpoIdentityResource>().Count() <= 0)
         {
             AddResource("profile", "Profile", new[] {
-            "profile",
-            "name",
-            "given_name",
-            "family_name",
-            "middle_name",
-            "nickname",
-            "preferred_username"
-        });
+                "profile",
+                "name",
+                "given_name",
+                "family_name",
+                "middle_name",
+                "nickname",
+                "preferred_username"
+            });
 
             AddResource("email", "E-mail", new[] {
-            "email",
-            "email_verified",
-        });
+                "email",
+                "email_verified",
+            });
 
             AddResource("openid", "User-Id", new[] {
-            "openid",
-            "sub",
-        });
+                "openid",
+                "sub",
+            });
 
             AddResource("phone", "Phonenumber", new[] {
-            "phone",
-            "phone_verified",
-        });
+                "phone",
+                "phone_verified",
+            });
 
             AddResource("role", "Role", new[] {
-            "role",
-        });
+                "role",
+            });
 
             AddResource("xenial", "Avatar", new[] {
-            "xenial",
-            "xenial_backcolor",
-            "xenial_forecolor",
-            "xenial_initials",
-        });
+                "xenial",
+                "xenial_backcolor",
+                "xenial_forecolor",
+                "xenial_initials",
+            });
 
             unitOfWork.CommitChanges();
+        }
+
+        if (createAdminUser)
+        {
+            var role = unitOfWork
+                .Query<XpoIdentityRole>()
+                .FirstOrDefault(m => m.NormalizedName == "ADMINISTRATOR");
+
+            if (role is null)
+            {
+                role = new XpoIdentityRole(unitOfWork)
+                {
+                    Id = CryptoRandom.CreateUniqueId(),
+                    Name = "Administrator",
+                    NormalizedName = "ADMINISTRATOR"
+                };
+                unitOfWork.Save(role);
+                unitOfWork.CommitChanges();
+            }
+
+            var userManager = provider.GetRequiredService<UserManager<XenialIdentityUser>>();
+            var user = await userManager.FindByNameAsync("Admin");
+
+            if (user is null)
+            {
+                var result = await userManager.CreateAsync(new XenialIdentityUser
+                {
+                    UserName = "Admin"
+                }, "!Admin321");
+                user = await userManager.FindByNameAsync("Admin");
+                await userManager.AddToRoleAsync(user, "Administrator");
+            }
         }
 
         void AddResource(
@@ -137,15 +181,20 @@ public sealed class DatabaseUpdateHandler
 
     private static async Task UpdateDatabase(
         UnitOfWork unitOfWork,
-        IServiceProvider provider)
+        IServiceProvider provider,
+        IConfiguration configuration
+    )
     {
         Log.Information("Update Database");
+
+        var createAdminUser = configuration.GetValue<bool?>("Xenial:SeedAdminUser") ?? false;
 
         unitOfWork.UpdateSchema(
             false,
             unitOfWork.Dictionary.Classes.OfType<XPClassInfo>().Where(c => c.IsPersistent).ToArray()
         );
-        SeedDatabase(unitOfWork);
+
+        await SeedDatabase(unitOfWork, provider, createAdminUser);
         await provider.GetRequiredService<XpoStringLocalizerService>().Refresh();
 
         Log.Information("Update Done");
