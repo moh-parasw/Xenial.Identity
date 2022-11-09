@@ -48,6 +48,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xenial.Identity.Channels.SM
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xenial.Identity.Channels.SMS.WebSmsCom", "src\Xenial.Identity.Channels.SMS.WebSmsCom\Xenial.Identity.Channels.SMS.WebSmsCom.csproj", "{2E82CFAE-F4FD-4264-A391-BD944456568D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{4182005E-8264-4DEA-A657-34986FEE892D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{94D5337B-2F0C-4EC8-96A2-15B04D12342A}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build.yml = .github\workflows\build.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -245,6 +252,8 @@ Global
 		{81612F4B-9936-467A-97A6-B92DED8E430D} = {9F253852-1584-4769-BC8C-EF3EE2B67216}
 		{972AA700-AD20-484E-8F5B-9778F5E429D3} = {9F253852-1584-4769-BC8C-EF3EE2B67216}
 		{2E82CFAE-F4FD-4264-A391-BD944456568D} = {9F253852-1584-4769-BC8C-EF3EE2B67216}
+		{4182005E-8264-4DEA-A657-34986FEE892D} = {F2C755B7-C50F-4D8A-A030-2D5DF2FA095F}
+		{94D5337B-2F0C-4EC8-96A2-15B04D12342A} = {4182005E-8264-4DEA-A657-34986FEE892D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {54506508-3F71-4603-BEAB-1608975B4484}

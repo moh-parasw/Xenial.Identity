@@ -31,9 +31,12 @@ Target("build:yarn", () => RunAsync("yarn", $"build"));
 Target("build:dotnet", DependsOn("restore:dotnet"), async () => await RunAsync("dotnet", $"build {sln} --no-restore {await assemblyProperties()}"));
 Target("build", DependsOn("restore", "build:yarn", "build:dotnet"));
 
+Target("test", DependsOn("build", "test:storage", "test:identity"));
+Target("test:storage", () => RunAsync("dotnet", "run --project src/Xenial.AspNetIdentity.Xpo.Tests/Xenial.AspNetIdentity.Xpo.Tests.csproj"));
+Target("test:identity", () => RunAsync("dotnet", "run --project src/Xenial.Identity.Xpo.Storage.Tests/Xenial.Identity.Xpo.Storage.Tests.csproj"));
 
 var connectionString = Environment.GetEnvironmentVariable("XENIAL_DEFAULTCONNECTIONSTRING");
-Target("publish", DependsOn("build"), async () => await RunAsync("dotnet", $"msbuild {web} /t:Restore;Build /p:Configuration={configuration} /p:RuntimeIdentifier=win-x64 /p:SelfContained={selfContained} /p:PackageAsSingleFile={packageAsSingleFile} /p:DeployOnBuild=true /p:WebPublishMethod=package /p:PublishProfile=Package /v:minimal /p:DesktopBuildPackageLocation={artifact} /p:DeployIisAppPath={iisPackageName} /p:DefaultConnectionString=\"{connectionString}\" /p:SkipExtraFilesOnServer={skipExtraFilesOnServer} {await assemblyProperties()}"));
+Target("publish", DependsOn("test"), async () => await RunAsync("dotnet", $"msbuild {web} /t:Restore;Build /p:Configuration={configuration} /p:RuntimeIdentifier=win-x64 /p:SelfContained={selfContained} /p:PackageAsSingleFile={packageAsSingleFile} /p:DeployOnBuild=true /p:WebPublishMethod=package /p:PublishProfile=Package /v:minimal /p:DesktopBuildPackageLocation={artifact} /p:DeployIisAppPath={iisPackageName} /p:DefaultConnectionString=\"{connectionString}\" /p:SkipExtraFilesOnServer={skipExtraFilesOnServer} {await assemblyProperties()}"));
 Target("deploy", DependsOn("publish"), () => RunAsync("cmd.exe", $"/C {projectName}.deploy.cmd /Y /M:{Environment.GetEnvironmentVariable("WEBDEPLOY_IP")} /U:{Environment.GetEnvironmentVariable("WEBDEPLOY_USER")} /P:{Environment.GetEnvironmentVariable("WEBDEPLOY_PASS")} -allowUntrusted -enableRule:AppOffline {(skipExtraFilesOnServer ? "-enableRule:DoNotDeleteRule" : "")}", workingDirectory: artifactsLocation));
 Target("default", DependsOn("publish"));
 

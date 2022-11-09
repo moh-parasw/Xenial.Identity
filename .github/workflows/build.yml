@@ -1,4 +1,4 @@
-name: .NET Core
+﻿name: .NET Core
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
     - name: Setup Node.js environment
       uses: actions/setup-node@v2.1.2
     - name: Build
-      run: dotnet run --project ".\build\build.csproj" "build"
+      run: dotnet run --project ".\build\build.csproj" "test"
       env:
         DEVEXPRESS_NUGET_FEED: ${{secrets.DEVEXPRESS_NUGET_FEED}}
     - name: Publish
@@ -36,7 +36,7 @@ jobs:
         DEVEXPRESS_NUGET_FEED: ${{secrets.DEVEXPRESS_NUGET_FEED}}
         XENIAL_DEFAULTCONNECTIONSTRING: ${{secrets.XENIAL_DEFAULTCONNECTIONSTRING}}
     - name: Deploy
-      if: startsWith(github.ref, 'refs/tags/v')
+      if: ${{ runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/v') }}
       run: dotnet run --project ".\build\build.csproj" "deploy" -s
       env:
         WEBDEPLOY_IP: ${{secrets.WEBDEPLOY_IP}}
