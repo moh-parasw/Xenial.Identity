@@ -22,7 +22,7 @@ public sealed record UserManagementApiTests()
             ClientId = "test-client",
             AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
             RequireClientSecret = false,
-            AllowedScopes = new[] { IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Email, "role", IdentityServerConstants.LocalApi.ScopeName },
+            AllowedScopes = new[] { "role", IdentityServerConstants.LocalApi.ScopeName },
             Enabled = true,
             AlwaysSendClientClaims = true,
             ClientClaimsPrefix = ""
@@ -36,7 +36,7 @@ public sealed record UserManagementApiTests()
             ClientId = "test-client",
             UserName = DatabaseUpdateHandler.AdminUserName,
             Password = DatabaseUpdateHandler.AdminPassword,
-            Scope = $"email openid role {IdentityServerConstants.LocalApi.ScopeName}",
+            Scope = $"role {IdentityServerConstants.LocalApi.ScopeName}",
         });
 
         token.IsError.ShouldBeFalse();
