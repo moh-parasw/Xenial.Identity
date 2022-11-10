@@ -34,6 +34,7 @@ namespace Xenial.Identity.Xpo
             _ = builder.AddCorsPolicyService<CorsPolicyService>();
             _ = builder.Services.AddTransient<IPersistedGrantStore, PersistedGrantStore>();
             _ = builder.Services.AddTransient<IDeviceFlowStore, DeviceFlowStore>();
+            _ = builder.Services.AddTransient<IClientFactory, ClientFactory>();
             _ = builder.Services.AddSingleton<IHostedService, TokenCleanupHost>();
 
             return builder;

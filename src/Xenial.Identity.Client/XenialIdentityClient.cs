@@ -24,7 +24,9 @@ public sealed record XenialIdentityClient
     public async Task<IList<XenialUser>> GetUsersAsync()
     {
         var response = await httpClient.GetAsync("api/management/users");
+
         response.EnsureSuccessStatusCode();
+
         var responseStr = await response.Content.ReadAsStringAsync();
 
         var result = JsonConvert.DeserializeObject<IEnumerable<XenialUser>>(responseStr, serializerSettings);

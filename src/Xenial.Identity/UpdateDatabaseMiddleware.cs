@@ -12,27 +12,45 @@ using Xenial.AspNetIdentity.Xpo.Models;
 using IdentityModel;
 using Microsoft.AspNetCore.Identity;
 using Xenial.Identity.Data;
+using Duende.IdentityServer;
+using System.Security.Claims;
+using Microsoft.Extensions.Options;
 
 namespace Xenial.Identity;
 
-public sealed class UpdateDatabaseMiddleware
+public class MyAppUserClaimsPrincipalFactory : UserClaimsPrincipalFactory<XenialIdentityUser>
 {
-    private static readonly object locker = new();
-    private static bool IsDatabaseUpdated { get; set; }
-
-    private readonly RequestDelegate next;
-    public UpdateDatabaseMiddleware(RequestDelegate next)
-        => this.next = next;
-
-    public async Task InvokeAsync(HttpContext context, [FromServices] DatabaseUpdateHandler handler)
+    public MyAppUserClaimsPrincipalFactory(UserManager<XenialIdentityUser> userManager, IOptions<IdentityOptions> optionsAccessor) : base(userManager, optionsAccessor)
     {
-        await handler.UpdateDatabase();
-        await next(context);
     }
+
+    protected override async Task<ClaimsIdentity> GenerateClaimsAsync(XenialIdentityUser user)
+    {
+        var identity = await base.GenerateClaimsAsync(user);
+        //identity.AddClaims(user.GetAdditionalClaims());
+        return identity;
+    }
+}
+
+public sealed class UpdateDatabaseBackgroundService : IHostedService
+{
+    private readonly DatabaseUpdateHandler handler;
+
+    public UpdateDatabaseBackgroundService(DatabaseUpdateHandler handler)
+        => this.handler = handler;
+
+    public Task StartAsync(CancellationToken cancellationToken)
+        => handler.UpdateDatabase();
+
+    public Task StopAsync(CancellationToken cancellationToken)
+        => Task.CompletedTask;
 }
 
 public sealed class DatabaseUpdateHandler
 {
+    public const string AdminRoleName = "Administrator";
+    public const string AdminUserName = "admin@admin.com";
+    public const string AdminPassword = "!Admin321";
     private bool IsDatabaseUpToDate { get; set; }
 
     private readonly IServiceProvider provider;
@@ -80,6 +98,41 @@ public sealed class DatabaseUpdateHandler
             unitOfWork.Save(new XpoApplicationSettings(unitOfWork));
             unitOfWork.CommitChanges();
         }
+
+
+        var idsScope = await unitOfWork.Query<XpoApiScope>().FirstOrDefaultAsync(m => m.Name == IdentityServerConstants.LocalApi.ScopeName);
+        if (idsScope is null)
+        {
+            idsScope = new XpoApiScope(unitOfWork)
+            {
+                Name = IdentityServerConstants.LocalApi.ScopeName,
+                Enabled = true,
+            };
+
+            await unitOfWork.SaveAsync(idsScope);
+            await unitOfWork.CommitChangesAsync();
+        }
+
+        var idsResource = await unitOfWork.Query<XpoApiResource>().FirstOrDefaultAsync(m => m.Name == IdentityServerConstants.LocalApi.ScopeName);
+        if (idsResource is null)
+        {
+            idsResource = new XpoApiResource(unitOfWork)
+            {
+                Name = IdentityServerConstants.LocalApi.ScopeName,
+                Enabled = true,
+                Scopes =
+                {
+                    new XpoApiResourceScope(unitOfWork)
+                    {
+                        Scope = "role"
+                    }
+                }
+            };
+
+            await unitOfWork.SaveAsync(idsResource);
+            await unitOfWork.CommitChangesAsync();
+        }
+
         if (unitOfWork.Query<XpoIdentityResource>().Count() <= 0)
         {
             AddResource("profile", "Profile", new[] {
@@ -121,30 +174,29 @@ public sealed class DatabaseUpdateHandler
             unitOfWork.CommitChanges();
         }
 
+        await CreateRole(AdminRoleName, provider);
+        await CreateRole(AuthPolicies.UserManagerRoleName, provider);
+        await CreateRole(AuthPolicies.UserManagerReadRoleName, provider);
+        await CreateRole(AuthPolicies.UserManagerCreateRoleName, provider);
+
         if (createAdminUser)
         {
             var roleManager = provider.GetRequiredService<RoleManager<IdentityRole>>();
-            const string roleName = "Administrator";
-            const string userName = "Admin";
-            const string password = "!Admin321";
-            var role = await roleManager.FindByNameAsync(roleName);
-
-            if (role is null)
-            {
-                await roleManager.CreateAsync(new IdentityRole(roleName));
-            }
 
             var userManager = provider.GetRequiredService<UserManager<XenialIdentityUser>>();
-            var user = await userManager.FindByNameAsync(userName);
+            var user = await userManager.FindByNameAsync(AdminUserName);
 
             if (user is null)
             {
                 var result = await userManager.CreateAsync(new XenialIdentityUser
                 {
-                    UserName = userName
-                }, password);
-                user = await userManager.FindByNameAsync(userName);
-                await userManager.AddToRoleAsync(user, roleName);
+                    UserName = AdminUserName
+                }, AdminPassword);
+                user = await userManager.FindByNameAsync(AdminUserName);
+                await userManager.AddToRoleAsync(user, AdminRoleName);
+                await userManager.SetEmailAsync(user, AdminUserName);
+                var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                await userManager.ConfirmEmailAsync(user, token);
             }
         }
 
@@ -171,6 +223,18 @@ public sealed class DatabaseUpdateHandler
             };
             resource.UserClaims.AddRange(xpoResources);
             unitOfWork.Save(resource);
+        }
+
+
+        async Task CreateRole(string roleName, IServiceProvider provider)
+        {
+            var roleManager = provider.GetRequiredService<RoleManager<IdentityRole>>();
+            var role = await roleManager.FindByNameAsync(roleName);
+
+            if (role is null)
+            {
+                await roleManager.CreateAsync(new IdentityRole(roleName));
+            }
         }
     }
 

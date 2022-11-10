@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
-
-using DevExpress.Data.Linq.Helpers;
 using DevExpress.Xpo;
 using DevExpress.Xpo.DB;
+
+using Duende.IdentityServer;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Localization;
 using Microsoft.Extensions.Localization;
+using Microsoft.IdentityModel.Tokens;
 
 using MudBlazor.Services;
 
@@ -14,8 +15,6 @@ using Serilog;
 using Serilog.Events;
 
 using Westwind.AspNetCore.LiveReload;
-
-using Xenial.AspNetIdentity.Xpo;
 using Xenial.AspNetIdentity.Xpo.Mappers;
 using Xenial.AspNetIdentity.Xpo.Models;
 using Xenial.AspNetIdentity.Xpo.Stores;
@@ -28,7 +27,6 @@ using Xenial.Identity.Infrastructure.Localization;
 using Xenial.Identity.Infrastructure.Logging.MemoryConsole.Themes;
 using Xenial.Identity.Models;
 using Xenial.Identity.Xpo;
-using Xenial.Identity.Xpo.Storage.Models;
 
 using XLocalizer;
 
@@ -122,7 +120,12 @@ try
     {
         //TODO: Email Sender
         options.SignIn.RequireConfirmedAccount = false;
-    }).AddXpoStores()
+        options.ClaimsIdentity.UserNameClaimType = "name";
+        options.ClaimsIdentity.UserIdClaimType = "sub";
+        options.ClaimsIdentity.RoleClaimType = "role";
+
+    }).AddClaimsPrincipalFactory<MyAppUserClaimsPrincipalFactory>()
+      .AddXpoStores()
       .AddDefaultTokenProviders();
 
     services
@@ -151,14 +154,21 @@ try
 
         // see https://Duende.IdentityServer.readthedocs.io/en/latest/topics/resources.html
         options.EmitStaticAudienceClaim = true;
+
     })
+      .AddCustomTokenRequestValidator<ClientCredentialsTokenRequestValidator>()
       .AddRedirectUriValidator<RedirectValidator>()
       .AddAspNetIdentity<XenialIdentityUser>()
       .AddXpoIdentityStore();
 
     idsBuilder.AddCertificate(Environment, Configuration, null);
 
-    services.AddAuthentication()
+    services
+        .AddAuthentication()
+        .AddLocalApi(o =>
+        {
+            o.ExpectedScope = IdentityServerConstants.LocalApi.ScopeName;
+        })
         .AddGitHub(options =>
         {
             options.ClientId = Configuration["GitHub:ClientId"];
@@ -172,6 +182,7 @@ try
             policy.RequireAuthenticatedUser();
             policy.RequireRole("Administrator");
         });
+        AuthPolicies.Configure(o);
     });
 
     services.AddServerSideBlazor();
@@ -180,6 +191,8 @@ try
     {
         options.ConstraintMap.Add(nameof(ClientTypes), typeof(EnumRouteConstraint<ClientTypes>));
     });
+
+    services.AddHostedService<UpdateDatabaseBackgroundService>();
 
     Log.Information("Creating Application");
 
@@ -191,7 +204,6 @@ try
         app.UseDeveloperExceptionPage();
     }
 
-    app.UseMiddleware<UpdateDatabaseMiddleware>();
     app.UseHttpsRedirection();
 
     app.UseStaticFiles();

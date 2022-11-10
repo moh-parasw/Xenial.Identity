@@ -15,8 +15,8 @@ namespace Xenial.Identity.Infrastructure
         )
             => services.AddXpoDefaultDataLayer(ServiceLifetime.Singleton, dl => dl
                 .UseConnectionString(configuration.GetConnectionString("DefaultConnection"))
-                .UseThreadSafeDataLayer(autoCreateOption == AutoCreateOption.None)
-                .UseConnectionPool(autoCreateOption == AutoCreateOption.None)
+                .UseThreadSafeDataLayer(autoCreateOption == AutoCreateOption.DatabaseAndSchema)
+                .UseConnectionPool(autoCreateOption == AutoCreateOption.DatabaseAndSchema)
                 .UseAutoCreationOption(autoCreateOption)
                 .UseEntityTypes(
                     IdentityXpoTypes.PersistentTypes

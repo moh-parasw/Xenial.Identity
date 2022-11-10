@@ -15,6 +15,8 @@
 
 #nullable enable
 
+using System.Diagnostics;
+
 namespace Xenial.Identity.Infrastructure.Logging.MemoryConsole.Themes;
 
 /// <summary>

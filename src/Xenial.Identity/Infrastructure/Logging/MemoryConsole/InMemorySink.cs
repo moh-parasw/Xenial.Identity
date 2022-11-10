@@ -14,6 +14,7 @@
 
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Text;
 
 using Serilog.Core;
@@ -43,11 +44,13 @@ public class InMemorySink : IEnumerable<string>, ILogEventSink
         this.syncRoot = syncRoot ?? throw new ArgumentNullException(nameof(syncRoot));
     }
 
+    [DebuggerStepThrough]
     private TextWriter SelectOutputStream()
         => CreateOutputWriter(stream);
 
     private static readonly MemoryStream stream = new();
 
+    [DebuggerStepThrough]
     private static TextWriter CreateOutputWriter(Stream outputStream) => TextWriter.Synchronized(outputStream == Stream.Null ?
             StreamWriter.Null :
             new StreamWriter(
@@ -61,6 +64,7 @@ public class InMemorySink : IEnumerable<string>, ILogEventSink
 
     public event EventHandler<InMemoryLogEventArgs>? Emitted;
 
+    [DebuggerStepThrough]
     public void Emit(LogEvent logEvent)
     {
         var output = SelectOutputStream();

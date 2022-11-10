@@ -1,8 +1,8 @@
 ﻿
 namespace Xenial.Identity.Client.Tests;
 
-[Collection(nameof(ApplicationInMemoryFixture))]
-public sealed record InMemorySmokeTests(ApplicationInMemoryFixture Fixture)
+public sealed record InMemorySmokeTests()
+     : XenialIdentityApiBaseTest(new ApplicationInMemoryFixture() with { AllowAutoRedirect = true })
 {
     [Fact]
     public async Task SmokeIndex()

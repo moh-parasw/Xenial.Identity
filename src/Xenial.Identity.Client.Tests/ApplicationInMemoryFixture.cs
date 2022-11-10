@@ -1,10 +1,17 @@
-﻿using DevExpress.Xpo.DB;
+﻿using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Text.Encodings.Web;
+
+using DevExpress.Xpo.DB;
 
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Options;
 
 namespace Xenial.Identity.Client.Tests;
 
@@ -13,21 +20,31 @@ public class ApplicationInMemoryCollection : ICollectionFixture<ApplicationInMem
 {
 }
 
-public sealed class ApplicationInMemoryFixture : IAsyncLifetime
+public sealed record ApplicationInMemoryFixture : IAsyncLifetime
 {
     private WebApplicationFactory<Program> factory = default!;
     public HttpClient HttpClient { get; private set; } = default!;
     public string ConnectionString { get; private set; } = default!;
 
+    public IServiceProvider Services => factory.Services;
+
+    public bool CreateLogger { get; set; }
+    public bool AllowAutoRedirect { get; set; }
+
     public async Task InitializeAsync()
     {
-        Program.CreateLogger = false;
+        Program.CreateLogger = CreateLogger;
 
         ConnectionString = InMemoryDataStore.GetConnectionStringInMemory(true);
 
         factory = new IdentityWebApplicationFactory<Program>(this);
 
-        HttpClient = factory.CreateClient();
+        HttpClient = factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = AllowAutoRedirect,
+        });
+
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme: "TestScheme");
 
         var handler = factory.Services.GetRequiredService<DatabaseUpdateHandler>();
 

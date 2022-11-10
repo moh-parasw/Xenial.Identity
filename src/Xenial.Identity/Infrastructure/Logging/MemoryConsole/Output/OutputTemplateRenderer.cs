@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
+
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Display;
@@ -79,6 +81,7 @@ internal class OutputTemplateRenderer : ITextFormatter
         this.renderers = renderers.ToArray();
     }
 
+    [DebuggerStepThrough]
     public void Format(LogEvent logEvent, TextWriter output)
     {
         if (logEvent is null)
