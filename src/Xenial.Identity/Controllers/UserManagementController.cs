@@ -29,6 +29,7 @@ public sealed class UserManagementController : ControllerBase
 {
     [Route("")]
     [Authorize(AuthPolicies.UsersRead)]
+    [ProducesResponseType(typeof(IEnumerable<XenialUser>), 200)]
     public async Task<IActionResult> Get([FromServices] UnitOfWork uow, CancellationToken cancellationToken)
     {
         var users = await uow
@@ -38,5 +39,14 @@ public sealed class UserManagementController : ControllerBase
         var userModel = users.Select(m => new XenialUser(m.Id, m.UserName));
 
         return Ok(userModel);
+    }
+
+    [Route("add")]
+    [Authorize(AuthPolicies.UsersCreate)]
+    [ProducesResponseType(typeof(XenialUser), 200)]
+    [ProducesResponseType(typeof(ProblemDetails), 400)]
+    public Task<IActionResult> Create([FromBody] CreateXenialUserRequest req, [FromServices] UnitOfWork uow, CancellationToken cancellationToken)
+    {
+        return Task.FromResult<IActionResult>(Ok());
     }
 }

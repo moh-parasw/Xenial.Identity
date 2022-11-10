@@ -3,7 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Mvc;
 
 using Newtonsoft.Json;
 
@@ -21,17 +24,76 @@ public sealed record XenialIdentityClient
     public XenialIdentityClient(HttpClient httpClient)
         => this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
-    public async Task<IList<XenialUser>> GetUsersAsync()
+    public Task<XenialResult<IEnumerable<XenialUser>>> GetUsersAsync()
+         => GetAsync<IEnumerable<XenialUser>>("api/management/users");
+
+    private async Task<XenialResult<TData>> GetAsync<TData>(string route)
     {
-        var response = await httpClient.GetAsync("api/management/users");
+        try
+        {
+            var response = await httpClient.GetAsync(route);
 
-        response.EnsureSuccessStatusCode();
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                var problemsStr = await response.Content.ReadAsStringAsync();
+                var problems = JsonConvert.DeserializeObject<ProblemDetails>(problemsStr, serializerSettings);
 
-        var responseStr = await response.Content.ReadAsStringAsync();
+                return new XenialResult<TData>.Error(new XenialBadRequestException(problems!));
+            }
 
-        var result = JsonConvert.DeserializeObject<IEnumerable<XenialUser>>(responseStr, serializerSettings);
-        return result.ToList().AsReadOnly();
+            response.EnsureSuccessStatusCode();
+
+            var responseStr = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<TData>(responseStr, serializerSettings);
+            return result!;
+        }
+        catch (Exception ex)
+        {
+            return new XenialResult<TData>.Error(new XenialUnknownApiException(ex));
+        }
     }
 }
 
-public sealed record XenialUser(string Id, string UserName);
+public sealed record XenialUser(
+    string Id,
+    string UserName
+);
+
+public sealed record CreateXenialUserRequest(
+    string Email,
+    string? Password = null
+);
+
+
+public abstract class XenialApiException : Exception
+{
+    public XenialApiException()
+    {
+
+    }
+
+    public XenialApiException(string message) : base(message)
+    {
+
+    }
+
+    public XenialApiException(Exception innerException) : base(null, innerException)
+    {
+
+    }
+}
+
+public sealed class XenialUnknownApiException : XenialApiException
+{
+    public XenialUnknownApiException(Exception innerException) : base(innerException)
+    {
+
+    }
+}
+
+public sealed class XenialBadRequestException : XenialApiException
+{
+    public ProblemDetails Details { get; private set; }
+    public XenialBadRequestException(ProblemDetails details)
+        => Details = details;
+}

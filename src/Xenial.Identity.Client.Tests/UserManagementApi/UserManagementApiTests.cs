@@ -20,13 +20,11 @@ public sealed record UserManagementApiTests()
         await factory.CreateClient(new Duende.IdentityServer.Models.Client
         {
             ClientId = "test-client",
-            AllowedGrantTypes = GrantTypes.ResourceOwnerPasswordAndClientCredentials,
+            AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
             RequireClientSecret = false,
             AllowedScopes = new[] { IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Email, "role", IdentityServerConstants.LocalApi.ScopeName },
-            AlwaysSendClientClaims = true,
-            AlwaysIncludeUserClaimsInIdToken = true,
-            AllowOfflineAccess = true,
             Enabled = true,
+            AlwaysSendClientClaims = true,
             ClientClaimsPrefix = ""
         });
 
@@ -38,14 +36,16 @@ public sealed record UserManagementApiTests()
             ClientId = "test-client",
             UserName = DatabaseUpdateHandler.AdminUserName,
             Password = DatabaseUpdateHandler.AdminPassword,
-            Scope = $"email openid role {IdentityServerConstants.LocalApi.ScopeName} offline_access",
+            Scope = $"email openid role {IdentityServerConstants.LocalApi.ScopeName}",
         });
 
         token.IsError.ShouldBeFalse();
         token.AccessToken.ShouldNotBeNull();
         Fixture.HttpClient.SetBearerToken(token.AccessToken);
-        var users = await Client.GetUsersAsync();
+
+        var users = (await Client.GetUsersAsync()).Unwrap();
+
         users.ShouldNotBeNull();
-        users.Count.ShouldBe(1);
+        users.Count().ShouldBe(1);
     }
 }
