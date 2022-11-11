@@ -1,4 +1,6 @@
-﻿using DevExpress.Xpo;
+﻿using System.Diagnostics;
+
+using DevExpress.Xpo;
 
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -22,6 +24,7 @@ namespace Xenial.Identity.Controllers;
 public sealed class UserManagementController : ControllerBase
 {
     [Route("")]
+    [HttpGet]
     [Authorize(AuthPolicies.UsersRead)]
     [ProducesResponseType(typeof(IEnumerable<XenialUser>), 200)]
     public async Task<IActionResult> Get([FromServices] UnitOfWork uow, CancellationToken cancellationToken)
@@ -35,7 +38,17 @@ public sealed class UserManagementController : ControllerBase
         return Ok(userModel);
     }
 
+    public sealed class CreateXenialUserRequestValidator : AbstractValidator<CreateXenialUserRequest>
+    {
+        public CreateXenialUserRequestValidator()
+            => RuleFor(m => m.Email)
+                .NotEmpty()
+                .EmailAddress()
+                .MaximumLength(250);
+    }
+
     [Route("create")]
+    [HttpPost]
     [Authorize(AuthPolicies.UsersCreate)]
     [ProducesResponseType(typeof(XenialUser), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -86,11 +99,67 @@ public sealed class UserManagementController : ControllerBase
         return Ok(user);
     }
 
-    public sealed class CreateXenialUserRequestValidator : AbstractValidator<CreateXenialUserRequest>
+    [Route("{userId}")]
+    [Authorize(AuthPolicies.UsersDelete)]
+    [ProducesResponseType(typeof(XenialIdResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    [HttpDelete]
+    public async Task<IActionResult> Delete([FromRoute] string userId, [FromServices] UserManager<XenialIdentityUser> userManager, CancellationToken cancellationToken)
     {
-        public CreateXenialUserRequestValidator()
-            => RuleFor(m => m.Email)
-                .NotEmpty()
-                .EmailAddress();
+        if (string.IsNullOrEmpty(userId))
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Detail = "UserId must not be empty"
+            });
+        }
+
+        var sub = User.Claims.FirstOrDefault(m => m.Type == "sub")?.Value;
+
+        if (string.IsNullOrEmpty(sub))
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Detail = "Current user has no sub claim"
+            });
+        }
+
+        if (sub == userId)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Detail = "Can not delete current user"
+            });
+        }
+
+        var user = await userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return NotFound(new ProblemDetails
+            {
+                Detail = $"Can not find user with id {userId}"
+            });
+        }
+
+        var result = await userManager.DeleteAsync(user);
+
+        if (!result.Succeeded)
+        {
+            var problemDetails = new ValidationProblemDetails(
+                result.Errors.ToDictionary(
+                    m => m.Code,
+                    m => new[]
+                    {
+                        m.Description
+                    })
+                );
+
+            return UnprocessableEntity(problemDetails);
+        }
+
+        return Ok(new XenialIdResponse(userId));
     }
+
 }

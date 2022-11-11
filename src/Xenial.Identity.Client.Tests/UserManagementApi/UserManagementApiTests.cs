@@ -5,6 +5,8 @@ using Duende.IdentityServer.Models;
 
 using IdentityModel.Client;
 
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 using Shouldly;
 
 using Xenial.Identity.Xpo.Storage.Stores;
@@ -108,6 +110,67 @@ public sealed record UserManagementApiTests()
         );
     }
 
+    [Fact]
+    public async Task DeleteUserCannotDeleteSelf()
+    {
+        using var scope = await SetAccessToken();
+        var disco = await Fixture.HttpClient.GetDiscoveryDocumentAsync();
+        var token = await Fixture.HttpClient.RequestPasswordTokenAsync(new()
+        {
+            Address = disco.TokenEndpoint,
+            ClientId = "test-client",
+            UserName = DatabaseUpdateHandler.AdminUserName,
+            Password = DatabaseUpdateHandler.AdminPassword,
+            Scope = $"role {IdentityServerConstants.LocalApi.ScopeName} {IdentityServerConstants.StandardScopes.OpenId}",
+        });
+
+        Fixture.HttpClient.SetBearerToken(token.AccessToken);
+
+        var userInfo = await Fixture.HttpClient.GetUserInfoAsync(new UserInfoRequest()
+        {
+            Address = disco.UserInfoEndpoint,
+            Token = token.AccessToken,
+        });
+
+        var id = userInfo.Claims.First(m => m.Type == "sub").Value;
+
+        var result = await Client.DeleteUserAsync(id);
+
+        result.Match(
+            _ => throw new Exception(),
+            e => e.Exception.ShouldBeOfType<XenialBadRequestException>()
+        );
+    }
+
+    [Fact]
+    public async Task DeleteUserCannotNonExisting()
+    {
+        using var scope = await SetAccessToken();
+
+        var result = await Client.DeleteUserAsync(new Faker().Random.AlphaNumeric(10));
+
+        result.Match(
+            _ => throw new Exception(),
+            e => e.Exception.ShouldBeOfType<XenialNotFoundException>()
+        );
+    }
+
+    [Fact]
+    public async Task DeleteUserExisting()
+    {
+        using var scope = await SetAccessToken();
+
+        var user = (await Client.CreateUserAsync(new CreateXenialUserRequest(new Faker().Internet.Email()))).Unwrap();
+
+        var result = await Client.DeleteUserAsync(user.Id);
+
+        result.Match(
+            r => r.Data.Id.ShouldBe(user.Id),
+            e => throw e.Exception
+        );
+    }
+
+
     private async Task<IServiceScope> SetAccessToken()
     {
         var scope = Fixture.Services.CreateScope();
@@ -117,7 +180,7 @@ public sealed record UserManagementApiTests()
             ClientId = "test-client",
             AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
             RequireClientSecret = false,
-            AllowedScopes = new[] { "role", IdentityServerConstants.LocalApi.ScopeName },
+            AllowedScopes = new[] { "role", IdentityServerConstants.LocalApi.ScopeName, IdentityServerConstants.StandardScopes.OpenId },
             Enabled = true,
             AlwaysSendClientClaims = true,
             ClientClaimsPrefix = ""

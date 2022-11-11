@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,10 +20,13 @@ public sealed record XenialIdentityClient
         => this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
     public Task<XenialResult<IEnumerable<XenialUser>>> GetUsersAsync(CancellationToken cancellationToken = default)
-         => GetAsync<IEnumerable<XenialUser>>("api/management/users", cancellationToken);
+        => GetAsync<IEnumerable<XenialUser>>("api/management/users", cancellationToken);
 
     public Task<XenialResult<XenialUser>> CreateUserAsync(CreateXenialUserRequest request, CancellationToken cancellationToken = default)
-         => PostAsync<XenialUser>("api/management/users/create", request, cancellationToken);
+        => PostAsync<XenialUser>("api/management/users/create", request, cancellationToken);
+
+    public Task<XenialResult<XenialIdResponse>> DeleteUserAsync(string userId, CancellationToken cancellationToken = default)
+        => DeleteAsync<XenialIdResponse>($"api/management/users/{userId}", cancellationToken);
 
     private async Task<XenialResult<TData>> PostAsync<TData>(string route, object payload, CancellationToken cancellationToken = default)
     {
@@ -39,28 +35,7 @@ public sealed record XenialIdentityClient
             var payloadString = JsonConvert.SerializeObject(payload, typeof(object), serializerSettings);
             var response = await httpClient.PostAsync(route, new StringContent(payloadString, Encoding.UTF8, "application/json"), cancellationToken);
 
-            if (StatusCodes.Status422UnprocessableEntity == (int)response.StatusCode)
-            {
-                var problemsStr = await response.Content.ReadAsStringAsync();
-
-                var problems = JsonConvert.DeserializeObject<ValidationProblemDetails>(problemsStr, serializerSettings);
-
-                return new XenialResult<TData>.Error(new XenialValidationException(problems!));
-            }
-
-            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
-            {
-                var problemsStr = await response.Content.ReadAsStringAsync();
-                var problems = JsonConvert.DeserializeObject<ProblemDetails>(problemsStr, serializerSettings);
-
-                return new XenialResult<TData>.Error(new XenialBadRequestException(problems!));
-            }
-
-            response.EnsureSuccessStatusCode();
-
-            var responseStr = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<TData>(responseStr, serializerSettings);
-            return result!;
+            return await ProcessResponse<TData>(response);
         }
         catch (Exception ex)
         {
@@ -74,35 +49,68 @@ public sealed record XenialIdentityClient
         {
             var response = await httpClient.GetAsync(route, cancellationToken);
 
-            if (StatusCodes.Status422UnprocessableEntity == (int)response.StatusCode)
-            {
-                var problemsStr = await response.Content.ReadAsStringAsync();
-
-                var problems = JsonConvert.DeserializeObject<ValidationProblemDetails>(problemsStr, serializerSettings);
-
-                return new XenialResult<TData>.Error(new XenialValidationException(problems!));
-            }
-
-            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
-            {
-                var problemsStr = await response.Content.ReadAsStringAsync();
-                var problems = JsonConvert.DeserializeObject<ProblemDetails>(problemsStr, serializerSettings);
-
-                return new XenialResult<TData>.Error(new XenialBadRequestException(problems!));
-            }
-
-            response.EnsureSuccessStatusCode();
-
-            var responseStr = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<TData>(responseStr, serializerSettings);
-            return result!;
+            return await ProcessResponse<TData>(response);
         }
         catch (Exception ex)
         {
             return new XenialResult<TData>.Error(new XenialUnknownApiException(ex));
         }
     }
+
+    private async Task<XenialResult<TData>> DeleteAsync<TData>(string route, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await httpClient.DeleteAsync(route, cancellationToken);
+
+            return await ProcessResponse<TData>(response);
+        }
+        catch (Exception ex)
+        {
+            return new XenialResult<TData>.Error(new XenialUnknownApiException(ex));
+        }
+    }
+
+    private async Task<XenialResult<TData>> ProcessResponse<TData>(HttpResponseMessage response)
+    {
+        if (StatusCodes.Status404NotFound == (int)response.StatusCode)
+        {
+            var problemsStr = await response.Content.ReadAsStringAsync();
+
+            var problems = JsonConvert.DeserializeObject<ProblemDetails>(problemsStr, serializerSettings);
+
+            return new XenialResult<TData>.Error(new XenialNotFoundException(problems!));
+        }
+
+        if (StatusCodes.Status422UnprocessableEntity == (int)response.StatusCode)
+        {
+            var problemsStr = await response.Content.ReadAsStringAsync();
+
+            var problems = JsonConvert.DeserializeObject<ValidationProblemDetails>(problemsStr, serializerSettings);
+
+            return new XenialResult<TData>.Error(new XenialValidationException(problems!));
+        }
+
+        if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            var problemsStr = await response.Content.ReadAsStringAsync();
+            var problems = JsonConvert.DeserializeObject<ProblemDetails>(problemsStr, serializerSettings);
+
+            return new XenialResult<TData>.Error(new XenialBadRequestException(problems!));
+        }
+
+        response.EnsureSuccessStatusCode();
+
+        var responseStr = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<TData>(responseStr, serializerSettings);
+        return result!;
+    }
+
 }
+
+public sealed record XenialIdResponse(
+    string Id
+);
 
 public sealed record XenialUser(
     string Id,
@@ -153,3 +161,10 @@ public sealed class XenialBadRequestException : XenialApiException
     public XenialBadRequestException(ProblemDetails details)
         => Details = details;
 }
+public sealed class XenialNotFoundException : XenialApiException
+{
+    public ProblemDetails Details { get; private set; }
+    public XenialNotFoundException(ProblemDetails details)
+        => Details = details;
+}
+

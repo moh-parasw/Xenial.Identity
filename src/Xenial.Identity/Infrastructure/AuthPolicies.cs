@@ -8,26 +8,31 @@ public class AuthPolicies
 {
     public const string UsersRead = "users:read";
     public const string UsersCreate = "users:create";
+    public const string UsersDelete = "users:delete";
 
     public const string UserManagerRoleName = "UserManager";
 
     public const string UserManagerReadRoleName = $"{UserManagerRoleName}:read";
     public const string UserManagerCreateRoleName = $"{UserManagerRoleName}:create";
+    public const string UserManagerDeleteRoleName = $"{UserManagerRoleName}:delete";
 
     internal static void Configure(AuthorizationOptions o)
     {
-        o.AddPolicy(UsersRead, o =>
+        var policies = new Dictionary<string, string>
         {
-            o.AddAuthenticationSchemes(IdentityServerConstants.LocalApi.AuthenticationScheme);
-            o.RequireAuthenticatedUser();
-            o.RequireRole(DatabaseUpdateHandler.AdminRoleName, UserManagerRoleName, UserManagerReadRoleName);
-        });
+            [UsersRead] = UserManagerReadRoleName,
+            [UsersCreate] = UserManagerCreateRoleName,
+            [UsersDelete] = UserManagerDeleteRoleName,
+        };
 
-        o.AddPolicy(UsersCreate, o =>
+        foreach (var (policyName, roleName) in policies)
         {
-            o.AddAuthenticationSchemes(IdentityServerConstants.LocalApi.AuthenticationScheme);
-            o.RequireAuthenticatedUser();
-            o.RequireRole(DatabaseUpdateHandler.AdminRoleName, UserManagerRoleName, UserManagerCreateRoleName);
-        });
+            o.AddPolicy(policyName, o =>
+            {
+                o.AddAuthenticationSchemes(IdentityServerConstants.LocalApi.AuthenticationScheme);
+                o.RequireAuthenticatedUser();
+                o.RequireRole(DatabaseUpdateHandler.AdminRoleName, UserManagerRoleName, roleName);
+            });
+        }
     }
 }
