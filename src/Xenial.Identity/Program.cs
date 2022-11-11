@@ -4,6 +4,9 @@ using DevExpress.Xpo.DB;
 
 using Duende.IdentityServer;
 
+using FluentValidation;
+using FluentValidation.AspNetCore;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Localization;
 using Microsoft.Extensions.Localization;
@@ -84,6 +87,8 @@ try
     services.AddSingleton<IHtmlLocalizer>(localizer);
     services.AddScoped<XpoStringLocalizerService>();
 
+
+    services.AddValidatorsFromAssemblyContaining<Program>();
     services.AddCommunicationChannels(o =>
     {
         o.AddMailKit();

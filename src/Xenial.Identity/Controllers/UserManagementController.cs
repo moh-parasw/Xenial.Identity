@@ -1,16 +1,10 @@
-﻿using System.Security.Claims;
-using System.Security.Principal;
+﻿using DevExpress.Xpo;
 
-using DevExpress.Data.Filtering.Helpers;
-using DevExpress.Xpo;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
-using Duende.IdentityServer;
-using Duende.IdentityServer.AspNetIdentity;
-using Duende.IdentityServer.Models;
-using Duende.IdentityServer.Services;
-using Duende.IdentityServer.Validation;
+using IdentityModel;
 
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -41,12 +35,62 @@ public sealed class UserManagementController : ControllerBase
         return Ok(userModel);
     }
 
-    [Route("add")]
+    [Route("create")]
     [Authorize(AuthPolicies.UsersCreate)]
-    [ProducesResponseType(typeof(XenialUser), 200)]
-    [ProducesResponseType(typeof(ProblemDetails), 400)]
-    public Task<IActionResult> Create([FromBody] CreateXenialUserRequest req, [FromServices] UnitOfWork uow, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(XenialUser), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> Create(
+        [FromBody] CreateXenialUserRequest req,
+        [FromServices] IValidator<CreateXenialUserRequest> validator,
+        [FromServices] UserManager<XenialIdentityUser> userManager,
+        CancellationToken cancellationToken
+    )
     {
-        return Task.FromResult<IActionResult>(Ok());
+        var validationResult = await validator.ValidateAsync(req, cancellationToken);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            var problemDetails = new ValidationProblemDetails(ModelState);
+            return UnprocessableEntity(problemDetails);
+        }
+
+        var id = CryptoRandom.CreateUniqueId();
+        var userReq = new XenialIdentityUser
+        {
+            Id = id,
+            UserName = req.Email,
+            Email = req.Email
+        };
+
+        var result = string.IsNullOrEmpty(req.Password)
+            ? await userManager.CreateAsync(userReq)
+            : await userManager.CreateAsync(userReq, req.Password);
+
+        if (!result.Succeeded)
+        {
+            var problemDetails = new ValidationProblemDetails(
+                result.Errors.ToDictionary(
+                    m => m.Code,
+                    m => new[]
+                    {
+                        m.Description
+                    })
+                );
+
+            return UnprocessableEntity(problemDetails);
+        }
+
+        var user = await userManager.FindByIdAsync(id);
+
+        return Ok(user);
+    }
+
+    public sealed class CreateXenialUserRequestValidator : AbstractValidator<CreateXenialUserRequest>
+    {
+        public CreateXenialUserRequestValidator()
+            => RuleFor(m => m.Email)
+                .NotEmpty()
+                .EmailAddress();
     }
 }

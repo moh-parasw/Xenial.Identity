@@ -25,6 +25,7 @@
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.6" />
     <PackageReference Include="Duende.IdentityServer" Version="6.1.2" />
     <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.1.2" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2" />
     <PackageReference Include="MudBlazor" Version="6.0.15" />
     <PackageReference Include="MySql.Data" Version="8.0.29" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

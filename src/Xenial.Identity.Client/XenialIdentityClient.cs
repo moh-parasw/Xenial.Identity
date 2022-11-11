@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.Serialization;
+using System.Text;
 using System.Threading.Tasks;
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 using Newtonsoft.Json;
@@ -24,14 +26,62 @@ public sealed record XenialIdentityClient
     public XenialIdentityClient(HttpClient httpClient)
         => this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
-    public Task<XenialResult<IEnumerable<XenialUser>>> GetUsersAsync()
-         => GetAsync<IEnumerable<XenialUser>>("api/management/users");
+    public Task<XenialResult<IEnumerable<XenialUser>>> GetUsersAsync(CancellationToken cancellationToken = default)
+         => GetAsync<IEnumerable<XenialUser>>("api/management/users", cancellationToken);
 
-    private async Task<XenialResult<TData>> GetAsync<TData>(string route)
+    public Task<XenialResult<XenialUser>> CreateUserAsync(CreateXenialUserRequest request, CancellationToken cancellationToken = default)
+         => PostAsync<XenialUser>("api/management/users/create", request, cancellationToken);
+
+    private async Task<XenialResult<TData>> PostAsync<TData>(string route, object payload, CancellationToken cancellationToken = default)
     {
         try
         {
-            var response = await httpClient.GetAsync(route);
+            var payloadString = JsonConvert.SerializeObject(payload, typeof(object), serializerSettings);
+            var response = await httpClient.PostAsync(route, new StringContent(payloadString, Encoding.UTF8, "application/json"), cancellationToken);
+
+            if (StatusCodes.Status422UnprocessableEntity == (int)response.StatusCode)
+            {
+                var problemsStr = await response.Content.ReadAsStringAsync();
+
+                var problems = JsonConvert.DeserializeObject<ValidationProblemDetails>(problemsStr, serializerSettings);
+
+                return new XenialResult<TData>.Error(new XenialValidationException(problems!));
+            }
+
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                var problemsStr = await response.Content.ReadAsStringAsync();
+                var problems = JsonConvert.DeserializeObject<ProblemDetails>(problemsStr, serializerSettings);
+
+                return new XenialResult<TData>.Error(new XenialBadRequestException(problems!));
+            }
+
+            response.EnsureSuccessStatusCode();
+
+            var responseStr = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<TData>(responseStr, serializerSettings);
+            return result!;
+        }
+        catch (Exception ex)
+        {
+            return new XenialResult<TData>.Error(new XenialUnknownApiException(ex));
+        }
+    }
+
+    private async Task<XenialResult<TData>> GetAsync<TData>(string route, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await httpClient.GetAsync(route, cancellationToken);
+
+            if (StatusCodes.Status422UnprocessableEntity == (int)response.StatusCode)
+            {
+                var problemsStr = await response.Content.ReadAsStringAsync();
+
+                var problems = JsonConvert.DeserializeObject<ValidationProblemDetails>(problemsStr, serializerSettings);
+
+                return new XenialResult<TData>.Error(new XenialValidationException(problems!));
+            }
 
             if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
             {
@@ -64,7 +114,6 @@ public sealed record CreateXenialUserRequest(
     string? Password = null
 );
 
-
 public abstract class XenialApiException : Exception
 {
     public XenialApiException()
@@ -89,6 +138,13 @@ public sealed class XenialUnknownApiException : XenialApiException
     {
 
     }
+}
+
+public sealed class XenialValidationException : XenialApiException
+{
+    public ValidationProblemDetails Details { get; private set; }
+    public XenialValidationException(ValidationProblemDetails details)
+        => Details = details;
 }
 
 public sealed class XenialBadRequestException : XenialApiException
