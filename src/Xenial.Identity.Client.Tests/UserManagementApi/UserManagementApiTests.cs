@@ -1,13 +1,9 @@
 ﻿using Bogus;
 
-using DevExpress.CodeParser;
-
 using Duende.IdentityServer;
 using Duende.IdentityServer.Models;
 
 using IdentityModel.Client;
-
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Shouldly;
 
@@ -202,6 +198,106 @@ public sealed record UserManagementApiTests()
         result.Match(
             _ => throw new Exception(),
             e => e.Exception.ShouldBeOfType<XenialNotFoundException>()
+        );
+    }
+
+    [Fact]
+    public async Task AddToRoleWhenOwnRoles()
+    {
+        using var scope = await SetAccessToken();
+        var adminUserName = new Faker().Internet.Email();
+        var createrUser = (await Client.CreateUserAsync(new CreateXenialUserRequest(adminUserName, DatabaseUpdateHandler.AdminPassword))).Unwrap();
+
+        foreach (var role in AuthPolicies.UserManagerRoles)
+        {
+            createrUser = (await Client.AddToRoleAsync(new(createrUser.Id, role))).Unwrap();
+        }
+
+        var disco = await Fixture.HttpClient.GetDiscoveryDocumentAsync();
+
+        var token = await Fixture.HttpClient.RequestPasswordTokenAsync(new()
+        {
+            Address = disco.TokenEndpoint,
+            ClientId = "test-client",
+            UserName = adminUserName,
+            Password = DatabaseUpdateHandler.AdminPassword,
+            Scope = $"role {IdentityServerConstants.LocalApi.ScopeName}",
+        });
+
+        Fixture.HttpClient.SetBearerToken(token.AccessToken);
+
+        var user = (await Client.CreateUserAsync(new CreateXenialUserRequest(new Faker().Internet.Email()))).Unwrap();
+
+        foreach (var role in createrUser.Roles)
+        {
+            user = (await Client.AddToRoleAsync(new(user.Id, role))).Unwrap();
+        }
+
+        user.Roles.ShouldBe(createrUser.Roles, ignoreOrder: true);
+    }
+
+    [Fact]
+    public async Task AddToRoleWhenUserManagerRoles()
+    {
+        using var scope = await SetAccessToken();
+        var adminUserName = new Faker().Internet.Email();
+        var createrUser = (await Client.CreateUserAsync(new CreateXenialUserRequest(adminUserName, DatabaseUpdateHandler.AdminPassword))).Unwrap();
+
+        createrUser = (await Client.AddToRoleAsync(new(createrUser.Id, AuthPolicies.UserManagerRoleName))).Unwrap();
+
+        var disco = await Fixture.HttpClient.GetDiscoveryDocumentAsync();
+
+        var token = await Fixture.HttpClient.RequestPasswordTokenAsync(new()
+        {
+            Address = disco.TokenEndpoint,
+            ClientId = "test-client",
+            UserName = adminUserName,
+            Password = DatabaseUpdateHandler.AdminPassword,
+            Scope = $"role {IdentityServerConstants.LocalApi.ScopeName}",
+        });
+
+        Fixture.HttpClient.SetBearerToken(token.AccessToken);
+
+        var user = (await Client.CreateUserAsync(new CreateXenialUserRequest(new Faker().Internet.Email()))).Unwrap();
+
+        foreach (var role in createrUser.Roles)
+        {
+            user = (await Client.AddToRoleAsync(new(user.Id, role))).Unwrap();
+        }
+
+        user.Roles.ShouldBe(createrUser.Roles, ignoreOrder: true);
+    }
+
+    [Fact]
+    public async Task AddToRoleForeignRoleFailes()
+    {
+        using var scope = await SetAccessToken();
+        var adminUserName = new Faker().Internet.Email();
+        var createrUser = (await Client.CreateUserAsync(new CreateXenialUserRequest(adminUserName, DatabaseUpdateHandler.AdminPassword))).Unwrap();
+
+        createrUser = (await Client.AddToRoleAsync(new(createrUser.Id, AuthPolicies.UserManagerRoleName))).Unwrap();
+
+        var disco = await Fixture.HttpClient.GetDiscoveryDocumentAsync();
+
+        var token = await Fixture.HttpClient.RequestPasswordTokenAsync(new()
+        {
+            Address = disco.TokenEndpoint,
+            ClientId = "test-client",
+            UserName = adminUserName,
+            Password = DatabaseUpdateHandler.AdminPassword,
+            Scope = $"role {IdentityServerConstants.LocalApi.ScopeName}",
+        });
+
+        Fixture.HttpClient.SetBearerToken(token.AccessToken);
+
+        var user = (await Client.CreateUserAsync(new CreateXenialUserRequest(new Faker().Internet.Email()))).Unwrap();
+
+
+        var result = await Client.AddToRoleAsync(new(user.Id, DatabaseUpdateHandler.AdminRoleName));
+
+        result.Match(
+            _ => throw new Exception(),
+            e => e.Exception.ShouldBeOfType<XenialBadRequestException>()
         );
     }
 

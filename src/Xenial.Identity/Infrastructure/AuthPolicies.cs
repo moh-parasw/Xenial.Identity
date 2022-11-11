@@ -1,4 +1,6 @@
-﻿using Duende.IdentityServer;
+﻿using System.Security.Claims;
+
+using Duende.IdentityServer;
 
 using Microsoft.AspNetCore.Authorization;
 
@@ -18,9 +20,15 @@ public class AuthPolicies
     public const string UserManagerDeleteRoleName = $"{UserManagerRoleName}:delete";
     public const string UserManagerManageRoleName = $"{UserManagerRoleName}:manage";
 
-    public static readonly string[] Roles = new[]
+    public static string[] Roles => new[]
     {
         DatabaseUpdateHandler.AdminRoleName,
+    }
+    .Concat(UserManagerRoles)
+    .ToArray();
+
+    public static readonly string[] UserManagerRoles = new[]
+    {
         UserManagerRoleName,
         UserManagerReadRoleName,
         UserManagerCreateRoleName,
@@ -48,4 +56,11 @@ public class AuthPolicies
             });
         }
     }
+
+    public static bool IsAllowedToAdd(ClaimsPrincipal user, string roleName)
+        => user.IsInRole(UserManagerRoleName) switch
+        {
+            true => UserManagerRoles.Contains(roleName),
+            false => false
+        };
 }

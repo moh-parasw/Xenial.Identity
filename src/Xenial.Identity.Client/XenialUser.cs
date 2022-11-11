@@ -8,6 +8,8 @@ public sealed record XenialUser(
 )
 {
     public ImmutableArray<XenialClaim> Claims { get; init; } = ImmutableArray.Create<XenialClaim>();
+
+    public string[] Roles => Claims.Where(m => m.Type == "role").Select(m => m.Value).ToArray();
 };
 
 public sealed record XenialClaim(string Type, string Value);

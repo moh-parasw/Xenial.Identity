@@ -184,9 +184,11 @@ public sealed class UserManagementController : ControllerBase
         public AddToXenialRoleRequestValidator()
         {
             RuleFor(m => m.UserId)
+                .MaximumLength(SizeAttribute.DefaultStringMappingFieldSize)
                 .NotEmpty();
 
             RuleFor(m => m.RoleName)
+                .MaximumLength(50)
                 .NotEmpty();
         }
     }
@@ -206,7 +208,7 @@ public sealed class UserManagementController : ControllerBase
     {
         var userId = req.UserId;
 
-        if (User.IsInRole(DatabaseUpdateHandler.AdminRoleName))
+        if (AuthPolicies.IsAllowedToAdd(User, req.RoleName) || User.IsInRole(req.RoleName) || User.IsInRole(DatabaseUpdateHandler.AdminRoleName))
         {
             var user = await userManager.FindByIdAsync(userId);
             if (user is null)
