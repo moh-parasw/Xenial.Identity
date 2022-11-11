@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Xenial.Identity.Client;
+﻿namespace Xenial.Identity.Client;
 
 #if NET7_0_OR_GREATER
 [JsonDerivedType(typeof(Success), typeDiscriminator: nameof(Success))]
