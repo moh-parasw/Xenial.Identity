@@ -33,7 +33,9 @@ public sealed record XenialIdentityClient
         try
         {
             var payloadString = JsonConvert.SerializeObject(payload, typeof(object), serializerSettings);
-            var response = await httpClient.PostAsync(route, new StringContent(payloadString, Encoding.UTF8, "application/json"), cancellationToken);
+            var request = new StringContent(payloadString, Encoding.UTF8, "application/json");
+            request.Headers.Add("X-XenialClientVersion", ThisAssembly.Info.Version);
+            var response = await httpClient.PostAsync(route, request, cancellationToken);
 
             return await ProcessResponse<TData>(response);
         }
@@ -47,7 +49,9 @@ public sealed record XenialIdentityClient
     {
         try
         {
-            var response = await httpClient.GetAsync(route, cancellationToken);
+            var request = new HttpRequestMessage(HttpMethod.Get, route);
+            request.Headers.Add("X-XenialClientVersion", ThisAssembly.Info.Version);
+            var response = await httpClient.SendAsync(request, cancellationToken);
 
             return await ProcessResponse<TData>(response);
         }
@@ -61,7 +65,9 @@ public sealed record XenialIdentityClient
     {
         try
         {
-            var response = await httpClient.DeleteAsync(route, cancellationToken);
+            var request = new HttpRequestMessage(HttpMethod.Delete, route);
+            request.Headers.Add("X-XenialClientVersion", ThisAssembly.Info.Version);
+            var response = await httpClient.SendAsync(request, cancellationToken);
 
             return await ProcessResponse<TData>(response);
         }
