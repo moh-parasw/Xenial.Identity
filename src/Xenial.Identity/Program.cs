@@ -35,6 +35,7 @@ using XLocalizer;
 
 SQLiteConnectionProvider.Register();
 MySqlConnectionProvider.Register();
+PostgreSqlConnectionProvider.Register();
 
 if (CreateLogger)
 {

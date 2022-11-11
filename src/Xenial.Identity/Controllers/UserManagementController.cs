@@ -1,10 +1,9 @@
 ﻿using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Security.Claims;
 
 using DevExpress.Xpo;
 
-using Duende.IdentityServer.Services;
+using Duende.IdentityServer;
 
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -17,7 +16,6 @@ using Microsoft.AspNetCore.Mvc;
 
 using Xenial.AspNetIdentity.Xpo.Models;
 using Xenial.Identity.Client;
-using Xenial.Identity.Components.Admin;
 using Xenial.Identity.Data;
 using Xenial.Identity.Infrastructure;
 
@@ -28,10 +26,32 @@ namespace Xenial.Identity.Controllers;
 [Authorize]
 public sealed class UserManagementController : ControllerBase
 {
+    [Route("currentUserId")]
+    [HttpGet]
+    [Authorize(AuthPolicies.LocalApiPolicyName)]
+    [ProducesResponseType(typeof(IEnumerable<XenialIdResponse>), 200)]
+    [ProducesResponseType(typeof(IEnumerable<ProblemDetails>), 200)]
+    public async Task<IActionResult> GetCurrentUserId(CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+
+        var sub = User.Claims.FirstOrDefault(m => m.Type == "sub")?.Value;
+
+        if (string.IsNullOrEmpty(sub))
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Detail = "Current user has no sub claim"
+            });
+        }
+
+        return Ok(new XenialIdResponse(sub));
+    }
+
     [Route("")]
     [HttpGet]
     [Authorize(AuthPolicies.UsersRead)]
-    [ProducesResponseType(typeof(IEnumerable<XenialUser>), 200)]
+    [ProducesResponseType(typeof(IEnumerable<XenialUser>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get([FromServices] UnitOfWork uow, CancellationToken cancellationToken)
     {
         var users = await uow
@@ -208,6 +228,24 @@ public sealed class UserManagementController : ControllerBase
     {
         var userId = req.UserId;
 
+        var sub = User.Claims.FirstOrDefault(m => m.Type == "sub")?.Value;
+
+        if (string.IsNullOrEmpty(sub))
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Detail = "Current user has no sub claim"
+            });
+        }
+
+        if (req.UserId == sub)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Detail = "You cannot add roles to the current user"
+            });
+        }
+
         if (AuthPolicies.IsAllowedToAdd(User, req.RoleName) || User.IsInRole(req.RoleName) || User.IsInRole(DatabaseUpdateHandler.AdminRoleName))
         {
             var user = await userManager.FindByIdAsync(userId);
@@ -228,19 +266,22 @@ public sealed class UserManagementController : ControllerBase
                 });
             }
 
-            var result = await userManager.AddToRoleAsync(user, req.RoleName);
-            if (!result.Succeeded)
+            if (!(await userManager.IsInRoleAsync(user, req.RoleName)))
             {
-                var problemDetails = new ValidationProblemDetails(
-                    result.Errors.ToDictionary(
-                        m => m.Code,
-                        m => new[]
-                        {
-                        m.Description
-                        })
-                    );
+                var result = await userManager.AddToRoleAsync(user, req.RoleName);
+                if (!result.Succeeded)
+                {
+                    var problemDetails = new ValidationProblemDetails(
+                        result.Errors.ToDictionary(
+                            m => m.Code,
+                            m => new[]
+                            {
+                            m.Description
+                            })
+                        );
 
-                return UnprocessableEntity(problemDetails);
+                    return UnprocessableEntity(problemDetails);
+                }
             }
 
             user = await userManager.FindByIdAsync(userId);
@@ -253,4 +294,82 @@ public sealed class UserManagementController : ControllerBase
         });
     }
 
+    [Route("roles/remove")]
+    [Authorize(AuthPolicies.UsersManage)]
+    [HttpPost]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(XenialUser), StatusCodes.Status200OK)]
+    public async Task<IActionResult> RemoveFromRoleAsync(
+        [FromBody] AddToXenialRoleRequest req,
+        [FromServices] UserManager<XenialIdentityUser> userManager,
+        [FromServices] RoleManager<IdentityRole> roleManager,
+        CancellationToken cancellationToken
+    )
+    {
+        var userId = req.UserId;
+
+        var sub = User.Claims.FirstOrDefault(m => m.Type == "sub")?.Value;
+
+        if (string.IsNullOrEmpty(sub))
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Detail = "Current user has no sub claim"
+            });
+        }
+
+        if (req.UserId == sub)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Detail = "You cannot add roles to the current user"
+            });
+        }
+
+        if (AuthPolicies.IsAllowedToAdd(User, req.RoleName) || User.IsInRole(req.RoleName) || User.IsInRole(DatabaseUpdateHandler.AdminRoleName))
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            if (user is null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Detail = $"Can not find user with id {userId}"
+                });
+            }
+
+            var role = await roleManager.FindByNameAsync(req.RoleName);
+
+            if (role is null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Detail = $"Can not find role {req.RoleName}"
+                });
+            }
+
+            var result = await userManager.RemoveFromRoleAsync(user, req.RoleName);
+            if (!result.Succeeded)
+            {
+                var problemDetails = new ValidationProblemDetails(
+                    result.Errors.ToDictionary(
+                        m => m.Code,
+                        m => new[]
+                        {
+                            m.Description
+                        })
+                    );
+
+                return UnprocessableEntity(problemDetails);
+            }
+
+            user = await userManager.FindByIdAsync(userId);
+            return Ok(await MapAsync(user, userManager));
+        }
+
+        return BadRequest(new ProblemDetails
+        {
+            Detail = $"You are not allowed to remove the role {req.RoleName}"
+        });
+    }
 }

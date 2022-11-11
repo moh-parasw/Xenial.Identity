@@ -28,6 +28,7 @@
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2" />
     <PackageReference Include="MudBlazor" Version="6.0.15" />
     <PackageReference Include="MySql.Data" Version="8.0.29" />
+    <PackageReference Include="Npgsql" Version="6.0.7" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NonFactors.Grid.Mvc6" Version="7.0.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="6.0.0" />

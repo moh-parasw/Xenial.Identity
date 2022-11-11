@@ -19,6 +19,9 @@ public sealed record XenialIdentityClient
     public XenialIdentityClient(HttpClient httpClient)
         => this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
+    public Task<XenialResult<XenialIdResponse>> GetUserIdAsync(CancellationToken cancellationToken = default)
+          => GetAsync<XenialIdResponse>("api/management/users/currentUserId", cancellationToken);
+
     public Task<XenialResult<IEnumerable<XenialUser>>> GetUsersAsync(CancellationToken cancellationToken = default)
         => GetAsync<IEnumerable<XenialUser>>("api/management/users", cancellationToken);
 
@@ -30,6 +33,9 @@ public sealed record XenialIdentityClient
 
     public Task<XenialResult<XenialUser>> AddToRoleAsync(AddToXenialRoleRequest req, CancellationToken cancellationToken = default)
        => PostAsync<XenialUser>("api/management/users/roles/add", req, cancellationToken);
+
+    public Task<XenialResult<XenialUser>> RemoveFromRoleAsync(RemoveFromXenialRoleRequest req, CancellationToken cancellationToken = default)
+        => PostAsync<XenialUser>("api/management/users/roles/remove", req, cancellationToken);
 
     private async Task<XenialResult<TData>> PostAsync<TData>(string route, object payload, CancellationToken cancellationToken = default)
     {
@@ -79,7 +85,7 @@ public sealed record XenialIdentityClient
             return new XenialResult<TData>.Error(new XenialUnknownApiException(ex));
         }
     }
-   
+
     private async Task<XenialResult<TData>> ProcessResponse<TData>(HttpResponseMessage response)
     {
         if (StatusCodes.Status404NotFound == (int)response.StatusCode)

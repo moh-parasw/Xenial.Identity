@@ -8,6 +8,8 @@ namespace Xenial.Identity.Infrastructure;
 
 public class AuthPolicies
 {
+    public const string LocalApiPolicyName = "localapi";
+
     public const string UsersRead = "users:read";
     public const string UsersCreate = "users:create";
     public const string UsersDelete = "users:delete";
@@ -45,6 +47,12 @@ public class AuthPolicies
             [UsersDelete] = UserManagerDeleteRoleName,
             [UsersManage] = UserManagerManageRoleName,
         };
+
+        o.AddPolicy(LocalApiPolicyName, o =>
+        {
+            o.AddAuthenticationSchemes(IdentityServerConstants.LocalApi.AuthenticationScheme);
+            o.RequireAuthenticatedUser();
+        });
 
         foreach (var (policyName, roleName) in policies)
         {

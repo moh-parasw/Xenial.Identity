@@ -268,6 +268,44 @@ public sealed record UserManagementApiTests()
         user.Roles.ShouldBe(createrUser.Roles, ignoreOrder: true);
     }
 
+
+    [Fact]
+    public async Task AddToRoleDuplicateRoles()
+    {
+        using var scope = await SetAccessToken();
+        var adminUserName = new Faker().Internet.Email();
+        var createrUser = (await Client.CreateUserAsync(new CreateXenialUserRequest(adminUserName, DatabaseUpdateHandler.AdminPassword))).Unwrap();
+
+        createrUser = (await Client.AddToRoleAsync(new(createrUser.Id, AuthPolicies.UserManagerRoleName))).Unwrap();
+
+        var disco = await Fixture.HttpClient.GetDiscoveryDocumentAsync();
+
+        var token = await Fixture.HttpClient.RequestPasswordTokenAsync(new()
+        {
+            Address = disco.TokenEndpoint,
+            ClientId = "test-client",
+            UserName = adminUserName,
+            Password = DatabaseUpdateHandler.AdminPassword,
+            Scope = $"role {IdentityServerConstants.LocalApi.ScopeName}",
+        });
+
+        Fixture.HttpClient.SetBearerToken(token.AccessToken);
+
+        var user = (await Client.CreateUserAsync(new CreateXenialUserRequest(new Faker().Internet.Email()))).Unwrap();
+
+        foreach (var role in createrUser.Roles)
+        {
+            user = (await Client.AddToRoleAsync(new(user.Id, role))).Unwrap();
+        }
+
+        foreach (var role in createrUser.Roles)
+        {
+            user = (await Client.AddToRoleAsync(new(user.Id, role))).Unwrap();
+        }
+
+        user.Roles.ShouldBe(createrUser.Roles, ignoreOrder: true);
+    }
+
     [Fact]
     public async Task AddToRoleForeignRoleFailes()
     {
@@ -292,8 +330,130 @@ public sealed record UserManagementApiTests()
 
         var user = (await Client.CreateUserAsync(new CreateXenialUserRequest(new Faker().Internet.Email()))).Unwrap();
 
-
         var result = await Client.AddToRoleAsync(new(user.Id, DatabaseUpdateHandler.AdminRoleName));
+
+        result.Match(
+            _ => throw new Exception(),
+            e => e.Exception.ShouldBeOfType<XenialBadRequestException>()
+        );
+    }
+
+    [Fact]
+    public async Task RemoveRoleNotFound()
+    {
+        using var scope = await SetAccessToken();
+
+        var user = (await Client.CreateUserAsync(new CreateXenialUserRequest(new Faker().Internet.Email()))).Unwrap();
+
+        var result = await Client.RemoveFromRoleAsync(new RemoveFromXenialRoleRequest(user.Id, new Faker().Random.AlphaNumeric(10)));
+
+        result.Match(
+            _ => throw new Exception(),
+            e => e.Exception.ShouldBeOfType<XenialNotFoundException>()
+        );
+    }
+
+    [Fact]
+    public async Task RemoveFromRoleAllowsAllRolesWhenAdministrator()
+    {
+        using var scope = await SetAccessToken();
+
+        var user = (await Client.CreateUserAsync(new CreateXenialUserRequest(new Faker().Internet.Email()))).Unwrap();
+
+        foreach (var role in AuthPolicies.Roles)
+        {
+            user = (await Client.AddToRoleAsync(new(user.Id, role))).Unwrap();
+        }
+        foreach (var role in AuthPolicies.Roles)
+        {
+            user = (await Client.RemoveFromRoleAsync(new(user.Id, role))).Unwrap();
+        }
+        var roles = user.Claims.Where(m => m.Type == "role").Select(m => m.Value).ToArray();
+
+        roles.ShouldBe(Array.Empty<string>(), ignoreOrder: true);
+    }
+
+    [Fact]
+    public async Task RemoveFromRoleWhenOwnRoles()
+    {
+        using var scope = await SetAccessToken();
+        var adminUserName = new Faker().Internet.Email();
+        var createrUser = (await Client.CreateUserAsync(new CreateXenialUserRequest(adminUserName, DatabaseUpdateHandler.AdminPassword))).Unwrap();
+
+        foreach (var role in AuthPolicies.UserManagerRoles)
+        {
+            createrUser = (await Client.AddToRoleAsync(new(createrUser.Id, role))).Unwrap();
+        }
+
+        var disco = await Fixture.HttpClient.GetDiscoveryDocumentAsync();
+
+        var token = await Fixture.HttpClient.RequestPasswordTokenAsync(new()
+        {
+            Address = disco.TokenEndpoint,
+            ClientId = "test-client",
+            UserName = adminUserName,
+            Password = DatabaseUpdateHandler.AdminPassword,
+            Scope = $"role {IdentityServerConstants.LocalApi.ScopeName}",
+        });
+
+        Fixture.HttpClient.SetBearerToken(token.AccessToken);
+
+        var user = (await Client.CreateUserAsync(new CreateXenialUserRequest(new Faker().Internet.Email()))).Unwrap();
+
+        foreach (var role in createrUser.Roles)
+        {
+            user = (await Client.AddToRoleAsync(new(user.Id, role))).Unwrap();
+        }
+        foreach (var role in createrUser.Roles)
+        {
+            user = (await Client.RemoveFromRoleAsync(new(user.Id, role))).Unwrap();
+        }
+        user.Roles.ShouldBe(Array.Empty<string>(), ignoreOrder: true);
+    }
+
+    [Fact]
+    public async Task RemoveFromRoleWhenNotInRole()
+    {
+        using var scope = await SetAccessToken();
+        var adminUserName = new Faker().Internet.Email();
+        var createrUser = (await Client.CreateUserAsync(new CreateXenialUserRequest(adminUserName, DatabaseUpdateHandler.AdminPassword))).Unwrap();
+
+        foreach (var role in AuthPolicies.UserManagerRoles)
+        {
+            createrUser = (await Client.AddToRoleAsync(new(createrUser.Id, role))).Unwrap();
+        }
+
+        var disco = await Fixture.HttpClient.GetDiscoveryDocumentAsync();
+
+        var token = await Fixture.HttpClient.RequestPasswordTokenAsync(new()
+        {
+            Address = disco.TokenEndpoint,
+            ClientId = "test-client",
+            UserName = adminUserName,
+            Password = DatabaseUpdateHandler.AdminPassword,
+            Scope = $"role {IdentityServerConstants.LocalApi.ScopeName}",
+        });
+
+        Fixture.HttpClient.SetBearerToken(token.AccessToken);
+
+        var user = (await Client.CreateUserAsync(new CreateXenialUserRequest(new Faker().Internet.Email()))).Unwrap();
+
+        var result = await Client.RemoveFromRoleAsync(new(user.Id, AuthPolicies.UserManagerManageRoleName));
+
+        result.Match(
+            _ => throw new Exception(),
+            e => e.Exception.ShouldBeOfType<XenialValidationException>()
+        );
+    }
+
+    [Fact]
+    public async Task CannotRemoveRolesFromOwnUser()
+    {
+        using var scope = await SetAccessToken();
+
+        var userId = (await Client.GetUserIdAsync()).Unwrap().Id;
+
+        var result = await Client.RemoveFromRoleAsync(new(userId, DatabaseUpdateHandler.AdminRoleName));
 
         result.Match(
             _ => throw new Exception(),
