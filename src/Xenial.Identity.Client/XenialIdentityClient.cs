@@ -28,6 +28,9 @@ public sealed record XenialIdentityClient
     public Task<XenialResult<XenialIdResponse>> DeleteUserAsync(string userId, CancellationToken cancellationToken = default)
         => DeleteAsync<XenialIdResponse>($"api/management/users/{userId}", cancellationToken);
 
+    public Task<XenialResult<XenialUser>> AddToRoleAsync(AddToXenialRoleRequest req, CancellationToken cancellationToken = default)
+       => PostAsync<XenialUser>("api/management/users/roles/add", req, cancellationToken);
+
     private async Task<XenialResult<TData>> PostAsync<TData>(string route, object payload, CancellationToken cancellationToken = default)
     {
         try
@@ -76,7 +79,7 @@ public sealed record XenialIdentityClient
             return new XenialResult<TData>.Error(new XenialUnknownApiException(ex));
         }
     }
-
+   
     private async Task<XenialResult<TData>> ProcessResponse<TData>(HttpResponseMessage response)
     {
         if (StatusCodes.Status404NotFound == (int)response.StatusCode)

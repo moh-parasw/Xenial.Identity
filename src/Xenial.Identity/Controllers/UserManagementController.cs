@@ -1,6 +1,10 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
+using System.Security.Claims;
 
 using DevExpress.Xpo;
+
+using Duende.IdentityServer.Services;
 
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -13,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using Xenial.AspNetIdentity.Xpo.Models;
 using Xenial.Identity.Client;
+using Xenial.Identity.Components.Admin;
 using Xenial.Identity.Data;
 using Xenial.Identity.Infrastructure;
 
@@ -95,8 +100,20 @@ public sealed class UserManagementController : ControllerBase
         }
 
         var user = await userManager.FindByIdAsync(id);
+        return Ok(await MapAsync(user, userManager));
+    }
 
-        return Ok(user);
+    private XenialUser Map(XenialIdentityUser user, IEnumerable<Claim> claims)
+        => new XenialUser(user.Id, user.UserName)
+        {
+            Claims = claims.Select(x => new XenialClaim(x.Type, x.Value)).ToImmutableArray()
+        };
+
+    private async Task<XenialUser> MapAsync(XenialIdentityUser user, UserManager<XenialIdentityUser> userManager)
+    {
+        var claims = await userManager.GetClaimsAsync(user);
+        var roles = await userManager.GetRolesAsync(user);
+        return Map(user, claims.Concat(roles.Select(m => new Claim("role", m))));
     }
 
     [Route("{userId}")]
@@ -160,6 +177,78 @@ public sealed class UserManagementController : ControllerBase
         }
 
         return Ok(new XenialIdResponse(userId));
+    }
+
+    public sealed class AddToXenialRoleRequestValidator : AbstractValidator<AddToXenialRoleRequest>
+    {
+        public AddToXenialRoleRequestValidator()
+        {
+            RuleFor(m => m.UserId)
+                .NotEmpty();
+
+            RuleFor(m => m.RoleName)
+                .NotEmpty();
+        }
+    }
+
+    [Route("roles/add")]
+    [Authorize(AuthPolicies.UsersManage)]
+    [HttpPost]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(XenialUser), StatusCodes.Status200OK)]
+    public async Task<IActionResult> AddToRoleAsync(
+        [FromBody] AddToXenialRoleRequest req,
+        [FromServices] UserManager<XenialIdentityUser> userManager,
+        [FromServices] RoleManager<IdentityRole> roleManager,
+        CancellationToken cancellationToken
+    )
+    {
+        var userId = req.UserId;
+
+        if (User.IsInRole(DatabaseUpdateHandler.AdminRoleName))
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            if (user is null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Detail = $"Can not find user with id {userId}"
+                });
+            }
+            var role = await roleManager.FindByNameAsync(req.RoleName);
+
+            if (role is null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Detail = $"Can not find role {req.RoleName}"
+                });
+            }
+
+            var result = await userManager.AddToRoleAsync(user, req.RoleName);
+            if (!result.Succeeded)
+            {
+                var problemDetails = new ValidationProblemDetails(
+                    result.Errors.ToDictionary(
+                        m => m.Code,
+                        m => new[]
+                        {
+                        m.Description
+                        })
+                    );
+
+                return UnprocessableEntity(problemDetails);
+            }
+
+            user = await userManager.FindByIdAsync(userId);
+            return Ok(await MapAsync(user, userManager));
+        }
+
+        return BadRequest(new ProblemDetails
+        {
+            Detail = $"You are not allowed to add the role {req.RoleName}"
+        });
     }
 
 }

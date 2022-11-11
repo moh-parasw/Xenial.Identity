@@ -178,6 +178,8 @@ public sealed class DatabaseUpdateHandler
         await CreateRole(AuthPolicies.UserManagerRoleName, provider);
         await CreateRole(AuthPolicies.UserManagerReadRoleName, provider);
         await CreateRole(AuthPolicies.UserManagerCreateRoleName, provider);
+        await CreateRole(AuthPolicies.UserManagerDeleteRoleName, provider);
+        await CreateRole(AuthPolicies.UserManagerManageRoleName, provider);
 
         if (createAdminUser)
         {

@@ -1,5 +1,7 @@
 ﻿using Bogus;
 
+using DevExpress.CodeParser;
+
 using Duende.IdentityServer;
 using Duende.IdentityServer.Models;
 
@@ -9,6 +11,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Shouldly;
 
+using Xenial.Identity.Infrastructure;
 using Xenial.Identity.Xpo.Storage.Stores;
 
 namespace Xenial.Identity.Client.Tests.UserManagementApi;
@@ -170,6 +173,37 @@ public sealed record UserManagementApiTests()
         );
     }
 
+    [Fact]
+    public async Task AddToRoleAllowsAllRolesWhenAdministrator()
+    {
+        using var scope = await SetAccessToken();
+
+        var user = (await Client.CreateUserAsync(new CreateXenialUserRequest(new Faker().Internet.Email()))).Unwrap();
+
+        foreach (var role in AuthPolicies.Roles)
+        {
+            user = (await Client.AddToRoleAsync(new(user.Id, role))).Unwrap();
+        }
+
+        var roles = user.Claims.Where(m => m.Type == "role").Select(m => m.Value).ToArray();
+
+        roles.ShouldBe(AuthPolicies.Roles, ignoreOrder: true);
+    }
+
+    [Fact]
+    public async Task AddToRoleNotFound()
+    {
+        using var scope = await SetAccessToken();
+
+        var user = (await Client.CreateUserAsync(new CreateXenialUserRequest(new Faker().Internet.Email()))).Unwrap();
+
+        var result = await Client.AddToRoleAsync(new(user.Id, new Faker().Random.AlphaNumeric(10)));
+
+        result.Match(
+            _ => throw new Exception(),
+            e => e.Exception.ShouldBeOfType<XenialNotFoundException>()
+        );
+    }
 
     private async Task<IServiceScope> SetAccessToken()
     {

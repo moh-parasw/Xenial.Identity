@@ -9,12 +9,24 @@ public class AuthPolicies
     public const string UsersRead = "users:read";
     public const string UsersCreate = "users:create";
     public const string UsersDelete = "users:delete";
+    public const string UsersManage = "users:manage";
 
     public const string UserManagerRoleName = "UserManager";
 
     public const string UserManagerReadRoleName = $"{UserManagerRoleName}:read";
     public const string UserManagerCreateRoleName = $"{UserManagerRoleName}:create";
     public const string UserManagerDeleteRoleName = $"{UserManagerRoleName}:delete";
+    public const string UserManagerManageRoleName = $"{UserManagerRoleName}:manage";
+
+    public static readonly string[] Roles = new[]
+    {
+        DatabaseUpdateHandler.AdminRoleName,
+        UserManagerRoleName,
+        UserManagerReadRoleName,
+        UserManagerCreateRoleName,
+        UserManagerDeleteRoleName,
+        UserManagerManageRoleName
+    };
 
     internal static void Configure(AuthorizationOptions o)
     {
@@ -23,6 +35,7 @@ public class AuthPolicies
             [UsersRead] = UserManagerReadRoleName,
             [UsersCreate] = UserManagerCreateRoleName,
             [UsersDelete] = UserManagerDeleteRoleName,
+            [UsersManage] = UserManagerManageRoleName,
         };
 
         foreach (var (policyName, roleName) in policies)
