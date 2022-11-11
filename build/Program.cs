@@ -15,6 +15,7 @@ var configuration = "Release";
 var selfContained = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBDEPLOY_SELFHOST")) ? false : true;
 var skipExtraFilesOnServer = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBDEPLOY_REMOVEFILESONSERVER")) ? false : true;
 var packageAsSingleFile = false;
+var nugetClientProject = "./src/Xenial.Identity.Client/Xenial.Identity.Client.csproj";
 
 var version = new Lazy<Task<string>>(async () => (await ReadToolAsync(() => ReadTrimmedAsync("dotnet", "minver -v e"))).Trim());
 var branch = new Lazy<Task<string>>(async () => await ReadTrimmedAsync("git", "rev-parse --abbrev-ref HEAD"));
@@ -37,7 +38,10 @@ Target("test:identity", () => RunAsync("dotnet", $"run --project src/Xenial.Iden
 Target("test:dotnet", () => RunAsync("dotnet", $"test {sln} --no-build --no-restore --logger:\"console;verbosity=normal\" -c {configuration} -- xunit.parallelizeAssembly=true"));
 
 var connectionString = Environment.GetEnvironmentVariable("XENIAL_DEFAULTCONNECTIONSTRING");
-Target("publish", DependsOn("test"), async () => await RunAsync("dotnet", $"msbuild {web} /t:Restore;Build /p:Configuration={configuration} /p:RuntimeIdentifier=win-x64 /p:SelfContained={selfContained} /p:PackageAsSingleFile={packageAsSingleFile} /p:DeployOnBuild=true /p:WebPublishMethod=package /p:PublishProfile=Package /v:minimal /p:DesktopBuildPackageLocation={artifact} /p:DeployIisAppPath={iisPackageName} /p:DefaultConnectionString=\"{connectionString}\" /p:SkipExtraFilesOnServer={skipExtraFilesOnServer} {await assemblyProperties()}"));
+Target("publish", DependsOn("publish:dotnet", "publish:nuget"), async () => await RunAsync("dotnet", $"msbuild {web} /t:Restore;Build /p:Configuration={configuration} /p:RuntimeIdentifier=win-x64 /p:SelfContained={selfContained} /p:PackageAsSingleFile={packageAsSingleFile} /p:DeployOnBuild=true /p:WebPublishMethod=package /p:PublishProfile=Package /v:minimal /p:DesktopBuildPackageLocation={artifact} /p:DeployIisAppPath={iisPackageName} /p:DefaultConnectionString=\"{connectionString}\" /p:SkipExtraFilesOnServer={skipExtraFilesOnServer} {await assemblyProperties()}"));
+Target("publish:dotnet", DependsOn("test"), async () => await RunAsync("dotnet", $"msbuild {web} /t:Restore;Build /p:Configuration={configuration} /p:RuntimeIdentifier=win-x64 /p:SelfContained={selfContained} /p:PackageAsSingleFile={packageAsSingleFile} /p:DeployOnBuild=true /p:WebPublishMethod=package /p:PublishProfile=Package /v:minimal /p:DesktopBuildPackageLocation={artifact} /p:DeployIisAppPath={iisPackageName} /p:DefaultConnectionString=\"{connectionString}\" /p:SkipExtraFilesOnServer={skipExtraFilesOnServer} {await assemblyProperties()}"));
+Target("publish:nuget", DependsOn("test"), () => RunAsync("dotnet", $"pack {nugetClientProject} --no-build --no-restore -c {configuration}"));
+
 Target("deploy", DependsOn("publish"), () => RunAsync("cmd.exe", $"/C {projectName}.deploy.cmd /Y /M:{Environment.GetEnvironmentVariable("WEBDEPLOY_IP")} /U:{Environment.GetEnvironmentVariable("WEBDEPLOY_USER")} /P:{Environment.GetEnvironmentVariable("WEBDEPLOY_PASS")} -allowUntrusted -enableRule:AppOffline {(skipExtraFilesOnServer ? "-enableRule:DoNotDeleteRule" : "")}", workingDirectory: artifactsLocation));
 Target("default", DependsOn("publish"));
 

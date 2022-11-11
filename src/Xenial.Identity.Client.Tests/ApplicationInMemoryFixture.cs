@@ -1,17 +1,7 @@
 ﻿using System.Net.Http.Headers;
-using System.Security.Claims;
-using System.Text.Encodings.Web;
 
 using DevExpress.Xpo.DB;
-
-using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Configurations;
-using DotNet.Testcontainers.Containers;
-
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Options;
 
 namespace Xenial.Identity.Client.Tests;
 
@@ -33,22 +23,37 @@ public sealed record ApplicationInMemoryFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        Program.CreateLogger = CreateLogger;
-
-        ConnectionString = InMemoryDataStore.GetConnectionStringInMemory(true);
-
-        factory = new IdentityWebApplicationFactory<Program>(this);
-
-        HttpClient = factory.CreateClient(new WebApplicationFactoryClientOptions
+        var retries = 0;
+    Retry:
+        try
         {
-            AllowAutoRedirect = AllowAutoRedirect,
-        });
 
-        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme: "TestScheme");
+            Program.CreateLogger = CreateLogger;
 
-        var handler = factory.Services.GetRequiredService<DatabaseUpdateHandler>();
+            ConnectionString = InMemoryDataStore.GetConnectionStringInMemory(true);
 
-        await handler.UpdateDatabase();
+            factory = new IdentityWebApplicationFactory<Program>(this);
+
+            HttpClient = factory.CreateClient(new WebApplicationFactoryClientOptions
+            {
+                AllowAutoRedirect = AllowAutoRedirect,
+            });
+
+            HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme: "TestScheme");
+
+            var handler = factory.Services.GetRequiredService<DatabaseUpdateHandler>();
+
+            await handler.UpdateDatabase();
+        }
+        catch (Exception)
+        {
+            retries++;
+            if (retries < 3)
+            {
+                goto Retry;
+            }
+            throw;
+        }
     }
 
     public async Task DisposeAsync()
@@ -76,7 +81,12 @@ public sealed record ApplicationInMemoryFixture : IAsyncLifetime
                 });
             });
 
-            return base.CreateHost(builder);
+            //https://www.strathweb.com/2021/05/the-curious-case-of-asp-net-core-integration-test-deadlock/
+            var host = builder.Build();
+
+            Task.Run(() => host.StartAsync()).GetAwaiter().GetResult();
+
+            return host;
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)

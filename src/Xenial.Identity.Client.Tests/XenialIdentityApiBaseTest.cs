@@ -1,4 +1,6 @@
-﻿namespace Xenial.Identity.Client.Tests;
+﻿using Spectre.Console;
+
+namespace Xenial.Identity.Client.Tests;
 
 public abstract record XenialIdentityApiBaseTest : IAsyncLifetime
 {
@@ -14,5 +16,6 @@ public abstract record XenialIdentityApiBaseTest : IAsyncLifetime
         await Fixture.InitializeAsync();
         Client = new XenialIdentityClient(Fixture.HttpClient);
     }
+
     public virtual Task DisposeAsync() => Fixture.DisposeAsync();
 }
