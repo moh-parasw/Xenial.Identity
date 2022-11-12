@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 using static Bullseye.Targets;
@@ -14,6 +15,8 @@ var artifact = Path.GetFullPath($"{artifactsLocation}/{projectName}.zip");
 var configuration = "Release";
 var selfContained = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBDEPLOY_SELFHOST")) ? false : true;
 var skipExtraFilesOnServer = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBDEPLOY_REMOVEFILESONSERVER")) ? false : true;
+var nugetApiKey = Environment.GetEnvironmentVariable("NUGET_API_KEY");
+
 var packageAsSingleFile = false;
 var nugetClientProject = "./src/Xenial.Identity.Client/Xenial.Identity.Client.csproj";
 
@@ -43,6 +46,20 @@ Target("publish:dotnet", DependsOn("test"), async () => await RunAsync("dotnet",
 Target("publish:nuget", DependsOn("test"), () => RunAsync("dotnet", $"pack {nugetClientProject} --no-build --no-restore -c {configuration}"));
 
 Target("deploy", DependsOn("publish"), () => RunAsync("cmd.exe", $"/C {projectName}.deploy.cmd /Y /M:{Environment.GetEnvironmentVariable("WEBDEPLOY_IP")} /U:{Environment.GetEnvironmentVariable("WEBDEPLOY_USER")} /P:{Environment.GetEnvironmentVariable("WEBDEPLOY_PASS")} -allowUntrusted -enableRule:AppOffline {(skipExtraFilesOnServer ? "-enableRule:DoNotDeleteRule" : "")}", workingDirectory: artifactsLocation));
+
+Target("deploy:nuget", DependsOn("publish:dotnet"), async () =>
+{
+    var files = Directory.EnumerateFiles("artifacts/nuget", "*.nupkg")
+        .Concat(Directory.EnumerateFiles("artifacts/nuget", "*.snupkg"));
+
+    foreach (var file in files)
+    {
+        await RunAsync("dotnet", $"nuget push {file} --skip-duplicate -s https://api.nuget.org/v3/index.json -k {nugetApiKey}",
+            noEcho: true
+        );
+    }
+});
+
 Target("default", DependsOn("publish"));
 
 await RunTargetsAndExitAsync(args);

@@ -51,6 +51,4 @@ jobs:
       if: ${{ runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/v') }}
       run: dotnet run --project ".\build\build.csproj" "deploy:nuget" -s
       env:
-        WEBDEPLOY_IP: ${{secrets.WEBDEPLOY_IP}}
-        WEBDEPLOY_USER: ${{secrets.WEBDEPLOY_USER}}
-        WEBDEPLOY_PASS: ${{secrets.WEBDEPLOY_PASS}}
+        NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
