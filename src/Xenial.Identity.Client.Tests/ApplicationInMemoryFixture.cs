@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 
 using DevExpress.Xpo.DB;
+
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Xenial.Identity.Client.Tests;
