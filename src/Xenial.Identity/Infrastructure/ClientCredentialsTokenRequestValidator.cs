@@ -1,4 +1,5 @@
-﻿using Duende.IdentityServer.Models;
+﻿using Duende.IdentityServer;
+using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Validation;
 
@@ -16,22 +17,27 @@ public sealed class ClientCredentialsTokenRequestValidator : ICustomTokenRequest
         {
             return;
         }
+
+        var scopes = context.Result.ValidatedRequest.RequestedScopes
+            ?? context.Result.ValidatedRequest.Client.AllowedScopes
+            ?? Enumerable.Empty<string>();
+
         //TODO: Configure via DB
-        //if (context.Result.ValidatedRequest.Client.AllowedGrantTypes.Any(x => GrantTypes.ResourceOwnerPasswordAndClientCredentials.Contains(x)))
-        //{
-        var ctx = new ProfileDataRequestContext(
-            context.Result.ValidatedRequest.Subject,
-            context.Result.ValidatedRequest.Client,
-            GetType().Name,
-            context.Result.ValidatedRequest.RequestedScopes
-        );
-
-        await profileService.GetProfileDataAsync(ctx);
-
-        foreach (var claim in ctx.IssuedClaims)
+        if (scopes.Contains(IdentityServerConstants.LocalApi.ScopeName))
         {
-            context.Result.ValidatedRequest.ClientClaims.Add(claim);
+            var ctx = new ProfileDataRequestContext(
+                context.Result.ValidatedRequest.Subject,
+                context.Result.ValidatedRequest.Client,
+                GetType().Name,
+                scopes
+            );
+
+            await profileService.GetProfileDataAsync(ctx);
+
+            foreach (var claim in ctx.IssuedClaims)
+            {
+                context.Result.ValidatedRequest.ClientClaims.Add(claim);
+            }
         }
-        //}
     }
 }
