@@ -41,7 +41,8 @@ Target("test:identity", () => RunAsync("dotnet", $"run --project src/Xenial.Iden
 Target("test:dotnet", () => RunAsync("dotnet", $"test {sln} --no-build --no-restore --logger:\"console;verbosity=normal\" -c {configuration} -- xunit.parallelizeAssembly=true"));
 
 var connectionString = Environment.GetEnvironmentVariable("XENIAL_DEFAULTCONNECTIONSTRING");
-Target("publish", DependsOn("publish:dotnet", "publish:nuget"), async () => await RunAsync("dotnet", $"msbuild {web} /t:Restore;Build /p:Configuration={configuration} /p:RuntimeIdentifier=win-x64 /p:SelfContained={selfContained} /p:PackageAsSingleFile={packageAsSingleFile} /p:DeployOnBuild=true /p:WebPublishMethod=package /p:PublishProfile=Package /v:minimal /p:DesktopBuildPackageLocation={artifact} /p:DeployIisAppPath={iisPackageName} /p:DefaultConnectionString=\"{connectionString}\" /p:SkipExtraFilesOnServer={skipExtraFilesOnServer} {await assemblyProperties()}"));
+
+Target("publish", DependsOn("publish:dotnet", "publish:nuget"));
 Target("publish:dotnet", DependsOn("test"), async () => await RunAsync("dotnet", $"msbuild {web} /t:Restore;Build /p:Configuration={configuration} /p:RuntimeIdentifier=win-x64 /p:SelfContained={selfContained} /p:PackageAsSingleFile={packageAsSingleFile} /p:DeployOnBuild=true /p:WebPublishMethod=package /p:PublishProfile=Package /v:minimal /p:DesktopBuildPackageLocation={artifact} /p:DeployIisAppPath={iisPackageName} /p:DefaultConnectionString=\"{connectionString}\" /p:SkipExtraFilesOnServer={skipExtraFilesOnServer} {await assemblyProperties()}"));
 Target("publish:nuget", DependsOn("test"), () => RunAsync("dotnet", $"pack {nugetClientProject} --no-build --no-restore -c {configuration}"));
 
