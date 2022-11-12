@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace Xenial.Identity.Client;
 
-public sealed record XenialIdentityClient
+public sealed class XenialIdentityClient : IXenialIdentityClient
 {
     private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings()
     {
