@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+
 using DevExpress.Xpo;
 using DevExpress.Xpo.DB;
 
@@ -19,6 +20,7 @@ using Serilog;
 using Serilog.Events;
 
 using Westwind.AspNetCore.LiveReload;
+
 using Xenial.AspNetIdentity.Xpo.Mappers;
 using Xenial.AspNetIdentity.Xpo.Models;
 using Xenial.AspNetIdentity.Xpo.Stores;
@@ -49,6 +51,7 @@ var loggerConfig = new LoggerConfiguration()
         .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
         .MinimumLevel.Override("System", LogEventLevel.Warning)
         .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Information)
+        .MinimumLevel.Override("Microsoft.AspNetCore.HttpLogging.HttpLoggingMiddleware", LogEventLevel.Information)
         .Enrich.FromLogContext()
         .WriteTo.Memory(out var inMemoryLogSink, outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: AnsiConsoleTheme.Code)
         ;
@@ -92,6 +95,11 @@ try
     services.AddHttpLogging(o =>
     {
         o.LoggingFields = HttpLoggingFields.All;
+        o.RequestHeaders.Add("Authorization");
+        o.ResponseHeaders.Add("Authorization");
+        o.MediaTypeOptions.AddText("application/javascript");
+        o.RequestBodyLogLimit = 4096;
+        o.ResponseBodyLogLimit = 4096;
     });
 
     services.AddValidatorsFromAssemblyContaining<Program>();
