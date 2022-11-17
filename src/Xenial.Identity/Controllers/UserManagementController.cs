@@ -3,8 +3,6 @@ using System.Security.Claims;
 
 using DevExpress.Xpo;
 
-using Duende.IdentityServer;
-
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
@@ -372,4 +370,89 @@ public sealed class UserManagementController : ControllerBase
             Detail = $"You are not allowed to remove the role {req.RoleName}"
         });
     }
+
+
+    public sealed class AddXenialClaimRequestValidator : AbstractValidator<AddXenialClaimRequest>
+    {
+        public AddXenialClaimRequestValidator()
+        {
+            RuleFor(m => m.UserId)
+                .MaximumLength(SizeAttribute.DefaultStringMappingFieldSize)
+                .NotEmpty();
+
+            RuleFor(m => m.Claim)
+                .NotEmpty();
+
+            RuleFor(m => m.Claim.Type)
+                .MaximumLength(250)
+                .NotEmpty();
+
+            RuleFor(m => m.Claim.Value)
+                .MaximumLength(250)
+                .NotEmpty();
+        }
+    }
+
+    [Route("claims/add")]
+    [Authorize(AuthPolicies.UsersManage)]
+    [HttpPost]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(XenialUser), StatusCodes.Status200OK)]
+    public async Task<IActionResult> AddClaimAsync(
+        [FromBody] AddXenialClaimRequest req,
+        [FromServices] UserManager<XenialIdentityUser> userManager,
+        [FromServices] IValidator<AddXenialClaimRequest> validator,
+        CancellationToken cancellationToken
+    )
+    {
+        var validationResult = await validator.ValidateAsync(req, cancellationToken);
+        if (!validationResult.IsValid)
+        {
+            validationResult.AddToModelState(ModelState);
+            var problemDetails = new ValidationProblemDetails(ModelState);
+            return UnprocessableEntity(problemDetails);
+        }
+
+        var userId = req.UserId;
+
+        var sub = User.Claims.FirstOrDefault(m => m.Type == "sub")?.Value;
+
+        if (string.IsNullOrEmpty(sub))
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Detail = "Current user has no sub claim"
+            });
+        }
+
+        var user = await userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return NotFound(new ProblemDetails
+            {
+                Detail = $"Can not find user with id {userId}"
+            });
+        }
+
+        var result = await userManager.AddClaimAsync(user, new Claim(req.Claim.Type, req.Claim.Value));
+        if (!result.Succeeded)
+        {
+            var problemDetails = new ValidationProblemDetails(
+                result.Errors.ToDictionary(
+                    m => m.Code,
+                    m => new[]
+                    {
+                            m.Description
+                    })
+                );
+
+            return UnprocessableEntity(problemDetails);
+        }
+
+        user = await userManager.FindByIdAsync(userId);
+        return Ok(await MapAsync(user, userManager));
+
+    }
+
 }

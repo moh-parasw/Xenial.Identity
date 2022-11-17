@@ -461,6 +461,58 @@ public sealed record UserManagementApiTests()
         );
     }
 
+    [Fact]
+    public async Task AddClaim()
+    {
+        using var scope = await SetAccessToken();
+        var faker = new Faker();
+
+        var email = faker.Internet.Email();
+        var user = (await Client.CreateUserAsync(
+            new CreateXenialUserRequest(
+                email
+            )
+        )).Unwrap();
+        var claimType = faker.Random.AlphaNumeric(100);
+        var claimValue = faker.Random.AlphaNumeric(100);
+        user = (await Client.AddClaimAsync(
+            new AddXenialClaimRequest(
+                user.Id,
+                new XenialClaim(claimType, claimValue)
+            ), CancellationToken.None)
+        ).Unwrap();
+
+        user.Claims.ShouldContain(new XenialClaim(claimType, claimValue));
+    }
+
+    [Fact]
+    public async Task ValidateClaims()
+    {
+        using var scope = await SetAccessToken();
+        var faker = new Faker();
+
+        var email = faker.Internet.Email();
+        var user = (await Client.CreateUserAsync(
+            new CreateXenialUserRequest(
+                email
+            )
+        )).Unwrap();
+
+        var claimType = faker.Random.AlphaNumeric(300);
+        var claimValue = faker.Random.AlphaNumeric(300);
+
+        var result = (await Client.AddClaimAsync(
+            new AddXenialClaimRequest(
+                user.Id,
+                new XenialClaim(claimType, claimValue)
+            ), CancellationToken.None)
+        );
+
+        result.Match(
+            _ => throw new Exception(),
+            e => e.Exception.ShouldBeOfType<XenialValidationException>()
+        );
+    }
     private async Task<IServiceScope> SetAccessToken()
     {
         var scope = Fixture.Services.CreateScope();
