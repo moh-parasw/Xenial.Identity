@@ -40,7 +40,7 @@ public sealed class XenialIdentityClient : IXenialIdentityClient
     public Task<XenialResult<XenialUser>> AddClaimAsync(AddXenialClaimRequest req, CancellationToken cancellationToken = default)
        => PostAsync<XenialUser>("api/management/users/claims/add", req, cancellationToken);
 
-    public Task<XenialResult<XenialUser>> RemoveToClaimAsync(RemoveXenialClaimRequest req, CancellationToken cancellationToken = default)
+    public Task<XenialResult<XenialUser>> RemoveClaimAsync(RemoveXenialClaimRequest req, CancellationToken cancellationToken = default)
        => PostAsync<XenialUser>("api/management/users/claims/remove", req, cancellationToken);
 
     private async Task<XenialResult<TData>> PostAsync<TData>(string route, object payload, CancellationToken cancellationToken = default)

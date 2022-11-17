@@ -508,11 +508,96 @@ public sealed record UserManagementApiTests()
             ), CancellationToken.None)
         );
 
-        result.Match(
-            _ => throw new Exception(),
-            e => e.Exception.ShouldBeOfType<XenialValidationException>()
-        );
+        Should.Throw<XenialValidationException>(result.Unwrap);
     }
+
+
+    [Fact]
+    public async Task RemoveNonExistingClaim()
+    {
+        using var scope = await SetAccessToken();
+        var faker = new Faker();
+
+        var email = faker.Internet.Email();
+        var user = (await Client.CreateUserAsync(
+            new CreateXenialUserRequest(
+                email
+            )
+        )).Unwrap();
+
+        var claimType = faker.Random.AlphaNumeric(100);
+
+        user = (await Client.RemoveClaimAsync(
+            new RemoveXenialClaimRequest(
+                user.Id,
+                claimType
+            ), CancellationToken.None)
+        ).Unwrap();
+
+        user.Claims.Select(m => m.Type).ShouldNotContain(claimType);
+    }
+
+
+    [Fact]
+    public async Task RemoveExistingClaim()
+    {
+        using var scope = await SetAccessToken();
+        var faker = new Faker();
+
+        var email = faker.Internet.Email();
+        var user = (await Client.CreateUserAsync(
+            new CreateXenialUserRequest(
+                email
+            )
+        )).Unwrap();
+
+        var claimType = faker.Random.AlphaNumeric(100);
+        var claimValue = faker.Random.AlphaNumeric(100);
+
+        var result = (await Client.AddClaimAsync(
+            new AddXenialClaimRequest(
+                user.Id,
+                new XenialClaim(claimType, claimValue)
+            ), CancellationToken.None)
+        );
+
+        user = (await Client.RemoveClaimAsync(
+            new RemoveXenialClaimRequest(
+                user.Id,
+                claimType
+            ), CancellationToken.None)
+        ).Unwrap();
+
+        user.Claims.Select(m => m.Type).ShouldNotContain(claimType);
+    }
+
+
+    [Fact]
+    public async Task ValidatesRemoveClaim()
+    {
+        using var scope = await SetAccessToken();
+        var faker = new Faker();
+
+        var email = faker.Internet.Email();
+        var user = (await Client.CreateUserAsync(
+            new CreateXenialUserRequest(
+                email
+            )
+        )).Unwrap();
+
+
+        var claimType = faker.Random.AlphaNumeric(300);
+
+        var result = (await Client.RemoveClaimAsync(
+            new RemoveXenialClaimRequest(
+                user.Id,
+                claimType
+            ), CancellationToken.None)
+        );
+
+        Should.Throw<XenialValidationException>(result.Unwrap);
+    }
+
     private async Task<IServiceScope> SetAccessToken()
     {
         var scope = Fixture.Services.CreateScope();
