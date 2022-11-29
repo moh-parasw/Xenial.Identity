@@ -630,16 +630,6 @@ public sealed class UserManagementController : ControllerBase
 
         var userId = req.UserId;
 
-        var sub = User.Claims.FirstOrDefault(m => m.Type == "sub")?.Value;
-
-        if (string.IsNullOrEmpty(sub))
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Detail = "Current user has no sub claim"
-            });
-        }
-
         var user = await userManager.FindByIdAsync(userId);
         if (user is null)
         {
