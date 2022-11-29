@@ -43,6 +43,12 @@ public sealed class XenialIdentityClient : IXenialIdentityClient
     public Task<XenialResult<XenialUser>> RemoveClaimAsync(RemoveXenialClaimRequest req, CancellationToken cancellationToken = default)
        => PostAsync<XenialUser>("api/management/users/claims/remove", req, cancellationToken);
 
+    public Task<XenialResult<ResetXenialUserPasswordResponse>> ResetPasswordAsync(ResetXenialUserPasswordRequest req, CancellationToken cancellationToken = default)
+        => PostAsync<ResetXenialUserPasswordResponse>("api/management/users/password/reset", req, cancellationToken);
+
+    public Task<XenialResult<XenialUser>> SetPasswordAsync(SetXenialUserPasswordRequest req, CancellationToken cancellationToken = default)
+        => PostAsync<XenialUser>("api/management/users/password/set", req, cancellationToken);
+
     private async Task<XenialResult<TData>> PostAsync<TData>(string route, object payload, CancellationToken cancellationToken = default)
     {
         try
@@ -126,6 +132,7 @@ public sealed class XenialIdentityClient : IXenialIdentityClient
         var result = JsonConvert.DeserializeObject<TData>(responseStr, serializerSettings);
         return result!;
     }
+    
 
 }
 

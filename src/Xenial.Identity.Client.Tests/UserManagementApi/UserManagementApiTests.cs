@@ -598,6 +598,37 @@ public sealed record UserManagementApiTests()
         Should.Throw<XenialValidationException>(result.Unwrap);
     }
 
+
+    [Fact]
+    public async Task ResetPassword()
+    {
+        using var scope = await SetAccessToken();
+        var faker = new Faker();
+
+        var email = faker.Internet.Email();
+        var user = (await Client.CreateUserAsync(
+            new CreateXenialUserRequest(
+                email
+            )
+        )).Unwrap();
+
+        var tokenResponse = (await Client.ResetPasswordAsync(
+            new ResetXenialUserPasswordRequest(
+                user.Id
+            ), CancellationToken.None)
+        ).Unwrap();
+
+        user = (await Client.SetPasswordAsync(
+           new SetXenialUserPasswordRequest(
+               user.Id,
+               tokenResponse.Token,
+               "!Xenial321"
+           ), CancellationToken.None)
+        ).Unwrap();
+
+        user.ShouldNotBeNull();
+    }
+
     private async Task<IServiceScope> SetAccessToken()
     {
         var scope = Fixture.Services.CreateScope();
