@@ -608,7 +608,7 @@ public sealed class UserManagementController : ControllerBase
     }
 
     [Route("password/set")]
-    [Authorize(AuthPolicies.UsersManage)]
+    [AllowAnonymous]
     [HttpPost]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
