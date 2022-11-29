@@ -8,4 +8,9 @@ public interface IXenialIdentityClient
     Task<XenialResult<XenialIdResponse>> GetUserIdAsync(CancellationToken cancellationToken = default);
     Task<XenialResult<IEnumerable<XenialUser>>> GetUsersAsync(CancellationToken cancellationToken = default);
     Task<XenialResult<XenialUser>> RemoveFromRoleAsync(RemoveFromXenialRoleRequest request, CancellationToken cancellationToken = default);
+    Task<XenialResult<XenialUser>> AddClaimAsync(AddXenialClaimRequest req, CancellationToken cancellationToken = default);
+    Task<XenialResult<XenialUser>> RemoveClaimAsync(RemoveXenialClaimRequest req, CancellationToken cancellationToken = default);
+    Task<XenialResult<ResetXenialUserPasswordResponse>> ResetPasswordAsync(ResetXenialUserPasswordRequest req, CancellationToken cancellationToken = default);
+    Task<XenialResult<XenialUser>> SetPasswordAsync(SetXenialUserPasswordRequest req, CancellationToken cancellationToken = default);
+
 }

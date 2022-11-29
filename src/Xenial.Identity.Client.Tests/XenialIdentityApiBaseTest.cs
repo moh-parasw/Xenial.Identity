@@ -6,7 +6,7 @@ public abstract record XenialIdentityApiBaseTest : IAsyncLifetime
 {
     protected ApplicationInMemoryFixture Fixture { get; private set; }
 
-    public XenialIdentityClient Client { get; private set; } = default!;
+    public IXenialIdentityClient Client { get; private set; } = default!;
 
     public XenialIdentityApiBaseTest(ApplicationInMemoryFixture fixture)
         => Fixture = fixture;
