@@ -9,7 +9,6 @@
 
 <div class="login-page">
     <div class="login-page-tabs">
-
         <input type="radio" id="tab1" name="tab-control" @(Model.SelectedPage == "login" ? "checked" : "")>
         @if (Model.AllowRegister)
         {
@@ -54,34 +53,66 @@
                         <span class="login-page-or">@L["or"]</span>
                     }
                 }
-
-                <form method="post" class="xenial-form" asp-page-handler="login">
-                    <ul class="xenial-form__list">
-                        <li class="xenial-form__list-item">
-                            <input type="hidden" asp-for="ReturnUrl" />
-                            <label asp-for="LoginInput.Email">@L["Email"]</label>
-                            <input placeholder="Email" asp-for="LoginInput.Email" autofocus>
-                            <span asp-validation-for="LoginInput.Email" class="text-danger"></span>
-                        </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="LoginInput.Password">@L["Password"]</label>
-                            <input type="password" placeholder="Password" asp-for="LoginInput.Password" autocomplete="off">
-                            <span asp-validation-for="LoginInput.Password" class="text-danger"></span>
-                        </li>
-                        <li class="xenial-form__list-item">
-                            <label asp-for="LoginInput.RememberMe">@L["Remember me?"]</label>
-                            <input class="toggle" asp-for="LoginInput.RememberMe">
-                            <span asp-validation-for="LoginInput.RememberMe" class="text-danger"></span>
-                        </li>
-                        <li class="xenial-form__list-item">
-                            <a asp-page="ForgotPassword">@L["Forgot password?"]</a>
-                        </li>
-                        <li class="xenial-form__list-item">
-                            <button class="xenial-form__list-item-submit" name="button" value="login">@L["Login"]</button>
-                        </li>
-                    </ul>
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                </form>
+                @if (Model.LoginType == Xenial.Identity.Models.LoginTypes.Email)
+                {
+                    <form method="post" class="xenial-form" asp-page-handler="login">
+                        <ul class="xenial-form__list">
+                            <li class="xenial-form__list-item">
+                                <input type="hidden" asp-for="ReturnUrl" />
+                                <label asp-for="LoginEmailInput.Email">@L["Email"]</label>
+                                <input placeholder="@L["Email"]" asp-for="LoginEmailInput.Email" autofocus type="email">
+                                <span asp-validation-for="LoginEmailInput.Email" class="text-danger"></span>
+                            </li>
+                            <li class="xenial-form__list-item">
+                                <label asp-for="LoginEmailInput.Password">@L["Password"]</label>
+                                <input type="password" placeholder="Password" asp-for="LoginEmailInput.Password" autocomplete="off">
+                                <span asp-validation-for="LoginEmailInput.Password" class="text-danger"></span>
+                            </li>
+                            <li class="xenial-form__list-item">
+                                <label asp-for="LoginEmailInput.RememberMe">@L["Remember me?"]</label>
+                                <input class="toggle" asp-for="LoginEmailInput.RememberMe">
+                                <span asp-validation-for="LoginEmailInput.RememberMe" class="text-danger"></span>
+                            </li>
+                            <li class="xenial-form__list-item">
+                                <a asp-page="ForgotPassword">@L["Forgot password?"]</a>
+                            </li>
+                            <li class="xenial-form__list-item">
+                                <button class="xenial-form__list-item-submit" name="button" value="login">@L["Login"]</button>
+                            </li>
+                        </ul>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    </form>
+                }
+                else if (Model.LoginType == Xenial.Identity.Models.LoginTypes.Username)
+                {
+                    <form method="post" class="xenial-form" asp-page-handler="loginUsername">
+                        <ul class="xenial-form__list">
+                            <li class="xenial-form__list-item">
+                                <input type="hidden" asp-for="ReturnUrl" />
+                                <label asp-for="LoginUsernameInput.Username">@L["Username"]</label>
+                                <input placeholder="@L["Username"]" asp-for="LoginUsernameInput.Username" autofocus>
+                                <span asp-validation-for="LoginUsernameInput.Username" class="text-danger"></span>
+                            </li>
+                            <li class="xenial-form__list-item">
+                                <label asp-for="LoginUsernameInput.Password">@L["Password"]</label>
+                                <input type="password" placeholder="@L["Password"]" asp-for="LoginUsernameInput.Password" autocomplete="off">
+                                <span asp-validation-for="LoginUsernameInput.Password" class="text-danger"></span>
+                            </li>
+                            <li class="xenial-form__list-item">
+                                <label asp-for="LoginUsernameInput.RememberMe">@L["Remember me?"]</label>
+                                <input class="toggle" asp-for="LoginUsernameInput.RememberMe">
+                                <span asp-validation-for="LoginUsernameInput.RememberMe" class="text-danger"></span>
+                            </li>
+                            <li class="xenial-form__list-item">
+                                <a asp-page="ForgotPassword">@L["Forgot password?"]</a>
+                            </li>
+                            <li class="xenial-form__list-item">
+                                <button class="xenial-form__list-item-submit" name="button" value="login">@L["Login"]</button>
+                            </li>
+                        </ul>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    </form>
+                }
             </section>
             @if (Model.AllowRegister)
             {

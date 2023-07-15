@@ -49,7 +49,9 @@ public sealed class UpdateDatabaseBackgroundService : IHostedService
 public sealed class DatabaseUpdateHandler
 {
     public const string AdminRoleName = "Administrator";
-    public const string AdminUserName = "admin@admin.com";
+    //public const string AdminUserName = "admin@admin.com";
+    public const string AdminUserName = "Administrator";
+
     public const string AdminPassword = "!Admin321";
     private bool IsDatabaseUpToDate { get; set; }
 

@@ -12,6 +12,17 @@
 
     <MudDivider />
 
+    <MudText Typo="Typo.h6" GutterBottom>Login Type</MudText>
+
+    <MudRadioGroup @bind-SelectedOption="@settings.LoginType">
+        @foreach (var val in Enum.GetValues<LoginTypes>())
+        {
+            <MudRadio Option="@val" Color="Color.Secondary">@val</MudRadio>
+        }
+    </MudRadioGroup>
+
+    <MudDivider />
+
     <MudText Typo="Typo.h6" GutterBottom>External Providers</MudText>
 
     <MudSwitch @bind-Checked="@settings.AllowExternalProviders"
@@ -21,8 +32,8 @@
     @if (settings.AllowExternalProviders)
     {
         <MudSwitch @bind-Checked="@settings.AllowGithub"
-               Label="Allow Github"
-               Color="Color.Secondary" />
+                   Label="Allow Github"
+                   Color="Color.Secondary" />
     }
 
     <MudButton Variant="Variant.Filled"

@@ -48,14 +48,20 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
             AllowRegister = settings.AllowRegister;
             AllowExternalProviders = settings.AllowExternalProviders;
             AllowGithub = settings.AllowGithub;
+            LoginType = settings.LoginType;
         }
 
         public readonly bool AllowRegister = true;
         public readonly bool AllowExternalProviders = true;
         public readonly bool AllowGithub = true;
+        public readonly LoginTypes LoginType = LoginTypes.Email;
 
         [BindProperty]
-        public LoginInputModel LoginInput { get; set; }
+        public LoginInputEmailModel LoginEmailInput { get; set; }
+
+
+        [BindProperty]
+        public LoginInputUsernameModel LoginUsernameInput { get; set; }
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; } = new AuthenticationScheme[0];
 
@@ -67,11 +73,24 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
         [TempData]
         public string SelectedPage { get; set; }
 
-        public class LoginInputModel
+        public class LoginInputEmailModel
         {
             [Required]
             [EmailAddress]
             public string Email { get; set; }
+
+            [Required]
+            [DataType(DataType.Password)]
+            public string Password { get; set; }
+
+            [Display(Name = "Remember me?")]
+            public bool RememberMe { get; set; }
+        }
+
+        public class LoginInputUsernameModel
+        {
+            [Required]
+            public string Username { get; set; }
 
             [Required]
             [DataType(DataType.Password)]
@@ -133,12 +152,12 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-            MarkAllFieldsAsSkipped(nameof(LoginInput));
+            MarkAllFieldsAsSkipped(nameof(LoginEmailInput));
             if (ModelState.IsValid)
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await signInManager.PasswordSignInAsync(LoginInput.Email, LoginInput.Password, LoginInput.RememberMe, lockoutOnFailure: false);
+                var result = await signInManager.PasswordSignInAsync(LoginEmailInput.Email, LoginEmailInput.Password, LoginEmailInput.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     logger.LogInformation("User logged in.");
@@ -146,7 +165,44 @@ namespace Xenial.Identity.Areas.Identity.Pages.Account
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, LoginInput.RememberMe });
+                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, LoginEmailInput.RememberMe });
+                }
+                if (result.IsLockedOut)
+                {
+                    logger.LogWarning("User account locked out.");
+                    return RedirectToPage("./Lockout");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    return Page();
+                }
+            }
+
+            // If we got this far, something failed, redisplay form
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostLoginUsernameAsync(string returnUrl = null)
+        {
+            SelectedPage = "login";
+            returnUrl ??= Url.Content("~/");
+            ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            MarkAllFieldsAsSkipped(nameof(LoginUsernameInput));
+            if (ModelState.IsValid)
+            {
+                // This doesn't count login failures towards account lockout
+                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+                var result = await signInManager.PasswordSignInAsync(LoginUsernameInput.Username, LoginUsernameInput.Password, LoginUsernameInput.RememberMe, lockoutOnFailure: false);
+                if (result.Succeeded)
+                {
+                    logger.LogInformation("User logged in.");
+                    return LocalRedirect(returnUrl);
+                }
+                if (result.RequiresTwoFactor)
+                {
+                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, LoginUsernameInput.RememberMe });
                 }
                 if (result.IsLockedOut)
                 {
