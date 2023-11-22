@@ -2,6 +2,7 @@
 
 public sealed record CreateXenialUserRequest(
     string Email,
+    string Username,
     string? Password = null
 );
 

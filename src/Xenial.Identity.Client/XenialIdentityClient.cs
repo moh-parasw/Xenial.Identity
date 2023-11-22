@@ -132,7 +132,6 @@ public sealed class XenialIdentityClient : IXenialIdentityClient
         var result = JsonConvert.DeserializeObject<TData>(responseStr, serializerSettings);
         return result!;
     }
-    
 
 }
 

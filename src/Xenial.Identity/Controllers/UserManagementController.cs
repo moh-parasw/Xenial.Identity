@@ -95,7 +95,7 @@ public sealed class UserManagementController : ControllerBase
         var userReq = new XenialIdentityUser
         {
             Id = id,
-            UserName = req.Email,
+            UserName = req.Username,
             Email = req.Email
         };
 

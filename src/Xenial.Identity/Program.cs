@@ -182,16 +182,12 @@ try
 
     idsBuilder.AddCertificate(Environment, Configuration, null);
 
+
     services
         .AddAuthentication()
         .AddLocalApi(o =>
         {
             o.ExpectedScope = IdentityServerConstants.LocalApi.ScopeName;
-        })
-        .AddGitHub(options =>
-        {
-            options.ClientId = Configuration["GitHub:ClientId"];
-            options.ClientSecret = Configuration["GitHub:ClientSecret"];
         });
 
     services.AddAuthorization(o =>

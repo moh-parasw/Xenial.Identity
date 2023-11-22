@@ -43,6 +43,9 @@
     <PackageReference Include="TextMateSharp" Version="1.0.41" />
     <PackageReference Include="TextMateSharp.Grammars" Version="1.0.41" />
     <PackageReference Include="XLocalizer" Version="1.0.3" />
+    <PackageReference Include="DevExpress.Xpo" Version="22.1.6" />
+    <PackageReference Include="DevExpress.Data" Version="22.1.6" />
+    <PackageReference Include="DevExpress.Persistent.Base" Version="22.1.6" />
   </ItemGroup>
 
   <ItemGroup>
