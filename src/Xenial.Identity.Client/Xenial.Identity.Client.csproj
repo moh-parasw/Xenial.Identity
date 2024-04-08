@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-      <NoWarn>NU1803</NoWarn>
+      <NoWarn>NU1803;NU1803</NoWarn>
     <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

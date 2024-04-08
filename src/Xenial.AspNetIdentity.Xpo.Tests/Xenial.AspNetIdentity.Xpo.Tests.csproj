@@ -17,9 +17,9 @@
     <PackageReference Include="Npgsql" Version="6.0.7" />
     <PackageReference Include="Testcontainers" Version="2.2.0" />
     <PackageReference Include="SimpleExec" Version="11.0.0" />
-    <PackageReference Include="DevExpress.Data" Version="22.1.6" />
-    <PackageReference Include="DevExpress.Xpo" Version="22.1.6" />
-    <PackageReference Include="DevExpress.Persistent.Base" Version="22.1.6" />
+    <PackageReference Include="DevExpress.Data" Version="23.1.5" />
+    <PackageReference Include="DevExpress.Xpo" Version="23.1.5" />
+    <PackageReference Include="DevExpress.Persistent.Base" Version="23.1.5" />
 
   </ItemGroup>
 

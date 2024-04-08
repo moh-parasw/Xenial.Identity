@@ -52,6 +52,7 @@
     "notyf": "^3.9.0",
     "qrcode": "^1.4.4",
     "xterm": "^5.0.0",
-    "xterm-addon-fit": "^0.6.0"
+    "xterm-addon-fit": "^0.6.0",
+    "yarn": "^1.22.22"
   }
 }

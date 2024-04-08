@@ -22,7 +22,7 @@
     <PackageIconUrl>https://blog.xenial.io/img/favicon.ico</PackageIconUrl>
     <Publish>false</Publish>
     <IsPackTarget>false</IsPackTarget>
-    <NoWarn>$(NoWarn);NU5105</NoWarn>
+    <NoWarn>$(NoWarn);NU5105;NU1803</NoWarn>
     <Nullable>disable</Nullable>
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
     <LastUpdate></LastUpdate>
